@@ -1,0 +1,53 @@
+name: 🔔 Discord Notification
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔔 Enviar notificação
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          COMMITS: ${{ toJson(github.event.commits) }}
+          ACTOR: ${{ github.actor }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          COMPARE: ${{ github.event.compare }}
+          SERVER: ${{ github.server_url }}
+        run: |
+          PAYLOAD=$(jq -n \
+            --argjson commits "$COMMITS" \
+            --arg actor "$ACTOR" \
+            --arg repo "$REPO" \
+            --arg branch "$BRANCH" \
+            --arg compare "$COMPARE" \
+            --arg server "$SERVER" '
+          {
+            username: "GitHub",
+            avatar_url: "https://github.com/fluidicon.png",
+            embeds: [{
+              author: {
+                name: $actor,
+                url: ($server + "/" + $actor),
+                icon_url: ($server + "/" + $actor + ".png")
+              },
+              title: ("🚀 Novo push em " + $branch),
+              url: $compare,
+              description: (
+                ($commits[:5] | map("[`" + .id[:7] + "`](" + .url + ") " + (.message | split("\n")[0])) | join("\n"))
+                + (if ($commits | length) > 5 then "\n*…e mais " + (($commits | length) - 5 | tostring) + " commits*" else "" end)
+              ),
+              color: 5793266,
+              footer: { text: $repo },
+              timestamp: (now | todate)
+            }]
+          }')
+
+          curl -sS --fail-with-body \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            "$WEBHOOK"
