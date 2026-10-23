@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('petsistters__availbalities', function (Blueprint $table) {
+        Schema::create('petsitter__availabilities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('petsitter_id')->constrained('petsitters', 'user_id')->cascadeOnDelete();
             $table->text('description');
             $table->json('photos')->nullable();
             $table->timestamps();

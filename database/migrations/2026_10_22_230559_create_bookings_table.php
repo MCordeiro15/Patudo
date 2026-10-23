@@ -14,13 +14,9 @@ return new class extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('user_id')
-                ->constrained()
-                ->restrictOnDelete();
+            $table->foreignId('user_id')->constrained()->restrictOnDelete();
 
-            $table->foreignId('pet_sitter_profile_id')
-                ->constrained()
-                ->restrictOnDelete();
+            $table->foreignId('petsitter_id')->constrained('petsitters', 'user_id')->restrictOnDelete();
 
             $table->date('start_date');
             $table->date('end_date');
