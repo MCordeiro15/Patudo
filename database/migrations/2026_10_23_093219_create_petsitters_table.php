@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('petsitters', function (Blueprint $table) {
             $table->foreignId('user_id')->primary()->constrained()->cascadeOnDelete();
             $table->text('biography')->nullable();
-            $table->text('experience')->nullable();
+            $table->text('experience');
             $table->string('service_location');
             $table->decimal('price_per_day', 8, 2);
             $table->json('accepted_sizes')->nullable();;
