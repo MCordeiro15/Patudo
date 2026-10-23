@@ -19,8 +19,8 @@ return new class extends Migration
             $table->text('experience');
             $table->string('service_location');
             $table->decimal('price_per_day', 8, 2);
-            $table->json('accepted_sizes')->nullable();;
-            $table->json('accepted_animal_types')->nullable();;
+            $table->json('accepted_sizes')->nullable();
+            $table->json('accepted_animal_types')->nullable();
             $table->string('approval_status')->default('pending'); // pending, approved, rejected
             $table->string('identification_documents');
             $table->timestamps();
