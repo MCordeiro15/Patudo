@@ -15,6 +15,6 @@ class Petsitters_Availability extends Model
 
     public function petsitter()
     {
-        return $this->belongsTo(Petsitter::class);
+        return $this->belongsTo(Petsitter::class, 'petsitter_id', 'user_id');
     }
 }

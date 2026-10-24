@@ -29,11 +29,32 @@ class Petsitter extends Model
 
     public function availabilities()
     {
-        return $this->hasMany(Petsitters_Availability::class);
+        return $this->hasMany(Petsitters_Availability::class, 'petsitter_id', 'user_id');
     }
 
     public function posts()
     {
-        return $this->hasMany(Post::class);   // Petsitter 1 — 0..* Post
+        return $this->hasMany(Post::class, 'petsitter_id', 'user_id');    // Petsitter 1 — 0..* Post
+    }
+
+    public function favouritedByUsers()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'favourites',
+            'petsitter_id',
+            'user_id',
+            'user_id',
+            'id'
+        );
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(
+            Review::class,
+            'petsitter_id',
+            'user_id'
+        );
     }
 }

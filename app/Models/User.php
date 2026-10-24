@@ -47,4 +47,42 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
+
+    public function animals()
+    {
+        return $this->hasMany(Animal::class);
+    }
+
+    public function petsitter()
+    {
+        return $this->hasOne(Petsitter::class);
+    }
+
+    public function favouritePetsitters()
+    {
+        return $this->belongsToMany(
+            Petsitter::class,
+            'favourites',
+            'user_id',
+            'petsitter_id',
+            'id',
+            'user_id'
+        );
+    }
+
+    public function createdTickets()
+    {
+        return $this->hasMany(SupportTicket::class, 'user_id');
+    }
+
+    public function claimedTickets()
+    {
+        return $this->hasMany(SupportTicket::class, 'claimed_by');
+    }
+
+    public function reportedTickets()
+    {
+        return $this->hasMany(SupportTicket::class, 'reported_user_id');
+    }
+
 }

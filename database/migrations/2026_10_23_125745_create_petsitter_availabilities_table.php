@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('petsitter__availabilities', function (Blueprint $table) {
+        Schema::create('petsitter_availabilities', function (Blueprint $table) {
             $table->id();
             $table->foreignId('petsitter_id')->constrained('petsitters', 'user_id')->cascadeOnDelete();
-            $table->text('description');
-            $table->json('photos')->nullable();
+            $table->date('date');
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('petsistters__availbalities');
+        Schema::dropIfExists('petsitter_availabilities');
     }
 };

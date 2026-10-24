@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('booking_id')->constrained()->cascadeOnDelete();
             $table->foreignId('animal_id')->constrained()->cascadeOnDelete();
 
-            $table->unique(['petsitter_id', 'animal_id']);
+            $table->unique(['booking_id', 'animal_id']);
         });
     }
 
