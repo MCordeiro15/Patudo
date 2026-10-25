@@ -29,7 +29,7 @@ class Petsitter extends Model
 
     public function availabilities()
     {
-        return $this->hasMany(Petsitters_Availability::class, 'petsitter_id', 'user_id');
+        return $this->hasMany(PetsitterAvailability::class, 'petsitter_id', 'user_id');
     }
 
     public function posts()

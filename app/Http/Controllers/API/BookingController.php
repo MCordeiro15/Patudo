@@ -7,7 +7,7 @@ use App\Http\Resources\BookingResource;
 use App\Models\Booking;
 use Illuminate\Http\Request;
 
-class BookingsController extends Controller
+class BookingController extends Controller
 {
     //
 }
