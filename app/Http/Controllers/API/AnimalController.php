@@ -14,11 +14,13 @@ class AnimalController extends Controller
     {
         Gate::authorize('viewAny', Animal::class);
 
-        $animals = $request->user()?->isAdmin()
-            ? Animal::all()
-            : Animal::where('user_id', $request->user()?->id)->get();
+        $query = Animal::with('user');
 
-        return AnimalResource::collection($animals);
+        if (! $request->user()?->isAdmin()) {
+            $query->where('user_id', $request->user()?->id);
+        }
+
+        return AnimalResource::collection($query->get());
     }
 
     public function store(Request $request)
@@ -39,14 +41,14 @@ class AnimalController extends Controller
 
         $animal = Animal::create($data);
 
-        return (new AnimalResource($animal))->response()->setStatusCode(201);
+        return (new AnimalResource($animal->load('user')))->response()->setStatusCode(201);
     }
 
     public function show(Animal $animal)
     {
         Gate::authorize('view', $animal);
 
-        return new AnimalResource($animal);
+        return new AnimalResource($animal->load('user'));
     }
 
     public function update(Request $request, Animal $animal)
@@ -67,7 +69,7 @@ class AnimalController extends Controller
 
         $animal->update($data);
 
-        return new AnimalResource($animal);
+        return new AnimalResource($animal->load('user'));
     }
 
     public function destroy(Animal $animal)

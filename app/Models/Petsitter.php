@@ -2,10 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Petsitter extends Model
 {
+    use HasFactory;
+
+    protected $primaryKey = 'user_id';
+
+    public $incrementing = false;
+
     /*The `approval_status` is not in `$fillable`, for the same reason as `is_admin`.
      Only an administrator should be able to change it, and it should not be possible to submit it via a form.*/
     protected $fillable = [
