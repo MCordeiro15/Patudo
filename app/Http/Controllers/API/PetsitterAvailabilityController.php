@@ -13,7 +13,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class PetsitterAvailabilityController extends Controller
 {
     /**
-     * Obter lista de dias disponíveis de um petsitter numa janela de tempo.
+     * Obtem lista de dias disponíveis de um petsitter numa janela de tempo.
      */
     public function calendar(Request $request, string|int $id): AnonymousResourceCollection|JsonResponse
     {
@@ -44,7 +44,7 @@ class PetsitterAvailabilityController extends Controller
     }
 
     /**
-     * Alternar a disponibilidade do petsitter para uma data específica (ativar/desativar).
+     * Altera a disponibilidade do petsitter para uma data específica.
      */
     public function toggle(Request $request): JsonResponse
     {
@@ -61,12 +61,12 @@ class PetsitterAvailabilityController extends Controller
 
         $petsitterId = $validated['petsitter_id'] ?? $user->id;
 
-        // Se passar petsitter_id diferente, apenas admin pode gerir o calendário de outro petsitter
+        // Se passar o petsitter_id diferente, apenas o admin pode gerir o calendário de outro petsitter
         if ($petsitterId != $user->id && ! $user->isAdmin()) {
             return response()->json(['message' => 'Não autorizado a alterar este calendário.'], 403);
         }
 
-        // Verificar se existe perfil de petsitter
+        // Verifica se existe o perfil de petsitter
         $petsitter = Petsitter::find($petsitterId);
         if (! $petsitter) {
             return response()->json(['message' => 'Perfil de petsitter não encontrado.'], 404);
