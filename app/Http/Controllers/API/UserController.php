@@ -58,4 +58,11 @@ class UserController extends Controller
 
         return response()->noContent();
     }
+
+    public function suspend(User $user)
+    {
+        $user->account_status = ("suspended");
+        $user->save();
+        return new UserResource($user);
+    }
 }
