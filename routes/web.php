@@ -1,17 +1,21 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\AnimalController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\UserController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('api')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 
     Route::middleware('auth')->group(function () {
+        Route::get('/me', [AuthController::class, 'myInformation']);
         Route::get('/myInformation', [AuthController::class, 'myInformation']);
         Route::post('/logout', [AuthController::class, 'logout']);
+        Route::post('/users/{user}/suspend', [UserController::class, 'suspend']);
         Route::apiResource('users', UserController::class);
+        Route::apiResource('animals', AnimalController::class);
     });
 });
 
