@@ -14,6 +14,12 @@ class PetsitterAvailabilityResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'petsitter_id' => $this->petsitter_id,
+            'date' => $this->date?->format('Y-m-d') ?? (string) $this->date,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
     }
 }
