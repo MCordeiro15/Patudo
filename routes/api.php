@@ -7,13 +7,13 @@ use App\Http\Controllers\API\PetsitterController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('web')->group(function () {
+
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 
     Route::get('/petsitters/{id}/calendar', [PetsitterAvailabilityController::class, 'calendar']);
 
-    Route::middleware('auth')->group(function () {
+    Route::middleware('auth:sactum')->group(function () {
         Route::get('/me', [AuthController::class, 'myInformation']);
         Route::get('/myInformation', [AuthController::class, 'myInformation']);
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -31,4 +31,4 @@ Route::middleware('web')->group(function () {
         // Animals
         Route::apiResource('animals', AnimalController::class);
     });
-});
+
