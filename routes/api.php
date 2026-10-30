@@ -7,7 +7,7 @@ use App\Http\Controllers\API\PetsitterController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
 
-
+Route::middleware('web')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 
@@ -31,4 +31,4 @@ use Illuminate\Support\Facades\Route;
         // Animals
         Route::apiResource('animals', AnimalController::class);
     });
-
+});
