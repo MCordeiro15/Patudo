@@ -13,7 +13,7 @@ Route::middleware('web')->group(function () {
 
     Route::get('/petsitters/{id}/calendar', [PetsitterAvailabilityController::class, 'calendar']);
 
-    Route::middleware('auth:sactum')->group(function () {
+    Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class, 'myInformation']);
         Route::get('/myInformation', [AuthController::class, 'myInformation']);
         Route::post('/logout', [AuthController::class, 'logout']);
