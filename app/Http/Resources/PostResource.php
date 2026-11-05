@@ -14,6 +14,14 @@ class PostResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'petsitter_id' => $this->petsitter_id,
+            'description' => $this->description,
+            'photos' => collect($this->photos)
+                ->map(fn ($path) => Storage::disk('public')->url($path))
+                ->all(),
+            'created_at' => $this->created_at,
+        ];
     }
 }

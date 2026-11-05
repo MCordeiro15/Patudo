@@ -6,6 +6,7 @@ use App\Http\Controllers\API\PetsitterAvailabilityController;
 use App\Http\Controllers\API\PetsitterController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\PostController;
 
 Route::middleware('web')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -30,6 +31,8 @@ Route::middleware('web')->group(function () {
         Route::post('/petsitters/{petsitter}/approve', [PetsitterController::class, 'approve']);
         Route::post('/petsitters/{petsitter}/reject', [PetsitterController::class, 'reject']);
         Route::apiResource('petsitters', PetsitterController::class);
+        Route::get('/petsitters/{petsitter}/posts', [PostController::class, 'byPetsitter']);
+        Route::apiResource('posts', PostController::class);
 
         // Animals
         Route::apiResource('animals', AnimalController::class);
