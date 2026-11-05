@@ -26,23 +26,29 @@ const login = async () => {
 </script>
 
 <template>
-    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #fff;">
-        <div style="padding: 24px; border: 1px solid #ddd; border-radius: 8px; width: 320px;">
-            <h2 style="margin-bottom: 16px;">Login Patudo</h2>
+    <div class="min-vh-100 d-flex align-items-center justify-content-center bg-white">
+        <div class="card p-4 shadow-sm" style="max-width: 320px; width: 100%;">
+            <h2 class="h4 mb-3 text-center">Login Patudo</h2>
+
             <form @submit.prevent="login">
-                <div style="margin-bottom: 12px;">
-                    <label>Email:</label>
-                    <input v-model="email" type="email" required style="width: 100%; padding: 8px; margin-top: 4px;" />
+                <div class="mb-3">
+                    <label class="form-label">Email:</label>
+                    <input v-model="email" type="email" class="form-control" required />
                 </div>
-                <div style="margin-bottom: 16px;">
-                    <label>Password:</label>
-                    <input v-model="password" type="password" required style="width: 100%; padding: 8px; margin-top: 4px;" />
+
+                <div class="mb-3">
+                    <label class="form-label">Password:</label>
+                    <input v-model="password" type="password" class="form-control" required />
                 </div>
-                <button type="submit" style="width: 100%; padding: 10px; background: #2C1810; color: white; border: none; border-radius: 4px; cursor: pointer;">
+
+                <button type="submit" class="btn text-white w-100" style="background-color: #2C1810;">
                     Entrar
                 </button>
             </form>
-            <p v-if="msg" style="margin-top: 12px; font-weight: bold;">{{ msg }}</p>
+
+            <div v-if="msg" class="alert alert-info mt-3 py-2 small mb-0 text-center">
+                {{ msg }}
+            </div>
         </div>
     </div>
 </template>
