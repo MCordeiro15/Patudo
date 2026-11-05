@@ -1,67 +1,42 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
-import InputError from '@/components/InputError.vue';
-import PasswordInput from '@/components/PasswordInput.vue';
-import TextLink from '@/components/TextLink.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
-import { login } from '@/routes';
-import { store } from '@/routes/register';
+import { ref } from 'vue';
 
-defineProps<{
-    passwordRules: string;
-}>();
+const name = ref('');
+const email = ref('');
+const phone = ref('');
+const password = ref('');
+const password_confirmation = ref('');
+const msg = ref('');
 
-defineOptions({
-    layout: {
-        title: 'Create an account',
-        description: 'Enter your details below to create your account',
-    },
-});
+const register = async () => {
+    msg.value = 'A registar...';
+    const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+            name: name.value,
+            email: email.value,
+            phone: phone.value,
+            password: password.value,
+            password_confirmation: password_confirmation.value
+        })
+    });
+    const data = await res.json();
+    msg.value = res.ok ? 'Conta criada!' : 'Erro: ' + (data.message || JSON.stringify(data.errors));
+};
 </script>
 
 <template>
-    <Head title="Register" />
-
-    <Form v-bind="store.form()" :reset-on-success="['password', 'password_confirmation']" v-slot="{ errors, processing }" class="flex flex-col gap-6">
-        <div class="grid gap-6">
-            <div class="grid gap-2">
-                <Label for="name">Name</Label>
-                <Input id="name" type="text" required v-focus :tabindex="1" autocomplete="name" name="name" placeholder="Full name"/>
-                <InputError :message="errors.name" />
-            </div>
-
-            <div class="grid gap-2">
-                <Label for="email">Email address</Label>
-                <Input id="email" type="email" required :tabindex="2" autocomplete="email" name="email" placeholder="email@example.com"/>
-                <InputError :message="errors.email" />
-            </div>
-
-            <div class="grid gap-2">
-                <Label for="password">Password</Label>
-                <PasswordInput id="password" required :tabindex="3" autocomplete="new-password" name="password" placeholder="Password" :passwordrules="passwordRules"/>
-                <InputError :message="errors.password" />
-            </div>
-
-            <div class="grid gap-2">
-                <Label for="password_confirmation">Confirm password</Label>
-                <PasswordInput id="password_confirmation" required :tabindex="4" autocomplete="new-password" name="password_confirmation" placeholder="Confirm password" :passwordrules="passwordRules"/>
-                <InputError :message="errors.password_confirmation" />
-            </div>
-
-            <Button type="submit" class="mt-2 w-full" tabindex="5" :disabled="processing" data-test="register-user-button">
-                <Spinner v-if="processing" />
-                Create account
-            </Button>
-        </div>
-
-        <div class="text-center text-sm text-muted-foreground">
-            Already have an account?
-            <TextLink :href="login()" class="underline underline-offset-4" :tabindex="6">
-                Log in
-            </TextLink>
-        </div>
-    </Form>
+    <div style="padding: 20px; max-width: 320px; margin: auto;">
+        <h2>Registar</h2>
+        <form @submit.prevent="register">
+            <input v-model="name" type="text" placeholder="Nome" required style="width: 100%; margin-bottom: 10px;" />
+            <input v-model="email" type="email" placeholder="Email" required style="width: 100%; margin-bottom: 10px;" />
+            <input v-model="phone" type="text" placeholder="Telemóvel (opcional)" maxlength="9" style="width: 100%; margin-bottom: 10px;" />
+            <input v-model="password" type="password" placeholder="Password (mín 8)" required minlength="8" style="width: 100%; margin-bottom: 10px;" />
+            <input v-model="password_confirmation" type="password" placeholder="Confirmar Password" required minlength="8" style="width: 100%; margin-bottom: 10px;" />
+            <button type="submit" style="width: 100%;">Criar Conta</button>
+        </form>
+        <p v-if="msg">{{ msg }}</p>
+    </div>
 </template>

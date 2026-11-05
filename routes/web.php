@@ -34,5 +34,7 @@ Route::prefix('api')->group(function () {
 });
 
 Route::inertia('/', 'Homepage')->name('home');
+Route::inertia('/login', 'auth/Login')->name('login');
+Route::inertia('/register', 'auth/Register')->name('register');
 
 require __DIR__.'/settings.php';
