@@ -2,13 +2,13 @@
 @import 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';
 
 :root {
-    --patudo-terracota: #C2410C;
-    --patudo-laranjaVivo: #F97316;
-    --patudo-castanhoDark: #2E1D14;
-    --patudo-castanhoMid: #7A6657;
-    --patudo-bege: #FED7AA;
-    --patudo-branco: #FFFAF3;
-    --patudo-verde: #4F6F52;
+    --patudo-terracota: #c2410c;
+    --patudo-laranjaVivo: #f97316;
+    --patudo-castanhoDark: #2e1d14;
+    --patudo-castanhoMid: #7a6657;
+    --patudo-bege: #fed7aa;
+    --patudo-branco: #fffaf3;
+    --patudo-verde: #4f6f52;
 
     --bs-body-bg: var(--patudo-branco);
     --bs-body-color: var(--patudo-castanhoDark);
