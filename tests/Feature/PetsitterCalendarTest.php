@@ -11,7 +11,7 @@ test('petsitter can toggle date availability on and off', function () {
     $date = '2026-11-15';
 
     // 1. Toggle ON
-    $response = $this->actingAs($user)->postJson('/api/petsitters/calendar/toggle', [
+    $response = $this->actingAs($user)->postJson('/api/petsitters/availability/toggle', [
         'date' => $date,
     ]);
 
@@ -24,7 +24,7 @@ test('petsitter can toggle date availability on and off', function () {
     expect(PetsitterAvailability::where('petsitter_id', $petsitter->user_id)->whereDate('date', $date)->exists())->toBeTrue();
 
     // 2. Toggle OFF (same date)
-    $responseOff = $this->actingAs($user)->postJson('/api/petsitters/calendar/toggle', [
+    $responseOff = $this->actingAs($user)->postJson('/api/petsitters/availability/toggle', [
         'date' => $date,
     ]);
 
@@ -38,7 +38,7 @@ test('petsitter can toggle date availability on and off', function () {
 });
 
 test('unauthenticated user cannot toggle availability', function () {
-    $response = $this->postJson('/api/petsitters/calendar/toggle', [
+    $response = $this->postJson('/api/petsitters/availability/toggle', [
         'date' => '2026-11-15',
     ]);
 
@@ -52,7 +52,7 @@ test('regular user cannot toggle availability for another petsitter', function (
     $user2 = User::factory()->create();
     $petsitter2 = Petsitter::factory()->create(['user_id' => $user2->id]);
 
-    $response = $this->actingAs($user1)->postJson('/api/petsitters/calendar/toggle', [
+    $response = $this->actingAs($user1)->postJson('/api/petsitters/availability/toggle', [
         'petsitter_id' => $petsitter2->user_id,
         'date' => '2026-11-15',
     ]);
@@ -67,7 +67,7 @@ test('admin can toggle availability for any petsitter', function () {
 
     $date = '2026-11-20';
 
-    $response = $this->actingAs($admin)->postJson('/api/petsitters/calendar/toggle', [
+    $response = $this->actingAs($admin)->postJson('/api/petsitters/availability/toggle', [
         'petsitter_id' => $petsitter->user_id,
         'date' => $date,
     ]);
@@ -81,7 +81,7 @@ test('admin can toggle availability for any petsitter', function () {
 test('toggle fails when user has no petsitter profile', function () {
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->postJson('/api/petsitters/calendar/toggle', [
+    $response = $this->actingAs($user)->postJson('/api/petsitters/availability/toggle', [
         'date' => '2026-11-15',
     ]);
 
@@ -108,7 +108,7 @@ test('client can get petsitter calendar within date window', function () {
         'date' => '2026-12-05',
     ]);
 
-    $response = $this->getJson("/api/petsitters/{$petsitter->user_id}/calendar?start_date=2026-11-05&end_date=2026-11-25");
+    $response = $this->getJson("/api/petsitters/{$petsitter->user_id}/availability?start_date=2026-11-05&end_date=2026-11-25");
 
     $response->assertOk()
         ->assertJsonCount(2, 'data')
@@ -119,7 +119,7 @@ test('client can get petsitter calendar within date window', function () {
 });
 
 test('calendar returns 404 for non-existent petsitter', function () {
-    $response = $this->getJson('/api/petsitters/99999/calendar');
+    $response = $this->getJson('/api/petsitters/99999/availability');
 
     $response->assertNotFound();
 });

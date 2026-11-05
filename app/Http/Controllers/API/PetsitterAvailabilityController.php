@@ -9,13 +9,14 @@ use App\Models\PetsitterAvailability;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Validation\Rule;
 
 class PetsitterAvailabilityController extends Controller
 {
     /**
      * Obtem lista de dias disponíveis de um petsitter numa janela de tempo.
      */
-    public function calendar(Request $request, string|int $id): AnonymousResourceCollection|JsonResponse
+    public function availability(Request $request, string|int $id): AnonymousResourceCollection|JsonResponse
     {
         $petsitter = Petsitter::find($id);
 
@@ -99,5 +100,84 @@ class PetsitterAvailabilityController extends Controller
             'date' => $formattedDate,
             'data' => new PetsitterAvailabilityResource($newAvailability),
         ], 200);
+    }
+    /**
+     * Cria uma disponibilidade para uma data.
+     */
+    public function store(Request $request, Petsitter $petsitter): JsonResponse
+    {
+        if (! $request->user()->can('update', $petsitter)) {
+            return response()->json(['message' => 'Não autorizado a alterar este calendário.'], 403);
+        }
+
+        $validated = $request->validate([
+            'date' => [
+                'required',
+                'date_format:Y-m-d',
+                Rule::unique('petsitter_availabilities', 'date')
+                    ->where('petsitter_id', $petsitter->user_id),
+            ],
+        ]);
+
+        $availability = PetsitterAvailability::create([
+            'petsitter_id' => $petsitter->user_id,
+            'date' => $validated['date'],
+        ]);
+
+        return (new PetsitterAvailabilityResource($availability))
+            ->response()
+            ->setStatusCode(201);
+    }
+
+    /**
+     * Atualiza a data de uma disponibilidade existente (identificada por petsitter_id + date).
+     */
+    public function update(Request $request, Petsitter $petsitter, string $date): JsonResponse
+    {
+        if (! $request->user()->can('update', $petsitter)) {
+            return response()->json(['message' => 'Não autorizado a alterar este calendário.'], 403);
+        }
+
+        $availability = PetsitterAvailability::where('petsitter_id', $petsitter->user_id)
+            ->whereDate('date', $date)
+            ->first();
+
+        if (! $availability) {
+            return response()->json(['message' => 'Disponibilidade não encontrada.'], 404);
+        }
+
+        $validated = $request->validate([
+            'date' => [
+                'required',
+                'date_format:Y-m-d',
+                Rule::unique('petsitter_availabilities', 'date')
+                    ->where('petsitter_id', $petsitter->user_id)
+                    ->ignore($availability->id),
+            ],
+        ]);
+
+        $availability->update(['date' => $validated['date']]);
+
+        return (new PetsitterAvailabilityResource($availability))->response();
+    }
+
+    /**
+     * Apaga a disponibilidade de uma data (identificada por petsitter_id + date).
+     */
+    public function destroy(Request $request, Petsitter $petsitter, string $date): JsonResponse
+    {
+        if (! $request->user()->can('update', $petsitter)) {
+            return response()->json(['message' => 'Não autorizado a alterar este calendário.'], 403);
+        }
+
+        $deleted = PetsitterAvailability::where('petsitter_id', $petsitter->user_id)
+            ->whereDate('date', $date)
+            ->delete();
+
+        if (! $deleted) {
+            return response()->json(['message' => 'Disponibilidade não encontrada.'], 404);
+        }
+
+        return response()->json(null, 204);
     }
 }
