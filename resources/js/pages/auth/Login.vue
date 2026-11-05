@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {Link} from '@inertiajs/vue3';
 import {ref} from 'vue';
+import logoPatudo from '@/../../assets/logoPatudo.svg';
 
 const email = ref('');
 const password = ref('');
@@ -45,9 +46,7 @@ const login = async () => {
             <div class="brand-panel d-flex flex-column justify-content-between">
                 <div>
                     <div class="d-flex align-items-center gap-2 mb-4">
-                        <svg class="brand-icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 3L2 12h3v8h14v-8h3L12 3zm0 4.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5zm-3.5 3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5zm7 0c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5zm-3.5 2c1.38 0 2.5 1.12 2.5 2.5s-1.12 2.5-2.5 2.5-2.5-1.12-2.5-2.5 1.12-2.5 2.5-2.5z"/>
-                        </svg>
+                        <img :src="logoPatudo" alt="Logótipo Patudo" class="brand-icon"/>
                         <span class="brand-title">Patudo</span>
                     </div>
 
@@ -118,7 +117,7 @@ const login = async () => {
 
 .brand-panel {
     background-color: #ffffff;
-    border-radius: 22px;
+    border-radius: 42px;
     border: 1px solid #d9531e;
     padding: 32px 28px;
     flex: 1;
@@ -149,7 +148,6 @@ const login = async () => {
     font-weight: 600;
 }
 
-/* Painel da Direita */
 .form-panel {
     flex: 1;
     padding: 20px 32px;
@@ -174,7 +172,6 @@ const login = async () => {
 .auth-input {
     height: 48px;
     border-radius: 12px;
-    border: 1.5px solid #2c1810;
     padding: 10px 16px;
     font-size: 0.95rem;
     background-color: #ffffff;

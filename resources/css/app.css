@@ -9,6 +9,7 @@
     --patudo-bege: #fed7aa;
     --patudo-branco: #fffaf3;
     --patudo-verde: #4f6f52;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont;
 
     --bs-body-bg: var(--patudo-branco);
     --bs-body-color: var(--patudo-castanhoDark);
@@ -28,6 +29,10 @@
     --bs-border-color: rgba(122, 102, 87, 0.25);
     --bs-border-radius-lg: 1rem;
     --bs-border-radius-xl: 1.5rem;
+}
+
+body {
+    font-family: var(--font-sans), serif;
 }
 
 .btn-primary {
