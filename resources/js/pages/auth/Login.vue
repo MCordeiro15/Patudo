@@ -2,6 +2,8 @@
 import {Link} from '@inertiajs/vue3';
 import {ref} from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
+import imgCao from '@/../../assets/caoLoginRegister.jpg';
+import '../../../css/login.css';
 
 const email = ref('');
 const password = ref('');
@@ -51,7 +53,7 @@ const login = async () => {
                     </div>
 
                     <div class="image-placeholder text-center text-muted">
-                        <em>imagem background</em>
+                        <img :src="imgCao" alt="Imagem Cão" class="brand-dog-img">
                     </div>
                 </div>
 
@@ -79,12 +81,12 @@ const login = async () => {
                             <input v-model="password" type="password" class="form-control auth-input" placeholder="Palavra-passe" required/>
                         </div>
 
-                        <button type="submit" class="btn btn-auth w-100 mb-3" :disabled="isLoading">
+                        <button type="submit" class="btn btn-primary w-100 mb-3" :disabled="isLoading">
                             {{ isLoading ? 'A entrar...' : 'Entrar' }}
                         </button>
                     </form>
 
-                    <div v-if="msg" class="alert alert-info py-2 small mb-3 text-center">
+                    <div v-if="msg" class="alert auth-valid-alert py-2 small mb-3 text-center">
                         {{ msg }}
                     </div>
 
@@ -99,116 +101,3 @@ const login = async () => {
         </div>
     </div>
 </template>
-
-<style scoped>
-.login-wrapper {
-    background-color: #faf7f2;
-}
-
-.auth-card {
-    background-color: #f7d5b2;
-    border-radius: 28px;
-    padding: 24px;
-    width: 100%;
-    max-width: 880px;
-    min-height: 520px;
-    gap: 24px;
-}
-
-.brand-panel {
-    background-color: #ffffff;
-    border-radius: 42px;
-    border: 1px solid #d9531e;
-    padding: 32px 28px;
-    flex: 1;
-    min-height: 460px;
-}
-
-.brand-icon {
-    width: 32px;
-    height: 32px;
-    color: #d9531e;
-}
-
-.brand-title {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #2c1810;
-}
-
-.image-placeholder {
-    margin-top: 60px;
-    font-size: 0.95rem;
-}
-
-.brand-slogan {
-    font-size: 1.1rem;
-    line-height: 1.4;
-    color: #2c1810;
-    font-weight: 600;
-}
-
-.form-panel {
-    flex: 1;
-    padding: 20px 32px;
-}
-
-.form-container {
-    max-width: 320px;
-}
-
-.auth-title {
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: #2c1810;
-    margin-bottom: 4px;
-}
-
-.auth-subtitle {
-    font-size: 0.95rem;
-    color: #4a3830;
-}
-
-.auth-input {
-    height: 48px;
-    border-radius: 12px;
-    padding: 10px 16px;
-    font-size: 0.95rem;
-    background-color: #ffffff;
-}
-
-.auth-input:focus {
-    border-color: #d9531e;
-    box-shadow: 0 0 0 0.2rem rgba(217, 83, 30, 0.2);
-}
-
-.btn-auth {
-    height: 48px;
-    border-radius: 12px;
-    background-color: #b73e10;
-    border: none;
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 1.05rem;
-    transition: background-color 0.2s ease;
-}
-
-.btn-auth:hover {
-    background-color: #9c330c;
-    color: #ffffff;
-}
-
-.footer-text {
-    color: #2c1810;
-}
-
-.auth-link {
-    color: #2c1810;
-    text-decoration: underline;
-    font-weight: 500;
-}
-
-.auth-link:hover {
-    color: #d9531e;
-}
-</style>

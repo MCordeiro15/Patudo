@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import {Link} from '@inertiajs/vue3';
+import {ref} from 'vue';
+import logoPatudo from '@/../../assets/logoPatudo.svg';
+import imgCao from "../../../../assets/caoLoginRegister.jpg";
+import '../../../css/register.css'
 
 const name = ref('');
 const email = ref('');
@@ -49,73 +52,36 @@ const register = async () => {
 </script>
 
 <template>
-    <div
-        class="register-wrapper min-vh-100 d-flex align-items-center justify-content-center p-3"
-    >
-        <!-- Card Contentor Principal -->
+    <div class="register-wrapper min-vh-100 d-flex align-items-center justify-content-center p-3">
         <div class="auth-card d-flex flex-column-reverse flex-md-row">
-            <!-- Coluna Esquerda: Formulário de Registo -->
-            <div
-                class="form-panel d-flex flex-column justify-content-center align-items-center"
-            >
+            <div class="form-panel d-flex flex-column justify-content-center align-items-center">
                 <div class="form-container w-100">
                     <h1 class="auth-title text-center">Registar</h1>
                     <p class="auth-subtitle text-center mb-4">Sê bem-vindo!</p>
 
                     <form @submit.prevent="register">
                         <div class="mb-3">
-                            <input
-                                v-model="name"
-                                type="text"
-                                class="form-control auth-input"
-                                placeholder="Nome de utilizador"
-                                required
-                            />
+                            <input v-model="name" type="text" class="form-control auth-input" placeholder="Nome de utilizador" required/>
                         </div>
 
                         <div class="mb-3">
-                            <input
-                                v-model="email"
-                                type="email"
-                                class="form-control auth-input"
-                                placeholder="Email"
-                                required
-                            />
+                            <input v-model="email" type="email" class="form-control auth-input" placeholder="Email" required/>
                         </div>
 
                         <div class="mb-3">
-                            <input
-                                v-model="password"
-                                type="password"
-                                class="form-control auth-input"
-                                placeholder="Palavra-passe"
-                                required
-                            />
+                            <input v-model="password" type="password" class="form-control auth-input" placeholder="Palavra-passe" required/>
                         </div>
 
                         <div class="mb-4">
-                            <input
-                                v-model="passwordConfirmation"
-                                type="password"
-                                class="form-control auth-input"
-                                placeholder="Confirmar palavra-passe"
-                                required
-                            />
+                            <input v-model="passwordConfirmation" type="password" class="form-control auth-input" placeholder="Confirmar palavra-passe" required/>
                         </div>
 
-                        <button
-                            type="submit"
-                            class="btn btn-auth w-100 mb-3"
-                            :disabled="isLoading"
-                        >
+                        <button type="submit" class="btn btn-primary w-100 mb-3" :disabled="isLoading">
                             {{ isLoading ? 'A registar...' : 'Registar' }}
                         </button>
                     </form>
 
-                    <div
-                        v-if="msg"
-                        class="alert alert-info py-2 small mb-3 text-center"
-                    >
+                    <div v-if="msg" class="alert auth-valid-alert py-2 small mb-3 text-center">
                         {{ msg }}
                     </div>
 
@@ -127,140 +93,23 @@ const register = async () => {
             </div>
             <div class="brand-panel d-flex flex-column justify-content-between">
                 <div>
-                   <div class="d-flex align-items-center gap-2 mb-4">
-                        <svg class="brand-icon" viewBox="0 0 24 24" fill="currentColor">
-                            <img href="">
-                        </svg>
+                    <div class="d-flex align-items-center gap-2 mb-4">
+                        <img :src="logoPatudo" alt="Logótipo Patudo" class="brand-icon"/>
                         <span class="brand-title">Patudo</span>
                     </div>
 
-                    <!-- Placeholder para Imagem de Background -->
                     <div class="image-placeholder text-center text-muted">
-                        <em>imagem background</em>
+                        <img :src="imgCao" alt="Imagem Cão" class="brand-dog-img">
                     </div>
                 </div>
 
-                <!-- Slogan Inferior -->
-                <p class="brand-slogan mb-0 text-end">
-                    Encontra o<br />
-                    cuidador ideal<br />
-                    para o teu animal,<br />
+               <p class="brand-slogan mb-0 text-end">
+                    Encontra o<br/>
+                    cuidador ideal<br/>
+                    para o teu animal,<br/>
                     perto de ti.
                 </p>
             </div>
         </div>
     </div>
 </template>
-
-<style scoped>
-.register-wrapper {
-    background-color: #faf7f2;
-}
-
-.auth-card {
-    background-color: #f7d5b2;
-    border-radius: 28px;
-    padding: 24px;
-    width: 100%;
-    max-width: 880px;
-    min-height: 520px;
-    gap: 24px;
-}
-
-.brand-panel {
-    background-color: #ffffff;
-    border-radius: 42px;
-    border: 1px solid #d9531e;
-    padding: 32px 28px;
-    flex: 1;
-    min-height: 460px;
-}
-
-.brand-icon {
-    width: 32px;
-    height: 32px;
-    color: #d9531e;
-}
-
-.brand-title {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #2c1810;
-}
-
-.image-placeholder {
-    margin-top: 60px;
-    font-size: 0.95rem;
-}
-
-.brand-slogan {
-    font-size: 1.1rem;
-    line-height: 1.4;
-    color: #2c1810;
-    font-weight: 600;
-}
-
-.form-panel {
-    flex: 1;
-    padding: 20px 32px;
-}
-
-.form-container {
-    max-width: 320px;
-}
-
-.auth-title {
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: #2c1810;
-    margin-bottom: 4px;
-}
-
-.auth-subtitle {
-    font-size: 0.95rem;
-    color: #4a3830;
-}
-
-.auth-input {
-    height: 48px;
-    border-radius: 12px;
-    padding: 10px 16px;
-    font-size: 0.95rem;
-    background-color: #ffffff;
-}
-
-.auth-input:focus {
-    border-color: #d9531e;
-    box-shadow: 0 0 0 0.2rem rgba(217, 83, 30, 0.2);
-}
-
-.btn-auth {
-    height: 48px;
-    border-radius: 12px;
-    background-color: #b73e10;
-    border: none;
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 1.05rem;
-    transition: background-color 0.2s ease;
-}
-
-.btn-auth:hover {
-    background-color: #9c330c;
-    color: #ffffff;
-}
-
-.footer-text {
-    color: #2c1810;
-}
-
-.auth-link {
-    color: #2c1810;
-    text-decoration: underline;
-    font-weight: 500;
-}
-
-.auth-link:hover {
-    color: #d9531e;
-}
-</style>
