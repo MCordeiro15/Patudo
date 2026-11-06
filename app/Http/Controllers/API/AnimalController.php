@@ -31,6 +31,7 @@ class AnimalController extends Controller
             'user_id' => 'sometimes|exists:users,id',
             'name' => 'required|string|max:255',
             'species' => 'required|string|max:255',
+            'breed' => 'required|string|max:255',
             'size' => 'required|string|max:255',
             'special_needs' => 'nullable|string',
         ]);
@@ -59,6 +60,7 @@ class AnimalController extends Controller
             'user_id' => 'sometimes|exists:users,id',
             'name' => 'sometimes|string|max:255',
             'species' => 'sometimes|string|max:255',
+            'breed' => 'sometimes|string|max:255',
             'size' => 'sometimes|string|max:255',
             'special_needs' => 'nullable|string',
         ]);

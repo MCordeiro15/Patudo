@@ -13,6 +13,7 @@ class Animal extends Model
         'user_id',
         'name',
         'species',
+        'breed',
         'size',
         'special_needs',
     ];
