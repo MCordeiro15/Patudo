@@ -62,3 +62,8 @@
     background-color: var(--patudo-verde);
     color: #ffffff;
 }
+
+.nav-pills .nav-link.active {
+    background-color: var(--patudo-bege);
+    color: var(--patudo-castanhoDark);
+}
