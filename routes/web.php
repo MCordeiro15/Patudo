@@ -39,5 +39,6 @@ Route::prefix('api')->group(function () {
 Route::inertia('/', 'Homepage')->name('home');
 Route::inertia('/login', 'auth/Login')->name('login');
 Route::inertia('/register', 'auth/Register')->name('register');
-
+Route::inertia('/petsitters', 'Petsitter/SearchPetsitter')->middleware('auth')->name('petsitters.search');
+Route::inertia('/find-petsitter', 'Petsitter/PublicSearchPetsitter')->name('petsitters.public');
 require __DIR__.'/settings.php';
