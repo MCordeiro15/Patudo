@@ -17,7 +17,8 @@ class Petsitter extends Model
      Only an administrator should be able to change it, and it should not be possible to submit it via a form.*/
     protected $fillable = [
         'user_id', 'biography', 'experience', 'service_location',
-        'price_per_day', 'accepted_sizes', 'accepted_animal_types',
+        'age',
+        'price_per_day', 'accepted_sizes', 'sex', 'accepted_animal_types',
         'identification_documents',
     ];
 
