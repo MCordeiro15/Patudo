@@ -1,12 +1,13 @@
 <?php
-//te
+
+// te
 use App\Http\Controllers\API\AnimalController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\PetsitterAvailabilityController;
 use App\Http\Controllers\API\PetsitterController;
+use App\Http\Controllers\API\PostController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\PostController;
 
 Route::middleware('web')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);

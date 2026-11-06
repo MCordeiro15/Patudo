@@ -101,6 +101,7 @@ class PetsitterAvailabilityController extends Controller
             'data' => new PetsitterAvailabilityResource($newAvailability),
         ], 200);
     }
+
     /**
      * Cria uma disponibilidade para uma data.
      */
