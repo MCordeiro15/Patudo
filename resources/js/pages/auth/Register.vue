@@ -10,15 +10,18 @@ const email = ref('');
 const password = ref('');
 const passwordConfirmation = ref('');
 const msg = ref('');
+const isError = ref(false);
 const isLoading = ref(false);
 
 const register = async () => {
     if (password.value !== passwordConfirmation.value) {
+        isError.value = true;
         msg.value = 'As palavras-passe não coincidem.';
         return;
     }
 
     isLoading.value = true;
+    isError.value = false;
     msg.value = 'A registar...';
     try {
         const res = await fetch('/api/register', {
@@ -37,13 +40,16 @@ const register = async () => {
         });
         const data = await res.json();
         if (res.ok) {
+            isError.value = false;
             msg.value = 'Registo efetuado com sucesso!';
             window.location.href = '/login';
         } else {
+            isError.value = true;
             msg.value =
                 'Erro: ' + (data.message || JSON.stringify(data.errors));
         }
     } catch (e: any) {
+        isError.value = true;
         msg.value = 'Erro: ' + e.message;
     } finally {
         isLoading.value = false;
@@ -81,7 +87,13 @@ const register = async () => {
                         </button>
                     </form>
 
-                    <div v-if="msg" class="alert auth-valid-alert py-2 small mb-3 text-center">
+                    <div
+                        v-if="msg"
+                        :class="[
+                            'alert py-2 small mb-3 text-center',
+                            isError ? 'auth-error-alert' : 'auth-valid-alert'
+                        ]"
+                    >
                         {{ msg }}
                     </div>
 
