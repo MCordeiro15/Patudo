@@ -46,23 +46,11 @@ const login = async () => {
     <div class="login-wrapper min-vh-100 d-flex align-items-center justify-content-center p-3">
         <div class="auth-card d-flex flex-column flex-md-row">
             <div class="brand-panel d-flex flex-column justify-content-between">
-                <div>
-                    <div class="d-flex align-items-center gap-2 mb-4">
-                        <img :src="logoPatudo" alt="Logótipo Patudo" class="brand-icon"/>
-                        <span class="brand-title">Patudo</span>
-                    </div>
-
-                    <div class="image-placeholder text-center text-muted">
-                        <img :src="imgCao" alt="Imagem Cão" class="brand-dog-img">
-                    </div>
+                <img :src="imgCao" alt="Cão Patudo" class="brand-bg-cover" />
+                 <div class="brand-header d-flex align-items-center gap-2">
+                    <img :src="logoPatudo" alt="Logótipo Patudo" class="brand-icon"/>
+                    <span class="brand-title">Patudo</span>
                 </div>
-
-                <p class="brand-slogan mb-0">
-                    Encontra o<br/>
-                    cuidador ideal<br/>
-                    para o teu animal,<br/>
-                    perto de ti.
-                </p>
             </div>
 
             <div class="form-panel d-flex flex-column justify-content-center align-items-center">
