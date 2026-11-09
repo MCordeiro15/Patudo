@@ -2,6 +2,7 @@
 //te
 use App\Http\Controllers\API\AnimalController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\FavouriteController;
 use App\Http\Controllers\API\PetsitterAvailabilityController;
 use App\Http\Controllers\API\PetsitterController;
 use App\Http\Controllers\API\UserController;
@@ -36,5 +37,9 @@ Route::middleware('web')->group(function () {
 
         // Animals
         Route::apiResource('animals', AnimalController::class);
+
+        // Favourites
+        Route::post('/favourites', [FavouriteController::class, 'store']);
+        Route::delete('/favourites/{petsitter}', [FavouriteController::class, 'destroy']);
     });
 });
