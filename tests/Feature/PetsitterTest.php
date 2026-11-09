@@ -43,6 +43,7 @@ test('authenticated user can register as a petsitter', function () {
         'experience' => '5 years caring for dogs and cats',
         'service_location' => 'Ponta Delgada',
         'price_per_day' => 25.50,
+        'age' => 30,
         'accepted_sizes' => ['small', 'medium'],
         'accepted_animal_types' => ['dog', 'cat'],
         'identification_documents' => 'id_card.pdf',
@@ -61,6 +62,28 @@ test('authenticated user can register as a petsitter', function () {
         'user_id' => $user->id,
         'approval_status' => 'pending',
     ]);
+});
+
+test('regular user cannot view a pending petsitter profile', function () {
+    $user = User::factory()->create();
+    $petsitter = Petsitter::factory()->create(['approval_status' => 'pending']);
+
+    $this->actingAs($user)
+        ->getJson('/api/petsitters/'.$petsitter->user_id)
+        ->assertForbidden();
+});
+
+test('petsitter profile hides private fields from other users', function () {
+    $user = User::factory()->create();
+    $petsitter = Petsitter::factory()->approved()->create();
+
+    $this->actingAs($user)
+        ->getJson('/api/petsitters/'.$petsitter->user_id)
+        ->assertOk()
+        ->assertJsonPath('data.biography', $petsitter->biography)
+        ->assertJsonPath('data.user.name', $petsitter->user->name)
+        ->assertJsonMissingPath('data.identification_documents')
+        ->assertJsonMissingPath('data.user.email');
 });
 
 test('authenticated user can view a petsitter profile', function () {

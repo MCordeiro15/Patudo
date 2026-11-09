@@ -21,6 +21,7 @@ class PetsitterFactory extends Factory
         return [
             'user_id' => User::factory(),
             'biography' => fake()->paragraph(),
+            'age' => fake()->numberBetween(18, 90),
             'experience' => fake()->sentence(),
             'service_location' => fake()->city(),
             'price_per_day' => fake()->randomFloat(2, 10, 100),
