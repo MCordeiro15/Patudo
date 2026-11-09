@@ -5,25 +5,28 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AnimalResource;
 use App\Models\Animal;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
 class AnimalController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Responsable
     {
         Gate::authorize('viewAny', Animal::class);
 
         $query = Animal::with('user');
 
-        if (! $request->user()?->isAdmin()) {
+        if (!$request->user()?->isAdmin()) {
             $query->where('user_id', $request->user()?->id);
         }
 
         return AnimalResource::collection($query->get());
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         Gate::authorize('create', Animal::class);
 
@@ -36,23 +39,23 @@ class AnimalController extends Controller
             'special_needs' => 'nullable|string',
         ]);
 
-        if (! $request->user()?->isAdmin() || empty($data['user_id'])) {
+        if (!$request->user()?->isAdmin() || empty($data['user_id'])) {
             $data['user_id'] = $request->user()->id;
         }
 
         $animal = Animal::create($data);
 
-        return (new AnimalResource($animal->load('user')))->response()->setStatusCode(201);
+        return new AnimalResource($animal->load('user'))->response()->setStatusCode(201);
     }
 
-    public function show(Animal $animal)
+    public function show(Animal $animal): Responsable
     {
         Gate::authorize('view', $animal);
 
         return new AnimalResource($animal->load('user'));
     }
 
-    public function update(Request $request, Animal $animal)
+    public function update(Request $request, Animal $animal): Responsable
     {
         Gate::authorize('update', $animal);
 
@@ -65,7 +68,7 @@ class AnimalController extends Controller
             'special_needs' => 'nullable|string',
         ]);
 
-        if (! $request->user()?->isAdmin()) {
+        if (!$request->user()?->isAdmin()) {
             unset($data['user_id']);
         }
 
@@ -74,7 +77,7 @@ class AnimalController extends Controller
         return new AnimalResource($animal->load('user'));
     }
 
-    public function destroy(Animal $animal)
+    public function destroy(Animal $animal): Response
     {
         Gate::authorize('delete', $animal);
 

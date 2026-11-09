@@ -2,9 +2,13 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Petsitter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin Petsitter
+ */
 class PetsitterResource extends JsonResource
 {
     /**

@@ -210,3 +210,39 @@ test('regular user cannot reject a petsitter', function () {
 
     $response->assertForbidden();
 });
+
+test('admin cannot approve a petsitter without identification documents', function () {
+    $admin = User::factory()->admin()->create();
+    $petsitter = Petsitter::factory()->create([
+        'approval_status' => 'pending',
+        'identification_documents' => '',
+    ]);
+
+    $response = $this->actingAs($admin)->postJson('/api/petsitters/'.$petsitter->user_id.'/approve');
+
+    $response->assertUnprocessable()
+        ->assertJsonFragment(['message' => 'Não é possível aprovar um petsitter sem documentos de identificação.']);
+
+    $this->assertDatabaseHas('petsitters', [
+        'user_id' => $petsitter->user_id,
+        'approval_status' => 'pending',
+    ]);
+});
+
+test('admin can approve a petsitter with identification documents', function () {
+    $admin = User::factory()->admin()->create();
+    $petsitter = Petsitter::factory()->create([
+        'approval_status' => 'pending',
+        'identification_documents' => 'id_card.pdf',
+    ]);
+
+    $response = $this->actingAs($admin)->postJson('/api/petsitters/'.$petsitter->user_id.'/approve');
+
+    $response->assertOk()
+        ->assertJsonFragment(['approval_status' => 'approved']);
+
+    $this->assertDatabaseHas('petsitters', [
+        'user_id' => $petsitter->user_id,
+        'approval_status' => 'approved',
+    ]);
+});

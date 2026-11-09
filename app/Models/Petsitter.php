@@ -4,7 +4,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $user_id
+ * @property string|null $biography
+ * @property string $experience
+ * @property string $service_location
+ * @property int $age
+ * @property float $price_per_day
+ * @property array<string>|null $accepted_sizes
+ * @property array<string>|null $accepted_animal_types
+ * @property string|null $sex
+ * @property string $approval_status
+ * @property string $identification_documents
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User $user
+ */
 class Petsitter extends Model
 {
     use HasFactory;
@@ -30,22 +50,22 @@ class Petsitter extends Model
         ];
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function availabilities()
+    public function availabilities(): HasMany
     {
         return $this->hasMany(PetsitterAvailability::class, 'petsitter_id', 'user_id');
     }
 
-    public function posts()
+    public function posts(): HasMany
     {
         return $this->hasMany(Post::class, 'petsitter_id', 'user_id');    // Petsitter 1 — 0..* Post
     }
 
-    public function favouritedByUsers()
+    public function favouritedByUsers(): BelongsToMany
     {
         return $this->belongsToMany(
             User::class,
@@ -57,12 +77,38 @@ class Petsitter extends Model
         );
     }
 
-    public function reviews()
+    public function reviews(): HasMany
     {
         return $this->hasMany(
             Review::class,
             'petsitter_id',
             'user_id'
         );
+    }
+
+    /**
+     * Approve this petsitter profile.
+     */
+    public function approve(): void
+    {
+        $this->approval_status = 'approved';
+        $this->save();
+    }
+
+    /**
+     * Reject this petsitter profile.
+     */
+    public function reject(): void
+    {
+        $this->approval_status = 'rejected';
+        $this->save();
+    }
+
+    /**
+     * Check if identification documents are present.
+     */
+    public function hasIdentificationDocuments(): bool
+    {
+        return ! empty($this->identification_documents);
     }
 }

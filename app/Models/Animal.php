@@ -4,7 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property string $name
+ * @property string $species
+ * @property string $breed
+ * @property string $size
+ * @property string|null $special_needs
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User $user
+ */
 class Animal extends Model
 {
     use HasFactory;
@@ -18,12 +33,12 @@ class Animal extends Model
         'special_needs',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function bookings()
+    public function bookings(): BelongsToMany
     {
         return $this->belongsToMany(
             Booking::class,

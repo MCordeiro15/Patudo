@@ -2,9 +2,13 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Animal;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin Animal
+ */
 class AnimalResource extends JsonResource
 {
     /**

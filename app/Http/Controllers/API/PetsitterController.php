@@ -95,8 +95,13 @@ class PetsitterController extends Controller
     {
         Gate::authorize('approve', $petsitter);
 
-        $petsitter->approval_status = 'approved';
-        $petsitter->save();
+        if (! $petsitter->hasIdentificationDocuments()) {
+            return response()->json([
+                'message' => 'Não é possível aprovar um petsitter sem documentos de identificação.',
+            ], 422);
+        }
+
+        $petsitter->approve();
 
         return new PetsitterResource($petsitter->load('user'));
     }
@@ -105,8 +110,7 @@ class PetsitterController extends Controller
     {
         Gate::authorize('approve', $petsitter);
 
-        $petsitter->approval_status = 'rejected';
-        $petsitter->save();
+        $petsitter->reject();
 
         return new PetsitterResource($petsitter->load('user'));
     }
