@@ -62,14 +62,14 @@ const petsitters = [
                         height="62"
                     />
                 </a>
-                <div class="d-flex gap-2">
-                    <a href="/login" class="btn btn-primary rounded-pill px-4">
+                <div class="d-flex gap-2 col-6 col-md-4 col-lg-3">
+                    <a href="/login" class="btn btn-primary rounded-pill w-50 py-2 fw-bold">
                         Login
                     </a>
 
                     <a
                         href="/register"
-                        class="btn btn-outline-secondary rounded-pill px-4"
+                        class="btn btn-outline-primary rounded-pill w-50 py-2 fw-bold"
                     >
                         Registar
                     </a>

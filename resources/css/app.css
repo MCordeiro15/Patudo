@@ -9,7 +9,6 @@
     --patudo-bege: #fed7aa;
     --patudo-branco: #fffaf3;
     --patudo-verde: #4f6f52;
-    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont;
 
     --bs-body-bg: var(--patudo-branco);
     --bs-body-color: var(--patudo-castanhoDark);
@@ -29,44 +28,27 @@
     --bs-border-color: rgba(122, 102, 87, 0.25);
     --bs-border-radius-lg: 1rem;
     --bs-border-radius-xl: 1.5rem;
-
-    --btn-primary-bg: var(--patudo-terracota);
-    --btn-primary-hover: var(--patudo-laranjaVivo);
-    --btn-primary-active: var(--patudo-castanhoDark);
-}
-
-body {
-    font-family: var(--font-sans), serif;
 }
 
 .btn-primary {
-    background-color: var(--btn-primary-bg);
-    color: var(--patudo-branco);
-    border: none;
-    border-radius: 8px;
-    padding: 12px 20px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    width: 100%;
+    --bs-btn-bg: var(--patudo-terracota);
+    --bs-btn-border-color: var(--patudo-terracota);
+    --bs-btn-hover-bg: var(--patudo-laranjaVivo);
+    --bs-btn-hover-border-color: var(--patudo-laranjaVivo);
+    --bs-btn-color: #ffffff;
 }
 
-.btn-primary:hover {
-    background-color: var(--btn-primary-hover);
-    transform: translateY(-1px);
+.btn-outline-primary {
+    --bs-btn-color: var(--patudo-terracota);
+    --bs-btn-border-color: var(--patudo-terracota);
+    --bs-btn-hover-bg: var(--patudo-bege);
+    --bs-btn-hover-border-color: var(--patudo-terracota);
+    --bs-btn-hover-color: var(--patudo-terracota);
+    --bs-btn-active-bg: var(--patudo-bege);
+    --bs-btn-active-border-color: var(--patudo-terracota);
+    --bs-btn-active-color: var(--patudo-terracota);
 }
 
-.btn-primary:focus {
-    background-color: var(--btn-primary-active);
-    transform: translateY(0);
-}
-
-.btn-primary:active {
-    background-color: var(--btn-primary-active);
-    outline: none;
-    transform: translateY(0);
-}
 
 .btn-outline-secondary {
     --bs-btn-color: var(--patudo-castanhoMid);
@@ -93,7 +75,32 @@ body {
     color: #ffffff;
 }
 
-.nav-pills .nav-link.active {
-    background-color: var(--patudo-bege);
-    color: var(--patudo-castanhoDark);
+.patudo-glow {
+    position: absolute;
+    width: 24rem;
+    height: 24rem;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.patudo-glow-top {
+    top: -5rem;
+    left: -5rem;
+    background-color: var(--patudo-terracota);
+    opacity: 0.12;
+}
+
+.patudo-glow-bottom {
+    bottom: -5rem;
+    right: -5rem;
+    background-color: var(--patudo-laranjaVivo);
+    opacity: 0.25;
+}
+
+.patudo-content {
+    position: relative;
+    z-index: 1;
 }
