@@ -18,9 +18,11 @@ return new class extends Migration
             $table->text('biography')->nullable();
             $table->text('experience');
             $table->string('service_location');
+            $table->integer('age');
             $table->decimal('price_per_day', 8, 2);
             $table->json('accepted_sizes')->nullable();
             $table->json('accepted_animal_types')->nullable();
+            $table->string('sex')->nullable();
             $table->string('approval_status')->default('pending'); // pending, approved, rejected
             $table->string('identification_documents');
             $table->timestamps();

@@ -18,6 +18,7 @@ return new class extends Migration
 
             $table->string('name');
             $table->string('species');
+            $table->string('breed');
             $table->string('size');
             $table->text('special_needs')->nullable();
             $table->timestamps();

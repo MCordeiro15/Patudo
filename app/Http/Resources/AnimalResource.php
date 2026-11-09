@@ -2,9 +2,13 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Animal;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin Animal
+ */
 class AnimalResource extends JsonResource
 {
     /**
@@ -19,6 +23,7 @@ class AnimalResource extends JsonResource
             'user_id' => $this->user_id,
             'name' => $this->name,
             'species' => $this->species,
+            'breed' => $this->breed,
             'size' => $this->size,
             'special_needs' => $this->special_needs,
             'created_at' => $this->created_at,

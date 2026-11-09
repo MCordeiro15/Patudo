@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+    <!-- Telhado (Laranja com cantos arredondados) -->
+    <path d="M 68 215 L 250 58 L 432 215" fill="none" stroke="#FF6A00" stroke-width="48" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Almofada Central da Pata (Terracota) -->
+    <ellipse cx="250" cy="365" rx="78" ry="60" fill="#C4400E" />
+
+    <!-- Dedos / Almofadas Superiores -->
+    <!-- Dedo 1 (Esquerda extremo) -->
+    <circle cx="152" cy="290" r="28" fill="#C4400E" />
+
+    <!-- Dedo 2 (Esquerda centro) -->
+    <circle cx="206" cy="250" r="30" fill="#C4400E" />
+
+    <!-- Dedo 3 (Direita centro) -->
+    <circle cx="294" cy="250" r="30" fill="#C4400E" />
+
+    <!-- Dedo 4 (Direita extremo) -->
+    <circle cx="348" cy="290" r="28" fill="#C4400E" />
+</svg>

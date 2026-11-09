@@ -32,11 +32,13 @@ class PetsitterController extends Controller
             'biography' => 'nullable|string',
             'experience' => 'required|string',
             'service_location' => 'required|string|max:255',
+            'age' => 'required|integer|min:18|max:99',
             'price_per_day' => 'required|numeric|min:0',
             'accepted_sizes' => 'nullable|array',
             'accepted_sizes.*' => 'string',
             'accepted_animal_types' => 'nullable|array',
             'accepted_animal_types.*' => 'string',
+            'sex' => 'string|in:male,female,other',
             'identification_documents' => 'required|string|max:255',
         ]);
 
@@ -66,8 +68,10 @@ class PetsitterController extends Controller
             'experience' => 'sometimes|string',
             'service_location' => 'sometimes|string|max:255',
             'price_per_day' => 'sometimes|numeric|min:0',
+            'age' => 'sometimes|integer|min:18|max:99',
             'accepted_sizes' => 'nullable|array',
             'accepted_sizes.*' => 'string',
+            'sex' => 'sometimes|string|in:male,female,other',
             'accepted_animal_types' => 'nullable|array',
             'accepted_animal_types.*' => 'string',
             'identification_documents' => 'sometimes|string|max:255',
@@ -91,8 +95,13 @@ class PetsitterController extends Controller
     {
         Gate::authorize('approve', $petsitter);
 
-        $petsitter->approval_status = 'approved';
-        $petsitter->save();
+        if (! $petsitter->hasIdentificationDocuments()) {
+            return response()->json([
+                'message' => 'Não é possível aprovar um petsitter sem documentos de identificação.',
+            ], 422);
+        }
+
+        $petsitter->approve();
 
         return new PetsitterResource($petsitter->load('user'));
     }
@@ -101,8 +110,7 @@ class PetsitterController extends Controller
     {
         Gate::authorize('approve', $petsitter);
 
-        $petsitter->approval_status = 'rejected';
-        $petsitter->save();
+        $petsitter->reject();
 
         return new PetsitterResource($petsitter->load('user'));
     }

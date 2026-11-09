@@ -3,9 +3,11 @@
 // te
 use App\Http\Controllers\API\AnimalController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\FavouriteController;
 use App\Http\Controllers\API\PetsitterAvailabilityController;
 use App\Http\Controllers\API\PetsitterController;
 use App\Http\Controllers\API\PostController;
+use App\Http\Controllers\API\SupportTicketsController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,5 +39,16 @@ Route::middleware('web')->group(function () {
 
         // Animals
         Route::apiResource('animals', AnimalController::class);
+
+        // Favourites
+        Route::post('/favourites', [FavouriteController::class, 'store']);
+        Route::delete('/favourites/{petsitter}', [FavouriteController::class, 'destroy']);
+
+        // Support Tickets
+        Route::get('/support-tickets', [SupportTicketsController::class, 'index']);
+        Route::post('/support-tickets', [SupportTicketsController::class, 'store']);
+        Route::get('/support-tickets/{ticket}', [SupportTicketsController::class, 'show']);
+        Route::post('/support-tickets/{ticket}/claim', [SupportTicketsController::class, 'claim']);
+        Route::post('/support-tickets/{ticket}/close', [SupportTicketsController::class, 'close']);
     });
 });

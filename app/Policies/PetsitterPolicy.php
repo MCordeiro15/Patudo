@@ -20,7 +20,9 @@ class PetsitterPolicy
      */
     public function view(User $user, Petsitter $petsitter): bool
     {
-        return true;
+        return $user->isAdmin()
+            || $user->id === $petsitter->user_id
+            || $petsitter->approval_status === 'approved';
     }
 
     /**
