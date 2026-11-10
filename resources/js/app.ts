@@ -4,7 +4,10 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
 import '../css/app.css';
-import 'bootstrap';
+
+if (typeof window !== 'undefined') {
+    void import('bootstrap');
+}
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -16,6 +19,7 @@ void createInertiaApp({
             case name.startsWith('auth/'):
             case name === 'Petsitter/SearchPetsitter':
             case name === 'Petsitter/PublicSearchPetsitter':
+            case name === 'Petsitter/Profile':
                 return null;
             case name.startsWith('settings/'):
                 return [AppLayout, SettingsLayout];

@@ -41,4 +41,5 @@ Route::inertia('/login', 'auth/Login')->name('login');
 Route::inertia('/register', 'auth/Register')->name('register');
 Route::inertia('/petsitters', 'Petsitter/SearchPetsitter')->middleware('auth')->name('petsitters.search');
 Route::inertia('/find-petsitter', 'Petsitter/PublicSearchPetsitter')->name('petsitters.public');
+Route::inertia('/petsitters/profile', 'Petsitter/Profile')->name('petsitters.profile');
 require __DIR__.'/settings.php';
