@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 import {
     Bell,
@@ -172,7 +172,7 @@ const memberSinceLabel = computed(() => {
                 <div
                     class="nav nav-pills border rounded-pill p-1 mx-auto d-none d-lg-flex"
                 >
-                    <a class="nav-link active rounded-pill px-4" href="/"
+                    <a class="nav-link text-dark rounded-pill px-4" href="/"
                         >Início</a
                     >
                     <a
@@ -208,9 +208,9 @@ const memberSinceLabel = computed(() => {
                 </div>
             </nav>
 
-            <div class="row justify-content-center mt-4">
+            <div class="row justify-content-center mt-5 pt-4">
                 <div class="col-12 col-xl-10">
-                    <h1 class="text-center fw-bold mb-4">O meu perfil</h1>
+                    <h1 class="text-center fw-bold mb-4 pb-2">O meu perfil</h1>
 
                     <section
                         class="card border border-primary rounded-4 p-3 p-md-4 mb-3"
@@ -296,7 +296,7 @@ const memberSinceLabel = computed(() => {
                     </section>
 
                     <div class="row g-3 mb-3">
-                        <div class="col-12 col-lg-5">
+                        <div class="col-12 col-lg-6">
                             <section
                                 class="card border border-primary rounded-4 p-3 p-md-4 h-100"
                             >
@@ -312,22 +312,21 @@ const memberSinceLabel = computed(() => {
                             </section>
                         </div>
 
-                        <div class="col-12 col-lg-7">
+                        <div class="col-12 col-lg-6">
                             <section
                                 class="card border border-primary rounded-4 p-3 p-md-4 h-100"
                             >
                                 <h3 class="h5 mb-3">Disponibilidade</h3>
-                                <div class="d-flex flex-wrap gap-2">
+                                <div class="d-flex gap-2">
                                     <div
                                         v-for="day in nextSevenDays"
                                         :key="day.date"
-                                        class="text-center text-white rounded-3 px-2 py-2"
+                                        class="flex-fill text-center text-white rounded-3 px-1 py-2"
                                         :class="
                                             availabilitySet.has(day.date)
                                                 ? 'bg-success'
                                                 : 'bg-danger'
                                         "
-                                        style="min-width: 44px"
                                     >
                                         <small class="d-block">{{
                                             day.label
@@ -343,8 +342,8 @@ const memberSinceLabel = computed(() => {
                         </div>
                     </div>
 
-                    <section>
-                        <h2 class="text-center fw-bold mb-3">Publicações</h2>
+                    <section class="mt-5">
+                        <h2 class="text-center fw-bold my-5">Publicações</h2>
                         <div class="d-grid gap-3">
                             <article
                                 v-for="post in petsitter.posts"
