@@ -209,7 +209,7 @@ const memberSinceLabel = computed(() => {
             </nav>
 
             <div class="row justify-content-center mt-5 pt-4">
-                <div class="col-12 col-xl-10">
+                <div class="col-12">
                     <h1 class="text-center fw-bold mb-4 pb-2">O meu perfil</h1>
 
                     <section
@@ -321,7 +321,8 @@ const memberSinceLabel = computed(() => {
                                     <div
                                         v-for="day in nextSevenDays"
                                         :key="day.date"
-                                        class="flex-fill text-center text-white rounded-3 px-1 py-2"
+                                        class="text-center text-white rounded-3 px-1 py-2"
+                                        style="flex: 1 1 0; min-width: 0"
                                         :class="
                                             availabilitySet.has(day.date)
                                                 ? 'bg-success'
