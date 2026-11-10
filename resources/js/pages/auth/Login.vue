@@ -33,7 +33,7 @@ const login = async () => {
         if (res.ok) {
             isError.value = false;
             msg.value = 'Login com sucesso!';
-            window.location.href = '/';
+            window.location.href = '/petsitters';
         } else {
             isError.value = true;
             msg.value =
