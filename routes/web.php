@@ -14,22 +14,7 @@ Route::prefix('api')->group(function () {
     Route::get('/petsitters/{id}/availability', [PetsitterAvailabilityController::class, 'availability']);
 
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/me', [AuthController::class, 'myInformation']);
-        Route::get('/myInformation', [AuthController::class, 'myInformation']);
-        Route::post('/logout', [AuthController::class, 'logout']);
-
-        // Users
-        Route::post('/users/{user}/suspend', [UserController::class, 'suspend']);
-        Route::apiResource('users', UserController::class);
-
-        // Petsitters
-        Route::post('/petsitters/availability/toggle', [PetsitterAvailabilityController::class, 'toggle']);
-        Route::post('/petsitters/{petsitter}/availability', [PetsitterAvailabilityController::class, 'store']);
-        Route::put('/petsitters/{petsitter}/availability/{date}', [PetsitterAvailabilityController::class, 'update']);
-        Route::delete('/petsitters/{petsitter}/availability/{date}', [PetsitterAvailabilityController::class, 'destroy']);
-        Route::post('/petsitters/{petsitter}/approve', [PetsitterController::class, 'approve']);
-        Route::post('/petsitters/{petsitter}/reject', [PetsitterController::class, 'reject']);
-        Route::apiResource('petsitters', PetsitterController::class);
+        extracted();
 
         // Animals
         Route::apiResource('animals', AnimalController::class);
@@ -41,4 +26,4 @@ Route::inertia('/login', 'auth/Login')->name('login');
 Route::inertia('/register', 'auth/Register')->name('register');
 Route::inertia('/petsitters', 'Petsitter/SearchPetsitter')->middleware('auth')->name('petsitters.search');
 Route::inertia('/find-petsitter', 'Petsitter/PublicSearchPetsitter')->name('petsitters.public');
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';
