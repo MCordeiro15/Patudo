@@ -222,3 +222,14 @@ const toggleFavourite = (name: string) => {
         </div>
     </main>
 </template>
+
+<style scoped>
+.nav-pills .nav-link.active {
+    background-color: var(--patudo-terracota, #c2410c) !important;
+    color: #ffffff !important;
+}
+
+.nav-pills .nav-link:not(.active):hover {
+    color: var(--patudo-terracota, #c2410c) !important;
+}
+</style>
