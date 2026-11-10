@@ -3,8 +3,6 @@
 use App\Http\Controllers\API\AnimalController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\PetsitterAvailabilityController;
-use App\Http\Controllers\API\PetsitterController;
-use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api')->group(function () {
@@ -26,4 +24,4 @@ Route::inertia('/login', 'auth/Login')->name('login');
 Route::inertia('/register', 'auth/Register')->name('register');
 Route::inertia('/petsitters', 'Petsitter/SearchPetsitter')->middleware('auth')->name('petsitters.search');
 Route::inertia('/find-petsitter', 'Petsitter/PublicSearchPetsitter')->name('petsitters.public');
-require __DIR__ . '/settings.php';
+require __DIR__.'/settings.php';
