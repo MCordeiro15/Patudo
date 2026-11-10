@@ -208,13 +208,13 @@ const toggleFavourite = (name: string) => {
                                 <p class="h3 mb-0">{{ petsitter.price }} €</p>
                             </div>
 
-                            <button
-                                type="button"
+                            <a
+                                href="/petsitters/profile"
                                 class="btn btn-link text-dark fs-5 p-0"
                             >
                                 Ver perfil
                                 <ChevronRight :size="24" />
-                            </button>
+                            </a>
                         </div>
                     </article>
                 </div>
