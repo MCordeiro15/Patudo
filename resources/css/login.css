@@ -106,7 +106,7 @@
 }
 
 .btn-primary:hover, .btn-primary:focus {
-    background-color: var(--btn-primary-hover);
+    background-color: var(--patudo-laranjaVivo);
     color: #ffffff;
 }
 
