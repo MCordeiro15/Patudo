@@ -51,7 +51,7 @@ import logoPatudo from '@/../../assets/logoPatudo.svg';
                             Encontra o cuidador ideal para o teu animal, perto de ti.
                         </p>
 
-                        <a href="/cuidadores"
+                        <a href="/petsitters"
                            class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-semibold shadow patudo-cta">
                             Procurar cuidador
                             <i class="bi bi-arrow-right ms-2"></i>
