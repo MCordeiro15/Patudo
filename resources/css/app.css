@@ -38,6 +38,18 @@
     --bs-btn-color: #ffffff;
 }
 
+.btn-outline-primary {
+    --bs-btn-color: var(--patudo-terracota);
+    --bs-btn-border-color: var(--patudo-terracota);
+    --bs-btn-hover-bg: var(--patudo-bege);
+    --bs-btn-hover-border-color: var(--patudo-terracota);
+    --bs-btn-hover-color: var(--patudo-terracota);
+    --bs-btn-active-bg: var(--patudo-bege);
+    --bs-btn-active-border-color: var(--patudo-terracota);
+    --bs-btn-active-color: var(--patudo-terracota);
+}
+
+
 .btn-outline-secondary {
     --bs-btn-color: var(--patudo-castanhoMid);
     --bs-btn-border-color: var(--patudo-castanhoMid);
@@ -61,4 +73,34 @@
 .badge-service {
     background-color: var(--patudo-verde);
     color: #ffffff;
+}
+
+.patudo-glow {
+    position: absolute;
+    width: 24rem;
+    height: 24rem;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.patudo-glow-top {
+    top: -5rem;
+    left: -5rem;
+    background-color: var(--patudo-terracota);
+    opacity: 0.12;
+}
+
+.patudo-glow-bottom {
+    bottom: -5rem;
+    right: -5rem;
+    background-color: var(--patudo-laranjaVivo);
+    opacity: 0.25;
+}
+
+.patudo-content {
+    position: relative;
+    z-index: 1;
 }

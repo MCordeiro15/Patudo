@@ -2,9 +2,14 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
+/**
+ * @mixin Post
+ */
 class PostResource extends JsonResource
 {
     /**
@@ -14,6 +19,14 @@ class PostResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'petsitter_id' => $this->petsitter_id,
+            'description' => $this->description,
+            'photos' => collect($this->photos)
+                ->map(fn ($path) => Storage::disk('public')->url($path))
+                ->all(),
+            'created_at' => $this->created_at,
+        ];
     }
 }

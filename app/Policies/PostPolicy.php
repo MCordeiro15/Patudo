@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\Post;
+use App\Models\User;
+
+class PostPolicy
+{
+    /**
+     * Determine whether the user can view any models.
+     */
+    public function viewAny(User $user): bool
+    {
+        return true;
+    }
+
+    public function view(User $user, Post $post): bool
+    {
+        return true;
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->petsitter?->approval_status === 'approved';
+    }
+
+    public function update(User $user, Post $post): bool
+    {
+        return $user->isAdmin() || $user->id === $post->petsitter_id;
+    }
+
+    public function delete(User $user, Post $post): bool
+    {
+        return $user->isAdmin() || $user->id === $post->petsitter_id;
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(User $user, Post $post): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(User $user, Post $post): bool
+    {
+        return false;
+    }
+}

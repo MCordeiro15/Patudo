@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
 class SupportTicket extends Model
@@ -16,17 +17,26 @@ class SupportTicket extends Model
         'status',
     ];
 
-    public function creator()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function claimant()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function claimant(): BelongsTo
     {
         return $this->belongsTo(User::class, 'claimed_by');
     }
 
-    public function reportedUser()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function reportedUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reported_user_id');
     }

@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('petsitter_id')->constrained('petsitters', 'user_id')->cascadeOnDelete();
             $table->date('date');
             $table->timestamps();
+
+            $table->unique(['petsitter_id', 'date']);
         });
     }
 

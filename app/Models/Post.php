@@ -3,10 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int $petsitter_id
+ * @property string $description
+ * @property array<string>|null $photos
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Petsitter $petsitter
+ */
 class Post extends Model
 {
-    protected $fillable = ['petsitter_id', 'description', 'photos'];
+    protected $fillable = ['description', 'photos'];
 
     protected function casts(): array
     {

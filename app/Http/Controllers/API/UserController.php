@@ -36,7 +36,7 @@ class UserController extends Controller
             'password' => Hash::make($data['password']),
         ]);
 
-        return (new UserResource($user))->response()->setStatusCode(201);
+        return new UserResource($user)->response()->setStatusCode(201);
     }
 
     public function show(User $user)
@@ -52,7 +52,7 @@ class UserController extends Controller
 
         $data = $request->validate([
             'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|unique:users,email,'.$user->id,
+            'email' => 'sometimes|email|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:9',
         ]);
 
