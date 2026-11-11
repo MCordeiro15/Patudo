@@ -21,8 +21,16 @@ Route::inertia('/login', 'auth/Login')->name('login');
 Route::inertia('/register', 'auth/Register')->name('register');
 Route::inertia('/petsitters', 'Petsitter/SearchPetsitter')->middleware('auth')->name('petsitters.search');
 Route::inertia('/find-petsitter', 'Petsitter/PublicSearchPetsitter')->name('petsitters.public');
+<<<<<<< HEAD
 Route::inertia('/favorites', 'Petsitter/Favorites')->middleware('auth')->name('favorites');
+=======
+<<<<<<< Updated upstream
+>>>>>>> 884fcacf151130366640d95e0c2a2a5f1a78f79c
 Route::get('/petsitters/profile', [PetsitterProfileController::class, 'show'])
     ->middleware('auth')
     ->name('petsitters.profile');
+=======
+Route::inertia('/petsitters/profile', 'Petsitter/Profile')->name('petsitters.profile');
+Route::inertia('/dev/modals', 'Modals/ModalTests');
+>>>>>>> Stashed changes
 require __DIR__ . '/settings.php';
