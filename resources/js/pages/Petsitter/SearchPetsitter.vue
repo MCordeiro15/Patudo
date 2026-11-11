@@ -107,7 +107,7 @@ const toggleFavourite = (name: string) => {
                     <a href="/notifications" class="text-dark">
                         <Bell :size="25" />
                     </a>
-                    <a href="/profile" class="text-dark">
+                    <a href="/petsitters/profile" class="text-dark">
                         <UserRound :size="25" />
                     </a>
 
