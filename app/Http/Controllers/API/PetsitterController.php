@@ -5,8 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PetsitterResource;
 use App\Models\Petsitter;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class PetsitterController extends Controller
 {
@@ -78,6 +80,53 @@ class PetsitterController extends Controller
         ]);
 
         $petsitter->update($data);
+
+        return new PetsitterResource($petsitter->load('user'));
+    }
+
+    /**
+     * Atualiza os dias da semana de disponibilidade do petsitter.
+     * O user_id vem do utilizador autenticado.
+     */
+    public function updateAvailabilityDays(Request $request): JsonResponse|PetsitterResource
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Não autenticado.'], 401);
+        }
+
+        $petsitter = Petsitter::where('user_id', $user->id)->first();
+
+        if (! $petsitter) {
+            return response()->json(['message' => 'Perfil de petsitter não encontrado.'], 404);
+        }
+
+        $validated = $request->validate([
+            'days' => [
+                'present',
+                'array',
+                'max:7',
+            ],
+            'days.*' => [
+                'string',
+                Rule::in(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']),
+            ],
+        ]);
+
+        // Verificar duplicatas
+        $days = $validated['days'];
+        $uniqueDays = array_unique($days);
+        if (count($days) !== count($uniqueDays)) {
+            return response()->json([
+                'message' => 'Os dias da semana não podem ser repetidos.',
+                'errors' => ['days' => ['Os dias da semana não podem ser repetidos.']],
+            ], 422);
+        }
+
+        $petsitter->update([
+            'availability_days' => $days,
+        ]);
 
         return new PetsitterResource($petsitter->load('user'));
     }

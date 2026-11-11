@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\AnimalController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\PetsitterAvailabilityController;
+use App\Http\Controllers\PetsitterProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -31,5 +32,7 @@ Route::inertia('/login', 'auth/Login')->name('login');
 Route::inertia('/register', 'auth/Register')->name('register');
 Route::inertia('/petsitters', 'Petsitter/SearchPetsitter')->middleware('auth')->name('petsitters.search');
 Route::inertia('/find-petsitter', 'Petsitter/PublicSearchPetsitter')->name('petsitters.public');
-Route::inertia('/petsitters/profile', 'Petsitter/Profile')->name('petsitters.profile');
+Route::get('/petsitters/profile', [PetsitterProfileController::class, 'show'])
+    ->middleware('auth')
+    ->name('petsitters.profile');
 require __DIR__ . '/settings.php';
