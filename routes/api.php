@@ -37,29 +37,29 @@ if (! function_exists('extracted')) {
     }
 }
 
-Route::middleware('web')->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+// SPA authentication routes — sanctum.stateful is applied automatically by statefulApi() in bootstrap/app.php
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
-    Route::get('/petsitters/{id}/availability', [PetsitterAvailabilityController::class, 'availability']);
+Route::get('/petsitters/{id}/availability', [PetsitterAvailabilityController::class, 'availability']);
 
-    Route::middleware('auth:sanctum')->group(function () {
-        extracted();
-        Route::get('/petsitters/{petsitter}/posts', [PostController::class, 'byPetsitter']);
-        Route::apiResource('posts', PostController::class);
+Route::middleware('auth:sanctum')->group(function () {
+    extracted();
+    Route::get('/petsitters/{petsitter}/posts', [PostController::class, 'byPetsitter']);
+    Route::apiResource('posts', PostController::class);
 
-        // Animals
-        Route::apiResource('animals', AnimalController::class);
+    // Animals
+    Route::apiResource('animals', AnimalController::class);
 
-        // Favourites
-        Route::post('/favourites', [FavouriteController::class, 'store']);
-        Route::delete('/favourites/{petsitter}', [FavouriteController::class, 'destroy']);
+    // Favourites
+    Route::get('/favourites', [FavouriteController::class, 'index']);
+    Route::post('/favourites', [FavouriteController::class, 'store']);
+    Route::delete('/favourites/{petsitter}', [FavouriteController::class, 'destroy']);
 
-        // Support Tickets
-        Route::get('/support-tickets', [SupportTicketsController::class, 'index']);
-        Route::post('/support-tickets', [SupportTicketsController::class, 'store']);
-        Route::get('/support-tickets/{ticket}', [SupportTicketsController::class, 'show']);
-        Route::post('/support-tickets/{ticket}/claim', [SupportTicketsController::class, 'claim']);
-        Route::post('/support-tickets/{ticket}/close', [SupportTicketsController::class, 'close']);
-    });
+    // Support Tickets
+    Route::get('/support-tickets', [SupportTicketsController::class, 'index']);
+    Route::post('/support-tickets', [SupportTicketsController::class, 'store']);
+    Route::get('/support-tickets/{ticket}', [SupportTicketsController::class, 'show']);
+    Route::post('/support-tickets/{ticket}/claim', [SupportTicketsController::class, 'claim']);
+    Route::post('/support-tickets/{ticket}/close', [SupportTicketsController::class, 'close']);
 });

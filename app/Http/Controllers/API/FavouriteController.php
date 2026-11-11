@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\FavouriteResource;
+use App\Http\Resources\PetsitterResource;
 use App\Models\Favourite;
 use App\Models\Petsitter;
 use Illuminate\Http\JsonResponse;
@@ -12,6 +13,20 @@ use Illuminate\Http\Response;
 
 class FavouriteController extends Controller
 {
+    /**
+     * Get the authenticated user's favourite petsitters.
+     */
+    public function index(Request $request)
+    {
+        $user = $request->user();
+
+        $favourites = Favourite::where('user_id', $user->id)
+            ->with(['petsitter.user'])
+            ->get();
+
+        return PetsitterResource::collection($favourites->pluck('petsitter')->filter());
+    }
+
     /**
      * Add a petsitter to the authenticated user's favourites.
      */

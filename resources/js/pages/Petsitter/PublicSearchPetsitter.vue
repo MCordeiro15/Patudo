@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import {
     Bell,
     ChevronRight,
@@ -10,7 +10,7 @@ import {
     Star,
     UserRound,
 } from '@lucide/vue';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
 //defineOptions({ layout: null });
 
@@ -22,50 +22,196 @@ interface Auth {
     } | null;
 }
 
+interface PetsitterApiData {
+    user_id: number;
+    service_location: string;
+    price_per_day: number;
+    user: {
+        id: number;
+        name: string;
+    };
+}
+
 const props = defineProps<{
     auth: Auth;
 }>();
 
-const petsitters = [
-    {
-        name: 'Sofia',
-        city: 'Lisboa',
-        price: 12,
-        rating: '4,9 (18)',
-        avatar: '👩🏻',
-    },
-    {
-        name: 'Tiago',
-        city: 'Porto',
-        price: 10,
-        rating: '4,8 (12)',
-        avatar: '👨🏻',
-    },
-    { name: 'João', city: 'Braga', price: 11, rating: '5,0 (9)', avatar: '👨🏾' },
-    {
-        name: 'Inês',
-        city: 'Coimbra',
-        price: 9,
-        rating: '4,7 (15)',
-        avatar: '👩🏾',
-    },
-    {
-        name: 'Maria',
-        city: 'Aveiro',
-        price: 13,
-        rating: '4,9 (21)',
-        avatar: '👩🏻',
-    },
-    { name: 'Rui', city: 'Faro', price: 10, rating: '4,8 (8)', avatar: '👨🏼' },
-];
+const petsitters = ref<PetsitterApiData[]>([]);
+const favourites = ref<number[]>([]);
+const error = ref<string | null>(null);
+const loading = ref(true);
 
-const favourites = ref<string[]>([]);
+function isFavourite(petsitterId: number): boolean {
+    return favourites.value.includes(petsitterId);
+}
 
-const toggleFavourite = (name: string) => {
-    favourites.value = favourites.value.includes(name)
-        ? favourites.value.filter((item) => item !== name)
-        : [...favourites.value, name];
-};
+// Avatar mapping based on name
+function getAvatar(name: string): string {
+    const avatars: Record<string, string> = {
+        'Sofia': '👩🏻',
+        'Tiago': '👨🏻',
+        'João': '👨🏾',
+        'Inês': '👩🏾',
+        'Maria': '👩🏻',
+        'Rui': '👨🏼',
+    };
+    return avatars[name] || '🐾';
+}
+
+// Generate a fake rating for display
+function getRating(name: string): string {
+    const ratings: Record<string, string> = {
+        'Sofia': '4,9 (18)',
+        'Tiago': '4,8 (12)',
+        'João': '5,0 (9)',
+        'Inês': '4,7 (15)',
+        'Maria': '4,9 (21)',
+        'Rui': '4,8 (8)',
+    };
+    return ratings[name] || '4,5 (0)';
+}
+
+async function fetchPetsitters() {
+    try {
+        await fetch('/sanctum/csrf-cookie', {
+            method: 'GET',
+            credentials: 'same-origin',
+        });
+
+        const response = await fetch('/api/petsitters', {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Não foi possível carregar os petsitters.');
+        }
+
+        const data = await response.json();
+        const apiPetsitters: PetsitterApiData[] = data.data ?? data;
+        petsitters.value = apiPetsitters;
+    } catch (e) {
+        error.value = e instanceof Error ? e.message : 'Ocorreu um erro ao carregar os petsitters.';
+    } finally {
+        loading.value = false;
+    }
+}
+
+async function fetchFavourites() {
+    // Only fetch if user is authenticated
+    if (!props.auth.user) return;
+
+    try {
+        await fetch('/sanctum/csrf-cookie', {
+            method: 'GET',
+            credentials: 'same-origin',
+        });
+
+        const response = await fetch('/api/favourites', {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const data = await response.json();
+        const apiPetsitters: PetsitterApiData[] = data.data ?? data;
+        favourites.value = apiPetsitters.map((p: PetsitterApiData) => p.user_id);
+    } catch {
+        // Silently fail on load
+    }
+}
+
+function getCsrfToken(): string | null {
+    const name = 'XSRF-TOKEN';
+    const cookies = document.cookie.split(';');
+    for (const cookie of cookies) {
+        const [cookieName, ...cookieValueParts] = cookie.trim().split('=');
+        if (cookieName === name) {
+            return decodeURIComponent(cookieValueParts.join('='));
+        }
+    }
+    return null;
+}
+
+async function toggleFavourite(petsitterId: number) {
+    // If not authenticated, redirect to login
+    if (!props.auth.user) {
+        router.get('/login');
+        return;
+    }
+
+    const isFavourited = favourites.value.includes(petsitterId);
+
+    // Optimistic update
+    const previousState = favourites.value;
+    if (isFavourited) {
+        favourites.value = favourites.value.filter((id) => id !== petsitterId);
+    } else {
+        favourites.value = [...favourites.value, petsitterId];
+    }
+
+    try {
+        // Get CSRF cookie first
+        await fetch('/sanctum/csrf-cookie', {
+            method: 'GET',
+            credentials: 'same-origin',
+        });
+
+        const csrfToken = getCsrfToken();
+
+        if (isFavourited) {
+            const response = await fetch(`/api/favourites/${petsitterId}`, {
+                method: 'DELETE',
+                credentials: 'same-origin',
+                headers: {
+                    Accept: 'application/json',
+                    'X-XSRF-TOKEN': csrfToken || '',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Não foi possível remover dos favoritos.');
+            }
+        } else {
+            const response = await fetch('/api/favourites', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-XSRF-TOKEN': csrfToken || '',
+                },
+                body: JSON.stringify({ petsitter_id: petsitterId }),
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    router.get('/login');
+                    return;
+                }
+                throw new Error('Não foi possível adicionar aos favoritos.');
+            }
+        }
+    } catch (e) {
+        // Revert on error
+        favourites.value = previousState;
+        error.value = e instanceof Error ? e.message : 'Ocorreu um erro.';
+    }
+}
+
+onMounted(() => {
+    fetchPetsitters();
+    fetchFavourites();
+});
 </script>
 <template>
     <Head title="Procurar Petsitter" />
@@ -138,10 +284,37 @@ const toggleFavourite = (name: string) => {
                 </button>
             </div>
 
-            <div class="row g-3">
+            <!-- Error message -->
+            <div
+                v-if="error"
+                class="alert alert-danger alert-dismissible fade show mb-4"
+                role="alert"
+            >
+                {{ error }}
+                <button
+                    type="button"
+                    class="btn-close"
+                    @click="error = null"
+                ></button>
+            </div>
+
+            <!-- Loading state -->
+            <div v-if="loading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">A carregar...</span>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div v-else-if="petsitters.length === 0" class="text-center py-5">
+                <p class="text-muted">Nenhum petsitter disponível no momento.</p>
+            </div>
+
+            <!-- Petsitters list -->
+            <div v-else class="row g-3">
                 <div
                     v-for="petsitter in petsitters"
-                    :key="petsitter.name"
+                    :key="petsitter.user_id"
                     class="col-12 col-md-6 col-lg-4"
                 >
                     <article
@@ -150,18 +323,18 @@ const toggleFavourite = (name: string) => {
                         <div
                             class="position-relative d-flex justify-content-center align-items-center border-bottom border-primary py-4"
                         >
-                            <div class="display-2">{{ petsitter.avatar }}</div>
+                            <div class="display-2">{{ getAvatar(petsitter.user.name) }}</div>
 
                             <button
                                 type="button"
                                 class="btn position-absolute top-0 end-0 m-3 p-0 text-primary"
-                                :aria-label="`Adicionar ${petsitter.name} aos favoritos`"
-                                @click="toggleFavourite(petsitter.name)"
+                                :aria-label="`Adicionar ${petsitter.user.name} aos favoritos`"
+                                @click="toggleFavourite(petsitter.user_id)"
                             >
                                 <Heart
                                     :size="32"
                                     :fill="
-                                        favourites.includes(petsitter.name)
+                                        isFavourite(petsitter.user_id)
                                             ? 'currentColor'
                                             : 'transparent'
                                     "
@@ -174,7 +347,7 @@ const toggleFavourite = (name: string) => {
                             <div
                                 class="d-flex justify-content-between align-items-start gap-2"
                             >
-                                <h2 class="h3 mb-1">{{ petsitter.name }}</h2>
+                                <h2 class="h3 mb-1">{{ petsitter.user.name }}</h2>
 
                                 <div
                                     class="d-flex align-items-center gap-1 text-dark text-nowrap"
@@ -184,7 +357,7 @@ const toggleFavourite = (name: string) => {
                                         class="text-warning"
                                         fill="currentColor"
                                     />
-                                    <span>{{ petsitter.rating }}</span>
+                                    <span>{{ getRating(petsitter.user.name) }}</span>
                                 </div>
                             </div>
 
@@ -192,7 +365,7 @@ const toggleFavourite = (name: string) => {
                                 class="d-flex align-items-center gap-1 text-muted mb-2"
                             >
                                 <MapPin :size="17" />
-                                <span>{{ petsitter.city }}</span>
+                                <span>{{ petsitter.service_location }}</span>
                             </div>
 
                             <div class="d-flex flex-wrap gap-2">
@@ -214,7 +387,7 @@ const toggleFavourite = (name: string) => {
                         >
                             <div>
                                 <p class="mb-0 small">A partir de</p>
-                                <p class="h3 mb-0">{{ petsitter.price }} €</p>
+                                <p class="h3 mb-0">{{ petsitter.price_per_day }} €</p>
                             </div>
 
                             <a
@@ -277,10 +450,23 @@ const toggleFavourite = (name: string) => {
                 </button>
             </div>
 
-            <div class="row g-3">
+            <!-- Loading state -->
+            <div v-if="loading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">A carregar...</span>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div v-else-if="petsitters.length === 0" class="text-center py-5">
+                <p class="text-muted">Nenhum petsitter disponível no momento.</p>
+            </div>
+
+            <!-- Petsitters list -->
+            <div v-else class="row g-3">
                 <div
                     v-for="petsitter in petsitters"
-                    :key="petsitter.name"
+                    :key="petsitter.user_id"
                     class="col-12 col-md-6 col-lg-4"
                 >
                     <article
@@ -289,14 +475,14 @@ const toggleFavourite = (name: string) => {
                         <div
                             class="position-relative d-flex justify-content-center align-items-center border-bottom border-primary py-4"
                         >
-                            <div class="display-2">{{ petsitter.avatar }}</div>
+                            <div class="display-2">{{ getAvatar(petsitter.user.name) }}</div>
                         </div>
 
                         <div class="p-4 border-bottom border-primary">
                             <div
                                 class="d-flex justify-content-between align-items-start gap-2"
                             >
-                                <h2 class="h3 mb-1">{{ petsitter.name }}</h2>
+                                <h2 class="h3 mb-1">{{ petsitter.user.name }}</h2>
 
                                 <div
                                     class="d-flex align-items-center gap-1 text-dark text-nowrap"
@@ -306,7 +492,7 @@ const toggleFavourite = (name: string) => {
                                         class="text-warning"
                                         fill="currentColor"
                                     />
-                                    <span>{{ petsitter.rating }}</span>
+                                    <span>{{ getRating(petsitter.user.name) }}</span>
                                 </div>
                             </div>
 
@@ -314,7 +500,7 @@ const toggleFavourite = (name: string) => {
                                 class="d-flex align-items-center gap-1 text-muted mb-2"
                             >
                                 <MapPin :size="17" />
-                                <span>{{ petsitter.city }}</span>
+                                <span>{{ petsitter.service_location }}</span>
                             </div>
 
                             <div class="d-flex flex-wrap gap-2">
@@ -336,7 +522,7 @@ const toggleFavourite = (name: string) => {
                         >
                             <div>
                                 <p class="mb-0 small">A partir de</p>
-                                <p class="h3 mb-0">{{ petsitter.price }} €</p>
+                                <p class="h3 mb-0">{{ petsitter.price_per_day }} €</p>
                             </div>
 
                             <a
