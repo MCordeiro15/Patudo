@@ -8,6 +8,7 @@ use App\Http\Controllers\API\PetsitterAvailabilityController;
 use App\Http\Controllers\API\PetsitterController;
 use App\Http\Controllers\API\PostController;
 use App\Http\Controllers\API\SupportTicketsController;
+use App\Http\Controllers\API\BookingController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -55,6 +56,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/favourites', [FavouriteController::class, 'index']);
     Route::post('/favourites', [FavouriteController::class, 'store']);
     Route::delete('/favourites/{petsitter}', [FavouriteController::class, 'destroy']);
+
+    // Bookings
+    Route::apiResource('bookings', BookingController::class)->only(['index', 'store', 'show']);
+    Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus']);
 
     // Support Tickets
     Route::get('/support-tickets', [SupportTicketsController::class, 'index']);
