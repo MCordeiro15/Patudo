@@ -27,6 +27,7 @@ void createInertiaApp({
             case name.startsWith('auth/'):
             case name === 'Petsitter/SearchPetsitter':
             case name === 'Petsitter/PublicSearchPetsitter':
+            case name === 'Petsitter/Favorites':
             case name === 'Petsitter/Profile':
                 return null;
             case name.startsWith('settings/'):
