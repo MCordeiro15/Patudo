@@ -1,7 +1,3 @@
-<script setup>
-import logoPatudo from '@/../../assets/logoPatudo.svg';
-</script>
-
 <template>
     <div class="min-vh-100 d-flex flex-column bg-light bg-opacity-25 position-relative overflow-hidden">
 
@@ -13,10 +9,9 @@ import logoPatudo from '@/../../assets/logoPatudo.svg';
             <header class="container py-4">
                 <nav class="d-flex align-items-center justify-content-between">
 
-                    <a href="/"
+                    <a href="/login"
                        class="navbar-brand fw-bolder fs-2 text-decoration-none text-body d-flex align-items-center gap-2">
-                        <img :src="logoPatudo" alt="Logo Patudo" width="70">
-                        Patudo
+                        <img src="/images/patudo-logo.svg" alt="Logo Patudo" width="190">
                     </a>
 
                     <div class="d-flex gap-2 col-6 col-md-4 col-lg-3">

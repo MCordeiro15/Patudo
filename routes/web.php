@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AnimalController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\PetsitterAvailabilityController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::prefix('api')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -19,7 +20,12 @@ Route::prefix('api')->group(function () {
     });
 });
 
-Route::inertia('/', 'Homepage')->name('home');
+Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('petsitters.public');
+    }
+    return Inertia::render('Homepage');
+})->name('home');
 Route::inertia('/login', 'auth/Login')->name('login');
 Route::inertia('/register', 'auth/Register')->name('register');
 Route::inertia('/petsitters', 'Petsitter/SearchPetsitter')->middleware('auth')->name('petsitters.search');
