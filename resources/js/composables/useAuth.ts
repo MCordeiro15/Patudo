@@ -70,10 +70,8 @@ export async function login(
     try {
         await fetchCsrfToken();
 
-        const xsrfToken = document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('XSRF-TOKEN='))
-            ?.split('=')[1];
+        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+        const xsrfToken = match ? decodeURIComponent(match[1]) : '';
 
         const response = await fetch('/api/login', {
             method: 'POST',
@@ -132,10 +130,8 @@ export async function register(
     try {
         await fetchCsrfToken();
 
-        const xsrfToken = document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('XSRF-TOKEN='))
-            ?.split('=')[1];
+        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+        const xsrfToken = match ? decodeURIComponent(match[1]) : '';
 
         const body: Record<string, string | null> = {
             name,
@@ -194,10 +190,8 @@ export async function logout() {
     try {
         await fetchCsrfToken();
 
-        const xsrfToken = document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('XSRF-TOKEN='))
-            ?.split('=')[1];
+        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+        const xsrfToken = match ? decodeURIComponent(match[1]) : '';
 
         await fetch('/api/logout', {
             method: 'POST',

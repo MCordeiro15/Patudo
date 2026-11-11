@@ -37,9 +37,15 @@ if (! function_exists('extracted')) {
     }
 }
 
-// SPA authentication routes — sanctum.stateful is applied automatically by statefulApi() in bootstrap/app.php
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+// SPA authentication routes — need session middleware for Auth::attempt() and session()->regenerate()
+Route::middleware([
+    \Illuminate\Cookie\Middleware\EncryptCookies::class,
+    \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    \Illuminate\Session\Middleware\StartSession::class,
+])->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+});
 
 Route::get('/petsitters/{id}/availability', [PetsitterAvailabilityController::class, 'availability']);
 

@@ -24,19 +24,23 @@ type PetsitterPost = {
 };
 
 type PetsitterProfile = {
+    id: number;
     user_id: number;
     name: string;
-    location: string;
     biography: string | null;
     experience: string;
-    pricePerDay: number;
-    acceptedSizes: string[];
-    acceptedAnimalTypes: string[];
-    memberSince: string | null;
-    rating: number | null;
-    reviewsCount: number;
-    availabilityDays: string[] | null;
-    posts: PetsitterPost[];
+    service_location: string;
+    age: number;
+    price_per_day: number;
+    accepted_sizes: string[] | null;
+    accepted_animal_types: string[] | null;
+    sex: string | null;
+    approval_status: string;
+    identification_documents?: string | null;
+    availability_days: string[] | null;
+    created_at: string;
+    updated_at: string;
+    posts?: PetsitterPost[];
 };
 
 const DAY_OPTIONS: Array<{ value: string; label: string }> = [
@@ -51,6 +55,8 @@ const DAY_OPTIONS: Array<{ value: string; label: string }> = [
 
 const props = defineProps<{
     petsitter?: PetsitterProfile | null;
+    isOwnProfile?: boolean;
+    isAdmin?: boolean;
 }>();
 
 // Reactive availability days for editing
@@ -64,9 +70,12 @@ const saveSuccess = ref(false);
 const showEditProfileModal = ref(false);
 
 const petsitter = computed(() => props.petsitter);
+const isOwnProfile = computed(() => props.isOwnProfile ?? false);
+const isAdmin = computed(() => props.isAdmin ?? false);
+const canEdit = computed(() => isOwnProfile.value || isAdmin.value);
 
 const currentAvailabilityDays = computed(() => {
-    return petsitter.value?.availabilityDays ?? [];
+    return petsitter.value?.availability_days ?? [];
 });
 
 const sizeLabelMap: Record<string, string> = {
@@ -84,10 +93,10 @@ const animalTypeLabelMap: Record<string, string> = {
 
 const serviceTags = computed(() => {
     if (!petsitter.value) return ['Cuidador'];
-    const sizeTags = petsitter.value.acceptedSizes.map(
+    const sizeTags = (petsitter.value.accepted_sizes ?? []).map(
         (size) => sizeLabelMap[size] ?? size,
     );
-    const animalTags = petsitter.value.acceptedAnimalTypes.map(
+    const animalTags = (petsitter.value.accepted_animal_types ?? []).map(
         (type) => animalTypeLabelMap[type] ?? type,
     );
     const tags = [...sizeTags, ...animalTags];
@@ -118,10 +127,10 @@ const formatDateTime = (dateTime: string | null) => {
 };
 
 const memberSinceLabel = computed(() => {
-    if (!petsitter.value?.memberSince) {
+    if (!petsitter.value?.created_at) {
         return '--';
     }
-    return new Date(petsitter.value.memberSince).toLocaleDateString('pt-PT');
+    return new Date(petsitter.value.created_at).toLocaleDateString('pt-PT');
 });
 
 const displayName = computed(() => {
@@ -129,7 +138,7 @@ const displayName = computed(() => {
 });
 
 const displayLocation = computed(() => {
-    return petsitter.value?.location ?? '--';
+    return petsitter.value?.service_location ?? '--';
 });
 
 const displayBiography = computed(() => {
@@ -141,22 +150,22 @@ const displayExperience = computed(() => {
 });
 
 const displayPricePerDay = computed(() => {
-    return petsitter.value?.pricePerDay ?? 0;
+    return petsitter.value?.price_per_day ?? 0;
 });
 
 const displayRating = computed(() => {
-    return petsitter.value?.rating ?? null;
+    return null;
 });
 
 const displayReviewsCount = computed(() => {
-    return petsitter.value?.reviewsCount ?? 0;
+    return 0;
 });
 
 const displayPosts = computed(() => {
     return petsitter.value?.posts ?? [];
 });
 
-const hasProfile = computed(() => petsitter.value !== null);
+const hasProfile = computed(() => petsitter.value != null);
 
 const startEditing = () => {
     editingDays.value = [...currentAvailabilityDays.value];
@@ -192,6 +201,9 @@ const saveAvailability = async () => {
             credentials: 'same-origin',
         });
 
+        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+        const xsrfToken = match ? decodeURIComponent(match[1]) : '';
+
         const response = await fetch('/api/petsitters/availability/days', {
             method: 'PUT',
             credentials: 'same-origin',
@@ -199,15 +211,19 @@ const saveAvailability = async () => {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': xsrfToken,
             },
-            body: JSON.stringify({ days: editingDays.value }),
+            body: JSON.stringify({
+                days: editingDays.value,
+                petsitter_id: petsitter.value?.user_id,
+            }),
         });
 
         if (response.ok) {
             const data = await response.json();
             // Update the local petsitter data
             if (data.data && data.data.availability_days !== undefined) {
-                (props.petsitter as any).availabilityDays = data.data.availability_days;
+                (props.petsitter as any).availability_days = data.data.availability_days;
             }
             isEditing.value = false;
             saveSuccess.value = true;
@@ -230,7 +246,7 @@ const saveAvailability = async () => {
 </script>
 
 <template>
-    <Head title="Perfil do Petsitter" />
+    <Head :title="isOwnProfile ? 'O meu perfil' : 'Perfil do Petsitter'" />
 
     <main class="min-vh-100 py-4 patudo-page">
         <div class="container">
@@ -291,7 +307,9 @@ const saveAvailability = async () => {
 
             <div class="row justify-content-center mt-5 pt-4">
                 <div class="col-12">
-                    <h1 class="text-center fw-bold mb-4 pb-2">O meu perfil</h1>
+                    <h1 class="text-center fw-bold mb-4 pb-2">
+                        {{ isOwnProfile ? 'O meu perfil' : 'Perfil do Petsitter' }}
+                    </h1>
 
                     <!-- No profile message -->
                     <section
@@ -369,6 +387,7 @@ const saveAvailability = async () => {
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <h3 class="h5 mb-0">Sobre mim</h3>
                                 <button
+                                    v-if="canEdit"
                                     type="button"
                                     class="btn btn-outline-primary btn-sm rounded-pill"
                                     @click="showEditProfileModal = true"
@@ -405,7 +424,7 @@ const saveAvailability = async () => {
                                 >
                                     <div class="d-flex align-items-center justify-content-between mb-3">
                                         <h3 class="h5 mb-0">Disponibilidade</h3>
-                                        <template v-if="!isEditing">
+                                        <template v-if="canEdit && !isEditing">
                                             <button
                                                 type="button"
                                                 class="btn btn-outline-secondary btn-sm rounded-pill"
@@ -442,7 +461,7 @@ const saveAvailability = async () => {
                                     </template>
 
                                     <!-- Edit mode: checkboxes -->
-                                    <template v-else>
+                                    <template v-else-if="canEdit">
                                         <p class="text-muted small mb-3">
                                             Selecione os dias em que está disponível:
                                         </p>
@@ -533,12 +552,14 @@ const saveAvailability = async () => {
                                             class="col-12 col-md-1 d-flex justify-content-md-end gap-2"
                                         >
                                             <button
+                                                v-if="canEdit"
                                                 type="button"
                                                 class="btn btn-link text-dark p-0"
                                             >
                                                 <PenLine :size="18" />
                                             </button>
                                             <button
+                                                v-if="canEdit"
                                                 type="button"
                                                 class="btn btn-link text-dark p-0"
                                             >
@@ -555,6 +576,7 @@ const saveAvailability = async () => {
                                 </article>
 
                                 <article
+                                    v-if="canEdit"
                                     class="card border border-primary rounded-4 p-4 text-center d-flex align-items-center justify-content-center"
                                     style="min-height: 170px"
                                 >
@@ -582,6 +604,7 @@ const saveAvailability = async () => {
 
         <!-- Edit Profile Modal -->
         <ModalEditPetsitterProfile
+            v-if="canEdit"
             :show="showEditProfileModal"
             :petsitter="petsitter as PetsitterProfileType | null"
             @close="showEditProfileModal = false"

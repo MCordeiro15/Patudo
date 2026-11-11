@@ -7,6 +7,7 @@ import type { Animal } from '@/types';
 import { useAuth } from '@/composables/useAuth';
 import AnimalCard from '@/components/AnimalCard.vue';
 import ModalAddPet from '@/pages/Modals/ModalAddPet.vue';
+import ModalDeleteAnimal from '@/pages/Modals/ModalDeleteAnimal.vue';
 
 const { user, logout } = useAuth();
 
@@ -14,6 +15,8 @@ const animals = ref<Animal[]>([]);
 const isLoading = ref(false);
 const loadError = ref('');
 const showAddModal = ref(false);
+const showDeleteModal = ref(false);
+const deletingAnimal = ref<{ id: number; name: string } | null>(null);
 
 const displayName = computed(() => user.value?.name ?? 'Utilizador');
 
@@ -52,6 +55,50 @@ const fetchAnimals = async () => {
 const handleAnimalSaved = () => {
     // Refresh the list after a new animal is saved
     void fetchAnimals();
+};
+
+const openDeleteModal = (animalId: number) => {
+    const animal = animals.value.find((a) => a.id === animalId);
+    if (animal) {
+        deletingAnimal.value = { id: animalId, name: animal.name };
+        showDeleteModal.value = true;
+    }
+};
+
+const confirmDeleteAnimal = async () => {
+    if (!deletingAnimal.value) return;
+
+    try {
+        await fetch('/sanctum/csrf-cookie', {
+            method: 'GET',
+            credentials: 'same-origin',
+        });
+
+        const token = document.cookie
+            .split('xsrf_token=')
+            .pop()
+            .split(';')
+            .shift();
+        const xsrfToken = token ? decodeURIComponent(token) : '';
+
+        const response = await fetch(`/api/animals/${deletingAnimal.value.id}`, {
+            method: 'DELETE',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': xsrfToken,
+            },
+        });
+
+        if (response.ok) {
+            animals.value = animals.value.filter((a) => a.id !== deletingAnimal.value!.id);
+            showDeleteModal.value = false;
+            deletingAnimal.value = null;
+        }
+    } catch {
+        // Erro de conexão
+    }
 };
 
 onMounted(() => {
@@ -199,7 +246,10 @@ onMounted(() => {
                                 :key="animal.id"
                                 class="col-12 col-md-6 col-lg-4"
                             >
-                                <AnimalCard :animal="animal" />
+                                <AnimalCard
+                                    :animal="animal"
+                                    @delete="openDeleteModal"
+                                />
                             </div>
                         </div>
                     </section>
@@ -212,6 +262,14 @@ onMounted(() => {
             :show="showAddModal"
             @close="showAddModal = false"
             @saved="handleAnimalSaved"
+        />
+
+        <!-- Delete Animal Modal -->
+        <ModalDeleteAnimal
+            :show="showDeleteModal"
+            :animal-name="deletingAnimal?.name ?? ''"
+            @close="showDeleteModal = false; deletingAnimal = null"
+            @confirmed="confirmDeleteAnimal"
         />
     </main>
 </template>

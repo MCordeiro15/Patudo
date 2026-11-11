@@ -1,8 +1,13 @@
 <script setup lang="ts">
+import { Trash2 } from '@lucide/vue';
 import type { Animal } from '@/types';
 
-defineProps<{
+const props = defineProps<{
     animal: Animal;
+}>();
+
+const emit = defineEmits<{
+    delete: [id: number];
 }>();
 
 const sizeLabelMap: Record<string, string> = {
@@ -52,6 +57,15 @@ const sizeBadgeClass = (size: string) => sizeBadgeClassMap[size] ?? 'text-bg-sec
                 <p v-if="animal.special_needs" class="mb-0 small text-muted">
                     <strong>Necessidades especiais:</strong> {{ animal.special_needs }}
                 </p>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger rounded-pill mt-2 d-flex align-items-center gap-1"
+                    @click="emit('delete', props.animal.id)"
+                >
+                    <Trash2 :size="14" />
+                    Remover
+                </button>
             </div>
         </div>
     </div>

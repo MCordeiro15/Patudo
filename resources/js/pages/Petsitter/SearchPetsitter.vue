@@ -386,7 +386,7 @@ onMounted(() => {
                             </div>
 
                             <a
-                                href="/petsitters/profile"
+                                :href="`/petsitters/${petsitter.user_id}`"
                                 class="btn btn-link text-dark fs-5 p-0"
                             >
                                 Ver perfil

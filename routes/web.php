@@ -22,10 +22,13 @@ Route::inertia('/register', 'auth/Register')->name('register');
 Route::inertia('/petsitters', 'Petsitter/SearchPetsitter')->middleware('auth')->name('petsitters.search');
 Route::inertia('/find-petsitter', 'Petsitter/PublicSearchPetsitter')->name('petsitters.public');
 Route::inertia('/favorites', 'Petsitter/Favorites')->middleware('auth')->name('favorites');
-Route::get('/petsitters/profile', [PetsitterProfileController::class, 'show'])
+Route::get('/petsitters/profile', [PetsitterProfileController::class, 'showOwn'])
     ->middleware('auth')
     ->name('petsitters.profile');
-Route::inertia('/petsitters/profile', 'Petsitter/Profile')->name('petsitters.profile');
+Route::get('/petsitters/{petsitter}', [PetsitterProfileController::class, 'show'])
+    ->middleware('auth')
+    ->whereNumber('petsitter')
+    ->name('petsitters.show');
 Route::inertia('/profile', 'Owner/Profile')->middleware('auth')->name('owner.profile');
 Route::inertia('/dev/modals', 'Modals/ModalTests');
 require __DIR__ . '/settings.php';

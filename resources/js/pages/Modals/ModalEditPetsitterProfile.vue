@@ -112,10 +112,8 @@ const submit = async () => {
             credentials: 'same-origin',
         });
 
-        const xsrfToken = document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('XSRF-TOKEN='))
-            ?.split('=')[1];
+        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+        const xsrfToken = match ? decodeURIComponent(match[1]) : '';
 
         const body: Record<string, string | number | string[] | null> = {
             biography: biography.value.trim() || null,

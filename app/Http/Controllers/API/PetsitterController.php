@@ -86,7 +86,8 @@ class PetsitterController extends Controller
 
     /**
      * Atualiza os dias da semana de disponibilidade do petsitter.
-     * O user_id vem do utilizador autenticado.
+     * Se um petsitter_id for enviado, atualiza esse perfil (admin ou dono).
+     * Caso contrário, atualiza o perfil do utilizador autenticado.
      */
     public function updateAvailabilityDays(Request $request): JsonResponse|PetsitterResource
     {
@@ -96,10 +97,20 @@ class PetsitterController extends Controller
             return response()->json(['message' => 'Não autenticado.'], 401);
         }
 
-        $petsitter = Petsitter::where('user_id', $user->id)->first();
-
-        if (! $petsitter) {
-            return response()->json(['message' => 'Perfil de petsitter não encontrado.'], 404);
+        // Se um petsitter_id for fornecido, tenta encontrar esse petsitter
+        if ($request->has('petsitter_id')) {
+            $petsitter = Petsitter::where('user_id', $request->input('petsitter_id'))->first();
+            if (! $petsitter) {
+                return response()->json(['message' => 'Perfil de petsitter não encontrado.'], 404);
+            }
+            // Verificar permissão: só admin ou o próprio dono podem editar
+            Gate::authorize('update', $petsitter);
+        } else {
+            // Comportamento original: atualiza o próprio perfil
+            $petsitter = Petsitter::where('user_id', $user->id)->first();
+            if (! $petsitter) {
+                return response()->json(['message' => 'Perfil de petsitter não encontrado.'], 404);
+            }
         }
 
         $validated = $request->validate([

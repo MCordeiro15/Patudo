@@ -1,6 +1,14 @@
+export type PetsitterPost = {
+    id: number;
+    description: string;
+    photos: string[];
+    createdAt: string | null;
+};
+
 export type PetsitterProfile = {
     id: number;
     user_id: number;
+    name: string;
     biography: string | null;
     experience: string;
     service_location: string;
@@ -10,10 +18,11 @@ export type PetsitterProfile = {
     accepted_animal_types: string[] | null;
     sex: string | null;
     approval_status: string;
-    identification_documents: string | null;
+    identification_documents?: string | null;
     availability_days: string[] | null;
     created_at: string;
     updated_at: string;
+    posts?: PetsitterPost[];
 };
 
 export type PetsitterFormErrors = {
