@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {Link} from '@inertiajs/vue3';
 import {ref} from 'vue';
+import {login as authLogin} from '@/composables/useAuth';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import imgCao from '@/../../assets/caoLoginRegister.jpg';
 import '../../../css/login.css';
@@ -16,35 +17,22 @@ const login = async () => {
     msg.value = 'A validar...';
     isError.value = false;
 
-    try {
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            body: JSON.stringify({
-                email: email.value,
-                password: password.value,
-            }),
-        });
-        const data = await res.json();
-        if (res.ok) {
-            isError.value = false;
-            msg.value = 'Login com sucesso!';
-            window.location.href = '/petsitters';
-        } else {
-            isError.value = true;
-            msg.value =
-                'Erro: ' + (data.message || JSON.stringify(data.errors));
-        }
-    } catch (e: any) {
+    const result = await authLogin(email.value, password.value);
+
+    if (result.success) {
+        isError.value = false;
+        msg.value = 'Login com sucesso!';
+        // Navigation is handled by the auth composable
+    } else {
         isError.value = true;
-        msg.value = 'Erro: ' + e.message;
-    } finally {
-        isLoading.value = false;
+        const errors = result.errors as Record<string, string | string[]>;
+        const firstError = Object.values(errors)[0];
+        msg.value = Array.isArray(firstError)
+            ? firstError.join(', ')
+            : (firstError ?? 'Credenciais inválidas.');
     }
+
+    isLoading.value = false;
 };
 </script>
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {Link} from '@inertiajs/vue3';
 import {ref} from 'vue';
+import {register as authRegister} from '@/composables/useAuth';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import imgCao from '@/../../assets/caoLoginRegister.jpg';
 import '../../../css/register.css';
@@ -23,37 +24,28 @@ const register = async () => {
     isLoading.value = true;
     isError.value = false;
     msg.value = 'A registar...';
-    try {
-        const res = await fetch('/api/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            body: JSON.stringify({
-                name: name.value,
-                email: email.value,
-                password: password.value,
-                password_confirmation: passwordConfirmation.value,
-            }),
-        });
-        const data = await res.json();
-        if (res.ok) {
-            isError.value = false;
-            msg.value = 'Registo efetuado com sucesso!';
-            window.location.href = '/login';
-        } else {
-            isError.value = true;
-            msg.value =
-                'Erro: ' + (data.message || JSON.stringify(data.errors));
-        }
-    } catch (e: any) {
+
+    const result = await authRegister(
+        name.value,
+        email.value,
+        password.value,
+        passwordConfirmation.value,
+    );
+
+    if (result.success) {
+        isError.value = false;
+        msg.value = 'Registo efetuado com sucesso!';
+        // Navigation is handled by the auth composable
+    } else {
         isError.value = true;
-        msg.value = 'Erro: ' + e.message;
-    } finally {
-        isLoading.value = false;
+        const errors = result.errors as Record<string, string | string[]>;
+        const firstError = Object.values(errors)[0];
+        msg.value = Array.isArray(firstError)
+            ? firstError.join(', ')
+            : (firstError ?? 'Erro ao registar.');
     }
+
+    isLoading.value = false;
 };
 </script>
 

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
-import TextLink from '@/components/TextLink.vue';
+import { logout as authLogout } from '@/composables/useAuth';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 
 defineOptions({
@@ -40,8 +39,12 @@ defineProps<{
             Resend verification email
         </Button>
 
-        <TextLink :href="logout()" as="button" class="mx-auto block text-sm">
+        <a
+            href="#"
+            @click.prevent="authLogout"
+            class="mx-auto block text-sm text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! cursor-pointer"
+        >
             Log out
-        </TextLink>
+        </a>
     </Form>
 </template>

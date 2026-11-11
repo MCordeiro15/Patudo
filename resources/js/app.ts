@@ -1,5 +1,6 @@
-import { createInertiaApp } from '@inertiajs/vue3';
+import { createInertiaApp, router } from '@inertiajs/vue3';
 import { initializeTheme } from '@/composables/useAppearance';
+import { loadUser } from '@/composables/useAuth';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
@@ -10,6 +11,13 @@ if (typeof window !== 'undefined') {
 }
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+
+// Global 401 interceptor – redirect to /login when the session is missing
+router.on('error', (error) => {
+    if ((error as { status?: number }).status === 401) {
+        window.location.href = '/login';
+    }
+});
 
 void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
@@ -46,3 +54,7 @@ initializeTheme();
 
 // This will listen for flash toast data from the server...
 initializeFlashToast();
+
+// Load the authenticated user once on app initialization so all pages
+// have access to the session data without repeating the request.
+void loadUser();
