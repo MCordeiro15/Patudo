@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import {
     Bell,
     ChevronRight,
     Heart,
+    LogOut,
     MapPin,
     MessageCircle,
     SlidersHorizontal,
@@ -54,6 +55,7 @@ const toggleFavourite = (name: string) => {
         : [...favourites.value, name];
 };
 </script>
+
 <template>
     <Head title="Procurar Petsitter" />
 
@@ -73,16 +75,17 @@ const toggleFavourite = (name: string) => {
                         height="62"
                     />
                 </a>
-                <!-- Маленькая навигация по центру -->
+
                 <div class="nav nav-pills border rounded-pill p-1 mx-auto">
-                    <a class="nav-link active rounded-pill px-4" href="/"
-                        >Início</a
-                    >
+                    <a class="nav-link active rounded-pill px-4" href="/">
+                        Início
+                    </a>
                     <a
                         class="nav-link text-dark rounded-pill px-4"
                         href="/orders"
-                        >Pedidos</a
                     >
+                        Pedidos
+                    </a>
                     <a
                         class="nav-link text-dark rounded-pill px-4"
                         href="/favorites"
@@ -97,17 +100,26 @@ const toggleFavourite = (name: string) => {
                     </a>
                 </div>
 
-                <!-- Иконки справа -->
                 <div class="d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark"
-                        ><MessageCircle :size="25"
-                    /></a>
-                    <a href="/notifications" class="text-dark"
-                        ><Bell :size="25"
-                    /></a>
-                    <a href="/profile" class="text-dark"
-                        ><UserRound :size="25"
-                    /></a>
+                    <a href="/messages" class="text-dark">
+                        <MessageCircle :size="25" />
+                    </a>
+                    <a href="/notifications" class="text-dark">
+                        <Bell :size="25" />
+                    </a>
+                    <a href="/profile" class="text-dark">
+                        <UserRound :size="25" />
+                    </a>
+
+                    <Link
+                        href="/logout"
+                        method="post"
+                        as="button"
+                        class="btn btn-outline-danger btn-sm rounded-pill d-flex align-items-center gap-2 px-3 py-1 ms-1"
+                    >
+                        <LogOut :size="16" />
+                        <span>Sair</span>
+                    </Link>
                 </div>
             </nav>
 
@@ -135,7 +147,6 @@ const toggleFavourite = (name: string) => {
                     <article
                         class="card petsitter-card h-100 overflow-hidden border border-primary rounded-5"
                     >
-                        <!-- Верх: аватар и избранное -->
                         <div
                             class="position-relative d-flex justify-content-center align-items-center border-bottom border-primary py-4"
                         >
@@ -159,7 +170,6 @@ const toggleFavourite = (name: string) => {
                             </button>
                         </div>
 
-                        <!-- Середина: имя, рейтинг, локация и теги -->
                         <div class="p-4 border-bottom border-primary">
                             <div
                                 class="d-flex justify-content-between align-items-start gap-2"
@@ -199,7 +209,6 @@ const toggleFavourite = (name: string) => {
                             </div>
                         </div>
 
-                        <!-- Низ: цена и переход в профиль -->
                         <div
                             class="d-flex justify-content-between align-items-end p-4"
                         >
