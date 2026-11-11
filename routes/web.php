@@ -26,5 +26,6 @@ Route::get('/petsitters/profile', [PetsitterProfileController::class, 'show'])
     ->middleware('auth')
     ->name('petsitters.profile');
 Route::inertia('/petsitters/profile', 'Petsitter/Profile')->name('petsitters.profile');
+Route::inertia('/profile', 'Owner/Profile')->middleware('auth')->name('owner.profile');
 Route::inertia('/dev/modals', 'Modals/ModalTests');
 require __DIR__ . '/settings.php';

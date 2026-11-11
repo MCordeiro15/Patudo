@@ -29,6 +29,7 @@ void createInertiaApp({
             case name === 'Petsitter/PublicSearchPetsitter':
             case name === 'Petsitter/Favorites':
             case name === 'Petsitter/Profile':
+            case name === 'Owner/Profile':
                 return null;
             case name.startsWith('settings/'):
                 return [AppLayout, SettingsLayout];
