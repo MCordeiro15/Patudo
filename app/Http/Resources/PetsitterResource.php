@@ -23,6 +23,7 @@ class PetsitterResource extends JsonResource
         $canSeePrivate = $viewer && ($viewer->isAdmin() || $viewer->id === $this->user_id);
 
         return [
+            'id' => $this->id,
             'user_id' => $this->user_id,
             'biography' => $this->biography,
             'experience' => $this->experience,

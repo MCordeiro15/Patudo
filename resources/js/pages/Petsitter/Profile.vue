@@ -13,6 +13,8 @@ import {
 } from '@lucide/vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import { computed, ref } from 'vue';
+import ModalEditPetsitterProfile from '@/pages/Modals/ModalEditPetsitterProfile.vue';
+import type { PetsitterProfile as PetsitterProfileType } from '@/types';
 
 type PetsitterPost = {
     id: number;
@@ -57,6 +59,9 @@ const isEditing = ref(false);
 const saving = ref(false);
 const saveError = ref<string | null>(null);
 const saveSuccess = ref(false);
+
+// Edit profile modal state
+const showEditProfileModal = ref(false);
 
 const petsitter = computed(() => props.petsitter);
 
@@ -361,7 +366,17 @@ const saveAvailability = async () => {
                         <section
                             class="card border border-primary rounded-4 p-3 p-md-4 mb-3"
                         >
-                            <h3 class="h5">Sobre mim</h3>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h3 class="h5 mb-0">Sobre mim</h3>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-primary btn-sm rounded-pill"
+                                    @click="showEditProfileModal = true"
+                                >
+                                    <Pencil :size="14" class="me-1" />
+                                    Editar perfil
+                                </button>
+                            </div>
                             <p class="mb-0 text-muted">
                                 {{ displayBiography }}
                             </p>
@@ -564,5 +579,12 @@ const saveAvailability = async () => {
                 </div>
             </div>
         </div>
+
+        <!-- Edit Profile Modal -->
+        <ModalEditPetsitterProfile
+            :show="showEditProfileModal"
+            :petsitter="petsitter as PetsitterProfileType | null"
+            @close="showEditProfileModal = false"
+        />
     </main>
 </template>

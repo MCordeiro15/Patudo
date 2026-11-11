@@ -246,3 +246,68 @@ test('admin can approve a petsitter with identification documents', function () 
         'approval_status' => 'approved',
     ]);
 });
+
+test('petsitter update returns 422 validation errors when required fields are missing', function () {
+    $owner = User::factory()->create();
+    $petsitter = Petsitter::factory()->create(['user_id' => $owner->id]);
+
+    $response = $this->actingAs($owner)->putJson('/api/petsitters/'.$petsitter->user_id, [
+        'experience' => '',
+        'service_location' => '',
+        'age' => 10,
+        'price_per_day' => -5,
+    ]);
+
+    $response->assertUnprocessable();
+});
+
+test('petsitter update cannot change approval_status', function () {
+    $owner = User::factory()->create();
+    $petsitter = Petsitter::factory()->create([
+        'user_id' => $owner->id,
+        'approval_status' => 'pending',
+    ]);
+
+    $response = $this->actingAs($owner)->putJson('/api/petsitters/'.$petsitter->user_id, [
+        'experience' => 'Updated experience',
+        'approval_status' => 'approved',
+    ]);
+
+    $response->assertOk();
+
+    // approval_status should remain unchanged
+    $petsitter->refresh();
+    expect($petsitter->approval_status)->toBe('pending');
+});
+
+test('petsitter update validates all editable fields', function () {
+    $owner = User::factory()->create();
+    $petsitter = Petsitter::factory()->create(['user_id' => $owner->id]);
+
+    $response = $this->actingAs($owner)->putJson('/api/petsitters/'.$petsitter->user_id, [
+        'biography' => 'New biography',
+        'experience' => '10 years of experience',
+        'service_location' => 'Lisboa',
+        'price_per_day' => 30.0,
+        'age' => 25,
+        'sex' => 'female',
+        'accepted_sizes' => ['small', 'large'],
+        'accepted_animal_types' => ['dog', 'cat'],
+    ]);
+
+    $response->assertOk()
+        ->assertJsonFragment(['biography' => 'New biography'])
+        ->assertJsonFragment(['experience' => '10 years of experience'])
+        ->assertJsonFragment(['service_location' => 'Lisboa'])
+        ->assertJsonFragment(['price_per_day' => 30.0])
+        ->assertJsonFragment(['age' => 25])
+        ->assertJsonFragment(['sex' => 'female'])
+        ->assertJsonFragment(['accepted_sizes' => ['small', 'large']])
+        ->assertJsonFragment(['accepted_animal_types' => ['dog', 'cat']]);
+
+    $this->assertDatabaseHas('petsitters', [
+        'user_id' => $owner->id,
+        'biography' => 'New biography',
+        'service_location' => 'Lisboa',
+    ]);
+});
