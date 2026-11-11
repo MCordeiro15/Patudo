@@ -22,7 +22,7 @@ Route::prefix('api')->group(function () {
 
 Route::get('/', action: function () {
     if (auth()->check()) {
-        return redirect()->route('petsitters.public');
+        return redirect()->route('petsitters.search');
     }
 
     return Inertia::render('Homepage');

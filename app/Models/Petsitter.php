@@ -39,7 +39,7 @@ class Petsitter extends Model
         'user_id', 'biography', 'experience', 'service_location',
         'age',
         'price_per_day', 'accepted_sizes', 'sex', 'accepted_animal_types',
-        'identification_documents',
+        'identification_documents', 'availability_days',
     ];
 
     protected function casts(): array
@@ -47,6 +47,7 @@ class Petsitter extends Model
         return [
             'accepted_sizes' => 'array',
             'accepted_animal_types' => 'array',
+            'availability_days' => 'array',
         ];
     }
 
@@ -55,10 +56,6 @@ class Petsitter extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function availabilities(): HasMany
-    {
-        return $this->hasMany(PetsitterAvailability::class, 'petsitter_id', 'user_id');
-    }
 
     public function posts(): HasMany
     {

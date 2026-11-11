@@ -34,6 +34,7 @@ class PetsitterResource extends JsonResource
             'sex' => $this->sex,
             'approval_status' => $this->approval_status,
             'identification_documents' => $this->when($canSeePrivate, $this->identification_documents),
+            'availability_days' => $this->availability_days,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'user' => $this->whenLoaded('user', fn () => $canSeePrivate
