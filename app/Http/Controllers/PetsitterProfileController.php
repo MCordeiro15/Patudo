@@ -21,7 +21,7 @@ class PetsitterProfileController extends Controller
             return redirect()->route('owner.profile');
         }
 
-        $petsitter->load(['user', 'posts']);
+        $petsitter->load('user');
 
         return $this->renderProfile($petsitter, true, true, $user->isAdmin());
     }
@@ -39,7 +39,7 @@ class PetsitterProfileController extends Controller
             404,
         );
 
-        $petsitter->load(['user', 'posts']);
+        $petsitter->load('user');
 
         return $this->renderProfile(
             $petsitter,
@@ -70,14 +70,6 @@ class PetsitterProfileController extends Controller
                 'availability_days' => $petsitter->availability_days ?? [],
                 'created_at' => $petsitter->created_at?->toIso8601String(),
                 'updated_at' => $petsitter->updated_at?->toIso8601String(),
-                'posts' => $petsitter->posts->map(function ($post) {
-                    return [
-                        'id' => $post->id,
-                        'description' => $post->description,
-                        'photos' => $post->photos ?? [],
-                        'createdAt' => $post->created_at?->toIso8601String(),
-                    ];
-                })->toArray(),
             ];
 
             if ($canSeePrivate) {

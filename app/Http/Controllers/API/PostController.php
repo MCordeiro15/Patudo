@@ -33,6 +33,7 @@ class PostController extends Controller
         Gate::authorize('create', Post::class);
 
         $data = $request->validate([
+            'title' => 'required|string|max:100',
             'description' => 'required|string|max:2000',
             'photos' => 'nullable|array|max:5',
             'photos.*' => 'image|mimes:jpg,jpeg,png|max:5120',
@@ -44,6 +45,7 @@ class PostController extends Controller
         }
 
         $post = $request->user()->petsitter->posts()->create([
+            'title' => $data['title'],
             'description' => $data['description'],
             'photos' => $paths,
         ]);
@@ -63,7 +65,8 @@ class PostController extends Controller
         Gate::authorize('update', $post);
 
         $data = $request->validate([
-            'description' => 'required|string|max:2000',
+            'title' => 'sometimes|required|string|max:100',
+            'description' => 'sometimes|string|max:2000',
         ]);
 
         $post->update($data);

@@ -22,6 +22,7 @@ class PostResource extends JsonResource
         return [
             'id' => $this->id,
             'petsitter_id' => $this->petsitter_id,
+            'title' => $this->title,
             'description' => $this->description,
             'photos' => collect($this->photos)
                 ->map(fn ($path) => Storage::disk('public')->url($path))
