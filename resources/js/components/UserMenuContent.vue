@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { LogOut, Settings } from '@lucide/vue';
+import { Dog, LogOut, Settings } from '@lucide/vue';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -27,6 +27,12 @@ defineProps<Props>();
     </DropdownMenuLabel>
     <DropdownMenuSeparator />
     <DropdownMenuGroup>
+        <DropdownMenuItem v-if="user.is_petsitter" :as-child="true">
+            <Link class="block w-full cursor-pointer" :href="`/petsitters/${user.id}`" prefetch>
+                <Dog class="mr-2 h-4 w-4" />
+                My Petsitter Profile
+            </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem :as-child="true">
             <Link class="block w-full cursor-pointer" :href="edit()" prefetch>
                 <Settings class="mr-2 h-4 w-4" />

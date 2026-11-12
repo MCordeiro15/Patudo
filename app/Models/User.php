@@ -27,9 +27,10 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property bool $is_petsitter
  * @property-read Petsitter|null $petsitter
  */
-#[Fillable(['name', 'email', 'password', 'phone', 'is_admin', 'account_status'])]
+#[Fillable(['name', 'email', 'password', 'phone', 'is_admin', 'is_petsitter', 'account_status'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
@@ -48,12 +49,18 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
             'is_admin' => 'boolean',
+            'is_petsitter' => 'boolean',
         ];
     }
 
     public function isAdmin(): bool
     {
         return (bool) $this->is_admin;
+    }
+
+    public function isPetsitter(): bool
+    {
+        return (bool) $this->is_petsitter;
     }
 
     public function animals()
