@@ -1,9 +1,4 @@
-export type PetsitterPost = {
-    id: number;
-    description: string;
-    photos: string[];
-    createdAt: string | null;
-};
+
 
 export type PetsitterProfile = {
     id: number;
@@ -22,7 +17,6 @@ export type PetsitterProfile = {
     availability_days: string[] | null;
     created_at: string;
     updated_at: string;
-    posts?: PetsitterPost[];
 };
 
 export type PetsitterFormErrors = {

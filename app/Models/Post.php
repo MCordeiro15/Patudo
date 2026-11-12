@@ -16,7 +16,7 @@ use Illuminate\Support\Carbon;
  */
 class Post extends Model
 {
-    protected $fillable = ['description', 'photos'];
+    protected $fillable = ['title','description', 'photos'];
 
     protected function casts(): array
     {

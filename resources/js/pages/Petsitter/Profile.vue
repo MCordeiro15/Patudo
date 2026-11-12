@@ -12,16 +12,11 @@ import {
     UserRound,
 } from '@lucide/vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import ModalEditPetsitterProfile from '@/pages/Modals/ModalEditPetsitterProfile.vue';
-import type { PetsitterProfile as PetsitterProfileType } from '@/types';
+import ModalNewPost from '@/pages/Modals/ModalNewPost.vue';
+import type { PetsitterProfile as PetsitterProfileType, Post } from '@/types';
 
-type PetsitterPost = {
-    id: number;
-    description: string;
-    photos: string[];
-    createdAt: string | null;
-};
 
 type PetsitterProfile = {
     id: number;
@@ -40,7 +35,6 @@ type PetsitterProfile = {
     availability_days: string[] | null;
     created_at: string;
     updated_at: string;
-    posts?: PetsitterPost[];
 };
 
 const DAY_OPTIONS: Array<{ value: string; label: string }> = [
@@ -161,9 +155,57 @@ const displayReviewsCount = computed(() => {
     return 0;
 });
 
-const displayPosts = computed(() => {
-    return petsitter.value?.posts ?? [];
-});
+// --- Publicações: carregadas da API (GET /api/petsitters/{id}/posts) ---
+const posts = ref<Post[]>([]);
+const postsLoading = ref(false);
+const postsError = ref('');
+const showNewPostModal = ref(false);
+
+// só o dono do perfil, se aprovado, pode publicar (o back-end devolve 403 aos outros)
+const canPost = computed(
+    () =>
+        isOwnProfile.value &&
+        petsitter.value?.approval_status === 'approved',
+);
+
+const loadPosts = async () => {
+    if (!petsitter.value) return;
+
+    postsLoading.value = true;
+    postsError.value = '';
+
+    try {
+        const res = await fetch(
+            `/api/petsitters/${petsitter.value.user_id}/posts`,
+            {
+                credentials: 'same-origin',
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            },
+        );
+        const data = await res.json();
+
+        if (res.ok) {
+            posts.value = data.data;
+        } else {
+            postsError.value =
+                data.message ?? 'Erro ao carregar as publicações.';
+        }
+    } catch {
+        postsError.value = 'Erro de rede ao carregar as publicações.';
+    } finally {
+        postsLoading.value = false;
+    }
+};
+
+// o post novo entra no topo da lista, sem recarregar a página
+const onPostCreated = (post: Post) => {
+    posts.value.unshift(post);
+};
+
+onMounted(loadPosts);
 
 const hasProfile = computed(() => petsitter.value != null);
 
@@ -520,9 +562,26 @@ const saveAvailability = async () => {
 
                         <section class="mt-5">
                             <h2 class="text-center fw-bold my-5">Publicações</h2>
+
+                            <p v-if="postsLoading" class="text-center">
+                                A carregar publicações...
+                            </p>
+                            <div
+                                v-else-if="postsError"
+                                class="alert alert-danger py-2 small text-center"
+                            >
+                                {{ postsError }}
+                            </div>
+                            <p
+                                v-else-if="posts.length === 0 && !canPost"
+                                class="text-center text-muted"
+                            >
+                                Ainda não há publicações.
+                            </p>
+
                             <div class="d-grid gap-3">
                                 <article
-                                    v-for="post in displayPosts"
+                                    v-for="post in posts"
                                     :key="post.id"
                                     class="card border border-primary rounded-4 p-3"
                                 >
@@ -539,13 +598,13 @@ const saveAvailability = async () => {
                                         </div>
 
                                         <div class="col-12 col-md-8">
-                                            <h3 class="h4 mb-2">Título do post</h3>
+                                            <h3 v-if="post.title" class="h4 mb-2">{{ post.title }}</h3>
                                             <p class="text-muted mb-3">
                                                 {{ post.description }}
                                             </p>
                                             <small class="text-muted">{{
-                                                formatDateTime(post.createdAt)
-                                            }}</small>
+                                                    formatDateTime(post.created_at)
+                                                }}</small>
                                         </div>
 
                                         <div
@@ -576,9 +635,10 @@ const saveAvailability = async () => {
                                 </article>
 
                                 <article
-                                    v-if="canEdit"
+                                    v-if="canPost"
                                     class="card border border-primary rounded-4 p-4 text-center d-flex align-items-center justify-content-center"
-                                    style="min-height: 170px"
+                                    style="min-height: 170px; cursor: pointer"
+                                    @click="showNewPostModal = true"
                                 >
                                     <CirclePlus
                                         :size="56"
@@ -608,6 +668,14 @@ const saveAvailability = async () => {
             :show="showEditProfileModal"
             :petsitter="petsitter as PetsitterProfileType | null"
             @close="showEditProfileModal = false"
+        />
+
+        <!-- New Post Modal -->
+        <ModalNewPost
+            v-if="canPost"
+            :show="showNewPostModal"
+            @close="showNewPostModal = false"
+            @created="onPostCreated"
         />
     </main>
 </template>
