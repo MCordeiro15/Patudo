@@ -8,7 +8,6 @@ use App\Models\Petsitter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class PetsitterController extends Controller
@@ -88,16 +87,7 @@ class PetsitterController extends Controller
             'accepted_animal_types' => 'nullable|array',
             'accepted_animal_types.*' => 'string',
             'identification_documents' => 'sometimes|string|max:255',
-            'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
-
-        if ($request->hasFile('profile_photo')) {
-            if ($petsitter->profile_photo) {
-                Storage::disk('public')->delete($petsitter->profile_photo);
-            }
-
-            $data['profile_photo'] = $request->file('profile_photo')->store('petsitter-photos', 'public');
-        }
 
         $petsitter->update($data);
 
