@@ -295,7 +295,7 @@ const saveAvailability = async () => {
     <main class="min-vh-100 py-4 patudo-page">
         <div class="container">
             <nav
-                class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
+                class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4 position-relative"
             >
                 <a
                     class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2"
@@ -311,7 +311,7 @@ const saveAvailability = async () => {
                 </a>
 
                 <div
-                    class="nav nav-pills border rounded-pill p-1 mx-auto d-none d-lg-flex"
+                    class="nav nav-pills border rounded-pill p-1 position-absolute start-50 translate-middle-x d-none d-lg-flex"
                 >
                     <a class="nav-link text-dark rounded-pill px-4" href="/"
                     >Início</a

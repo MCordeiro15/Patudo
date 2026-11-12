@@ -12,6 +12,7 @@ import {
     Star,
     UserRound,
 } from '@lucide/vue';
+import logoPatudo from '@/../../assets/logoPatudo.svg';
 
 //defineOptions({ layout: null });
 
@@ -222,11 +223,12 @@ onMounted(() => {
                     href="/"
                 >
                     <img
-                        src="/images/patudo-logo.svg"
+                        :src="logoPatudo"
                         alt="Patudo"
-                        width="190"
-                        height="62"
+                        width="70"
+                        height="70"
                     />
+                    <span>Patudo</span>
                 </a>
 
                 <div class="nav nav-pills border rounded-pill p-1 mx-auto">
