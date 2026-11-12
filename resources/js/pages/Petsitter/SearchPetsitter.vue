@@ -264,7 +264,7 @@ onMounted(() => {
                     </a>
                     <button
                         type="button"
-                        class="text-dark p-0 border-0 bg-none"
+                        class="text-dark p-0 border-0 bg-transparent"
                         @click="navigateToMyProfile()"
                     >
                         <UserRound :size="25" />
