@@ -9,6 +9,7 @@ use App\Http\Controllers\API\PetsitterController;
 use App\Http\Controllers\API\PostController;
 use App\Http\Controllers\API\SupportTicketsController;
 use App\Http\Controllers\API\BookingController;
+use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -69,6 +70,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Bookings
     Route::apiResource('bookings', BookingController::class)->only(['index', 'store', 'show']);
     Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus']);
+
+    // Reviews
+    Route::post('/bookings/{booking}/review', [ReviewController::class, 'store']);
+    Route::get('/petsitters/{petsitter}/reviews', [ReviewController::class, 'byPetsitter']);
+    Route::patch('/reviews/{review}/hide', [ReviewController::class, 'hide']);
+    Route::apiResource('reviews', ReviewController::class)->only(['show', 'update', 'destroy']);
 
     // Support Tickets
     Route::get('/support-tickets', [SupportTicketsController::class, 'index']);

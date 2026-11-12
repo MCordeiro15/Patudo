@@ -14,6 +14,14 @@ class Review extends Model
         'visible',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'visible' => 'boolean',
+            'star_rating' => 'integer',
+        ];
+    }
+
     public function booking()
     {
         return $this->belongsTo(Booking::class);
