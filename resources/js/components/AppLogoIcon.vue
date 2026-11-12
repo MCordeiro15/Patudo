@@ -1,3 +1,5 @@
+<!-- Componente que exibe o ícone do logotipo da aplicação Patudo. -->
+<!-- Component that displays the logo icon of the Patudo application. -->
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue';
 
@@ -5,6 +7,8 @@ defineOptions({
     inheritAttrs: false,
 });
 
+// Tipo TypeScript para Props.
+// TypeScript type for Props.
 type Props = {
     className?: HTMLAttributes['class'];
 };

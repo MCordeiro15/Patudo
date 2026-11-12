@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Seeder que preenche a base de dados com petsitters de exemplo para desenvolvimento e testes.
+ * Seeder that fills the database with example petsitters for development and testing.
+ */
 namespace Database\Seeders;
 
 use App\Models\Animal;
@@ -10,8 +15,9 @@ use Illuminate\Database\Seeder;
 class PetsitterSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
-     */
+ * Run the database seeds.
+ * Run the database seeds.
+ */
     public function run(): void
     {
         // Create test users for petsitters if they don't exist

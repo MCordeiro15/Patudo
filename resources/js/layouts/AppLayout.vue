@@ -1,3 +1,5 @@
+<!-- Layout principal da aplicação. Define a estrutura base com sidebar, header e conteúdo. -->
+<!-- Main application layout. Defines the base structure with sidebar, header, and content. -->
 <script setup lang="ts">
 import AppLayout from '@/layouts/app/AppSidebarLayout.vue';
 import type { BreadcrumbItem } from '@/types';

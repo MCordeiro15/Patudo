@@ -1,6 +1,10 @@
 <?php
 
-// te
+
+/**
+ * Ficheiro PHP: api.php
+ * PHP file: api.php
+ */
 use App\Http\Controllers\API\AnimalController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\FavouriteController;
@@ -13,6 +17,7 @@ use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
 
 /**
+ * @return void
  * @return void
  */
 if (! function_exists('extracted')) {

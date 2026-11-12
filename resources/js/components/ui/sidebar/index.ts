@@ -1,3 +1,5 @@
+// Componente UI sidebar do shadcn/ui. Parte da biblioteca de componentes base do projeto.
+// sidebar UI component from shadcn/ui. Part of the project's base component library.
 import type { VariantProps } from "class-variance-authority"
 import type { HTMLAttributes } from "vue"
 import { cva } from "class-variance-authority"

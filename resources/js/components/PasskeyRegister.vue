@@ -1,3 +1,5 @@
+<!-- Componente para registar uma nova passkey biométrica. -->
+<!-- Component to register a new biometric passkey. -->
 <script setup lang="ts">
 import { usePasskeyRegister } from '@laravel/passkeys/vue';
 import { ref } from 'vue';
@@ -43,6 +45,8 @@ const { register, isLoading, error, isSupported } = usePasskeyRegister({
     },
 });
 
+// Processa a submissão do formulário, valida os dados e envia para a API.
+// Processes form submission, validates data, and sends to the API.
 const handleSubmit = async (event: Event) => {
     event.preventDefault();
 
@@ -68,6 +72,8 @@ const handleCancel = () => {
         Add passkey
     </Button>
 
+    <!-- Formulário para entrada de dados. -->
+    <!-- Form for data input. -->
     <form
         v-else
         @submit="handleSubmit"

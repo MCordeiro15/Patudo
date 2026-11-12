@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: app.php
+ * PHP file: app.php
+ */
 return [
 
     /*

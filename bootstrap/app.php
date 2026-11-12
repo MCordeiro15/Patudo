@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: app.php
+ * PHP file: app.php
+ */
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Auth\Middleware\Authenticate;

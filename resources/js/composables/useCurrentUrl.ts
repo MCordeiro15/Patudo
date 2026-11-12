@@ -1,3 +1,5 @@
+// Composable para obter a URL atual da página. Utilizado para destacar o item ativo na navegação.
+// Composable to get the current page URL. Used to highlight the active item in navigation.
 import type { InertiaLinkProps } from '@inertiajs/vue3';
 import { usePage } from '@inertiajs/vue3';
 import type { ComputedRef, DeepReadonly } from 'vue';
@@ -33,6 +35,8 @@ const currentUrlReactive = computed(
         ).pathname,
 );
 
+// Retorna a URL atual da página para destacar itens ativos na navegação.
+// Returns the current page URL to highlight active navigation items.
 export function useCurrentUrl(): UseCurrentUrlReturn {
     function isCurrentUrl(
         urlToCheck: NonNullable<InertiaLinkProps['href']>,

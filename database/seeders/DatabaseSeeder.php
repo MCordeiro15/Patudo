@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Seeder principal que orquestra a população da base de dados. Chama os outros seeders e cria dados iniciais para desenvolvimento/testes.
+ * Main seeder that orchestrates database population. Calls other seeders and creates initial data for development/testing.
+ */
 namespace Database\Seeders;
 
 use App\Models\Animal;
@@ -13,8 +18,9 @@ class DatabaseSeeder extends Seeder
     use WithoutModelEvents;
 
     /**
-     * Seed the application's database.
-     */
+ * Seed the application's database.
+ * Seed the application's database.
+ */
     public function run(): void
     {
         // Call PetsitterSeeder to create petsitters with test data

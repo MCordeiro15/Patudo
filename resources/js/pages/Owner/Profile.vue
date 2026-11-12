@@ -1,3 +1,5 @@
+<!-- Página de perfil do utilizador. Mostra e permite editar informações pessoais. -->
+<!-- User profile page. Shows and allows editing personal information. -->
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { CirclePlus, LogOut, UserRound } from '@lucide/vue';
@@ -19,6 +21,8 @@ const showDeleteModal = ref(false);
 const deletingAnimal = ref<{ id: number; name: string } | null>(null);
 const deletingAnimalLoading = ref(false);
 
+// Propriedade computada que retorna o nome de exibição do utilizador.
+// Computed property that returns the user's display name.
 const displayName = computed(() => user.value?.name ?? 'Utilizador');
 
 const fetchAnimals = async () => {
@@ -105,6 +109,8 @@ onMounted(() => {
 <template>
     <Head title="O meu perfil" />
 
+    <!-- Conteúdo principal da página. -->
+    <!-- Main content area of the page. -->
     <main class="min-vh-100 py-4 patudo-page">
         <div class="container">
             <!-- Navbar -->

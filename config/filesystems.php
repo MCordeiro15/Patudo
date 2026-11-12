@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: filesystems.php
+ * PHP file: filesystems.php
+ */
 return [
 
     /*

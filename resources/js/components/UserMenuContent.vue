@@ -1,3 +1,5 @@
+<!-- Componente do conteúdo do menu dropdown do utilizador. -->
+<!-- User dropdown menu content component. -->
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { Dog, LogOut, Settings } from '@lucide/vue';
@@ -12,6 +14,8 @@ import UserInfo from '@/components/UserInfo.vue';
 import { edit } from '@/routes/profile';
 import type { User } from '@/types';
 
+// Tipo TypeScript para Props.
+// TypeScript type for Props.
 type Props = {
     user: User;
 };

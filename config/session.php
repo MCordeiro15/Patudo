@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: session.php
+ * PHP file: session.php
+ */
 use Illuminate\Support\Str;
 
 return [

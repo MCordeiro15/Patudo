@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: VerificationNotificationTest.php
+ * PHP file: VerificationNotificationTest.php
+ */
 use App\Models\User;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Support\Facades\Notification;

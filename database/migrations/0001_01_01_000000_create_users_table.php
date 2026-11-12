@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Migração que cria a tabela users com campos básicos de autenticação (id, name, email, password, remember_token, timestamps).
+ * Migration that creates the users table with basic authentication fields (id, name, email, password, remember_token, timestamps).
+ */
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -7,8 +12,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
-     */
+ * Run the migrations.
+ * Run the migrations.
+ */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
@@ -41,8 +47,9 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
-     */
+         * Reverte a migração, removendo as alterações feitas pelo método up.
+         * Reverts the migration, removing the changes made by the up method.
+         */
     public function down(): void
     {
         Schema::dropIfExists('users');

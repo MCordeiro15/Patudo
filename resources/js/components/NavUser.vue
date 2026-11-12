@@ -1,3 +1,5 @@
+<!-- Componente do menu do utilizador na barra lateral. Mostra perfil e opções. -->
+<!-- User menu component in the sidebar. Shows profile and options. -->
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
 import { ChevronsUpDown } from '@lucide/vue';

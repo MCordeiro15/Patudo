@@ -1,3 +1,5 @@
+<!-- Página de redefinição de password. Formulário para definir nova password. -->
+<!-- Password reset page. Form to set a new password. -->
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -16,6 +18,8 @@ defineOptions({
     },
 });
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<{
     token: string;
     email: string;

@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Controlador API para gestão de perfis de petsitter. Fornece endpoints CRUD, aprovação/rejeição por admin e atualização de dias de disponibilidade.
+ * API controller for petsitter profile management. Provides CRUD endpoints, admin approval/rejection, and availability days update.
+ */
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
@@ -12,6 +17,10 @@ use Illuminate\Validation\Rule;
 
 class PetsitterController extends Controller
 {
+    /**
+     * Lista todos os registos com paginação. Admin vê todos, utilizador normal vê apenas os seus.
+     * Lists all records with pagination. Admin sees all, normal user sees only their own.
+     */
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Petsitter::class);
@@ -26,8 +35,9 @@ class PetsitterController extends Controller
     }
 
     /**
-     * Retorna apenas os petsitters aprovados, sem necessidade de autenticação.
-     */
+ * Retorna apenas os petsitters aprovados, sem necessidade de autenticação.
+ * Retorna apenas os petsitters aprovados, sem necessidade de autenticação.
+ */
     public function publicIndex()
     {
         $query = Petsitter::with('user')->where('approval_status', 'approved');
@@ -35,6 +45,10 @@ class PetsitterController extends Controller
         return PetsitterResource::collection($query->get());
     }
 
+    /**
+     * Cria um novo registo após validação dos dados do pedido. Retorna o recurso criado com status 201.
+     * Creates a new record after validating request data. Returns the created resource with status 201.
+     */
     public function store(Request $request)
     {
         Gate::authorize('create', Petsitter::class);
@@ -64,6 +78,10 @@ class PetsitterController extends Controller
         return (new PetsitterResource($petsitter->load('user')))->response()->setStatusCode(201);
     }
 
+    /**
+     * Retorna os detalhes de um registo específico. Verifica permissão antes de exibir.
+     * Returns details of a specific record. Checks permission before displaying.
+     */
     public function show(Petsitter $petsitter)
     {
         Gate::authorize('view', $petsitter);
@@ -71,6 +89,10 @@ class PetsitterController extends Controller
         return new PetsitterResource($petsitter->load('user'));
     }
 
+    /**
+     * Atualiza um registo existente com os dados validados do pedido.
+     * Updates an existing record with validated request data.
+     */
     public function update(Request $request, Petsitter $petsitter)
     {
         Gate::authorize('update', $petsitter);
@@ -152,6 +174,10 @@ class PetsitterController extends Controller
         return new PetsitterResource($petsitter->load('user'));
     }
 
+    /**
+     * Elimina um registo após verificar permissão. Retorna resposta 204 No Content.
+     * Deletes a record after checking permission. Returns 204 No Content response.
+     */
     public function destroy(Petsitter $petsitter)
     {
         Gate::authorize('delete', $petsitter);
@@ -161,6 +187,10 @@ class PetsitterController extends Controller
         return response()->noContent();
     }
 
+    /**
+     * Aprova o perfil de um petsitter (apenas admin). Altera o status para 'approved'.
+     * Approves a petsitter's profile (admin only). Changes status to 'approved'.
+     */
     public function approve(Petsitter $petsitter)
     {
         Gate::authorize('approve', $petsitter);
@@ -176,6 +206,10 @@ class PetsitterController extends Controller
         return new PetsitterResource($petsitter->load('user'));
     }
 
+    /**
+     * Rejeita o perfil de um petsitter (apenas admin). Altera o status para 'rejected'.
+     * Rejects a petsitter's profile (admin only). Changes status to 'rejected'.
+     */
     public function reject(Petsitter $petsitter)
     {
         Gate::authorize('approve', $petsitter);

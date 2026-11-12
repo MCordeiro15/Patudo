@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: TwoFactorChallengeTest.php
+ * PHP file: TwoFactorChallengeTest.php
+ */
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Fortify\Features;

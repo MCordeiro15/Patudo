@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: cache.php
+ * PHP file: cache.php
+ */
 use Illuminate\Support\Str;
 
 return [

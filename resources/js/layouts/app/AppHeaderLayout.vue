@@ -1,3 +1,5 @@
+<!-- Layout Vue: AppHeaderLayout.vue -->
+<!-- Vue layout: AppHeaderLayout.vue -->
 <script setup lang="ts">
 import AppContent from '@/components/AppContent.vue';
 import AppHeader from '@/components/AppHeader.vue';
@@ -5,6 +7,8 @@ import AppShell from '@/components/AppShell.vue';
 import { Toaster } from '@/components/ui/sonner';
 import type { BreadcrumbItem } from '@/types';
 
+// Tipo TypeScript para Props.
+// TypeScript type for Props.
 type Props = {
     breadcrumbs?: BreadcrumbItem[];
 };

@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: auth.php
+ * PHP file: auth.php
+ */
 use App\Models\User;
 
 return [

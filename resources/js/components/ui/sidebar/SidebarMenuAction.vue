@@ -1,3 +1,5 @@
+<!-- Componente UI sidebar do shadcn/ui. Parte da biblioteca de componentes base do projeto. -->
+<!-- sidebar UI component from shadcn/ui. Part of the project's base component library. -->
 <script setup lang="ts">
 import type { PrimitiveProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"

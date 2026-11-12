@@ -1,3 +1,5 @@
+<!-- Componente para eliminar a conta do utilizador. Inclui confirmação e validação. -->
+<!-- Component to delete the user's account. Includes confirmation and validation. -->
 <script setup lang="ts">
 import { Form } from '@inertiajs/vue3';
 import { useTemplateRef } from 'vue';

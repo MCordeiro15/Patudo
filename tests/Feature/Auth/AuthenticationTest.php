@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: AuthenticationTest.php
+ * PHP file: AuthenticationTest.php
+ */
 use App\Models\User;
 use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Fortify\Features;

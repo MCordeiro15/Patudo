@@ -1,3 +1,5 @@
+<!-- Componente do cabeçalho da aplicação. Contém navegação, pesquisa e menu do utilizador. -->
+<!-- Application header component. Contains navigation, search, and user menu. -->
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import { BookOpen, Folder, Home, LayoutGrid, Menu, Search } from '@lucide/vue';
@@ -37,6 +39,8 @@ import { getInitials } from '@/composables/useInitials';
 import { toUrl } from '@/lib/utils';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
+// Tipo TypeScript para Props.
+// TypeScript type for Props.
 type Props = {
     breadcrumbs?: BreadcrumbItem[];
 };
@@ -102,6 +106,8 @@ const rightNavItems: NavItem[] = [
                             <div
                                 class="flex h-full flex-1 flex-col justify-between space-y-4 py-6"
                             >
+                                <!-- Barra de navegação com links para as secções principais da aplicação. -->
+                                <!-- Navigation bar with links to the main sections of the application. -->
                                 <nav class="-mx-3 space-y-1">
                                     <Link
                                         v-for="item in mainNavItems"

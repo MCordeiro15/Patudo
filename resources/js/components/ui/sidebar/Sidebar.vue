@@ -1,3 +1,5 @@
+<!-- Componente UI sidebar do shadcn/ui. Parte da biblioteca de componentes base do projeto. -->
+<!-- sidebar UI component from shadcn/ui. Part of the project's base component library. -->
 <script setup lang="ts">
 import type { SidebarProps } from "."
 import { cn } from "@/lib/utils"

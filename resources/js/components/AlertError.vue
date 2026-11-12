@@ -1,8 +1,12 @@
+<!-- Componente que exibe mensagens de erro ao utilizador com ícone e texto descritivo. -->
+<!-- Component that displays error messages to the user with icon and descriptive text. -->
 <script setup lang="ts">
 import { AlertCircle } from '@lucide/vue';
 import { computed } from 'vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
+// Tipo TypeScript para Props.
+// TypeScript type for Props.
 type Props = {
     errors: string[];
     title?: string;

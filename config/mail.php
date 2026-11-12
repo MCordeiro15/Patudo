@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: mail.php
+ * PHP file: mail.php
+ */
 return [
 
     /*

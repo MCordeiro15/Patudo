@@ -1,3 +1,5 @@
+// Componente UI sheet do shadcn/ui. Parte da biblioteca de componentes base do projeto.
+// sheet UI component from shadcn/ui. Part of the project's base component library.
 export { default as Sheet } from "./Sheet.vue"
 export { default as SheetClose } from "./SheetClose.vue"
 export { default as SheetContent } from "./SheetContent.vue"

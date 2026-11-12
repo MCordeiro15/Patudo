@@ -1,3 +1,5 @@
+<!-- Componente para gerir 2FA. Permite ativar, desativar e ver códigos de recuperação. -->
+<!-- Component to manage 2FA. Allows enabling, disabling, and viewing recovery codes. -->
 <script setup lang="ts">
 import { Form } from '@inertiajs/vue3';
 import { ShieldCheck } from '@lucide/vue';
@@ -70,6 +72,8 @@ onUnmounted(() => clearTwoFactorAuthData());
             </p>
 
             <div class="relative inline">
+                <!-- Formulário para entrada de dados do utilizador. -->
+                <!-- Form for user data input. -->
                 <Form v-bind="disable.form()" #default="{ processing }">
                     <Button
                         variant="destructive"

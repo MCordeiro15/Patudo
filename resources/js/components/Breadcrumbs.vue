@@ -1,3 +1,5 @@
+<!-- Componente de migalhas de pão. Mostra o caminho de navegação atual. -->
+<!-- Breadcrumbs component. Shows the current navigation path. -->
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import {
@@ -10,6 +12,8 @@ import {
 } from '@/components/ui/breadcrumb';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 
+// Tipo TypeScript para Props.
+// TypeScript type for Props.
 type Props = {
     breadcrumbs: BreadcrumbItemType[];
 };

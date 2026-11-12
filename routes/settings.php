@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: settings.php
+ * PHP file: settings.php
+ */
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use Illuminate\Auth\Middleware\RequirePassword;

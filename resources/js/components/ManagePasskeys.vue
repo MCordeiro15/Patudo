@@ -1,3 +1,5 @@
+<!-- Componente para gerir passkeys. Permite adicionar e remover chaves de autenticação biométrica. -->
+<!-- Component to manage passkeys. Allows adding and removing biometric authentication keys. -->
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
 import { KeyRound } from '@lucide/vue';

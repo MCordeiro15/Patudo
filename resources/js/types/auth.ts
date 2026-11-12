@@ -1,3 +1,5 @@
+// Definição de tipo TypeScript para autenticação. Inclui tipo User com dados de sessão, permissões e perfil.
+// TypeScript type definition for authentication. Includes User type with session data, permissions, and profile.
 export type User = {
     id: number;
     name: string;

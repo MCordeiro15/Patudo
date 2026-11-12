@@ -1,3 +1,5 @@
+// Componente UI dialog do shadcn/ui. Parte da biblioteca de componentes base do projeto.
+// dialog UI component from shadcn/ui. Part of the project's base component library.
 export { default as Dialog } from "./Dialog.vue"
 export { default as DialogClose } from "./DialogClose.vue"
 export { default as DialogContent } from "./DialogContent.vue"

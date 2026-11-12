@@ -1,3 +1,5 @@
+<!-- Componente UI sonner do shadcn/ui. Parte da biblioteca de componentes base do projeto. -->
+<!-- sonner UI component from shadcn/ui. Part of the project's base component library. -->
 <script lang="ts" setup>
 import type { ToasterProps } from "vue-sonner"
 import { CircleCheckIcon, InfoIcon, Loader2Icon, OctagonXIcon, TriangleAlertIcon, XIcon } from "@lucide/vue"
@@ -6,6 +8,8 @@ import { cn } from "@/lib/utils"
 
 import 'vue-sonner/style.css';
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<ToasterProps>()
 </script>
 

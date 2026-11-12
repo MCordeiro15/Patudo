@@ -1,3 +1,5 @@
+<!-- Página de desafio 2FA. Solicita o código de autenticação de dois fatores. -->
+<!-- 2FA challenge page. Requests the two-factor authentication code. -->
 <script setup lang="ts">
 import { Form, Head, setLayoutProps } from '@inertiajs/vue3';
 import { computed, ref, watchEffect } from 'vue';

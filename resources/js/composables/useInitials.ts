@@ -1,3 +1,5 @@
+// Composable para gerar iniciais a partir do nome do utilizador, usado em avatares.
+// Composable to generate initials from the user's name, used in avatars.
 export type UseInitialsReturn = {
     getInitials: (fullName?: string) => string;
 };
@@ -24,6 +26,8 @@ export function getInitials(fullName?: string): string {
     return `${getInitial(names[0])}${getInitial(names[names.length - 1])}`.toUpperCase();
 }
 
+// Gera as iniciais do nome do utilizador para avatares.
+// Generates user name initials for avatars.
 export function useInitials(): UseInitialsReturn {
     return { getInitials };
 }

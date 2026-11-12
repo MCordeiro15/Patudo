@@ -1,3 +1,5 @@
+// Definição de tipo TypeScript para itens de navegação. Inclui label, ícone, rota e permissões.
+// TypeScript type definition for navigation items. Includes label, icon, route, and permissions.
 import type { InertiaLinkProps } from '@inertiajs/vue3';
 import type { LucideIcon } from '@lucide/vue';
 

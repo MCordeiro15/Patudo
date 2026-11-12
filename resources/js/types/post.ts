@@ -1,3 +1,5 @@
+// Definição de tipo TypeScript para Post. Inclui id, título, descrição, fotos e dados do petsitter autor.
+// TypeScript type definition for Post. Includes id, title, description, photos, and author petsitter data.
 export type Post = {
     id: number;
     petsitter_id: number;

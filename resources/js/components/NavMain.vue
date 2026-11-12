@@ -1,3 +1,5 @@
+<!-- Componente da navegação principal. Lista os links de menu principais. -->
+<!-- Main navigation component. Lists the main menu links. -->
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import {

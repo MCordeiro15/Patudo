@@ -1,3 +1,5 @@
+<!-- Página de perfil do utilizador. Mostra e permite editar informações pessoais. -->
+<!-- User profile page. Shows and allows editing personal information. -->
 <script setup lang="ts">
 import { Form, Head, usePage } from '@inertiajs/vue3';
 import { Link } from '@inertiajs/vue3';

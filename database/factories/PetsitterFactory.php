@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Factory para gerar dados fictícios de petsitters nos testes. Cria perfis com biografia, experiência e preço aleatórios.
+ * Factory to generate fake petsitter data in tests. Creates profiles with random biography, experience, and price.
+ */
 namespace Database\Factories;
 
 use App\Models\Petsitter;
@@ -7,6 +12,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
+ * @extends Factory<Petsitter>
  * @extends Factory<Petsitter>
  */
 class PetsitterFactory extends Factory

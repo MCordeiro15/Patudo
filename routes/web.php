@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: web.php
+ * PHP file: web.php
+ */
 use App\Http\Controllers\PetsitterProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;

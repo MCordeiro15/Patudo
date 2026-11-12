@@ -1,3 +1,5 @@
+<!-- Componente que exibe uma passkey individual com opções de editar/eliminar. -->
+<!-- Component that displays an individual passkey with edit/delete options. -->
 <script setup lang="ts">
 import { KeyRound, Trash2 } from '@lucide/vue';
 import { ref } from 'vue';
@@ -13,6 +15,8 @@ import {
 } from '@/components/ui/dialog';
 import type { Passkey } from '@/types/auth';
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<{
     passkey: Passkey;
 }>();

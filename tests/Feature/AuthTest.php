@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: AuthTest.php
+ * PHP file: AuthTest.php
+ */
 namespace Tests\Feature;
 
 use App\Models\User;

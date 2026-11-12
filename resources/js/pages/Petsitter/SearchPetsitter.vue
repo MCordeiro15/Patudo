@@ -1,3 +1,5 @@
+<!-- Página Vue: SearchPetsitter.vue -->
+<!-- Vue page: SearchPetsitter.vue -->
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
@@ -213,8 +215,12 @@ onMounted(() => {
 <template>
     <Head title="Procurar Petsitter" />
 
+    <!-- Conteúdo principal da página. -->
+    <!-- Main content area of the page. -->
     <main class="min-vh-100 py-4 patudo-page">
         <div class="container">
+            <!-- Barra de navegação com links principais. -->
+            <!-- Navigation bar with main links. -->
             <nav
                 class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
             >

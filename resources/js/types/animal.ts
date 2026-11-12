@@ -1,3 +1,5 @@
+// Definição de tipo TypeScript para Animal. Inclui id, nome, espécie, raça, tamanho, necessidades especiais e dados do proprietário.
+// TypeScript type definition for Animal. Includes id, name, species, breed, size, special needs, and owner data.
 export type Animal = {
     id: number;
     user_id: number;

@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Form request para validação da ativação/desativação de 2FA. Valida o código de verificação.
+ * Form request for 2FA enable/disable validation. Validates the verification code.
+ */
 namespace App\Http\Requests\Settings;
 
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -11,7 +16,13 @@ class TwoFactorAuthenticationRequest extends FormRequest
     use InteractsWithTwoFactorState;
 
     /**
-     * Get the validation rules that apply to the request.
+     * Define as regras de validação para os campos do formulário.
+     * Defines validation rules for form fields.
+     *
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */|/**
+     * Define as regras de validação para os campos do formulário.
+     * Defines validation rules for form fields.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */

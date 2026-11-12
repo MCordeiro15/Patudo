@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: Pest.php
+ * PHP file: Pest.php
+ */
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

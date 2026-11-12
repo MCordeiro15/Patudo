@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Modelo Eloquent para perfis de petsitter. Contém biografia, experiência, preço por dia, tamanhos de animais aceites, localização, estado de aprovação e dias de disponibilidade.
+ * Eloquent model for petsitter profiles. Contains biography, experience, price per day, accepted animal sizes, location, approval status, and availability days.
+ */
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -39,6 +44,10 @@ class Petsitter extends Model
 
     /*The `approval_status` is not in `$fillable`, for the same reason as `is_admin`.
      Only an administrator should be able to change it, and it should not be possible to submit it via a form.*/
+    /**
+     * Campos que podem ser preenchidos em massa via create() ou fill().
+     * Fields that can be mass-assigned via create() or fill().
+     */
     protected $fillable = [
         'user_id', 'biography', 'profile_photo', 'short_bio', 'experience', 'service_location', 'city',
         'age',
@@ -55,12 +64,20 @@ class Petsitter extends Model
         ];
     }
 
+    /**
+     * Relação belongsTo com User. Retorna o proprietário/criador deste registo.
+     * BelongsTo relationship with User. Returns the owner/creator of this record.
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
 
+    /**
+     * Relação hasMany com Post. Retorna todas as publicações deste petsitter.
+     * HasMany relationship with Post. Returns all posts by this petsitter.
+     */
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class, 'petsitter_id', 'user_id');    // Petsitter 1 — 0..* Post
@@ -78,6 +95,10 @@ class Petsitter extends Model
         );
     }
 
+    /**
+     * Relação hasMany com Review. Retorna todas as avaliações deste petsitter.
+     * HasMany relationship with Review. Returns all reviews of this petsitter.
+     */
     public function reviews(): HasMany
     {
         return $this->hasMany(
@@ -88,8 +109,9 @@ class Petsitter extends Model
     }
 
     /**
-     * Approve this petsitter profile.
-     */
+ * Approve this petsitter profile.
+ * Approve this petsitter profile.
+ */
     public function approve(): void
     {
         $this->approval_status = 'approved';

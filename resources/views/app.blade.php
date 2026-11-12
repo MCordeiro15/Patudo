@@ -1,3 +1,5 @@
+<!-- Template Blade principal da aplicação. Ponto de montagem do SPA Vue.js via Inertia.js. -->
+<!-- Main Blade template of the application. Mounting point for the Vue.js SPA via Inertia.js. -->
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>

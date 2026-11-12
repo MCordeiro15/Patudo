@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: console.php
+ * PHP file: console.php
+ */
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 

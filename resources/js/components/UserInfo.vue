@@ -1,9 +1,13 @@
+<!-- Componente que exibe informações do utilizador (nome, email, avatar). -->
+<!-- Component that displays user information (name, email, avatar). -->
 <script setup lang="ts">
 import { computed } from 'vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/composables/useInitials';
 import type { User } from '@/types';
 
+// Tipo TypeScript para Props.
+// TypeScript type for Props.
 type Props = {
     user: User;
     showEmail?: boolean;

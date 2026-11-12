@@ -1,8 +1,12 @@
+<!-- Componente que define a área de conteúdo principal da aplicação, fora da sidebar. -->
+<!-- Component that defines the main content area of the application, outside the sidebar. -->
 <script setup lang="ts">
 import { computed } from 'vue';
 import { SidebarInset } from '@/components/ui/sidebar';
 import type { AppVariant } from '@/types';
 
+// Tipo TypeScript para Props.
+// TypeScript type for Props.
 type Props = {
     variant?: AppVariant;
     class?: string;

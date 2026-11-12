@@ -1,3 +1,5 @@
+<!-- Componente que exibe mensagens de erro de validação abaixo dos campos de entrada. -->
+<!-- Component that displays validation error messages below input fields. -->
 <script setup lang="ts">
 defineProps<{
     message?: string;

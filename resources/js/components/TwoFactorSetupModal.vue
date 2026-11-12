@@ -1,3 +1,5 @@
+<!-- Modal para configurar 2FA. Mostra QR code e instruções. -->
+<!-- Modal to set up 2FA. Shows QR code and instructions. -->
 <script setup lang="ts">
 import { Form } from '@inertiajs/vue3';
 import { useClipboard } from '@vueuse/core';
@@ -24,6 +26,8 @@ import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import { confirm } from '@/routes/two-factor';
 import type { TwoFactorConfigContent } from '@/types';
 
+// Tipo TypeScript para Props.
+// TypeScript type for Props.
 type Props = {
     requiresConfirmation: boolean;
     twoFactorEnabled: boolean;
@@ -31,6 +35,8 @@ type Props = {
 
 const { resolvedAppearance } = useAppearance();
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<Props>();
 const isOpen = defineModel<boolean>('isOpen');
 

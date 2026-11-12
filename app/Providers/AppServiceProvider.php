@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Service provider principal da aplicação. Registra serviços, configurações e bindings do container de injeção de dependências.
+ * Main service provider of the application. Registers services, configurations, and dependency injection container bindings.
+ */
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
@@ -12,16 +17,18 @@ use Illuminate\Validation\Rules\Password;
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
-     */
+ * Register any application services.
+ * Register any application services.
+ */
     public function register(): void
     {
         //
     }
 
     /**
-     * Bootstrap any application services.
-     */
+ * Inicializa o service provider, registando serviços e configurações.
+ * Initializes the service provider, registering services and configurations.
+ */
     public function boot(): void
     {
         $this->configureDefaults();

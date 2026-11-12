@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Trait com regras reutilizáveis de validação de perfil. Define as regras para nome e email.
+ * Trait with reusable profile validation rules. Defines rules for name and email.
+ */
 namespace App\Concerns;
 
 use App\Models\User;

@@ -1,3 +1,5 @@
+// Composable para gestão de autenticação de dois fatores (2FA) no front-end. Lida com ativação, desativação e verificação de códigos.
+// Composable for front-end two-factor authentication (2FA) management. Handles activation, deactivation, and code verification.
 import { useHttp } from '@inertiajs/vue3';
 import type { ComputedRef, Ref } from 'vue';
 import { computed, ref } from 'vue';
