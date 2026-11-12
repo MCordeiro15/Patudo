@@ -55,15 +55,7 @@ class DatabaseSeeder extends Seeder
                 'short_bio' => 'Admin do Patudo',
                 'city' => 'São Miguel',
                 'average_rating' => 5.0,
-                'availability_days' => json_encode([
-                    'monday' => true,
-                    'tuesday' => true,
-                    'wednesday' => true,
-                    'thursday' => true,
-                    'friday' => true,
-                    'saturday' => true,
-                    'sunday' => true,
-                ]),
+                'availability_days' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
             ]);
         } else {
             Petsitter::create([
@@ -81,15 +73,7 @@ class DatabaseSeeder extends Seeder
                 'short_bio' => 'Admin do Patudo',
                 'city' => 'São Miguel',
                 'average_rating' => 5.0,
-                'availability_days' => json_encode([
-                    'monday' => true,
-                    'tuesday' => true,
-                    'wednesday' => true,
-                    'thursday' => true,
-                    'friday' => true,
-                    'saturday' => true,
-                    'sunday' => true,
-                ]),
+                'availability_days' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
             ]);
         }
 

@@ -129,15 +129,7 @@ class PetsitterSeeder extends Seeder
                     'short_bio' => $userData['short_bio'],
                     'city' => $userData['city'],
                     'average_rating' => $userData['average_rating'],
-                    'availability_days' => json_encode([
-                        'monday' => true,
-                        'tuesday' => true,
-                        'wednesday' => true,
-                        'thursday' => true,
-                        'friday' => true,
-                        'saturday' => true,
-                        'sunday' => false,
-                    ]),
+                    'availability_days' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
                 ]);
             } else {
                 Petsitter::create([
@@ -155,15 +147,7 @@ class PetsitterSeeder extends Seeder
                     'short_bio' => $userData['short_bio'],
                     'city' => $userData['city'],
                     'average_rating' => $userData['average_rating'],
-                    'availability_days' => json_encode([
-                        'monday' => true,
-                        'tuesday' => true,
-                        'wednesday' => true,
-                        'thursday' => true,
-                        'friday' => true,
-                        'saturday' => true,
-                        'sunday' => false,
-                    ]),
+                    'availability_days' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
                 ]);
             }
 
