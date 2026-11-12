@@ -16,6 +16,7 @@ test('user can list their own animals', function () {
         'user_id' => $user->id,
         'name' => 'Rex',
         'species' => 'Dog',
+        'breed' => 'Labrador',
         'size' => 'Medium',
     ]);
 
@@ -23,6 +24,7 @@ test('user can list their own animals', function () {
         'user_id' => $otherUser->id,
         'name' => 'Garfield',
         'species' => 'Cat',
+        'breed' => 'Persian',
         'size' => 'Large',
     ]);
 
@@ -43,6 +45,7 @@ test('admin can list all animals from all users', function () {
         'user_id' => $user1->id,
         'name' => 'Rex',
         'species' => 'Dog',
+        'breed' => 'Labrador',
         'size' => 'Medium',
     ]);
 
@@ -50,6 +53,7 @@ test('admin can list all animals from all users', function () {
         'user_id' => $user2->id,
         'name' => 'Garfield',
         'species' => 'Cat',
+        'breed' => 'Persian',
         'size' => 'Large',
     ]);
 
@@ -67,6 +71,7 @@ test('user can create an animal', function () {
     $response = $this->actingAs($user)->postJson('/api/animals', [
         'name' => 'Bobby',
         'species' => 'Dog',
+        'breed' => 'Bulldog',
         'size' => 'Small',
         'special_needs' => 'Allergic to chicken',
     ]);
@@ -93,7 +98,7 @@ test('fails to create animal when validation fails', function () {
     $response = $this->actingAs($user)->postJson('/api/animals', []);
 
     $response->assertUnprocessable()
-        ->assertJsonValidationErrors(['name', 'species', 'size']);
+        ->assertJsonValidationErrors(['name', 'species', 'breed', 'size']);
 });
 
 test('user can show their own animal', function () {
@@ -102,6 +107,7 @@ test('user can show their own animal', function () {
         'user_id' => $user->id,
         'name' => 'Mimi',
         'species' => 'Cat',
+        'breed' => 'Siamese',
         'size' => 'Small',
     ]);
 
@@ -118,6 +124,7 @@ test('user cannot show another users animal', function () {
         'user_id' => $otherUser->id,
         'name' => 'Mimi',
         'species' => 'Cat',
+        'breed' => 'Siamese',
         'size' => 'Small',
     ]);
 
@@ -132,6 +139,7 @@ test('user can update their own animal', function () {
         'user_id' => $user->id,
         'name' => 'Max',
         'species' => 'Dog',
+        'breed' => 'German Shepherd',
         'size' => 'Large',
     ]);
 
@@ -155,6 +163,7 @@ test('user cannot update another users animal', function () {
         'user_id' => $otherUser->id,
         'name' => 'Max',
         'species' => 'Dog',
+        'breed' => 'German Shepherd',
         'size' => 'Large',
     ]);
 
@@ -171,6 +180,7 @@ test('user can delete their own animal', function () {
         'user_id' => $user->id,
         'name' => 'Thor',
         'species' => 'Dog',
+        'breed' => 'Husky',
         'size' => 'Large',
     ]);
 
@@ -190,6 +200,7 @@ test('user cannot delete another users animal', function () {
         'user_id' => $otherUser->id,
         'name' => 'Thor',
         'species' => 'Dog',
+        'breed' => 'Husky',
         'size' => 'Large',
     ]);
 
@@ -209,6 +220,7 @@ test('admin can update and delete another users animal', function () {
         'user_id' => $user->id,
         'name' => 'Thor',
         'species' => 'Dog',
+        'breed' => 'Husky',
         'size' => 'Large',
     ]);
 

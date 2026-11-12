@@ -104,7 +104,7 @@ async function fetchPetsitters() {
 
         const data = await response.json();
         const apiPetsitters: PetsitterApiData[] = data.data ?? data;
-        petsitters.value = apiPetsitters;
+        petsitters.value = apiPetsitters.filter((p) => p.user && p.user.name);
     } catch (e) {
         error.value = e instanceof Error ? e.message : 'Ocorreu um erro ao carregar os petsitters.';
     } finally {

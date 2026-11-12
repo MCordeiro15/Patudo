@@ -37,6 +37,11 @@ class AnimalController extends Controller
             'breed' => 'required|string|max:255',
             'size' => 'required|string|max:255',
             'special_needs' => 'nullable|string',
+            'aggression' => 'nullable|string|max:255',
+            'medication' => 'nullable|string',
+            'sex' => 'nullable|string|max:255',
+            'photo' => 'nullable|string|max:255',
+            'weight' => 'nullable|numeric|min:0|max:999.99',
         ]);
 
         if (!$request->user()?->isAdmin() || empty($data['user_id'])) {
@@ -66,6 +71,11 @@ class AnimalController extends Controller
             'breed' => 'sometimes|string|max:255',
             'size' => 'sometimes|string|max:255',
             'special_needs' => 'nullable|string',
+            'aggression' => 'nullable|string|max:255',
+            'medication' => 'nullable|string',
+            'sex' => 'nullable|string|max:255',
+            'photo' => 'nullable|string|max:255',
+            'weight' => 'nullable|numeric|min:0|max:999.99',
         ]);
 
         if (!$request->user()?->isAdmin()) {

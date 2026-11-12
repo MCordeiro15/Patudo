@@ -18,6 +18,11 @@ const species = ref('');
 const breed = ref('');
 const size = ref('');
 const specialNeeds = ref('');
+const aggression = ref('');
+const medication = ref('');
+const sex = ref('');
+const weight = ref('');
+const photoFile = ref<File | null>(null);
 
 // UI state
 const errors = ref<AnimalFormErrors>({});
@@ -30,12 +35,29 @@ const sizeOptions = [
     { value: 'large', label: 'Grande' },
 ];
 
+const aggressionOptions = [
+    { value: 'nenhuma', label: 'Nenhuma' },
+    { value: 'baixa', label: 'Baixa' },
+    { value: 'media', label: 'Média' },
+    { value: 'alta', label: 'Alta' },
+];
+
+const sexOptions = [
+    { value: 'macho', label: 'Macho' },
+    { value: 'femea', label: 'Fêmea' },
+];
+
 const resetForm = () => {
     name.value = '';
     species.value = '';
     breed.value = '';
     size.value = '';
     specialNeeds.value = '';
+    aggression.value = '';
+    medication.value = '';
+    sex.value = '';
+    weight.value = '';
+    photoFile.value = null;
     errors.value = {};
     generalError.value = '';
 };
@@ -61,12 +83,16 @@ const submit = async () => {
             .find((row) => row.startsWith('XSRF-TOKEN='))
             ?.split('=')[1];
 
-        const body: Record<string, string | null> = {
+        const body: Record<string, string | number | null> = {
             name: name.value.trim(),
             species: species.value.trim(),
             breed: breed.value.trim(),
             size: size.value,
             special_needs: specialNeeds.value.trim() || null,
+            aggression: aggression.value || null,
+            medication: medication.value.trim() || null,
+            sex: sex.value || null,
+            weight: weight.value ? parseFloat(weight.value) : null,
         };
 
         const response = await fetch('/api/animals', {
@@ -97,6 +123,13 @@ const submit = async () => {
         generalError.value = 'Erro de conexão. Tente novamente.';
     } finally {
         isLoading.value = false;
+    }
+};
+
+const handlePhotoChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files[0]) {
+        photoFile.value = target.files[0];
     }
 };
 </script>
@@ -217,19 +250,114 @@ const submit = async () => {
                         <InputError :message="errors.size?.[0]" />
                     </div>
 
-                    <!-- Necessidades especiais -->
+                    <!-- Necessidades especiais / Sobre o animal -->
                     <div class="mb-3">
                         <label for="animal-special-needs" class="patudo-section-label d-block mb-1">
-                            Necessidades especiais <span class="patudo-optional">(opcional)</span>
+                            Necessidades especiais / Sobre o animal <span class="patudo-optional">(opcional)</span>
                         </label>
                         <textarea
                             id="animal-special-needs"
                             v-model="specialNeeds"
                             rows="2"
                             class="patudo-textarea"
-                            placeholder="Ex: Medicação diária, dieta especial..."
+                            placeholder="Ex: Medicação diária, dieta especial, comportamento..."
                         ></textarea>
                         <InputError :message="errors.special_needs?.[0]" />
+                    </div>
+
+                    <!-- Agressividade -->
+                    <div class="mb-3">
+                        <label for="animal-aggression" class="patudo-section-label d-block mb-1">
+                            Agressividade <span class="patudo-optional">(opcional)</span>
+                        </label>
+                        <select
+                            id="animal-aggression"
+                            v-model="aggression"
+                            class="patudo-input patudo-select"
+                            :class="{ 'is-invalid': errors.aggression }"
+                        >
+                            <option value="" disabled>Seleciona o nível</option>
+                            <option
+                                v-for="option in aggressionOptions"
+                                :key="option.value"
+                                :value="option.value"
+                            >
+                                {{ option.label }}
+                            </option>
+                        </select>
+                        <InputError :message="errors.aggression?.[0]" />
+                    </div>
+
+                    <!-- Medicação -->
+                    <div class="mb-3">
+                        <label for="animal-medication" class="patudo-section-label d-block mb-1">
+                            Medicação <span class="patudo-optional">(opcional)</span>
+                        </label>
+                        <textarea
+                            id="animal-medication"
+                            v-model="medication"
+                            rows="2"
+                            class="patudo-textarea"
+                            placeholder="Ex: Anti-inflamatório, 1x ao dia..."
+                        ></textarea>
+                        <InputError :message="errors.medication?.[0]" />
+                    </div>
+
+                    <!-- Sexo e Peso lado a lado -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label for="animal-sex" class="patudo-section-label d-block mb-1">
+                                Sexo <span class="patudo-optional">(opcional)</span>
+                            </label>
+                            <select
+                                id="animal-sex"
+                                v-model="sex"
+                                class="patudo-input patudo-select"
+                                :class="{ 'is-invalid': errors.sex }"
+                            >
+                                <option value="" disabled>Seleciona</option>
+                                <option
+                                    v-for="option in sexOptions"
+                                    :key="option.value"
+                                    :value="option.value"
+                                >
+                                    {{ option.label }}
+                                </option>
+                            </select>
+                            <InputError :message="errors.sex?.[0]" />
+                        </div>
+
+                        <div class="col-6">
+                            <label for="animal-weight" class="patudo-section-label d-block mb-1">
+                                Peso (kg) <span class="patudo-optional">(opcional)</span>
+                            </label>
+                            <input
+                                id="animal-weight"
+                                v-model="weight"
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                class="patudo-input"
+                                :class="{ 'is-invalid': errors.weight }"
+                                placeholder="Ex: 12.5"
+                            />
+                            <InputError :message="errors.weight?.[0]" />
+                        </div>
+                    </div>
+
+                    <!-- Upload de foto -->
+                    <div class="mb-3">
+                        <label for="animal-photo" class="patudo-section-label d-block mb-1">
+                            Foto do animal <span class="patudo-optional">(opcional)</span>
+                        </label>
+                        <input
+                            id="animal-photo"
+                            type="file"
+                            accept="image/*"
+                            class="patudo-input"
+                            @change="handlePhotoChange"
+                        />
+                        <InputError :message="errors.photo?.[0]" />
                     </div>
 
                     <!-- Botões de Ação -->
