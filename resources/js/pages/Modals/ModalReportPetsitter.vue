@@ -46,7 +46,7 @@ const handleSubmit = () => {
                 </button>
 
                 <div class="mb-3">
-                    <h2 class="patudo-modal-title">Denunciar pet sitter</h2>
+                    <h2 class="patudo-modal-title">Denunciar Petsitter</h2>
                     <p class="patudo-modal-subtitle">
                         Ajuda-nos a manter a comunidade Patudo segura.
                     </p>
