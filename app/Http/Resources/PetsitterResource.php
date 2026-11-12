@@ -5,7 +5,6 @@ namespace App\Http\Resources;
 use App\Models\Petsitter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * @mixin Petsitter
@@ -27,9 +26,7 @@ class PetsitterResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'biography' => $this->biography,
-            'profile_photo' => $this->profile_photo
-                ? Storage::disk('public')->url($this->profile_photo)
-                : null,
+            'profile_photo' => $this->profile_photo,
             'short_bio' => $this->short_bio,
             'experience' => $this->experience,
             'service_location' => $this->service_location,

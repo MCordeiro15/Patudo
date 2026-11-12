@@ -4,7 +4,6 @@ export type PetsitterProfile = {
     id: number;
     user_id: number;
     name: string;
-    profile_photo: string | null;
     biography: string | null;
     experience: string;
     service_location: string;
