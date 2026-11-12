@@ -17,6 +17,7 @@ const loadError = ref('');
 const showAddModal = ref(false);
 const showDeleteModal = ref(false);
 const deletingAnimal = ref<{ id: number; name: string } | null>(null);
+const deletingAnimalLoading = ref(false);
 
 const displayName = computed(() => user.value?.name ?? 'Utilizador');
 
@@ -68,17 +69,10 @@ const openDeleteModal = (animalId: number) => {
 const confirmDeleteAnimal = async () => {
     if (!deletingAnimal.value) return;
 
+    deletingAnimalLoading.value = true;
     try {
-        await fetch('/sanctum/csrf-cookie', {
-            method: 'GET',
-            credentials: 'same-origin',
-        });
-
-        const token = document.cookie
-            .split('xsrf_token=')
-            .pop()
-            .split(';')
-            .shift();
+        const cookiePart = document.cookie.split('xsrf_token=').pop();
+        const token = cookiePart ? cookiePart.split(';').shift() : '';
         const xsrfToken = token ? decodeURIComponent(token) : '';
 
         const response = await fetch(`/api/animals/${deletingAnimal.value.id}`, {
@@ -98,6 +92,8 @@ const confirmDeleteAnimal = async () => {
         }
     } catch {
         // Erro de conexão
+    } finally {
+        deletingAnimalLoading.value = false;
     }
 };
 
@@ -268,6 +264,7 @@ onMounted(() => {
         <ModalDeleteAnimal
             :show="showDeleteModal"
             :animal-name="deletingAnimal?.name ?? ''"
+            :deleting="deletingAnimalLoading"
             @close="showDeleteModal = false; deletingAnimal = null"
             @confirmed="confirmDeleteAnimal"
         />

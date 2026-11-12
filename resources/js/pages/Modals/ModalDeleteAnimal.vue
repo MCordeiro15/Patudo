@@ -9,16 +9,14 @@ const emit = defineEmits<{
 const props = defineProps<{
     show: boolean;
     animalName: string;
+    deleting?: boolean;
 }>();
-
-const isLoading = ref(false);
 
 const close = () => {
     emit('close');
 };
 
 const confirm = () => {
-    isLoading.value = true;
     emit('confirmed');
 };
 </script>
@@ -64,7 +62,7 @@ const confirm = () => {
                                 type="button"
                                 class="btn btn-outline-secondary rounded-pill flex-fill"
                                 @click="close"
-                                :disabled="isLoading"
+                                :disabled="deleting"
                             >
                                 Cancelar
                             </button>
@@ -72,9 +70,9 @@ const confirm = () => {
                                 type="button"
                                 class="btn btn-danger rounded-pill flex-fill"
                                 @click="confirm"
-                                :disabled="isLoading"
+                                :disabled="deleting"
                             >
-                                {{ isLoading ? 'A remover...' : 'Remover' }}
+                                {{ deleting ? 'A remover...' : 'Remover' }}
                             </button>
                         </div>
                     </div>
