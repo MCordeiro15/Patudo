@@ -17,7 +17,7 @@ const sizeLabelMap: Record<string, string> = {
 };
 
 const sizeBadgeClassMap: Record<string, string> = {
-    small: 'text-bg-info',
+    small: 'text-bg-success',
     medium: 'text-bg-warning',
     large: 'text-bg-danger',
 };
