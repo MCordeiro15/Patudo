@@ -16,7 +16,7 @@ const emit = defineEmits(['close']);
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content p-4 rounded-4 bg-white">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="modal-title fw-bold">Título do Modal</h5>
+                    <h5 class="modal-title fw-bold">Quero ser Petsitter</h5>
                     <button
                         type="button"
                         class="btn-close"

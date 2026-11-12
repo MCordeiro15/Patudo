@@ -2,17 +2,15 @@
 import { ref } from 'vue';
 import { Head } from '@inertiajs/vue3';
 
-// Os teus 8 modais
-import ModalAddPet from '/resources/js/pages/Modals/ModalAddPet.vue';
-import ModalEditOwnerProfile from '/resources/js/pages/Modals/ModalEditOwnerProfile.vue';
-import ModalEditPetsitterProfile from '/resources/js/pages/Modals/ModalEditPetsitterProfile.vue';
-import ModalFormPetsitter from '/resources/js/pages/Modals/ModalFormPetsitter.vue';
-import ModalNewPost from '/resources/js/pages/Modals/ModalNewPost.vue';
-import ModalPetDetails from '/resources/js/pages/Modals/ModalPetDetails.vue';
-import ModalReportPetsitter from '/resources/js/pages/Modals/ModalReportPetsitter.vue';
-import ModalReviewPetsitter from '/resources/js/pages/Modals/ModalReviewPetsitter.vue';
+import ModalAddPet from '@/pages/Modals/ModalAddPet.vue';
+import ModalEditOwnerProfile from '@/pages/Modals/ModalEditOwnerProfile.vue';
+import ModalEditPetsitterProfile from '@/pages/Modals/ModalEditPetsitterProfile.vue';
+import ModalFormPetsitter from '@/pages/Modals/ModalFormPetsitter.vue';
+import ModalNewPost from '@/pages/Modals/ModalNewPost.vue';
+import ModalPetDetails from '@/pages/Modals/ModalPetDetails.vue';
+import ModalReportPetsitter from '@/pages/Modals/ModalReportPetsitter.vue';
+import ModalReviewPetsitter from '@/pages/Modals/ModalReviewPetsitter.vue';
 
-// Estados de abertura
 const showAddPet = ref(false);
 const showEditOwner = ref(false);
 const showEditPetsitter = ref(false);
@@ -22,7 +20,6 @@ const showPetDetails = ref(false);
 const showReport = ref(false);
 const showReview = ref(false);
 
-// Mock data para modais que necessitam de objeto
 const mockPet = {
     id: 1,
     name: 'Bobby',
@@ -43,7 +40,7 @@ const mockPet = {
 <template>
     <Head title="Bancada de Modais" />
 
-    <div style="position: fixed; inset: 0; background-color: #fffbf6; z-index: 999999; padding: 40px; overflow-y: auto;">
+    <div style="position: fixed; inset: 0; background-color: #fffbf6; z-index: 10; padding: 40px; overflow-y: auto;">
         <h1 style="font-size: 28px; font-weight: bold; margin-bottom: 8px; color: #111827;">
             Bancada de Testes de Modais
         </h1>
@@ -78,7 +75,6 @@ const mockPet = {
             </button>
         </div>
 
-        <!-- Render dos 8 componentes -->
         <ModalAddPet
             :show="showAddPet"
             @close="showAddPet = false"
