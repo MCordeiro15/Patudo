@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import {Head, Link} from '@inertiajs/vue3';
 import {
     Bell,
     CirclePlus,
@@ -12,10 +12,10 @@ import {
     UserRound,
 } from '@lucide/vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
-import { computed, onMounted, ref } from 'vue';
+import {computed, onMounted, ref} from 'vue';
 import ModalEditPetsitterProfile from '@/pages/Modals/ModalEditPetsitterProfile.vue';
 import ModalNewPost from '@/pages/Modals/ModalNewPost.vue';
-import type { PetsitterProfile as PetsitterProfileType, Post } from '@/types';
+import type {PetsitterProfile as PetsitterProfileType, Post} from '@/types';
 
 
 type PetsitterProfile = {
@@ -38,13 +38,13 @@ type PetsitterProfile = {
 };
 
 const DAY_OPTIONS: Array<{ value: string; label: string }> = [
-    { value: 'monday', label: 'Segunda' },
-    { value: 'tuesday', label: 'Terça' },
-    { value: 'wednesday', label: 'Quarta' },
-    { value: 'thursday', label: 'Quinta' },
-    { value: 'friday', label: 'Sexta' },
-    { value: 'saturday', label: 'Sábado' },
-    { value: 'sunday', label: 'Domingo' },
+    {value: 'monday', label: 'Segunda'},
+    {value: 'tuesday', label: 'Terça'},
+    {value: 'wednesday', label: 'Quarta'},
+    {value: 'thursday', label: 'Quinta'},
+    {value: 'friday', label: 'Sexta'},
+    {value: 'saturday', label: 'Sábado'},
+    {value: 'sunday', label: 'Domingo'},
 ];
 
 const props = defineProps<{
@@ -269,7 +269,9 @@ const saveAvailability = async () => {
             }
             isEditing.value = false;
             saveSuccess.value = true;
-            setTimeout(() => { saveSuccess.value = false; }, 3000);
+            setTimeout(() => {
+                saveSuccess.value = false;
+            }, 3000);
         } else {
             const errorData = await response.json().catch(() => ({}));
             if (errorData.errors) {
@@ -288,7 +290,7 @@ const saveAvailability = async () => {
 </script>
 
 <template>
-    <Head :title="isOwnProfile ? 'O meu perfil' : 'Perfil do Petsitter'" />
+    <Head :title="isOwnProfile ? 'O meu perfil' : 'Perfil do Petsitter'"/>
 
     <main class="min-vh-100 py-4 patudo-page">
         <div class="container">
@@ -312,7 +314,7 @@ const saveAvailability = async () => {
                     class="nav nav-pills border rounded-pill p-1 mx-auto d-none d-lg-flex"
                 >
                     <a class="nav-link text-dark rounded-pill px-4" href="/"
-                        >Início</a
+                    >Início</a
                     >
                     <a
                         class="nav-link text-dark rounded-pill px-4"
@@ -336,13 +338,13 @@ const saveAvailability = async () => {
 
                 <div class="d-flex align-items-center gap-3 ms-auto">
                     <a href="/messages" class="text-dark">
-                        <MessageCircle :size="25" />
+                        <MessageCircle :size="25"/>
                     </a>
                     <a href="/notifications" class="text-dark">
-                        <Bell :size="25" />
+                        <Bell :size="25"/>
                     </a>
                     <Link :href="petsitter ? `/petsitters/${petsitter.user_id}` : '/profile'" class="text-dark">
-                        <UserRound :size="25" />
+                        <UserRound :size="25"/>
                     </Link>
                 </div>
             </nav>
@@ -434,7 +436,7 @@ const saveAvailability = async () => {
                                     class="btn btn-outline-primary btn-sm rounded-pill"
                                     @click="showEditProfileModal = true"
                                 >
-                                    <Pencil :size="14" class="me-1" />
+                                    <Pencil :size="14" class="me-1"/>
                                     Editar perfil
                                 </button>
                             </div>
@@ -454,8 +456,8 @@ const saveAvailability = async () => {
                                     >
                                         <span>Dog Sitting (diário)</span>
                                         <strong>{{
-                                            formatPrice(displayPricePerDay)
-                                        }}</strong>
+                                                formatPrice(displayPricePerDay)
+                                            }}</strong>
                                     </div>
                                 </section>
                             </div>
@@ -472,7 +474,7 @@ const saveAvailability = async () => {
                                                 class="btn btn-outline-secondary btn-sm rounded-pill"
                                                 @click="startEditing"
                                             >
-                                                <Pencil :size="14" class="me-1" />
+                                                <Pencil :size="14" class="me-1"/>
                                                 Editar
                                             </button>
                                         </template>
@@ -530,7 +532,7 @@ const saveAvailability = async () => {
                                                 :disabled="saving"
                                                 @click="saveAvailability"
                                             >
-                                                <Save v-if="!saving" :size="14" class="me-1" />
+                                                <Save v-if="!saving" :size="14" class="me-1"/>
                                                 {{ saving ? 'A guardar...' : 'Guardar' }}
                                             </button>
                                             <button
@@ -615,20 +617,20 @@ const saveAvailability = async () => {
                                                 type="button"
                                                 class="btn btn-link text-dark p-0"
                                             >
-                                                <PenLine :size="18" />
+                                                <PenLine :size="18"/>
                                             </button>
                                             <button
                                                 v-if="canEdit"
                                                 type="button"
                                                 class="btn btn-link text-dark p-0"
                                             >
-                                                <Trash2 :size="18" />
+                                                <Trash2 :size="18"/>
                                             </button>
                                             <button
                                                 type="button"
                                                 class="btn btn-link text-primary p-0"
                                             >
-                                                <Heart :size="24" />
+                                                <Heart :size="24"/>
                                             </button>
                                         </div>
                                     </div>
@@ -650,12 +652,6 @@ const saveAvailability = async () => {
                         </section>
 
                         <div class="d-flex justify-content-end mt-3">
-                            <a
-                                href="/petsitters"
-                                class="btn btn-outline-primary rounded-pill px-4"
-                            >
-                                Voltar à pesquisa
-                            </a>
                         </div>
                     </template>
                 </div>
