@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { CirclePlus, LogOut, UserRound } from '@lucide/vue';
+import { CirclePlus, LogOut, UserRound, MessageCircle, Bell ,SquarePen } from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import type { Animal } from '@/types';
@@ -111,7 +111,7 @@ onMounted(() => {
 
     <main class="min-vh-100 py-4 patudo-page">
         <div class="container">
-            <!-- Navbar -->
+
             <nav
                 class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
             >
@@ -120,25 +120,22 @@ onMounted(() => {
                     href="/"
                 >
                     <img
-                        :src="logoPatudo"
+                        src="/images/patudo-logo.svg"
                         alt="Patudo"
-                        width="70"
-                        height="70"
+                        width="190"
+                        height="62"
                     />
-                    <span>Patudo</span>
                 </a>
 
-                <div
-                    class="nav nav-pills border rounded-pill p-1 mx-auto d-none d-lg-flex"
-                >
-                    <a class="nav-link text-dark rounded-pill px-4" href="/"
-                        >Início</a
-                    >
+                <div class="nav nav-pills border rounded-pill p-1 mx-auto">
+                    <a class="nav-link active rounded-pill px-4" href="/">
+                        Início
+                    </a>
                     <a
                         class="nav-link text-dark rounded-pill px-4"
-                        href="/petsitters"
+                        href="/orders"
                     >
-                        Petsitters
+                        Pedidos
                     </a>
                     <a
                         class="nav-link text-dark rounded-pill px-4"
@@ -147,124 +144,165 @@ onMounted(() => {
                         Favoritos
                     </a>
                     <a
-                        class="nav-link active rounded-pill px-4"
-                        aria-current="page"
-                        href="/petsitters/profile"
+                        class="nav-link text-dark rounded-pill px-4"
+                        href="/reservations"
                     >
-                        Perfil
+                        Reservas
                     </a>
                 </div>
 
-                <div class="d-flex align-items-center gap-3 ms-auto">
-                    <Link href="/login" class="text-dark" @click.prevent="logout">
-                        <LogOut :size="25" />
-                    </Link>
-                    <Link href="/petsitters/profile" class="text-dark">
+                <div class="d-flex align-items-center gap-3">
+                    <a href="/messages" class="text-dark">
+                        <MessageCircle :size="25" />
+                    </a>
+                    <a href="/notifications" class="text-dark">
+                        <Bell :size="25" />
+                    </a>
+                    <button
+                        type="button"
+                        class="text-dark p-0 border-0 bg-none"
+                    >
                         <UserRound :size="25" />
+                    </button>
+
+                    <Link
+                        href="/logout"
+                        method="post"
+                        as="button"
+                        class="btn btn-outline-danger btn-sm rounded-pill d-flex align-items-center gap-2 px-3 py-1 ms-1"
+                    >
+                        <LogOut :size="16" />
+                        <span>Sair</span>
                     </Link>
                 </div>
             </nav>
 
-            <!-- Page title -->
-            <div class="row justify-content-center mt-5 pt-4">
-                <div class="col-12">
-                    <h1 class="text-center fw-bold mb-4 pb-2">O meu perfil</h1>
+            <h1 class="text-center fw-bold display-5 mt-5 pt-4 mb-4">O meu perfil</h1>
 
-                    <!-- User info card -->
-                    <section
-                        class="card border border-primary rounded-4 p-3 p-md-4 mb-4"
-                    >
-                        <div class="row g-4 align-items-center">
-                            <div class="col-12 col-md-8">
-                                <div class="d-flex gap-3">
-                                    <div
-                                        class="d-flex align-items-center justify-content-center rounded-circle bg-light flex-shrink-0"
-                                        style="width: 80px; height: 80px"
-                                    >
-                                        <UserRound :size="40" class="text-primary" />
-                                    </div>
+            <section
+                class="card bg-white border border-primary rounded-4 p-3 p-md-4 mb-3 position-relative"
+            >
+                <button
+                    type="button"
+                    class="btn btn-primary btn-sm d-flex align-items-center gap-2 position-absolute top-0 end-0 mt-3 me-3 px-4"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
+                    </svg>
+                    Editar
+                </button>
 
-                                    <div>
-                                        <h2 class="h5 mb-1">{{ displayName }}</h2>
-                                        <p class="mb-1 text-muted small">
-                                            {{ user?.email }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Animals section -->
-                    <section class="mb-4">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <h2 class="h4 mb-0">Os meus animais</h2>
-                            <button
-                                type="button"
-                                class="btn btn-primary rounded-pill d-flex align-items-center gap-2"
-                                @click="showAddModal = true"
+                <div class="row g-4 align-items-center">
+                    <div class="col-12 col-md-8">
+                        <div class="d-flex align-items-center gap-4">
+                            <div
+                                class="profile-avatar d-flex align-items-center justify-content-center rounded-circle border border-primary flex-shrink-0"
                             >
-                                <CirclePlus :size="18" />
-                                Adicionar animal
-                            </button>
-                        </div>
+                                <UserRound :size="64" class="text-primary" />
+                            </div>
 
-                        <!-- Loading state -->
-                        <div v-if="isLoading" class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">A carregar...</span>
+                            <div>
+                                <h2 class="h5 fw-bold mb-0">{{ displayName }}</h2>
+                                <p class="text-muted small mb-2">
+                                    {{ user?.location ?? 'Localização' }}
+                                </p>
+
+                                <div class="d-flex flex-wrap gap-3 mb-2">
+                                    <span
+                                        v-for="species in [...new Set(animals.map((a) => a.species))]"
+                                        :key="species"
+                                        class="tag-pill rounded-pill py-1 small"
+                                    >
+                                        {{ species }}
+                                    </span>
+                                </div>
+
+                                <p class="text-muted small mb-0">
+                                    {{ user?.bio ?? 'Breve descrição sobre o que procura, sobre o seu animal.' }}
+                                </p>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Error state -->
-                        <div
-                            v-else-if="loadError"
-                            class="alert alert-danger py-2 small"
-                            role="alert"
-                        >
-                            {{ loadError }}
-                        </div>
-
-                        <!-- Empty state -->
-                        <div
-                            v-else-if="animals.length === 0"
-                            class="card border border-warning rounded-4 p-4 text-center"
-                        >
-                            <p class="mb-0 text-muted">
-                                Ainda não adicionaste nenhum animal. Clica em
-                                <strong>"Adicionar animal"</strong> para começar.
+                    <div class="col-12 col-md-4">
+                        <div class="border-start border-secondary ps-4 py-2">
+                            <p class="fs-5 text-muted mb-1">
+                                <span class="star">★</span> 5,0
+                            </p>
+                            <p class="text-muted mb-2">Avaliações</p>
+                            <p class="text-muted mb-0">
+                                Membro desde:<br />
+                                {{
+                                    user?.created_at
+                                        ? new Date(user.created_at).toLocaleDateString('pt-PT')
+                                        : '—'
+                                }}
                             </p>
                         </div>
-
-                        <!-- Animals grid -->
-                        <div
-                            v-else
-                            class="row g-3"
-                        >
-                            <div
-                                v-for="animal in animals"
-                                :key="animal.id"
-                                class="col-12 col-md-6 col-lg-4"
-                            >
-                                <AnimalCard
-                                    :animal="animal"
-                                    @delete="openDeleteModal"
-                                />
-                            </div>
-                        </div>
-                    </section>
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            <section
+                class="card bg-white border border-primary rounded-4 p-3 px-md-4 mb-5 about-card"
+            >
+                <h2 class="h5 fw-semibold mb-3">Sobre mim</h2>
+                <p class="text-muted fs-5 mb-0 ps-md-2">
+                    {{ user?.about ?? 'Um pouco sobre mim' }}
+                </p>
+            </section>
+
+            <h1 class="text-center fw-bold display-5 mb-4">Meus animais</h1>
+
+            <section
+                class="card bg-white border border-primary rounded-4 p-3 p-md-4 mb-4"
+            >
+                <h2 class="h6 fw-semibold mb-3">Os meus animais</h2>
+
+                <div v-if="isLoading" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">A carregar...</span>
+                    </div>
+                </div>
+
+                <div
+                    v-else-if="loadError"
+                    class="alert alert-danger py-2 small"
+                    role="alert"
+                >
+                    {{ loadError }}
+                </div>
+
+                <div v-else class="row g-4">
+                    <div
+                        v-for="animal in animals"
+                        :key="animal.id"
+                        class="col-12 col-md-6 col-lg-4"
+                    >
+                        <AnimalCard :animal="animal" @delete="openDeleteModal" />
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <button
+                            type="button"
+                            class="add-animal-card w-100 h-100 d-flex flex-column align-items-center justify-content-center gap-2 border border-primary rounded-4 bg-white"
+                            @click="showAddModal = true"
+                        >
+                            <CirclePlus :size="56" :stroke-width="1" class="text-primary" />
+                            <span class="small text-muted">Adicionar animal</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
         </div>
 
-        <!-- Add Pet Modal -->
         <ModalAddPet
             :show="showAddModal"
             @close="showAddModal = false"
             @saved="handleAnimalSaved"
         />
 
-        <!-- Delete Animal Modal -->
         <ModalDeleteAnimal
             :show="showDeleteModal"
             :animal-name="deletingAnimal?.name ?? ''"
@@ -273,3 +311,38 @@ onMounted(() => {
         />
     </main>
 </template>
+
+<style scoped>
+.patudo-page {
+    background-color: #fffaf3;
+}
+
+.profile-avatar {
+    width: 140px;
+    height: 140px;
+}
+
+.tag-pill {
+    background-color: #587257;
+    color: #fff;
+    min-width: 120px;
+    text-align: center;
+}
+
+.about-card {
+    min-height: 210px;
+}
+
+.add-animal-card {
+    min-height: 200px;
+    cursor: pointer;
+}
+
+.add-animal-card:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.05) !important;
+}
+
+.star {
+    color: #f5b301;
+}
+</style>
