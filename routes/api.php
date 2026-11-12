@@ -49,6 +49,9 @@ Route::middleware([
 
 Route::get('/petsitters/{id}/availability', [PetsitterAvailabilityController::class, 'availability']);
 
+// Rota pública para listar petsitters aprovados
+Route::get('/petsitters/public', [PetsitterController::class, 'publicIndex']);
+
 Route::middleware('auth:sanctum')->group(function () {
     extracted();
     Route::get('/petsitters/{petsitter}/posts', [PostController::class, 'byPetsitter']);

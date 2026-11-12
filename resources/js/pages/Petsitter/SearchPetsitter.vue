@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import {
     Bell,
     ChevronRight,
@@ -87,6 +87,18 @@ async function fetchPetsitters() {
     } finally {
         loading.value = false;
     }
+}
+
+function navigateToProfile(userId: number) {
+    window.location.href = `/petsitters/${userId}`;
+}
+
+function navigateToMyProfile() {
+    window.location.href = '/petsitters/profile';
+}
+
+function goToLogin() {
+    window.location.href = '/login';
 }
 
 async function fetchFavourites() {
@@ -178,7 +190,7 @@ async function toggleFavourite(petsitterId: number) {
             if (!response.ok) {
                 // If 401, redirect to login
                 if (response.status === 401) {
-                    router.get('/login');
+                    goToLogin();
                     return;
                 }
                 throw new Error('Não foi possível adicionar aos favoritos.');
@@ -248,9 +260,13 @@ onMounted(() => {
                     <a href="/notifications" class="text-dark">
                         <Bell :size="25" />
                     </a>
-                    <a href="/petsitters/profile" class="text-dark">
+                    <button
+                        type="button"
+                        class="text-dark p-0 border-0 bg-none"
+                        @click="navigateToMyProfile()"
+                    >
                         <UserRound :size="25" />
-                    </a>
+                    </button>
 
                     <Link
                         href="/logout"
@@ -385,13 +401,14 @@ onMounted(() => {
                                 <p class="h3 mb-0">{{ petsitter.price_per_day }} €</p>
                             </div>
 
-                            <a
-                                :href="`/petsitters/${petsitter.user_id}`"
-                                class="btn btn-link text-dark fs-5 p-0"
+                            <button
+                                type="button"
+                                class="btn btn-link text-dark fs-5 p-0 cursor-pointer"
+                                @click="navigateToProfile(petsitter.user_id)"
                             >
                                 Ver perfil
                                 <ChevronRight :size="24" />
-                            </a>
+                            </button>
                         </div>
                     </article>
                 </div>

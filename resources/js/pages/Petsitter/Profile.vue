@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import {
     Bell,
     CirclePlus,
@@ -299,9 +299,9 @@ const saveAvailability = async () => {
                     <a href="/notifications" class="text-dark">
                         <Bell :size="25" />
                     </a>
-                    <a href="/profile" class="text-dark">
+                    <Link :href="petsitter ? `/petsitters/${petsitter.user_id}` : '/profile'" class="text-dark">
                         <UserRound :size="25" />
-                    </a>
+                    </Link>
                 </div>
             </nav>
 

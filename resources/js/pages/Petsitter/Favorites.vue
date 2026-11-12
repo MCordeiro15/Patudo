@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import {
     Bell,
     ChevronRight,
@@ -34,6 +34,18 @@ interface PetsitterData {
 const favouritePetsitters = ref<PetsitterData[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
+
+function navigateToProfile(userId: number) {
+    window.location.href = `/petsitters/${userId}`;
+}
+
+function navigateToMyProfile() {
+    window.location.href = '/petsitters/profile';
+}
+
+function goToLogin() {
+    window.location.href = '/login';
+}
 
 async function fetchFavourites() {
     loading.value = true;
@@ -177,9 +189,13 @@ onMounted(() => {
                     <a href="/notifications" class="text-dark">
                         <Bell :size="25" />
                     </a>
-                    <a href="/petsitters/profile" class="text-dark">
+                    <button
+                        type="button"
+                        class="text-dark p-0 border-0 bg-none"
+                        @click="navigateToMyProfile()"
+                    >
                         <UserRound :size="25" />
-                    </a>
+                    </button>
 
                     <Link
                         href="/logout"
@@ -298,13 +314,14 @@ onMounted(() => {
                                 </p>
                             </div>
 
-                            <a
-                                :href="`/petsitters/${petsitter.user_id}`"
-                                class="btn btn-link text-dark fs-5 p-0"
+                            <button
+                                type="button"
+                                class="btn btn-link text-dark fs-5 p-0 cursor-pointer"
+                                @click="navigateToProfile(petsitter.user_id)"
                             >
                                 Ver perfil
                                 <ChevronRight :size="24" />
-                            </a>
+                            </button>
                         </div>
                     </article>
                 </div>

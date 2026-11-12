@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import {
     Bell,
     ChevronRight,
@@ -41,6 +41,18 @@ const favourites = ref<number[]>([]);
 const error = ref<string | null>(null);
 const loading = ref(true);
 
+function navigateToProfile(userId: number) {
+    window.location.href = `/petsitters/${userId}`;
+}
+
+function navigateToMyProfile() {
+    window.location.href = '/petsitters/profile';
+}
+
+function goToLogin() {
+    window.location.href = '/login';
+}
+
 function isFavourite(petsitterId: number): boolean {
     return favourites.value.includes(petsitterId);
 }
@@ -78,7 +90,7 @@ async function fetchPetsitters() {
             credentials: 'same-origin',
         });
 
-        const response = await fetch('/api/petsitters', {
+        const response = await fetch('/api/petsitters/public', {
             method: 'GET',
             credentials: 'same-origin',
             headers: {
@@ -145,7 +157,7 @@ function getCsrfToken(): string | null {
 async function toggleFavourite(petsitterId: number) {
     // If not authenticated, redirect to login
     if (!props.auth.user) {
-        router.get('/login');
+        goToLogin();
         return;
     }
 
@@ -195,7 +207,7 @@ async function toggleFavourite(petsitterId: number) {
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    router.get('/login');
+                    goToLogin();
                     return;
                 }
                 throw new Error('Não foi possível adicionar aos favoritos.');
@@ -263,9 +275,13 @@ onMounted(() => {
                     <a href="/notifications" class="text-dark"
                         ><Bell :size="25"
                     /></a>
-                    <a href="/profile" class="text-dark"
-                        ><UserRound :size="25"
-                    /></a>
+                    <button
+                        type="button"
+                        class="text-dark p-0 border-0 bg-none"
+                        @click="navigateToMyProfile()"
+                    >
+                        <UserRound :size="25" />
+                    </button>
                 </div>
             </nav>
 
@@ -390,13 +406,14 @@ onMounted(() => {
                                 <p class="h3 mb-0">{{ petsitter.price_per_day }} €</p>
                             </div>
 
-                            <a
-                                :href="`/petsitters/${petsitter.user_id}`"
-                                class="btn btn-link text-dark fs-5 p-0"
+                            <button
+                                type="button"
+                                class="btn btn-link text-dark fs-5 p-0 cursor-pointer"
+                                @click="navigateToProfile(petsitter.user_id)"
                             >
                                 Ver perfil
                                 <ChevronRight :size="24" />
-                            </a>
+                            </button>
                         </div>
                     </article>
                 </div>
@@ -525,13 +542,14 @@ onMounted(() => {
                                 <p class="h3 mb-0">{{ petsitter.price_per_day }} €</p>
                             </div>
 
-                            <a
-                                :href="`/petsitters/${petsitter.user_id}`"
-                                class="btn btn-link text-dark fs-5 p-0"
+                            <button
+                                type="button"
+                                class="btn btn-link text-dark fs-5 p-0 cursor-pointer"
+                                @click="navigateToProfile(petsitter.user_id)"
                             >
                                 Ver perfil
                                 <ChevronRight :size="24" />
-                            </a>
+                            </button>
                         </div>
                     </article>
                 </div>

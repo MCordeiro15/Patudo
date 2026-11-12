@@ -25,6 +25,16 @@ class PetsitterController extends Controller
         return PetsitterResource::collection($query->get());
     }
 
+    /**
+     * Retorna apenas os petsitters aprovados, sem necessidade de autenticação.
+     */
+    public function publicIndex()
+    {
+        $query = Petsitter::with('user')->where('approval_status', 'approved');
+
+        return PetsitterResource::collection($query->get());
+    }
+
     public function store(Request $request)
     {
         Gate::authorize('create', Petsitter::class);

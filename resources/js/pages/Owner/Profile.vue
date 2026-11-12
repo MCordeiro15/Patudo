@@ -149,7 +149,7 @@ onMounted(() => {
                     <a
                         class="nav-link active rounded-pill px-4"
                         aria-current="page"
-                        href="/profile"
+                        href="/petsitters/profile"
                     >
                         Perfil
                     </a>
@@ -159,9 +159,9 @@ onMounted(() => {
                     <Link href="/login" class="text-dark" @click.prevent="logout">
                         <LogOut :size="25" />
                     </Link>
-                    <a href="/profile" class="text-dark">
+                    <Link href="/petsitters/profile" class="text-dark">
                         <UserRound :size="25" />
-                    </a>
+                    </Link>
                 </div>
             </nav>
 

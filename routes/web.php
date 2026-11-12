@@ -29,6 +29,15 @@ Route::get('/petsitters/{petsitter}', [PetsitterProfileController::class, 'show'
     ->middleware('auth')
     ->whereNumber('petsitter')
     ->name('petsitters.show');
-Route::inertia('/profile', 'Owner/Profile')->middleware('auth')->name('owner.profile');
+Route::get('/profile', function () {
+    $user = auth()->user();
+    if ($user->isPetsitter()) {
+        $petsitter = \App\Models\Petsitter::where('user_id', $user->id)->first();
+        if ($petsitter) {
+            return redirect()->route('petsitters.profile');
+        }
+    }
+    return Inertia::render('Owner/Profile');
+})->middleware('auth')->name('owner.profile');
 Route::inertia('/dev/modals', 'Modals/ModalTests');
 require __DIR__ . '/settings.php';
