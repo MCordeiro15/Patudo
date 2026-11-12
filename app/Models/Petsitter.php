@@ -12,10 +12,14 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $user_id
  * @property string|null $biography
+ * @property string|null $profile_photo
+ * @property string|null $short_bio
  * @property string $experience
  * @property string $service_location
+ * @property string|null $city
  * @property int $age
  * @property float $price_per_day
+ * @property float|null $average_rating
  * @property array<string>|null $accepted_sizes
  * @property array<string>|null $accepted_animal_types
  * @property string|null $sex
@@ -36,9 +40,9 @@ class Petsitter extends Model
     /*The `approval_status` is not in `$fillable`, for the same reason as `is_admin`.
      Only an administrator should be able to change it, and it should not be possible to submit it via a form.*/
     protected $fillable = [
-        'user_id', 'biography', 'experience', 'service_location',
+        'user_id', 'biography', 'profile_photo', 'short_bio', 'experience', 'service_location', 'city',
         'age',
-        'price_per_day', 'accepted_sizes', 'sex', 'accepted_animal_types',
+        'price_per_day', 'average_rating', 'accepted_sizes', 'sex', 'accepted_animal_types',
         'identification_documents', 'availability_days',
     ];
 
