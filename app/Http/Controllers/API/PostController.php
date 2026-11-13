@@ -52,9 +52,12 @@ class PostController extends Controller
             'photos.*' => 'image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
+        // Guardar fotos como base64 na base de dados
         $paths = [];
         foreach ($request->file('photos', []) as $file) {
-            $paths[] = $file->store('posts', 'public');
+            $content = file_get_contents($file->getRealPath());
+            $mimeType = $file->getMimeType();
+            $paths[] = 'data:' . $mimeType . ';base64,' . base64_encode($content);
         }
 
         $post = $request->user()->petsitter->posts()->create([
@@ -102,10 +105,6 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         Gate::authorize('delete', $post);
-
-        foreach ($post->photos ?? [] as $path) {
-            Storage::disk('public')->delete($path);
-        }
 
         $post->delete();
 

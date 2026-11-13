@@ -265,6 +265,11 @@ class ExportDatabase extends Command
             return null;
         }
 
+        // Se já é base64, retorna diretamente
+        if (str_starts_with($photoPath, 'data:')) {
+            return $photoPath;
+        }
+
         try {
             $fullPath = storage_path('app/public/' . $photoPath);
             if (File::exists($fullPath)) {
