@@ -66,19 +66,21 @@ function isFavourite(petsitterId: number): boolean {
 // Avatar mapping based on name
 function getAvatar(name: string): string {
     const avatars: Record<string, string> = {
-        'Sofia': '👩🏻',
-        'Tiago': '👨🏻',
-        'João': '👨🏾',
-        'Inês': '👩🏾',
-        'Maria': '👩🏻',
-        'Rui': '👨🏼',
+        Sofia: '👩🏻',
+        Tiago: '👨🏻',
+        João: '👨🏾',
+        Inês: '👩🏾',
+        Maria: '👩🏻',
+        Rui: '👨🏼',
     };
     return avatars[name] || '🐾';
 }
 
 // Generate a fake rating for display
 function formatRating(p: PetsitterApiData): string {
-    const avg = Number(p.average_rating ?? 0).toFixed(1).replace('.', ',');
+    const avg = Number(p.average_rating ?? 0)
+        .toFixed(1)
+        .replace('.', ',');
     return `${avg} (${p.reviews_count ?? 0})`;
 }
 
@@ -105,7 +107,10 @@ async function fetchPetsitters() {
         const apiPetsitters: PetsitterApiData[] = data.data ?? data;
         petsitters.value = apiPetsitters.filter((p) => p.user && p.user.name);
     } catch (e) {
-        error.value = e instanceof Error ? e.message : 'Ocorreu um erro ao carregar os petsitters.';
+        error.value =
+            e instanceof Error
+                ? e.message
+                : 'Ocorreu um erro ao carregar os petsitters.';
     } finally {
         loading.value = false;
     }
@@ -135,7 +140,9 @@ async function fetchFavourites() {
 
         const data = await response.json();
         const apiPetsitters: PetsitterApiData[] = data.data ?? data;
-        favourites.value = apiPetsitters.map((p: PetsitterApiData) => p.user_id);
+        favourites.value = apiPetsitters.map(
+            (p: PetsitterApiData) => p.user_id,
+        );
     } catch {
         // Silently fail on load
     }
@@ -324,7 +331,9 @@ onMounted(() => {
 
             <!-- Empty state -->
             <div v-else-if="petsitters.length === 0" class="text-center py-5">
-                <p class="text-muted">Nenhum petsitter disponível no momento.</p>
+                <p class="text-muted">
+                    Nenhum petsitter disponível no momento.
+                </p>
             </div>
 
             <!-- Petsitters list -->
@@ -340,7 +349,9 @@ onMounted(() => {
                         <div
                             class="position-relative d-flex justify-content-center align-items-center border-bottom border-primary py-4"
                         >
-                            <div class="display-2">{{ getAvatar(petsitter.user.name) }}</div>
+                            <div class="display-2">
+                                {{ getAvatar(petsitter.user.name) }}
+                            </div>
 
                             <button
                                 type="button"
@@ -364,7 +375,9 @@ onMounted(() => {
                             <div
                                 class="d-flex justify-content-between align-items-start gap-2"
                             >
-                                <h2 class="h3 mb-1">{{ petsitter.user.name }}</h2>
+                                <h2 class="h3 mb-1">
+                                    {{ petsitter.user.name }}
+                                </h2>
 
                                 <div
                                     class="d-flex align-items-center gap-1 text-dark text-nowrap"
@@ -404,7 +417,9 @@ onMounted(() => {
                         >
                             <div>
                                 <p class="mb-0 small">A partir de</p>
-                                <p class="h3 mb-0">{{ petsitter.price_per_day }} €</p>
+                                <p class="h3 mb-0">
+                                    {{ petsitter.price_per_day }} €
+                                </p>
                             </div>
 
                             <button
@@ -477,7 +492,9 @@ onMounted(() => {
 
             <!-- Empty state -->
             <div v-else-if="petsitters.length === 0" class="text-center py-5">
-                <p class="text-muted">Nenhum petsitter disponível no momento.</p>
+                <p class="text-muted">
+                    Nenhum petsitter disponível no momento.
+                </p>
             </div>
 
             <!-- Petsitters list -->
@@ -493,14 +510,18 @@ onMounted(() => {
                         <div
                             class="position-relative d-flex justify-content-center align-items-center border-bottom border-primary py-4"
                         >
-                            <div class="display-2">{{ getAvatar(petsitter.user.name) }}</div>
+                            <div class="display-2">
+                                {{ getAvatar(petsitter.user.name) }}
+                            </div>
                         </div>
 
                         <div class="p-4 border-bottom border-primary">
                             <div
                                 class="d-flex justify-content-between align-items-start gap-2"
                             >
-                                <h2 class="h3 mb-1">{{ petsitter.user.name }}</h2>
+                                <h2 class="h3 mb-1">
+                                    {{ petsitter.user.name }}
+                                </h2>
 
                                 <div
                                     class="d-flex align-items-center gap-1 text-dark text-nowrap"
@@ -540,7 +561,9 @@ onMounted(() => {
                         >
                             <div>
                                 <p class="mb-0 small">A partir de</p>
-                                <p class="h3 mb-0">{{ petsitter.price_per_day }} €</p>
+                                <p class="h3 mb-0">
+                                    {{ petsitter.price_per_day }} €
+                                </p>
                             </div>
 
                             <button

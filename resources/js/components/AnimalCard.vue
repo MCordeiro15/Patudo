@@ -27,7 +27,8 @@ const sizeBadgeClassMap: Record<string, string> = {
 };
 
 const sizeLabel = (size: string) => sizeLabelMap[size] ?? size;
-const sizeBadgeClass = (size: string) => sizeBadgeClassMap[size] ?? 'text-bg-secondary';
+const sizeBadgeClass = (size: string) =>
+    sizeBadgeClassMap[size] ?? 'text-bg-secondary';
 </script>
 
 <template>
@@ -59,7 +60,8 @@ const sizeBadgeClass = (size: string) => sizeBadgeClassMap[size] ?? 'text-bg-sec
                 </p>
 
                 <p v-if="animal.special_needs" class="mb-0 small text-muted">
-                    <strong>Necessidades especiais:</strong> {{ animal.special_needs }}
+                    <strong>Necessidades especiais:</strong>
+                    {{ animal.special_needs }}
                 </p>
 
                 <button

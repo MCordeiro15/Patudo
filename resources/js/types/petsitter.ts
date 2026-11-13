@@ -1,7 +1,6 @@
 // Definição de tipo TypeScript para Petsitter. Inclui perfil, disponibilidade, preço, avaliações e posts.
 // TypeScript type definition for Petsitter. Includes profile, availability, price, reviews, and posts.
 
-
 export type PetsitterProfile = {
     id: number;
     user_id: number;

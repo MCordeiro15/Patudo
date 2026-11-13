@@ -38,11 +38,16 @@ const confirm = () => {
                 role="dialog"
                 @keydown.escape="close"
             >
-                <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+                <div
+                    class="modal-dialog modal-dialog-centered modal-sm"
+                    role="document"
+                >
                     <div class="modal-content rounded-4 border border-danger">
                         <!-- Header -->
                         <div class="modal-header border-bottom border-danger">
-                            <h5 class="modal-title fw-bold text-danger">Remover Animal</h5>
+                            <h5 class="modal-title fw-bold text-danger">
+                                Remover Animal
+                            </h5>
                             <button
                                 type="button"
                                 class="btn-close"
@@ -55,13 +60,18 @@ const confirm = () => {
                         <div class="modal-body text-center py-4">
                             <p class="mb-0">
                                 Tem a certeza que quer remover
-                                <strong>{{ animalName }}</strong>?
+                                <strong>{{ animalName }}</strong
+                                >?
                             </p>
-                            <p class="text-muted small">Esta ação não pode ser desfeita.</p>
+                            <p class="text-muted small">
+                                Esta ação não pode ser desfeita.
+                            </p>
                         </div>
 
                         <!-- Footer -->
-                        <div class="modal-footer border-top border-danger d-flex gap-2">
+                        <div
+                            class="modal-footer border-top border-danger d-flex gap-2"
+                        >
                             <button
                                 type="button"
                                 class="btn btn-outline-secondary rounded-pill flex-fill"

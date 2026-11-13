@@ -45,7 +45,7 @@ watch(
             avatarFile.value = null;
         }
     },
-    { immediate: true }
+    { immediate: true },
 );
 
 const triggerFileInput = () => {
@@ -91,10 +91,32 @@ const handleDeleteAccount = () => {
 
 <template>
     <Teleport to="body">
-        <div v-if="show" class="patudo-modal-backdrop" @click.self="handleClose" @keydown.escape="handleClose">
-            <div class="patudo-modal-card patudo-edit-profile-card" role="dialog" aria-modal="true">
-                <button type="button" class="patudo-close-btn" aria-label="Fechar" @click="handleClose">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <div
+            v-if="show"
+            class="patudo-modal-backdrop"
+            @click.self="handleClose"
+            @keydown.escape="handleClose"
+        >
+            <div
+                class="patudo-modal-card patudo-edit-profile-card"
+                role="dialog"
+                aria-modal="true"
+            >
+                <button
+                    type="button"
+                    class="patudo-close-btn"
+                    aria-label="Fechar"
+                    @click="handleClose"
+                >
+                    <svg
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linecap="round"
+                    >
                         <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
                 </button>
@@ -105,19 +127,51 @@ const handleDeleteAccount = () => {
 
                 <div class="d-flex flex-column align-items-center mb-4">
                     <div class="patudo-avatar-circle mb-2">
-                        <img v-if="avatarPreview" :src="avatarPreview" alt="Foto de perfil" class="patudo-avatar-img"/>
-                        <svg v-else viewBox="0 0 100 100" class="patudo-avatar-placeholder" aria-hidden="true">
+                        <img
+                            v-if="avatarPreview"
+                            :src="avatarPreview"
+                            alt="Foto de perfil"
+                            class="patudo-avatar-img"
+                        />
+                        <svg
+                            v-else
+                            viewBox="0 0 100 100"
+                            class="patudo-avatar-placeholder"
+                            aria-hidden="true"
+                        >
                             <circle cx="50" cy="50" r="48" fill="#ffffff" />
-                            <path d="M35 72 C35 66, 65 66, 65 72 L68 85 L32 85 Z" fill="#f3c69f" />
-                            <path d="M27 52 C27 25, 73 25, 73 52 L76 64 L24 64 Z" fill="#f25c66" />
-                            <path d="M34 42 C34 30, 66 30, 66 42 C66 57, 58 66, 50 66 C42 66, 34 57, 34 42 Z" fill="#fbd3ae" />
-                            <path d="M32 42 C32 24, 68 24, 68 42 C60 39, 42 44, 32 42 Z" fill="#f25c66" />
+                            <path
+                                d="M35 72 C35 66, 65 66, 65 72 L68 85 L32 85 Z"
+                                fill="#f3c69f"
+                            />
+                            <path
+                                d="M27 52 C27 25, 73 25, 73 52 L76 64 L24 64 Z"
+                                fill="#f25c66"
+                            />
+                            <path
+                                d="M34 42 C34 30, 66 30, 66 42 C66 57, 58 66, 50 66 C42 66, 34 57, 34 42 Z"
+                                fill="#fbd3ae"
+                            />
+                            <path
+                                d="M32 42 C32 24, 68 24, 68 42 C60 39, 42 44, 32 42 Z"
+                                fill="#f25c66"
+                            />
                         </svg>
                     </div>
 
-                    <input ref="fileInputRef" type="file" accept="image/*" class="d-none" @change="handleFileChange"/>
+                    <input
+                        ref="fileInputRef"
+                        type="file"
+                        accept="image/*"
+                        class="d-none"
+                        @change="handleFileChange"
+                    />
 
-                    <button type="button" class="btn-patudo-avatar-pill" @click="triggerFileInput">
+                    <button
+                        type="button"
+                        class="btn-patudo-avatar-pill"
+                        @click="triggerFileInput"
+                    >
                         Alterar foto
                     </button>
                 </div>
@@ -127,42 +181,91 @@ const handleDeleteAccount = () => {
                 <form @submit.prevent="handleSubmit">
                     <div class="row g-4 mb-3">
                         <div class="col-12 col-md-6">
-                            <label for="owner-name" class="patudo-field-label d-block mb-1">
+                            <label
+                                for="owner-name"
+                                class="patudo-field-label d-block mb-1"
+                            >
                                 Nome Completo
                             </label>
-                            <input id="owner-name" v-model="name" type="text" class="patudo-pill-input" required/>
+                            <input
+                                id="owner-name"
+                                v-model="name"
+                                type="text"
+                                class="patudo-pill-input"
+                                required
+                            />
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <label for="owner-location" class="patudo-field-label d-block mb-1">
+                            <label
+                                for="owner-location"
+                                class="patudo-field-label d-block mb-1"
+                            >
                                 Localização / Cidade
                             </label>
-                            <input id="owner-location" v-model="location" type="text" class="patudo-pill-input"/>
+                            <input
+                                id="owner-location"
+                                v-model="location"
+                                type="text"
+                                class="patudo-pill-input"
+                            />
                         </div>
                     </div>
 
                     <div class="row g-4 mb-3">
                         <div class="col-12 col-md-6">
-                            <label for="owner-phone" class="patudo-field-label d-block mb-1">
+                            <label
+                                for="owner-phone"
+                                class="patudo-field-label d-block mb-1"
+                            >
                                 Telemóvel / Whatsapp
                             </label>
-                            <input id="owner-phone" v-model="phone" type="tel" class="patudo-pill-input"/>
+                            <input
+                                id="owner-phone"
+                                v-model="phone"
+                                type="tel"
+                                class="patudo-pill-input"
+                            />
                         </div>
                     </div>
 
-                     <div class="mb-4">
-                        <label for="owner-about" class="patudo-field-label d-block mb-1">
+                    <div class="mb-4">
+                        <label
+                            for="owner-about"
+                            class="patudo-field-label d-block mb-1"
+                        >
                             Sobre mim
                         </label>
-                        <textarea id="owner-about" v-model="about" rows="4" class="patudo-bordered-textarea"
+                        <textarea
+                            id="owner-about"
+                            v-model="about"
+                            rows="4"
+                            class="patudo-bordered-textarea"
                         ></textarea>
                     </div>
 
-                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-2">
-                        <button type="button" class="btn-patudo-danger" @click="handleDeleteAccount">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <div
+                        class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-2"
+                    >
+                        <button
+                            type="button"
+                            class="btn-patudo-danger"
+                            @click="handleDeleteAccount"
+                        >
+                            <svg
+                                width="15"
+                                height="15"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
                                 <polyline points="3 6 5 6 21 6" />
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                <path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                                />
                                 <line x1="10" y1="11" x2="10" y2="17" />
                                 <line x1="14" y1="11" x2="14" y2="17" />
                             </svg>
@@ -170,11 +273,23 @@ const handleDeleteAccount = () => {
                         </button>
 
                         <div class="d-flex align-items-center gap-2">
-                            <button type="button" class="btn-patudo-outline-sm" @click="handleClose">
+                            <button
+                                type="button"
+                                class="btn-patudo-outline-sm"
+                                @click="handleClose"
+                            >
                                 Cancelar
                             </button>
-                            <button type="submit" class="btn-patudo-solid-sm" :disabled="isLoading">
-                                {{ isLoading ? 'A guardar...' : 'Guardar Alterações' }}
+                            <button
+                                type="submit"
+                                class="btn-patudo-solid-sm"
+                                :disabled="isLoading"
+                            >
+                                {{
+                                    isLoading
+                                        ? 'A guardar...'
+                                        : 'Guardar Alterações'
+                                }}
                             </button>
                         </div>
                     </div>
@@ -287,7 +402,9 @@ const handleDeleteAccount = () => {
     font-size: 0.86rem;
     color: #231810;
     outline: none;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
 }
 
 .patudo-pill-input:focus {
@@ -305,7 +422,9 @@ const handleDeleteAccount = () => {
     color: #231810;
     resize: none;
     outline: none;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
 }
 
 .patudo-bordered-textarea:focus {

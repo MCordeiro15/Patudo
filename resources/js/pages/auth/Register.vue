@@ -1,9 +1,9 @@
 <!-- Página de registo. Formulário para criar nova conta de utilizador. -->
 <!-- Registration page. Form to create a new user account. -->
 <script setup lang="ts">
-import {Link} from '@inertiajs/vue3';
-import {ref} from 'vue';
-import {register as authRegister} from '@/composables/useAuth';
+import { Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { register as authRegister } from '@/composables/useAuth';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import imgCao from '@/../../assets/caoLoginRegister.jpg';
 import '../../../css/register.css';
@@ -52,9 +52,13 @@ const register = async () => {
 </script>
 
 <template>
-    <div class="register-wrapper min-vh-100 d-flex align-items-center justify-content-center p-3">
+    <div
+        class="register-wrapper min-vh-100 d-flex align-items-center justify-content-center p-3"
+    >
         <div class="auth-card d-flex flex-column-reverse flex-md-row">
-            <div class="form-panel d-flex flex-column justify-content-center align-items-center">
+            <div
+                class="form-panel d-flex flex-column justify-content-center align-items-center"
+            >
                 <div class="form-container w-100">
                     <h1 class="auth-title text-center">Registar</h1>
                     <p class="auth-subtitle text-center mb-4">Sê bem-vindo!</p>
@@ -63,22 +67,50 @@ const register = async () => {
                     <!-- Form for user data input. -->
                     <form @submit.prevent="register">
                         <div class="mb-3">
-                            <input v-model="name" type="text" class="form-control auth-input" placeholder="Nome de utilizador" required/>
+                            <input
+                                v-model="name"
+                                type="text"
+                                class="form-control auth-input"
+                                placeholder="Nome de utilizador"
+                                required
+                            />
                         </div>
 
                         <div class="mb-3">
-                            <input v-model="email" type="email" class="form-control auth-input" placeholder="Email" required/>
+                            <input
+                                v-model="email"
+                                type="email"
+                                class="form-control auth-input"
+                                placeholder="Email"
+                                required
+                            />
                         </div>
 
                         <div class="mb-3">
-                            <input v-model="password" type="password" class="form-control auth-input" placeholder="Palavra-passe" required/>
+                            <input
+                                v-model="password"
+                                type="password"
+                                class="form-control auth-input"
+                                placeholder="Palavra-passe"
+                                required
+                            />
                         </div>
 
                         <div class="mb-4">
-                            <input v-model="passwordConfirmation" type="password" class="form-control auth-input" placeholder="Confirmar palavra-passe" required/>
+                            <input
+                                v-model="passwordConfirmation"
+                                type="password"
+                                class="form-control auth-input"
+                                placeholder="Confirmar palavra-passe"
+                                required
+                            />
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 mb-3" :disabled="isLoading">
+                        <button
+                            type="submit"
+                            class="btn btn-primary w-100 mb-3"
+                            :disabled="isLoading"
+                        >
                             {{ isLoading ? 'A registar...' : 'Registar' }}
                         </button>
                     </form>
@@ -87,7 +119,7 @@ const register = async () => {
                         v-if="msg"
                         :class="[
                             'alert py-2 small mb-3 text-center',
-                            isError ? 'auth-error-alert' : 'auth-valid-alert'
+                            isError ? 'auth-error-alert' : 'auth-valid-alert',
                         ]"
                     >
                         {{ msg }}
@@ -95,7 +127,9 @@ const register = async () => {
 
                     <p class="text-center small mb-0 footer-text">
                         Já tens conta?
-                        <Link href="/login" class="auth-link">Faz login aqui</Link>
+                        <Link href="/login" class="auth-link"
+                            >Faz login aqui</Link
+                        >
                     </p>
                 </div>
             </div>
@@ -103,7 +137,11 @@ const register = async () => {
             <div class="brand-panel d-flex flex-column justify-content-between">
                 <img :src="imgCao" alt="Cão Patudo" class="brand-bg-cover" />
                 <div class="brand-header d-flex align-items-center gap-2">
-                    <img :src="logoPatudo" alt="Logótipo Patudo" class="brand-icon"/>
+                    <img
+                        :src="logoPatudo"
+                        alt="Logótipo Patudo"
+                        class="brand-icon"
+                    />
                     <span class="brand-title">Patudo</span>
                 </div>
             </div>

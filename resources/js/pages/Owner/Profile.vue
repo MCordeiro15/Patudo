@@ -79,18 +79,23 @@ const confirmDeleteAnimal = async () => {
         const token = cookiePart ? cookiePart.split(';').shift() : '';
         const xsrfToken = token ? decodeURIComponent(token) : '';
 
-        const response = await fetch(`/api/animals/${deletingAnimal.value.id}`, {
-            method: 'DELETE',
-            credentials: 'same-origin',
-            headers: {
-                Accept: 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-XSRF-TOKEN': xsrfToken,
+        const response = await fetch(
+            `/api/animals/${deletingAnimal.value.id}`,
+            {
+                method: 'DELETE',
+                credentials: 'same-origin',
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-XSRF-TOKEN': xsrfToken,
+                },
             },
-        });
+        );
 
         if (response.ok) {
-            animals.value = animals.value.filter((a) => a.id !== deletingAnimal.value!.id);
+            animals.value = animals.value.filter(
+                (a) => a.id !== deletingAnimal.value!.id,
+            );
             showDeleteModal.value = false;
             deletingAnimal.value = null;
         }
@@ -158,7 +163,11 @@ onMounted(() => {
                 </div>
 
                 <div class="d-flex align-items-center gap-3 ms-auto">
-                    <Link href="/login" class="text-dark" @click.prevent="logout">
+                    <Link
+                        href="/login"
+                        class="text-dark"
+                        @click.prevent="logout"
+                    >
                         <LogOut :size="25" />
                     </Link>
                     <Link href="/petsitters/profile" class="text-dark">
@@ -183,11 +192,16 @@ onMounted(() => {
                                         class="d-flex align-items-center justify-content-center rounded-circle bg-light flex-shrink-0"
                                         style="width: 80px; height: 80px"
                                     >
-                                        <UserRound :size="40" class="text-primary" />
+                                        <UserRound
+                                            :size="40"
+                                            class="text-primary"
+                                        />
                                     </div>
 
                                     <div>
-                                        <h2 class="h5 mb-1">{{ displayName }}</h2>
+                                        <h2 class="h5 mb-1">
+                                            {{ displayName }}
+                                        </h2>
                                         <p class="mb-1 text-muted small">
                                             {{ user?.email }}
                                         </p>
@@ -199,7 +213,9 @@ onMounted(() => {
 
                     <!-- Animals section -->
                     <section class="mb-4">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div
+                            class="d-flex align-items-center justify-content-between mb-3"
+                        >
                             <h2 class="h4 mb-0">Os meus animais</h2>
                             <button
                                 type="button"
@@ -213,8 +229,13 @@ onMounted(() => {
 
                         <!-- Loading state -->
                         <div v-if="isLoading" class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">A carregar...</span>
+                            <div
+                                class="spinner-border text-primary"
+                                role="status"
+                            >
+                                <span class="visually-hidden"
+                                    >A carregar...</span
+                                >
                             </div>
                         </div>
 
@@ -234,15 +255,13 @@ onMounted(() => {
                         >
                             <p class="mb-0 text-muted">
                                 Ainda não adicionaste nenhum animal. Clica em
-                                <strong>"Adicionar animal"</strong> para começar.
+                                <strong>"Adicionar animal"</strong> para
+                                começar.
                             </p>
                         </div>
 
                         <!-- Animals grid -->
-                        <div
-                            v-else
-                            class="row g-3"
-                        >
+                        <div v-else class="row g-3">
                             <div
                                 v-for="animal in animals"
                                 :key="animal.id"
@@ -271,7 +290,10 @@ onMounted(() => {
             :show="showDeleteModal"
             :animal-name="deletingAnimal?.name ?? ''"
             :deleting="deletingAnimalLoading"
-            @close="showDeleteModal = false; deletingAnimal = null"
+            @close="
+                showDeleteModal = false;
+                deletingAnimal = null;
+            "
             @confirmed="confirmDeleteAnimal"
         />
     </main>

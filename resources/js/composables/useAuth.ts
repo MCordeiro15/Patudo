@@ -92,10 +92,14 @@ export async function login(
             user.value = data.data ?? data;
 
             // Also refresh the Inertia page props so page.props.auth.user stays in sync
-            router.get(redirectTo, {}, {
-                replace: true,
-                preserveScroll: true,
-            });
+            router.get(
+                redirectTo,
+                {},
+                {
+                    replace: true,
+                    preserveScroll: true,
+                },
+            );
 
             return { success: true, user: user.value };
         } else {
@@ -161,10 +165,14 @@ export async function register(
             const data = await response.json();
             user.value = data.data ?? data;
 
-            router.get(redirectTo, {}, {
-                replace: true,
-                preserveScroll: true,
-            });
+            router.get(
+                redirectTo,
+                {},
+                {
+                    replace: true,
+                    preserveScroll: true,
+                },
+            );
 
             return { success: true, user: user.value };
         } else {

@@ -1,13 +1,7 @@
 <!-- Página Vue: ProfileOwnerView.vue -->
 <!-- Vue page: ProfileOwnerView.vue -->
-<script setup lang="ts">
+<script setup lang="ts"></script>
 
-</script>
+<template></template>
 
-<template>
-
-</template>
-
-<style scoped>
-
-</style>
+<style scoped></style>

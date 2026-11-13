@@ -118,7 +118,8 @@ const submit = async () => {
             if (errorData.errors) {
                 errors.value = errorData.errors;
             } else {
-                generalError.value = errorData.message ?? 'Erro ao adicionar animal.';
+                generalError.value =
+                    errorData.message ?? 'Erro ao adicionar animal.';
             }
         }
     } catch {
@@ -152,7 +153,15 @@ const handlePhotoChange = (event: Event) => {
                     aria-label="Fechar"
                     @click="close"
                 >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                    >
                         <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
                 </button>
@@ -161,7 +170,8 @@ const handlePhotoChange = (event: Event) => {
                 <div class="mb-3">
                     <h2 class="patudo-modal-title">Adicionar animal</h2>
                     <p class="patudo-modal-subtitle">
-                        Preenche os dados do teu patudo para o associares ao teu perfil.
+                        Preenche os dados do teu patudo para o associares ao teu
+                        perfil.
                     </p>
                 </div>
 
@@ -178,7 +188,10 @@ const handlePhotoChange = (event: Event) => {
 
                     <!-- Nome -->
                     <div class="mb-3">
-                        <label for="animal-name" class="patudo-section-label d-block mb-1">
+                        <label
+                            for="animal-name"
+                            class="patudo-section-label d-block mb-1"
+                        >
                             Nome *
                         </label>
                         <input
@@ -196,7 +209,10 @@ const handlePhotoChange = (event: Event) => {
                     <!-- Espécie e Raça lado a lado -->
                     <div class="row g-2 mb-3">
                         <div class="col-6">
-                            <label for="animal-species" class="patudo-section-label d-block mb-1">
+                            <label
+                                for="animal-species"
+                                class="patudo-section-label d-block mb-1"
+                            >
                                 Espécie *
                             </label>
                             <input
@@ -212,7 +228,10 @@ const handlePhotoChange = (event: Event) => {
                         </div>
 
                         <div class="col-6">
-                            <label for="animal-breed" class="patudo-section-label d-block mb-1">
+                            <label
+                                for="animal-breed"
+                                class="patudo-section-label d-block mb-1"
+                            >
                                 Raça *
                             </label>
                             <input
@@ -230,7 +249,10 @@ const handlePhotoChange = (event: Event) => {
 
                     <!-- Porte -->
                     <div class="mb-3">
-                        <label for="animal-size" class="patudo-section-label d-block mb-1">
+                        <label
+                            for="animal-size"
+                            class="patudo-section-label d-block mb-1"
+                        >
                             Porte *
                         </label>
                         <select
@@ -254,8 +276,12 @@ const handlePhotoChange = (event: Event) => {
 
                     <!-- Necessidades especiais / Sobre o animal -->
                     <div class="mb-3">
-                        <label for="animal-special-needs" class="patudo-section-label d-block mb-1">
-                            Necessidades especiais / Sobre o animal <span class="patudo-optional">(opcional)</span>
+                        <label
+                            for="animal-special-needs"
+                            class="patudo-section-label d-block mb-1"
+                        >
+                            Necessidades especiais / Sobre o animal
+                            <span class="patudo-optional">(opcional)</span>
                         </label>
                         <textarea
                             id="animal-special-needs"
@@ -269,8 +295,12 @@ const handlePhotoChange = (event: Event) => {
 
                     <!-- Agressividade -->
                     <div class="mb-3">
-                        <label for="animal-aggression" class="patudo-section-label d-block mb-1">
-                            Agressividade <span class="patudo-optional">(opcional)</span>
+                        <label
+                            for="animal-aggression"
+                            class="patudo-section-label d-block mb-1"
+                        >
+                            Agressividade
+                            <span class="patudo-optional">(opcional)</span>
                         </label>
                         <select
                             id="animal-aggression"
@@ -292,8 +322,12 @@ const handlePhotoChange = (event: Event) => {
 
                     <!-- Medicação -->
                     <div class="mb-3">
-                        <label for="animal-medication" class="patudo-section-label d-block mb-1">
-                            Medicação <span class="patudo-optional">(opcional)</span>
+                        <label
+                            for="animal-medication"
+                            class="patudo-section-label d-block mb-1"
+                        >
+                            Medicação
+                            <span class="patudo-optional">(opcional)</span>
                         </label>
                         <textarea
                             id="animal-medication"
@@ -308,8 +342,12 @@ const handlePhotoChange = (event: Event) => {
                     <!-- Sexo e Peso lado a lado -->
                     <div class="row g-2 mb-3">
                         <div class="col-6">
-                            <label for="animal-sex" class="patudo-section-label d-block mb-1">
-                                Sexo <span class="patudo-optional">(opcional)</span>
+                            <label
+                                for="animal-sex"
+                                class="patudo-section-label d-block mb-1"
+                            >
+                                Sexo
+                                <span class="patudo-optional">(opcional)</span>
                             </label>
                             <select
                                 id="animal-sex"
@@ -330,8 +368,12 @@ const handlePhotoChange = (event: Event) => {
                         </div>
 
                         <div class="col-6">
-                            <label for="animal-weight" class="patudo-section-label d-block mb-1">
-                                Peso (kg) <span class="patudo-optional">(opcional)</span>
+                            <label
+                                for="animal-weight"
+                                class="patudo-section-label d-block mb-1"
+                            >
+                                Peso (kg)
+                                <span class="patudo-optional">(opcional)</span>
                             </label>
                             <input
                                 id="animal-weight"
@@ -349,8 +391,12 @@ const handlePhotoChange = (event: Event) => {
 
                     <!-- Upload de foto -->
                     <div class="mb-3">
-                        <label for="animal-photo" class="patudo-section-label d-block mb-1">
-                            Foto do animal <span class="patudo-optional">(opcional)</span>
+                        <label
+                            for="animal-photo"
+                            class="patudo-section-label d-block mb-1"
+                        >
+                            Foto do animal
+                            <span class="patudo-optional">(opcional)</span>
                         </label>
                         <input
                             id="animal-photo"
@@ -473,7 +519,9 @@ const handlePhotoChange = (event: Event) => {
     color: #231810;
     outline: none;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    transition:
+        box-shadow 0.15s ease,
+        border-color 0.15s ease;
 }
 
 .patudo-textarea {

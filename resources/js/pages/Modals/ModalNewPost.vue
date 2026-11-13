@@ -169,11 +169,15 @@ const submit = async () => {
                                         rows="4"
                                         maxlength="2000"
                                         class="form-control"
-                                        :class="{ 'is-invalid': errors.description }"
+                                        :class="{
+                                            'is-invalid': errors.description,
+                                        }"
                                         placeholder="Escreve algo sobre a publicação..."
                                         required
                                     ></textarea>
-                                    <InputError :message="errors.description?.[0]" />
+                                    <InputError
+                                        :message="errors.description?.[0]"
+                                    />
                                 </div>
 
                                 <div class="mb-3">
@@ -181,7 +185,8 @@ const submit = async () => {
                                         for="post-photos"
                                         class="form-label fw-semibold small"
                                     >
-                                        Fotografias (até 5, jpg ou png, máx. 5 MB cada)
+                                        Fotografias (até 5, jpg ou png, máx. 5
+                                        MB cada)
                                     </label>
                                     <input
                                         id="post-photos"
@@ -194,9 +199,16 @@ const submit = async () => {
                                     />
                                     <InputError :message="errors.photos?.[0]" />
                                     <!-- erros por ficheiro: photos.0, photos.1, ... -->
-                                    <template v-for="(msgs, key) in errors" :key="key">
+                                    <template
+                                        v-for="(msgs, key) in errors"
+                                        :key="key"
+                                    >
                                         <InputError
-                                            v-if="String(key).startsWith('photos.')"
+                                            v-if="
+                                                String(key).startsWith(
+                                                    'photos.',
+                                                )
+                                            "
                                             :message="msgs[0]"
                                         />
                                     </template>

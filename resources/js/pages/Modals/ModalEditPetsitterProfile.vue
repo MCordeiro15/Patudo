@@ -61,7 +61,9 @@ const populateForm = () => {
     pricePerDay.value = props.petsitter.price_per_day ?? 0;
     age.value = props.petsitter.age ?? 0;
     sex.value = props.petsitter.sex ?? '';
-    acceptedSizes.value = props.petsitter.accepted_sizes ? [...props.petsitter.accepted_sizes] : [];
+    acceptedSizes.value = props.petsitter.accepted_sizes
+        ? [...props.petsitter.accepted_sizes]
+        : [];
     acceptedAnimalTypes.value = props.petsitter.accepted_animal_types
         ? [...props.petsitter.accepted_animal_types]
         : [];
@@ -126,9 +128,12 @@ const submit = async () => {
             price_per_day: pricePerDay.value,
             age: age.value,
             sex: sex.value || null,
-            accepted_sizes: acceptedSizes.value.length > 0 ? acceptedSizes.value : null,
+            accepted_sizes:
+                acceptedSizes.value.length > 0 ? acceptedSizes.value : null,
             accepted_animal_types:
-                acceptedAnimalTypes.value.length > 0 ? acceptedAnimalTypes.value : null,
+                acceptedAnimalTypes.value.length > 0
+                    ? acceptedAnimalTypes.value
+                    : null,
         };
 
         const response = await fetch(`/api/petsitters/${props.petsitter.id}`, {
@@ -158,7 +163,8 @@ const submit = async () => {
             if (errorData.errors) {
                 errors.value = errorData.errors;
             } else {
-                generalError.value = errorData.message ?? 'Erro ao atualizar perfil.';
+                generalError.value =
+                    errorData.message ?? 'Erro ao atualizar perfil.';
             }
         }
     } catch {
@@ -182,11 +188,16 @@ const submit = async () => {
                 role="dialog"
                 @keydown.escape="close"
             >
-                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+                <div
+                    class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
+                    role="document"
+                >
                     <div class="modal-content rounded-4 border border-primary">
                         <!-- Header -->
                         <div class="modal-header border-bottom border-primary">
-                            <h5 class="modal-title fw-bold">Editar Perfil de Petsitter</h5>
+                            <h5 class="modal-title fw-bold">
+                                Editar Perfil de Petsitter
+                            </h5>
                             <button
                                 type="button"
                                 class="btn-close"
@@ -220,7 +231,10 @@ const submit = async () => {
 
                                 <!-- Biography -->
                                 <div class="mb-3">
-                                    <label for="petsitter-biography" class="form-label fw-semibold small">
+                                    <label
+                                        for="petsitter-biography"
+                                        class="form-label fw-semibold small"
+                                    >
                                         Biografia
                                     </label>
                                     <textarea
@@ -228,15 +242,22 @@ const submit = async () => {
                                         v-model="biography"
                                         rows="3"
                                         class="form-control"
-                                        :class="{ 'is-invalid': errors.biography }"
+                                        :class="{
+                                            'is-invalid': errors.biography,
+                                        }"
                                         placeholder="Conte um pouco sobre si..."
                                     ></textarea>
-                                    <InputError :message="errors.biography?.[0]" />
+                                    <InputError
+                                        :message="errors.biography?.[0]"
+                                    />
                                 </div>
 
                                 <!-- Experience -->
                                 <div class="mb-3">
-                                    <label for="petsitter-experience" class="form-label fw-semibold small">
+                                    <label
+                                        for="petsitter-experience"
+                                        class="form-label fw-semibold small"
+                                    >
                                         Experiência *
                                     </label>
                                     <textarea
@@ -244,16 +265,23 @@ const submit = async () => {
                                         v-model="experience"
                                         rows="2"
                                         class="form-control"
-                                        :class="{ 'is-invalid': errors.experience }"
+                                        :class="{
+                                            'is-invalid': errors.experience,
+                                        }"
                                         placeholder="Descreva a sua experiência com animais..."
                                         required
                                     ></textarea>
-                                    <InputError :message="errors.experience?.[0]" />
+                                    <InputError
+                                        :message="errors.experience?.[0]"
+                                    />
                                 </div>
 
                                 <!-- Service Location -->
                                 <div class="mb-3">
-                                    <label for="petsitter-service-location" class="form-label fw-semibold small">
+                                    <label
+                                        for="petsitter-service-location"
+                                        class="form-label fw-semibold small"
+                                    >
                                         Localização de serviço *
                                     </label>
                                     <input
@@ -261,16 +289,24 @@ const submit = async () => {
                                         v-model="serviceLocation"
                                         type="text"
                                         class="form-control"
-                                        :class="{ 'is-invalid': errors.service_location }"
+                                        :class="{
+                                            'is-invalid':
+                                                errors.service_location,
+                                        }"
                                         placeholder="Ex: Ponta Delgada"
                                         required
                                     />
-                                    <InputError :message="errors.service_location?.[0]" />
+                                    <InputError
+                                        :message="errors.service_location?.[0]"
+                                    />
                                 </div>
 
                                 <!-- Price per day -->
                                 <div class="mb-3">
-                                    <label for="petsitter-price" class="form-label fw-semibold small">
+                                    <label
+                                        for="petsitter-price"
+                                        class="form-label fw-semibold small"
+                                    >
                                         Preço por dia (€) *
                                     </label>
                                     <input
@@ -280,15 +316,22 @@ const submit = async () => {
                                         step="0.01"
                                         min="0"
                                         class="form-control"
-                                        :class="{ 'is-invalid': errors.price_per_day }"
+                                        :class="{
+                                            'is-invalid': errors.price_per_day,
+                                        }"
                                         required
                                     />
-                                    <InputError :message="errors.price_per_day?.[0]" />
+                                    <InputError
+                                        :message="errors.price_per_day?.[0]"
+                                    />
                                 </div>
 
                                 <!-- Age -->
                                 <div class="mb-3">
-                                    <label for="petsitter-age" class="form-label fw-semibold small">
+                                    <label
+                                        for="petsitter-age"
+                                        class="form-label fw-semibold small"
+                                    >
                                         Idade *
                                     </label>
                                     <input
@@ -306,7 +349,9 @@ const submit = async () => {
 
                                 <!-- Sex -->
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold small">Sexo</label>
+                                    <label class="form-label fw-semibold small"
+                                        >Sexo</label
+                                    >
                                     <div class="d-flex flex-wrap gap-3">
                                         <label
                                             v-for="option in sexOptions"
@@ -320,7 +365,9 @@ const submit = async () => {
                                                 :value="option.value"
                                                 v-model="sex"
                                             />
-                                            <span class="form-check-label">{{ option.label }}</span>
+                                            <span class="form-check-label">{{
+                                                option.label
+                                            }}</span>
                                         </label>
                                     </div>
                                     <InputError :message="errors.sex?.[0]" />
@@ -328,7 +375,9 @@ const submit = async () => {
 
                                 <!-- Accepted Sizes -->
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold small">Portes aceites</label>
+                                    <label class="form-label fw-semibold small"
+                                        >Portes aceites</label
+                                    >
                                     <div class="d-flex flex-wrap gap-3">
                                         <label
                                             v-for="option in sizeOptions"
@@ -339,24 +388,36 @@ const submit = async () => {
                                                 class="form-check-input"
                                                 type="checkbox"
                                                 :value="option.value"
-                                                :checked="acceptedSizes.includes(option.value)"
+                                                :checked="
+                                                    acceptedSizes.includes(
+                                                        option.value,
+                                                    )
+                                                "
                                                 @change="
                                                     toggleArrayValue(
                                                         acceptedSizes,
                                                         option.value,
-                                                        (val) => { acceptedSizes = val },
+                                                        (val) => {
+                                                            acceptedSizes = val;
+                                                        },
                                                     )
                                                 "
                                             />
-                                            <span class="form-check-label">{{ option.label }}</span>
+                                            <span class="form-check-label">{{
+                                                option.label
+                                            }}</span>
                                         </label>
                                     </div>
-                                    <InputError :message="errors.accepted_sizes?.[0]" />
+                                    <InputError
+                                        :message="errors.accepted_sizes?.[0]"
+                                    />
                                 </div>
 
                                 <!-- Accepted Animal Types -->
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold small">Tipos de animal aceites</label>
+                                    <label class="form-label fw-semibold small"
+                                        >Tipos de animal aceites</label
+                                    >
                                     <div class="d-flex flex-wrap gap-3">
                                         <label
                                             v-for="option in animalTypeOptions"
@@ -367,19 +428,32 @@ const submit = async () => {
                                                 class="form-check-input"
                                                 type="checkbox"
                                                 :value="option.value"
-                                                :checked="acceptedAnimalTypes.includes(option.value)"
+                                                :checked="
+                                                    acceptedAnimalTypes.includes(
+                                                        option.value,
+                                                    )
+                                                "
                                                 @change="
                                                     toggleArrayValue(
                                                         acceptedAnimalTypes,
                                                         option.value,
-                                                        (val) => { acceptedAnimalTypes = val },
+                                                        (val) => {
+                                                            acceptedAnimalTypes =
+                                                                val;
+                                                        },
                                                     )
                                                 "
                                             />
-                                            <span class="form-check-label">{{ option.label }}</span>
+                                            <span class="form-check-label">{{
+                                                option.label
+                                            }}</span>
                                         </label>
                                     </div>
-                                    <InputError :message="errors.accepted_animal_types?.[0]" />
+                                    <InputError
+                                        :message="
+                                            errors.accepted_animal_types?.[0]
+                                        "
+                                    />
                                 </div>
                             </form>
                         </div>
@@ -404,7 +478,11 @@ const submit = async () => {
                                     class="spinner-border spinner-border-sm me-1"
                                     role="status"
                                 ></span>
-                                {{ isLoading ? 'A guardar...' : 'Guardar alterações' }}
+                                {{
+                                    isLoading
+                                        ? 'A guardar...'
+                                        : 'Guardar alterações'
+                                }}
                             </button>
                         </div>
                     </div>

@@ -49,7 +49,6 @@
     --bs-btn-active-color: var(--patudo-terracota);
 }
 
-
 .btn-outline-secondary {
     --bs-btn-color: var(--patudo-castanhoMid);
     --bs-btn-border-color: var(--patudo-castanhoMid);
@@ -106,9 +105,9 @@
 }
 
 .nav-pills .nav-link.active {
-     background-color: var(--patudo-terracota, #c2410c) !important;
-     color: #ffffff !important;
- }
+    background-color: var(--patudo-terracota, #c2410c) !important;
+    color: #ffffff !important;
+}
 
 .nav-pills .nav-link:not(.active):hover {
     color: var(--patudo-terracota, #c2410c) !important;
