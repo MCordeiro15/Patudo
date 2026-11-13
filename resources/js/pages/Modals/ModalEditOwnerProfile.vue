@@ -35,7 +35,13 @@ watch(
         if (isOpen) {
             name.value = props.user?.name ?? '';
             location.value = props.user?.location ?? '';
-            phone.value = props.user?.phone ?? '';
+            // Remove o prefixo +351 e formata para apenas 9 dígitos
+            const rawPhone = props.user?.phone ?? '';
+            if (rawPhone) {
+                phone.value = rawPhone.replace(/\D/g, '').replace(/^351/, '').slice(-9);
+            } else {
+                phone.value = '';
+            }
             about.value = props.user?.about ?? '';
             avatarPreview.value = props.user?.avatar_url ?? null;
             avatarFile.value = null;
@@ -216,6 +222,10 @@ const handleDeleteAccount = () => {
                                 id="owner-phone"
                                 v-model="phone"
                                 type="tel"
+                                inputmode="numeric"
+                                maxlength="9"
+                                pattern="[0-9]*"
+                                @input="phone = phone.replace(/\D/g, '').slice(0, 9)"
                                 class="patudo-pill-input"
                             />
                         </div>

@@ -77,7 +77,13 @@ const sexOptions = [
 const populateForm = () => {
     if (!props.petsitter) return;
     name.value = props.petsitter.name ?? props.petsitter.user?.name ?? '';
-    phone.value = props.petsitter.phone ?? props.petsitter.user?.phone ?? '';
+    // Remove o prefixo +351 e formata para apenas 9 dígitos
+    const rawPhone = props.petsitter.phone ?? props.petsitter.user?.phone ?? '';
+    if (rawPhone) {
+        phone.value = rawPhone.replace(/\D/g, '').replace(/^351/, '').slice(-9);
+    } else {
+        phone.value = '';
+    }
     biography.value = props.petsitter.biography ?? '';
     experience.value = props.petsitter.experience ?? '';
     serviceLocation.value = props.petsitter.service_location ?? '';
@@ -383,9 +389,13 @@ const submit = async () => {
                                 id="petsitter-phone"
                                 v-model="phone"
                                 type="tel"
+                                inputmode="numeric"
+                                maxlength="9"
+                                pattern="[0-9]*"
+                                @input="phone = phone.replace(/\D/g, '').slice(0, 9)"
                                 class="patudo-input"
                                 :class="{ 'is-invalid': errors.phone }"
-                                placeholder="Ex: 912 345 678"
+                                placeholder="Ex: 912345678"
                             />
                             <InputError :message="errors.phone?.[0]" />
                         </div>

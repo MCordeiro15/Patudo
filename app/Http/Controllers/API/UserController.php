@@ -37,9 +37,15 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'phone' => 'nullable|string|max:9',
+            'phone' => 'nullable|string|max:20',
             'password' => 'required|min:8|confirmed',
         ]);
+
+        // Limpar o phone para apenas 9 dígitos numéricos
+        if (!empty($data['phone'])) {
+            $data['phone'] = preg_replace('/\D/', '', $data['phone']);
+            $data['phone'] = substr($data['phone'], 0, 9);
+        }
 
         $user = User::create([
             'name' => $data['name'],
@@ -73,8 +79,14 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string|max:9',
+            'phone' => 'nullable|string|max:20',
         ]);
+
+        // Limpar o phone para apenas 9 dígitos numéricos
+        if (isset($data['phone'])) {
+            $data['phone'] = preg_replace('/\D/', '', $data['phone']);
+            $data['phone'] = substr($data['phone'], 0, 9);
+        }
 
         $user->update($data);
 

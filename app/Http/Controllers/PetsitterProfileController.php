@@ -62,6 +62,7 @@ class PetsitterProfileController extends Controller
                 'id' => $petsitter->user_id,
                 'user_id' => $petsitter->user_id,
                 'name' => $petsitter->user->name,
+                'phone' => $petsitter->user->phone,
                 'biography' => $petsitter->biography,
                 'experience' => $petsitter->experience ?? '',
                 'service_location' => $petsitter->service_location,

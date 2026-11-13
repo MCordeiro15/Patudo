@@ -25,6 +25,16 @@ const deletingAnimalLoading = ref(false);
 // Computed property that returns the user's display name.
 const displayName = computed(() => user.value?.name ?? 'Utilizador');
 
+// Função para formatar o número de telemóvel com prefixo +351 e separação 3 dígitos.
+// Function to format phone number with +351 prefix and 3-digit separation.
+function formatPhone(phone: string | null | undefined): string | null {
+    if (!phone) return null;
+    // Remove o prefixo +351 se já existir e extrai apenas os 9 dígitos
+    const digits = phone.replace(/\D/g, '').replace(/^351/, '').slice(-9);
+    const formatted = digits.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+    return `+351 ${formatted}`;
+}
+
 const fetchAnimals = async () => {
     isLoading.value = true;
     loadError.value = '';
@@ -202,8 +212,14 @@ onMounted(() => {
                                         <h2 class="h5 mb-1">
                                             {{ displayName }}
                                         </h2>
-                                        <p class="mb-1 text-muted small">
+                                        <p class="mb-0 text-muted small">
                                             {{ user?.email }}
+                                        </p>
+                                        <p
+                                            v-if="user?.phone"
+                                            class="mb-0 text-muted small"
+                                        >
+                                            {{ formatPhone(user.phone) }}
                                         </p>
                                     </div>
                                 </div>

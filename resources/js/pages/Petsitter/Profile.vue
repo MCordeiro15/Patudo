@@ -25,6 +25,7 @@ type PetsitterProfile = {
     id: number;
     user_id: number;
     name: string;
+    phone: string | null;
     biography: string | null;
     experience: string;
     service_location: string;
@@ -164,6 +165,18 @@ const displayName = computed(() => {
 // Computed property that returns the service location.
 const displayLocation = computed(() => {
     return petsitter.value?.service_location ?? '--';
+});
+
+// Propriedade computada que retorna o número de telemóvel formatado com prefixo +351.
+// Computed property that returns the formatted phone number with +351 prefix.
+const displayPhone = computed(() => {
+    const phone = petsitter.value?.phone;
+    if (!phone) return null;
+    // Remove o prefixo +351 se já existir e extrai apenas os 9 dígitos
+    const digits = phone.replace(/\D/g, '').replace(/^351/, '').slice(-9);
+    // Formata o número separando 3 dígitos por 3 dígitos
+    const formatted = digits.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+    return `+351 ${formatted}`;
 });
 
 // Propriedade computada que retorna a biografia ou mensagem padrão.
@@ -456,8 +469,14 @@ const saveAvailability = async () => {
                                             <h2 class="h5 mb-0">
                                                 {{ displayName }}
                                             </h2>
-                                            <p class="mb-2 text-muted small">
+                                            <p class="mb-0 text-muted small">
                                                 {{ displayLocation }}
+                                            </p>
+                                            <p
+                                                v-if="displayPhone"
+                                                class="mb-2 text-muted small"
+                                            >
+                                                {{ displayPhone }}
                                             </p>
 
                                             <div

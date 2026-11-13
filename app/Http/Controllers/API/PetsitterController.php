@@ -96,6 +96,8 @@ class PetsitterController extends Controller
         Gate::authorize('update', $petsitter);
 
         $data = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'phone' => 'nullable|string|max:20',
             'biography' => 'nullable|string',
             'experience' => 'sometimes|string',
             'service_location' => 'sometimes|string|max:255',
@@ -109,6 +111,27 @@ class PetsitterController extends Controller
             'identification_documents' => 'sometimes|string|max:255',
         ]);
 
+        // Separar os dados do usuário dos dados do petsitter
+        $userData = [];
+        $petsitterData = [];
+
+        if (isset($data['name'])) {
+            $userData['name'] = $data['name'];
+            unset($data['name']);
+        }
+        if (isset($data['phone'])) {
+            // Remove qualquer caractere não numérico e garante apenas 9 dígitos
+            $userData['phone'] = preg_replace('/\D/', '', $data['phone']);
+            $userData['phone'] = substr($userData['phone'], 0, 9);
+            unset($data['phone']);
+        }
+
+        // Atualizar o usuário se houver dados
+        if (!empty($userData)) {
+            $petsitter->user->update($userData);
+        }
+
+        // Atualizar o petsitter com os dados restantes
         $petsitter->update($data);
 
         return new PetsitterResource($petsitter->load('user'));
