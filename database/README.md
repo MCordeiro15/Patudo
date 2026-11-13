@@ -1,38 +1,38 @@
-# Base de Dados Patudo
+# Base de Dados e Arquivos Patudo
 
-## Configuração
+## O que está incluído no Git
 
-A base de dados SQLite (`database.sqlite`) já está incluída no repositório Git para que todos os membros da equipa tenham os mesmos dados de teste.
+- **Base de dados SQLite** (`database/database.sqlite`) — já vem com todos os dados de teste
+- **Fotos de petsitters** (`storage/app/public/petsitters/`) — fotos de perfil já incluídas
+- **Symlink de storage** (`public/storage`) — link para as fotos e arquivos públicos
 
-### Para começar
+## Para começar (após `git pull`)
 
-1. **Fazer pull do repositório**
-   ```bash
-   git pull origin main
-   ```
-
-2. **Instalar dependências**
+1. **Instalar dependências**
    ```bash
    composer install
    npm install
    ```
 
-3. **Configurar o ambiente**
+2. **Configurar o ambiente** (se não tiveres `.env`)
    ```bash
    cp .env.example .env
    php artisan key:generate
    ```
 
-4. **Criar symlink para storage**
+3. **Garantir que o symlink de storage existe**
    ```bash
    php artisan storage:link
    ```
+   > O symlink já vem do Git, mas este comando garante que está correto no teu sistema.
 
-5. **Rodar a aplicação**
+4. **Rodar a aplicação**
    ```bash
    npm run dev
    php artisan serve
    ```
+
+5. **Fazer login** com as credenciais abaixo
 
 ## Credenciais de Teste
 
@@ -49,14 +49,15 @@ A base de dados SQLite (`database.sqlite`) já está incluída no repositório G
 
 ## Importante
 
-- **Não modifiques a base de dados diretamente** se quiseres manter os dados sincronizados com a equipa.
-- Se precisares de adicionar novos dados de teste, atualiza os **seeders** em vez de modificar o SQLite diretamente.
+- **A base de dados já vem do Git** — não precisas rodar `migrate` nem `seed` na primeira vez
+- **Não modifiques a base de dados diretamente** se quiseres manter os dados sincronizados com a equipa
+- Se precisares de adicionar novos dados de teste, atualiza os **seeders** em vez de modificar o SQLite diretamente
 - Para resetar a base de dados para o estado do Git:
   ```bash
   git checkout database/database.sqlite
   ```
 
-## Seeders
+## Seeders (opcional)
 
 Os seeders estão configurados para não sobrescrever users existentes. Para adicionar dados de teste sem perder users locais:
 
@@ -64,8 +65,27 @@ Os seeders estão configurados para não sobrescrever users existentes. Para adi
 php artisan db:seed
 ```
 
-Para reconstruir tudo do zero (apaga todos os dados):
+Para reconstruir tudo do zero (apaga todos os dados e reseta para o Git):
 
 ```bash
-php artisan migrate:fresh --seed
+git checkout database/database.sqlite
 ```
+
+## Se as fotos não aparecem
+
+1. Verifica se `public/storage` existe e aponta para `storage/app/public`:
+   ```bash
+   ls -la public/storage
+   ```
+2. Se não existe, cria o symlink:
+   ```bash
+   php artisan storage:link
+   ```
+3. Verifica se as fotos estão em `storage/app/public/petsitters/`:
+   ```bash
+   ls storage/app/public/petsitters/
+   ```
+4. Se as fotos não estão, faz `git pull` novamente:
+   ```bash
+   git pull origin main
+   ```
