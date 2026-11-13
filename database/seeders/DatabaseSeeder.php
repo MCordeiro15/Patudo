@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
         // 1. Create petsitters with test data
         $this->call(PetsitterSeeder::class);
 
-        // 2. Create admin user only if it doesn't exist (don't overwrite existing passwords)
-        $admin = User::firstOrCreate(
+        // 2. Create or update admin user (always ensure correct password)
+        $admin = User::updateOrCreate(
             ['email' => 'admin@admin.com'],
             [
                 'name' => 'Admin',
