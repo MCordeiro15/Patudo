@@ -28,6 +28,8 @@ interface PetsitterApiData {
     user_id: number;
     service_location: string;
     price_per_day: number;
+    average_rating: number | string | null;
+    reviews_count: number;
     user: {
         id: number;
         name: string;
@@ -75,16 +77,9 @@ function getAvatar(name: string): string {
 }
 
 // Generate a fake rating for display
-function getRating(name: string): string {
-    const ratings: Record<string, string> = {
-        'Sofia': '4,9 (18)',
-        'Tiago': '4,8 (12)',
-        'João': '5,0 (9)',
-        'Inês': '4,7 (15)',
-        'Maria': '4,9 (21)',
-        'Rui': '4,8 (8)',
-    };
-    return ratings[name] || '4,5 (0)';
+function formatRating(p: PetsitterApiData): string {
+    const avg = Number(p.average_rating ?? 0).toFixed(1).replace('.', ',');
+    return `${avg} (${p.reviews_count ?? 0})`;
 }
 
 async function fetchPetsitters() {
@@ -379,7 +374,7 @@ onMounted(() => {
                                         class="text-warning"
                                         fill="currentColor"
                                     />
-                                    <span>{{ getRating(petsitter.user.name) }}</span>
+                                    <span>{{ formatRating(petsitter) }}</span>
                                 </div>
                             </div>
 
@@ -515,7 +510,7 @@ onMounted(() => {
                                         class="text-warning"
                                         fill="currentColor"
                                     />
-                                    <span>{{ getRating(petsitter.user.name) }}</span>
+                                    <span>{{ formatRating(petsitter) }}</span>
                                 </div>
                             </div>
 
