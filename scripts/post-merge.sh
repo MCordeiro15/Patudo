@@ -16,10 +16,11 @@ fi
 # Mudar para o diretório do projeto
 cd "$PROJECT_ROOT"
 
-# Verificar se o ExportedDataSeeder mudou
-if git diff-tree -r --name-only HEAD^1 HEAD | grep -q "ExportedDataSeeder.php"; then
-    echo "Detetadas mudanças nos dados do banco de dados..."
-    echo "Atualizando tudo automaticamente..."
+# Verificar se ExportedDataSeeder existe e se mudou
+if [ -f "$PROJECT_ROOT/database/seeders/ExportedDataSeeder.php" ]; then
+    # Sempre atualiza se o seeder existe (primeira vez ou atualização)
+    echo "ExportedDataSeeder detetado. Atualizando banco de dados..."
+    echo "Apagando banco de dados antigo e criando o novo..."
     
     php "$ARTISAN" migrate:fresh --seed --no-interaction
     

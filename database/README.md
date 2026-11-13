@@ -16,6 +16,7 @@ cp .env.example .env
 php artisan key:generate
 
 # 3. Configurar os git hooks (só uma vez!)
+# Este comando apaga o banco de dados antigo e cria o novo com todos os dados
 bash scripts/setup-hooks.sh
 
 # 4. Rodar a aplicação
@@ -25,13 +26,15 @@ php artisan serve
 
 ### Após `git pull` (atualizações futuras)
 
-Tudo é automático — o banco de dados e o storage link são atualizados sozinhos. Só precisas de:
+Tudo é automático — o banco de dados antigo é apagado e substituído pelo novo a cada `git pull`. Só precisas de:
 
 ```bash
 git pull origin main
 npm run dev
 php artisan serve
 ```
+
+O `setup-hooks.sh` na primeira vez apaga o banco de dados antigo e cria o novo. A cada `git pull` seguinte, o banco de dados é automaticamente atualizado com os dados mais recentes.
 
 ## Como funciona o sistema automático
 
