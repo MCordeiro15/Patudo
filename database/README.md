@@ -71,6 +71,25 @@ Os dados de teste são gerados pelos **seeders** do Laravel. Não versionamos o 
 - `php artisan migrate:fresh --seed` — Resetar tudo e recomeçar do zero
 - `php artisan db:seed` — Adicionar dados de teste sem apagar o que já existe
 - `php artisan storage:link` — Criar symlink para as fotos aparecerem
+- `php artisan users:export-to-seeders` — Exportar users novos para os seeders automaticamente
+
+## Adicionar users novos automaticamente
+
+Se criaste uma conta nova e queres que os teus colegas também tenham:
+
+1. **Cria a conta** normalmente na aplicação
+2. **Roda o comando**:
+   ```bash
+   php artisan users:export-to-seeders
+   ```
+   O comando deteta automaticamente os users que não estão nos seeders e os adiciona.
+3. **Faz commit e push**:
+   ```bash
+   git add -A
+   git commit -m "Adicionar novos users aos seeders"
+   git push origin main
+   ```
+4. **Os colegas recebem** com `git pull origin main` e `php artisan migrate:fresh --seed`
 
 ## Importante
 
