@@ -89,3 +89,25 @@ git checkout database/database.sqlite
    ```bash
    git pull origin main
    ```
+
+## Erro: "unlink of file 'database/database.sqlite' failed: Should I try again"
+
+Este erro aparece quando o Laravel (`php artisan serve`) está a rodar e mantém o banco de dados SQLite aberto, impedindo o Git de atualizar o arquivo.
+
+**Solução — segue estes passos em ordem:**
+
+1. **Para o servidor Laravel** (Ctrl+C no terminal onde rodou `php artisan serve`)
+2. **Faz git pull novamente:**
+   ```bash
+   git pull origin main
+   ```
+3. **Se o erro persistir, reseta o arquivo manualmente:**
+   ```bash
+   git checkout database/database.sqlite
+   ```
+4. **Reinicia o servidor:**
+   ```bash
+   php artisan serve
+   ```
+
+**Importante:** Sempre para o `php artisan serve` antes de fazer `git pull` para evitar este erro.
