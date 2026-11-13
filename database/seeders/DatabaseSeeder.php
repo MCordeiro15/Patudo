@@ -18,15 +18,14 @@ class DatabaseSeeder extends Seeder
     use WithoutModelEvents;
 
     /**
- * Seed the application's database.
- * Seed the application's database.
- */
+     * Seed the application's database.
+     */
     public function run(): void
     {
-        // Call PetsitterSeeder to create petsitters with test data
+        // 1. Create petsitters with test data
         $this->call(PetsitterSeeder::class);
 
-        // Create or update admin user with petsitter profile
+        // 2. Create admin user only if it doesn't exist (don't overwrite existing passwords)
         $admin = User::firstOrCreate(
             ['email' => 'admin@admin.com'],
             [
@@ -98,7 +97,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Create regular test user
+        // 3. Create regular test user only if it doesn't exist
         User::firstOrCreate(
             ['email' => 'test@example.com'],
             [
@@ -107,5 +106,11 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        // 4. Create posts for petsitters
+        $this->call(PostSeeder::class);
+
+        // 5. Create bookings and reviews
+        $this->call(BookingSeeder::class);
     }
 }

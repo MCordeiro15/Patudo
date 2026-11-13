@@ -39,6 +39,7 @@ class PetsitterFactory extends Factory
             'accepted_animal_types' => ['dog', 'cat'],
             'approval_status' => 'pending',
             'identification_documents' => 'doc_'.fake()->uuid().'.pdf',
+            'availability_days' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
         ];
     }
 

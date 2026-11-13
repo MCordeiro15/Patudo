@@ -103,7 +103,7 @@ class PetsitterSeeder extends Seeder
         ];
 
         foreach ($users as $userData) {
-            // Create or update user and set is_petsitter
+            // Create user only if it doesn't exist (don't overwrite existing passwords)
             $user = User::firstOrCreate(
                 ['email' => $userData['email']],
                 [
