@@ -353,7 +353,8 @@ const handleDeleteAccount = () => {
     justify-content: center;
 }
 
-.patudo-avatar-img, .patudo-avatar-placeholder {
+.patudo-avatar-img,
+.patudo-avatar-placeholder {
     width: 100%;
     height: 100%;
     object-fit: cover;
