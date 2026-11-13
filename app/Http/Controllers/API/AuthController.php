@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Controlador API para autenticação. Lida com login, logout e obtenção do utilizador autenticado via tokens.
  * API controller for authentication. Handles login, logout, and retrieving the authenticated user via tokens.

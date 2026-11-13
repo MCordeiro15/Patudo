@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Form request para validação da eliminação da conta. Exige confirmação da password atual.
  * Form request for account deletion validation. Requires current password confirmation.

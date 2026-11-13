@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Controlador API para gestão de reservas de petsitters. Permite criar reservas, listar reservas do utilizador, ver detalhes e alterar o estado (pending, approved, rejected, completed, cancelled).
  * API controller for petsitter booking management. Allows creating bookings, listing user's bookings, viewing details, and changing status (pending, approved, rejected, completed, cancelled).

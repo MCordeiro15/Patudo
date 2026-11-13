@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Modelo Eloquent para avaliações de petsitters. Contém nota em estrelas (1-5) e comentário textual. Relaciona-se com o owner que avaliou e o petsitter avaliado.
  * Eloquent model for petsitter reviews. Contains star rating (1-5) and textual comment. Relates to the owner who reviewed and the reviewed petsitter.

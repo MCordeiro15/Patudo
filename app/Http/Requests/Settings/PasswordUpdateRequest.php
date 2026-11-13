@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Form request para validação da alteração de password. Valida password atual, nova password e confirmação.
  * Form request for password change validation. Validates current password, new password, and confirmation.

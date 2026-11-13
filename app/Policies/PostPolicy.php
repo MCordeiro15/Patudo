@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Política de autorização para posts. Define quem pode visualizar, criar, atualizar e eliminar posts.
  * Authorization policy for posts. Defines who can view, create, update, and delete posts.
@@ -13,9 +12,8 @@ use App\Models\User;
 class PostPolicy
 {
     /**
- * Determine whether the user can view any models.
- * Determine whether the user can view any models.
- */
+     * Determine whether the user can view any models.
+     */
     public function viewAny(User $user): bool
     {
         return true;

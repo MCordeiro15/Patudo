@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Modelo Eloquent para tickets de suporte. Contém tipo (complaint/help), estado (open, claimed, closed), título e descrição. Relaciona-se com o criador e o utilizador reportado.
  * Eloquent model for support tickets. Contains type (complaint/help), status (open, claimed, closed), title, and description. Relates to the creator and the reported user.
@@ -27,9 +26,8 @@ class SupportTicket extends Model
     ];
 
     /**
- * @return BelongsTo<User, $this>
- * @return BelongsTo<User, $this>
- */
+     * @return BelongsTo<User, $this>
+     */
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');

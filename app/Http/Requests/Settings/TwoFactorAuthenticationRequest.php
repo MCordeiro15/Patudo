@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Form request para validação da ativação/desativação de 2FA. Valida o código de verificação.
  * Form request for 2FA enable/disable validation. Validates the verification code.

@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Controlador web para definições de segurança. Permite alterar password, ativar/desativar 2FA e gerir passkeys.
  * Web controller for security settings. Allows changing password, enabling/disabling 2FA, and managing passkeys.
@@ -19,9 +18,8 @@ use Laravel\Fortify\Features;
 class SecurityController extends Controller
 {
     /**
- * Show the user's security settings page.
- * Show the user's security settings page.
- */
+     * Show the user's security settings page.
+     */
     public function edit(TwoFactorAuthenticationRequest $request): Response
     {
         $props = [

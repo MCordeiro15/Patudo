@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Modelo Eloquent para datas de disponibilidade individual de cada petsitter. Permite ativar/desativar datas específicas no calendário.
  * Eloquent model for individual availability dates of each petsitter. Allows enabling/disabling specific dates on the calendar.

@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Política de autorização para reservas. Define quem pode visualizar, criar, atualizar e alterar o estado das reservas.
  * Authorization policy for bookings. Defines who can view, create, update, and change the status of bookings.

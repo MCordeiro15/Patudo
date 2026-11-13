@@ -1,10 +1,10 @@
 <?php
 
-
 /**
  * Modelo Eloquent para animais de estimação. Representa um animal com dados como espécie, raça, tamanho, necessidades especiais, peso e foto. Relaciona-se com o proprietário (User) e com reservas (Booking).
  * Eloquent model for pets. Represents an animal with data like species, breed, size, special needs, weight, and photo. Relates to the owner (User) and bookings (Booking).
  */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;

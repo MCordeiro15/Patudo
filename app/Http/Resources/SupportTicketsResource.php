@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Recurso API que transforma o modelo SupportTicketsResource em JSON para resposta da API. Define quais os atributos e relações são expostos ao front-end.
  * API resource that transforms the SupportTicketsResource model into JSON for API responses. Defines which attributes and relationships are exposed to the front-end.
@@ -12,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin SupportTicket
  * @mixin SupportTicket
  */
 class SupportTicketsResource extends JsonResource

@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Controlador API para gestão de tickets de suporte. Permite criar reclamações, listar tickets, claim por admins e fechar tickets.
  * API controller for support tickets management. Allows creating complaints, listing tickets, admin claim, and closing tickets.
@@ -18,9 +17,8 @@ use Illuminate\Http\Response;
 class SupportTicketsController extends Controller
 {
     /**
- * Open a new support ticket (complaint or help request).
- * Open a new support ticket (complaint or help request).
- */
+     * Open a new support ticket (complaint or help request).
+     */
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
