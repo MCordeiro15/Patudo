@@ -17,6 +17,7 @@ import {
 
 interface PetsitterData {
     user_id: number;
+    avatar_url?: string | null;
     biography: string | null;
     experience: string;
     service_location: string;
@@ -268,7 +269,13 @@ onMounted(() => {
                         <div
                             class="position-relative d-flex justify-content-center align-items-center border-bottom border-primary py-4"
                         >
-                            <div class="display-2">🐾</div>
+                            <img
+                                v-if="petsitter.avatar_url"
+                                :src="petsitter.avatar_url"
+                                :alt="petsitter.user.name"
+                                style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%"
+                            />
+                            <div v-else class="display-2">🐾</div>
 
                             <button
                                 type="button"

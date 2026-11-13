@@ -20,6 +20,7 @@ import logoPatudo from '@/../../assets/logoPatudo.svg';
 
 interface PetsitterApiData {
     user_id: number;
+    avatar_url?: string | null;
     service_location: string;
     price_per_day: number;
     average_rating: number | string | null;
@@ -39,18 +40,6 @@ function isFavourite(petsitterId: number): boolean {
     return favourites.value.includes(petsitterId);
 }
 
-// Avatar mapping based on name
-function getAvatar(name: string): string {
-    const avatars: Record<string, string> = {
-        Sofia: '👩🏻',
-        Tiago: '👨🏻',
-        João: '👨🏾',
-        Inês: '👩🏾',
-        Maria: '👩🏻',
-        Rui: '👨🏼',
-    };
-    return avatars[name] || '🐾';
-}
 
 // Generate a fake rating for display
 function formatRating(p: PetsitterApiData): string {
@@ -346,9 +335,13 @@ onMounted(() => {
                         <div
                             class="position-relative d-flex justify-content-center align-items-center border-bottom border-primary py-4"
                         >
-                            <div class="display-2">
-                                {{ getAvatar(petsitter.user.name) }}
-                            </div>
+                            <img
+                                v-if="petsitter.avatar_url"
+                                :src="petsitter.avatar_url"
+                                :alt="petsitter.user.name"
+                                style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%"
+                            />
+                            <div v-else class="display-2">🐾</div>
 
                             <button
                                 type="button"
