@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue';
 import InputError from '@/components/InputError.vue';
 import type { Post, PostFormErrors } from '@/types';
 
+
 const emit = defineEmits<{
     (e: 'close'): void;
     (e: 'created', post: Post): void;
