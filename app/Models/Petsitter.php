@@ -48,7 +48,7 @@ class Petsitter extends Model
      * Fields that can be mass-assigned via create() or fill().
      */
     protected $fillable = [
-        'user_id', 'biography', 'profile_photo', 'profile_photo_data', 'short_bio', 'experience', 'service_location', 'city',
+        'user_id', 'biography', 'profile_photo', 'short_bio', 'experience', 'service_location', 'city',
         'age',
         'price_per_day', 'average_rating', 'accepted_sizes', 'sex', 'accepted_animal_types',
         'identification_documents', 'availability_days',

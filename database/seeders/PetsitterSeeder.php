@@ -20,10 +20,6 @@ class PetsitterSeeder extends Seeder
  */
     public function run(): void
     {
-        // Load avatar data URIs from files
-        $avatarFemale = file_get_contents(database_path('seeders/avatars/female.txt'));
-        $avatarMale = file_get_contents(database_path('seeders/avatars/male.txt'));
-
         // Create test users for petsitters if they don't exist
         $users = [
             [
@@ -34,7 +30,6 @@ class PetsitterSeeder extends Seeder
                 'price' => 12,
                 'sex' => 'female',
                 'age' => 28,
-                'avatar' => $avatarFemale,
                 'experience' => 'Cuidadora de animais há 5 anos. Especializada em cães de grande porte e gatos. Disponibilidade total e muito amor para dar!',
                 'biography' => 'Apaixonada por animais desde criança, tenho experiência com todas as raças de cães e gatos. Ofereço cuidados personalizados e muitos mimos.',
                 'short_bio' => 'Cuidadora experiente em Lisboa',
@@ -48,7 +43,6 @@ class PetsitterSeeder extends Seeder
                 'price' => 10,
                 'sex' => 'male',
                 'age' => 24,
-                'avatar' => $avatarMale,
                 'experience' => 'Estudante de veterinária com 3 anos de experiência em cuidados com animais. Adoro passeios longos com cães.',
                 'biography' => 'Estudante de veterinária no Porto. Nos tempos livres, cuido de animais e faço passeios com cães pela cidade e pela praia.',
                 'short_bio' => 'Estudante de veterinária no Porto',
@@ -62,7 +56,6 @@ class PetsitterSeeder extends Seeder
                 'price' => 11,
                 'sex' => 'male',
                 'age' => 30,
-                'avatar' => $avatarMale,
                 'experience' => 'Técnico veterinário com 7 anos de experiência. Cuidado especializado para animais com necessidades especiais.',
                 'biography' => 'Técnico veterinário qualificado. Ofereço cuidados de saúde básicos, administração de medicação e acompanhamento de animais idosos.',
                 'short_bio' => 'Técnico veterinário em Braga',
@@ -76,7 +69,6 @@ class PetsitterSeeder extends Seeder
                 'price' => 9,
                 'sex' => 'female',
                 'age' => 22,
-                'avatar' => $avatarFemale,
                 'experience' => 'Jovem entusiasta de animais com experiência em pet sitting e dog walking. Adoro todos os tipos de animais!',
                 'biography' => 'Apaixonada por animais e natureza. Faço passeios diários e ofereço um ambiente acolhedor para os seus companheiros de quatro patas.',
                 'short_bio' => 'Entusiasta de animais em Coimbra',
@@ -90,7 +82,6 @@ class PetsitterSeeder extends Seeder
                 'price' => 13,
                 'sex' => 'female',
                 'age' => 35,
-                'avatar' => $avatarFemale,
                 'experience' => 'Comportamentalista animal com 10 anos de experiência. Especialista em animais com ansiedade de separação.',
                 'biography' => 'Profissional certificada em comportamento animal. Ofereço cuidados especializados para animais com necessidades comportamentais.',
                 'short_bio' => 'Comportamentalista animal em Aveiro',
@@ -104,7 +95,6 @@ class PetsitterSeeder extends Seeder
                 'price' => 10,
                 'sex' => 'male',
                 'age' => 26,
-                'avatar' => $avatarMale,
                 'experience' => 'Treinador canino com 4 anos de experiência. Combino cuidados com sessões de treino para enriquecer a vida do seu pet.',
                 'biography' => 'Treinador canino profissional. Ofereço passeios ativos, sessões de treino e muito carinho para os seus animais.',
                 'short_bio' => 'Treinador canino em Faro',
@@ -146,7 +136,6 @@ class PetsitterSeeder extends Seeder
                     'city' => $userData['city'],
                     'average_rating' => $userData['average_rating'],
                     'availability_days' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
-                    'profile_photo_data' => $userData['avatar'] ?? null,
                 ]);
             } else {
                 Petsitter::create([
@@ -165,7 +154,6 @@ class PetsitterSeeder extends Seeder
                     'city' => $userData['city'],
                     'average_rating' => $userData['average_rating'],
                     'availability_days' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
-                    'profile_photo_data' => $userData['avatar'] ?? null,
                 ]);
             }
 
