@@ -9,6 +9,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class UserResource extends JsonResource
 {
@@ -20,11 +21,22 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $avatarUrl = null;
+
+        // Se o usuário é petsitter, usa a foto do perfil do petsitter
+        if ($this->isPetsitter() && $this->relationLoaded('petsitter')) {
+            $petsitter = $this->petsitter;
+            if ($petsitter && $petsitter->profile_photo) {
+                $avatarUrl = Storage::disk('public')->url($petsitter->profile_photo);
+            }
+        }
+
         return [
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
+            'avatar_url' => $avatarUrl,
             'email_verified_at' => $this->email_verified_at,
             'is_petsitter' => $this->isPetsitter(),
             'created_at' => $this->created_at,

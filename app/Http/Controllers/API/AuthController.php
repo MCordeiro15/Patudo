@@ -61,12 +61,16 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return new UserResource(Auth::user());
+        $user = Auth::user();
+        $user->load('petsitter');
+        return new UserResource($user);
     }
 
     public function myInformation(Request $request)
     {
-        return new UserResource($request->user());
+        $user = $request->user();
+        $user->load('petsitter');
+        return new UserResource($user);
     }
 
     /**

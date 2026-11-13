@@ -8,6 +8,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Petsitter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class PetsitterProfileController extends Controller
@@ -63,6 +64,7 @@ class PetsitterProfileController extends Controller
                 'user_id' => $petsitter->user_id,
                 'name' => $petsitter->user->name,
                 'phone' => $petsitter->user->phone,
+                'avatar_url' => $petsitter->profile_photo ? Storage::disk('public')->url($petsitter->profile_photo) : null,
                 'biography' => $petsitter->biography,
                 'experience' => $petsitter->experience ?? '',
                 'service_location' => $petsitter->service_location,

@@ -12,6 +12,7 @@ use App\Models\Petsitter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class PetsitterController extends Controller
@@ -109,6 +110,7 @@ class PetsitterController extends Controller
             'accepted_animal_types' => 'nullable|array',
             'accepted_animal_types.*' => 'string',
             'identification_documents' => 'sometimes|string|max:255',
+            'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:20480',
         ]);
 
         // Separar os dados do usuário dos dados do petsitter
@@ -131,8 +133,25 @@ class PetsitterController extends Controller
             $petsitter->user->update($userData);
         }
 
+        // Processar upload de foto de perfil
+        if ($request->hasFile('avatar')) {
+            // Remover foto antiga se existir
+            if ($petsitter->profile_photo) {
+                Storage::disk('public')->delete($petsitter->profile_photo);
+            }
+
+            $file = $request->file('avatar');
+            $path = $file->store('petsitters', 'public');
+            $petsitterData['profile_photo'] = $path;
+        }
+
         // Atualizar o petsitter com os dados restantes
         $petsitter->update($data);
+
+        // Aplicar dados adicionais (profile_photo)
+        if (!empty($petsitterData)) {
+            $petsitter->update($petsitterData);
+        }
 
         return new PetsitterResource($petsitter->load('user'));
     }

@@ -351,7 +351,7 @@ const submit = async () => {
                             >
                                 Alterar foto
                             </button>
-                            <span class="patudo-photo-hint">JPG ou PNG (máx. 2MB)</span>
+                            <span class="patudo-photo-hint">JPG ou PNG (máx. 20MB)</span>
                             <InputError :message="errors.avatar?.[0] || errors.photo?.[0]" />
                         </div>
                     </div>

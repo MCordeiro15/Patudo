@@ -199,10 +199,17 @@ onMounted(() => {
                             <div class="col-12 col-md-8">
                                 <div class="d-flex gap-3">
                                     <div
-                                        class="d-flex align-items-center justify-content-center rounded-circle bg-light flex-shrink-0"
+                                        class="d-flex align-items-center justify-content-center rounded-circle bg-light flex-shrink-0 overflow-hidden"
                                         style="width: 80px; height: 80px"
                                     >
+                                        <img
+                                            v-if="user?.avatar_url"
+                                            :src="user.avatar_url"
+                                            alt="Foto de perfil"
+                                            style="width: 80px; height: 80px; object-fit: cover"
+                                        />
                                         <UserRound
+                                            v-else
                                             :size="40"
                                             class="text-primary"
                                         />

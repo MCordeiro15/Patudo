@@ -26,6 +26,7 @@ type PetsitterProfile = {
     user_id: number;
     name: string;
     phone: string | null;
+    avatar_url?: string | null;
     biography: string | null;
     experience: string;
     service_location: string;
@@ -177,6 +178,12 @@ const displayPhone = computed(() => {
     // Formata o número separando 3 dígitos por 3 dígitos
     const formatted = digits.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
     return `+351 ${formatted}`;
+});
+
+// Propriedade computada que retorna a URL da foto de perfil.
+// Computed property that returns the profile photo URL.
+const displayAvatar = computed(() => {
+    return petsitter.value?.avatar_url ?? null;
 });
 
 // Propriedade computada que retorna a biografia ou mensagem padrão.
@@ -459,10 +466,16 @@ const saveAvailability = async () => {
                                 <div class="col-12 col-md-8">
                                     <div class="d-flex gap-3">
                                         <div
-                                            class="d-flex align-items-center justify-content-center rounded-circle bg-light flex-shrink-0"
+                                            class="d-flex align-items-center justify-content-center rounded-circle bg-light flex-shrink-0 overflow-hidden"
                                             style="width: 100px; height: 100px"
                                         >
-                                            <span class="display-6">🐶</span>
+                                            <img
+                                                v-if="displayAvatar"
+                                                :src="displayAvatar"
+                                                alt="Foto de perfil"
+                                                style="width: 100px; height: 100px; object-fit: cover"
+                                            />
+                                            <span v-else class="display-6">🐶</span>
                                         </div>
 
                                         <div class="w-100">
