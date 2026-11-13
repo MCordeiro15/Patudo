@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Controlador API para gestão de perfis de petsitter. Fornece endpoints CRUD, aprovação/rejeição por admin e atualização de dias de disponibilidade.
  * API controller for petsitter profile management. Provides CRUD endpoints, admin approval/rejection, and availability days update.
@@ -35,9 +34,8 @@ class PetsitterController extends Controller
     }
 
     /**
- * Retorna apenas os petsitters aprovados, sem necessidade de autenticação.
- * Retorna apenas os petsitters aprovados, sem necessidade de autenticação.
- */
+     * Retorna apenas os petsitters aprovados, sem necessidade de autenticação.
+     */
     public function publicIndex()
     {
         $query = Petsitter::with('user')->where('approval_status', 'approved');

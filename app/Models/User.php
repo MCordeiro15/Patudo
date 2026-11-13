@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Modelo Eloquent principal para utilizadores. Suporta autenticação, 2FA, passkeys, roles (admin, petsitter) e relações com animais, reservas, posts, petsitter, reviews e favoritos.
  * Main Eloquent model for users. Supports authentication, 2FA, passkeys, roles (admin, petsitter), and relationships with animals, bookings, posts, petsitter, reviews, and favorites.

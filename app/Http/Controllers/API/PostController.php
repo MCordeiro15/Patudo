@@ -1,10 +1,10 @@
 <?php
 
-
 /**
  * Controlador API para gestão de posts de petsitters. Permite criar posts com até 5 fotos, listar posts, ver detalhes, atualizar e eliminar.
  * API controller for petsitter posts management. Allows creating posts with up to 5 photos, listing posts, viewing details, updating, and deleting.
  */
+
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;

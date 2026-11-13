@@ -124,6 +124,7 @@ const mockPet = {
 
         <ModalEditPetsitterProfile
             :show="showEditPetsitter"
+            :petsitter="null"
             @close="showEditPetsitter = false"
         />
 

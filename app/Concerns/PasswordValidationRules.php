@@ -1,10 +1,10 @@
 <?php
 
-
 /**
  * Trait com regras reutilizáveis de validação de password. Define os requisitos mínimos de complexidade.
  * Trait with reusable password validation rules. Defines minimum complexity requirements.
  */
+
 namespace App\Concerns;
 
 use Illuminate\Contracts\Validation\ValidationRule;

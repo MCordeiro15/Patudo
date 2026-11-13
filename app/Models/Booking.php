@@ -1,10 +1,10 @@
 <?php
 
-
 /**
  * Modelo Eloquent para reservas de petsitters. Contém datas de início/fim, estado (pending, approved, rejected, completed, cancelled), preço total e notas. Relaciona-se com o owner, petsitter, animais e review.
  * Eloquent model for petsitter bookings. Contains start/end dates, status (pending, approved, rejected, completed, cancelled), total price, and notes. Relates to owner, petsitter, animals, and review.
  */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;

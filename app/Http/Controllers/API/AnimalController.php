@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Controlador API para gestão de animais de estimação. Fornece endpoints CRUD (criar, listar, ver detalhes, atualizar, eliminar) para os animais dos utilizadores.
  * API controller for pet management. Provides CRUD endpoints (create, list, view details, update, delete) for users' pets.
@@ -28,7 +27,7 @@ class AnimalController extends Controller
 
         $query = Animal::with('user');
 
-        if (!$request->user()?->isAdmin()) {
+        if ( ! $request->user()?->isAdmin()) {
             $query->where('user_id', $request->user()?->id);
         }
 
@@ -57,7 +56,7 @@ class AnimalController extends Controller
             'weight' => 'nullable|numeric|min:0|max:999.99',
         ]);
 
-        if (!$request->user()?->isAdmin() || empty($data['user_id'])) {
+        if ( ! $request->user()?->isAdmin() || empty($data['user_id'])) {
             $data['user_id'] = $request->user()->id;
         }
 
@@ -99,7 +98,7 @@ class AnimalController extends Controller
             'weight' => 'nullable|numeric|min:0|max:999.99',
         ]);
 
-        if (!$request->user()?->isAdmin()) {
+        if ( ! $request->user()?->isAdmin()) {
             unset($data['user_id']);
         }
 

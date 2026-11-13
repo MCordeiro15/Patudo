@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Política de autorização para petsitters. Define quem pode visualizar, criar, atualizar, eliminar e aprovar perfis de petsitter.
  * Authorization policy for petsitters. Defines who can view, create, update, delete, and approve petsitter profiles.
@@ -13,9 +12,8 @@ use App\Models\User;
 class PetsitterPolicy
 {
     /**
- * Determine whether the user can view any models.
- * Determine whether the user can view any models.
- */
+     * Determine whether the user can view any models.
+     */
     public function viewAny(User $user): bool
     {
         return true;

@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Modelo Eloquent para perfis de petsitter. Contém biografia, experiência, preço por dia, tamanhos de animais aceites, localização, estado de aprovação e dias de disponibilidade.
  * Eloquent model for petsitter profiles. Contains biography, experience, price per day, accepted animal sizes, location, approval status, and availability days.
@@ -73,7 +72,6 @@ class Petsitter extends Model
         return $this->belongsTo(User::class);
     }
 
-
     /**
      * Relação hasMany com Post. Retorna todas as publicações deste petsitter.
      * HasMany relationship with Post. Returns all posts by this petsitter.
@@ -118,9 +116,8 @@ class Petsitter extends Model
     }
 
     /**
- * Approve this petsitter profile.
- * Approve this petsitter profile.
- */
+     * Approve this petsitter profile.
+     */
     public function approve(): void
     {
         $this->approval_status = 'approved';

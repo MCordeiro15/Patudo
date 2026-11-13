@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Controlador API para gestão de utilizadores (admin). Fornece endpoints para listar, ver, atualizar e suspender contas de utilizadores.
  * API controller for user management (admin). Provides endpoints to list, view, update, and suspend user accounts.

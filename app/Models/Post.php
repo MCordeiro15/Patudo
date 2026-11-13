@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Modelo Eloquent para posts de petsitters. Contém título, descrição e array de fotos. Relaciona-se com o petsitter que o criou.
  * Eloquent model for petsitter posts. Contains title, description, and photo array. Relates to the petsitter who created it.
@@ -25,7 +24,7 @@ class Post extends Model
      * Campos que podem ser preenchidos em massa via create() ou fill().
      * Fields that can be mass-assigned via create() or fill().
      */
-    protected $fillable = ['title','description', 'photos'];
+    protected $fillable = ['title', 'description', 'photos'];
 
     protected function casts(): array
     {
