@@ -1,21 +1,30 @@
 #!/bin/bash
 
-# Script de setup para configurar o git hook de exportação automática
+# Script de setup para configurar os git hooks automáticos
 # Roda este script uma vez após clonar o repositório
 
-echo "Configurando git hook de exportação automática..."
+echo "Configurando git hooks automáticos..."
 
 # Copiar o pre-push hook para .git/hooks/
 cp scripts/pre-push.sh .git/hooks/pre-push
 chmod +x .git/hooks/pre-push
 
-echo "Git hook configurado com sucesso!"
+# Copiar o post-merge hook para .git/hooks/
+cp scripts/post-merge.sh .git/hooks/post-merge
+chmod +x .git/hooks/post-merge
+
+echo "Git hooks configurados com sucesso!"
 echo ""
-echo "Agora, quando fizeres git push, todos os dados do banco de dados"
-echo "(users, petsitters, animais, posts, bookings, reviews, fotos)"
-echo "são automaticamente exportados e partilhados com os teus colegas."
+echo "O que acontece agora:"
 echo ""
-echo "Para os colegas receberem os dados:"
-echo "  git pull origin main"
-echo "  php artisan migrate:fresh --seed"
-echo "  php artisan storage:link"
+echo "1. Quando fizeres git push:"
+echo "   - Todos os dados (users, petsitters, fotos, etc.) são exportados automaticamente"
+echo ""
+echo "2. Quando os colegas fizerem git pull:"
+echo "   - O banco de dados é atualizado automaticamente com os dados novos"
+echo "   - Depois só precisam rodar:"
+echo "     php artisan storage:link"
+echo "     npm run dev"
+echo "     php artisan serve"
+echo ""
+echo "Resumo: Tudo é automático. Só precisam rodar os comandos acima uma vez após git pull."

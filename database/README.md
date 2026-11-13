@@ -2,69 +2,52 @@
 
 ## Como ter os dados de teste
 
-Os dados de teste são gerados pelos **seeders** do Laravel. Não versionamos o arquivo SQLite no Git.
+Tudo é **automático**. Quando alguém faz `git push`, todos os dados são exportados. Quando os colegas fazem `git pull`, o banco de dados é atualizado automaticamente.
 
-### Passo a passo (após `git pull`)
-
-1. **Para o servidor** (se estiver a rodar)
-   ```bash
-   # Pressiona Ctrl+C no terminal onde php artisan serve está a rodar
-   ```
-
-2. **Instalar dependências**
-   ```bash
-   composer install
-   npm install
-   ```
-
-3. **Configurar o ambiente** (se não tiveres `.env`)
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
-
-4. **Rodar migrations e seeders**
-   ```bash
-   php artisan migrate:fresh --seed
-   ```
-   Isso cria todas as tabelas e popula com os dados de teste.
-
-5. **Criar symlink para storage**
-   ```bash
-   php artisan storage:link
-   ```
-
-6. **Rodar a aplicação**
-   ```bash
-   npm run dev
-   php artisan serve
-   ```
-
-## Exportação automática de dados
-
-Quando fazes `git push`, um **git hook** exporta automaticamente todos os dados do teu banco de dados (users, petsitters, animais, posts, bookings, reviews, fotos) para um seeder.
-
-**Como funciona:**
-
-1. Criaste uma conta nova, fizeste uma reserva, subiste uma foto de perfil, etc.
-2. Rodas `git push origin main`
-3. O git hook roda `php artisan db:export` automaticamente
-4. Todos os dados são exportados para `ExportedDataSeeder.php`
-5. O seeder é commitado e pushado
-6. Os colegas fazem `git pull` e `php artisan migrate:fresh --seed` para receberem tudo
-
-**Para os colegas configurarem o git hook (uma vez após `git pull`):**
+### Primeira configuração (após clonar o repositório)
 
 ```bash
+# 1. Instalar dependências
+composer install
+npm install
+
+# 2. Configurar o ambiente (se não tiveres .env)
+cp .env.example .env
+php artisan key:generate
+
+# 3. Configurar os git hooks (só uma vez!)
 bash scripts/setup-hooks.sh
+
+# 4. Rodar a aplicação
+npm run dev
+php artisan serve
 ```
 
-Ou manualmente:
+### Após `git pull` (atualizações futuras)
+
+Depois de configurar os hooks, só precisas de:
 
 ```bash
-cp scripts/pre-push.sh .git/hooks/pre-push
-chmod +x .git/hooks/pre-push
+git pull origin main
+php artisan storage:link
+npm run dev
+php artisan serve
 ```
+
+O banco de dados é atualizado **automaticamente** pelo git hook.
+
+## Como funciona o sistema automático
+
+**Quando tu fazes `git push`:**
+- Um git hook exporta automaticamente todos os dados (users, petsitters, animais, posts, bookings, reviews, fotos)
+- Os dados são guardados em `ExportedDataSeeder.php` e incluídos no push
+
+**Quando os colegas fazem `git pull`:**
+- Um git hook deteta que os dados mudaram
+- Roda automaticamente `migrate:fresh --seed` para atualizar o banco de dados
+- Os colegas recebem todos os dados novos sem fazer nada
+
+**Resumo:** Criaste uma conta, fizeste uma reserva, subiste uma foto? Faz `git push` e todos os colegas recebem tudo com `git pull`.
 
 ## O que é criado pelos seeders
 
