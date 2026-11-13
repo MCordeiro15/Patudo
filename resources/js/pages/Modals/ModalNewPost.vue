@@ -207,7 +207,7 @@ const submit = async () => {
                                             v-if="
                                                 String(key).startsWith(
                                                     'photos.',
-                                                )
+                                                ) && msgs
                                             "
                                             :message="msgs[0]"
                                         />
