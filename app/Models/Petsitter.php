@@ -108,6 +108,15 @@ class Petsitter extends Model
         );
     }
 
+    public function refreshAverageRating(): void
+    {
+        $avg = $this->reviews()->where('visible', true)->avg('star_rating');
+
+        $this->forceFill([
+            'average_rating' => $avg !== null ? round((float) $avg, 2) : null,
+        ])->save();
+    }
+
     /**
  * Approve this petsitter profile.
  * Approve this petsitter profile.

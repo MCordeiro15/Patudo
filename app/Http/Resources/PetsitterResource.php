@@ -41,6 +41,7 @@ class PetsitterResource extends JsonResource
             'age' => $this->age,
             'price_per_day' => $this->price_per_day,
             'average_rating' => $this->average_rating,
+            'reviews_count' => $this->reviews()->where('visible', true)->count(),
             'accepted_sizes' => $this->accepted_sizes,
             'accepted_animal_types' => $this->accepted_animal_types,
             'sex' => $this->sex,

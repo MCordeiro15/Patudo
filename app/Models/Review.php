@@ -23,6 +23,14 @@ class Review extends Model
         'visible',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'visible' => 'boolean',
+            'star_rating' => 'integer',
+        ];
+    }
+
     /**
      * Relação belongsTo com Booking. Retorna a reserva associada.
      * BelongsTo relationship with Booking. Returns the associated booking.
