@@ -25,6 +25,7 @@ class PetsitterSeeder extends Seeder
             [
                 'name' => 'Sofia Mendes',
                 'email' => 'sofia@patudo.test',
+                'phone' => '912345678',
                 'city' => 'Lisboa',
                 'service_location' => 'Lisboa, Portugal',
                 'price' => 12,
@@ -38,6 +39,7 @@ class PetsitterSeeder extends Seeder
             [
                 'name' => 'Tiago Ferreira',
                 'email' => 'tiago@patudo.test',
+                'phone' => '923456789',
                 'city' => 'Porto',
                 'service_location' => 'Porto, Portugal',
                 'price' => 10,
@@ -51,6 +53,7 @@ class PetsitterSeeder extends Seeder
             [
                 'name' => 'João Santos',
                 'email' => 'joao@patudo.test',
+                'phone' => '934567890',
                 'city' => 'Braga',
                 'service_location' => 'Braga, Portugal',
                 'price' => 11,
@@ -64,6 +67,7 @@ class PetsitterSeeder extends Seeder
             [
                 'name' => 'Inês Rodrigues',
                 'email' => 'ines@patudo.test',
+                'phone' => '945678901',
                 'city' => 'Coimbra',
                 'service_location' => 'Coimbra, Portugal',
                 'price' => 9,
@@ -77,6 +81,7 @@ class PetsitterSeeder extends Seeder
             [
                 'name' => 'Maria Oliveira',
                 'email' => 'maria@patudo.test',
+                'phone' => '956789012',
                 'city' => 'Aveiro',
                 'service_location' => 'Aveiro, Portugal',
                 'price' => 13,
@@ -90,6 +95,7 @@ class PetsitterSeeder extends Seeder
             [
                 'name' => 'Rui Costa',
                 'email' => 'rui@patudo.test',
+                'phone' => '967890123',
                 'city' => 'Faro',
                 'service_location' => 'Faro, Portugal',
                 'price' => 10,
@@ -110,6 +116,7 @@ class PetsitterSeeder extends Seeder
                     'name' => $userData['name'],
                     'password' => bcrypt('password'),
                     'email_verified_at' => now(),
+                    'phone' => $userData['phone'] ?? null,
                 ]
             );
 

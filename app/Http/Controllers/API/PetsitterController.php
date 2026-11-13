@@ -133,8 +133,12 @@ class PetsitterController extends Controller
             $petsitter->user->update($userData);
         }
 
+        // Processar remoção de foto de perfil
+        if ($request->input('_remove_avatar')) {
+            $petsitterData['profile_photo'] = null;
+        }
         // Processar upload de foto de perfil - guardar como base64 na base de dados
-        if ($request->hasFile('avatar')) {
+        elseif ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
             $content = file_get_contents($file->getRealPath());
             $mimeType = $file->getMimeType();

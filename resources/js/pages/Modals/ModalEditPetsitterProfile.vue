@@ -42,6 +42,7 @@ const acceptedAnimalTypes = ref<string[]>([]);
 const avatarFile = ref<File | null>(null);
 const avatarPreview = ref<string | null>(null);
 const fileInputRef = ref<HTMLInputElement | null>(null);
+const removeAvatar = ref(false);
 
 // UI state
 const errors = ref<
@@ -97,6 +98,7 @@ const populateForm = () => {
         ? [...props.petsitter.accepted_animal_types]
         : [];
     avatarFile.value = null;
+    removeAvatar.value = false;
     avatarPreview.value =
         props.petsitter.avatar_url ??
         props.petsitter.photo_url ??
@@ -109,6 +111,7 @@ const resetForm = () => {
     generalError.value = '';
     successMessage.value = '';
     avatarFile.value = null;
+    removeAvatar.value = false;
 };
 
 const triggerFileInput = () => {
@@ -121,7 +124,14 @@ const handleAvatarChange = (event: Event) => {
     if (!file) return;
 
     avatarFile.value = file;
+    removeAvatar.value = false;
     avatarPreview.value = URL.createObjectURL(file);
+};
+
+const handleRemoveAvatar = () => {
+    removeAvatar.value = true;
+    avatarFile.value = null;
+    avatarPreview.value = null;
 };
 
 const close = () => {
@@ -171,7 +181,7 @@ const submit = async () => {
 
         let response: Response;
 
-        if (avatarFile.value) {
+        if (avatarFile.value || removeAvatar.value) {
             const formData = new FormData();
             formData.append('_method', 'PUT');
             formData.append('name', name.value.trim());
@@ -194,8 +204,13 @@ const submit = async () => {
             acceptedAnimalTypes.value.forEach((type) =>
                 formData.append('accepted_animal_types[]', type),
             );
-            formData.append('avatar', avatarFile.value);
-            formData.append('photo', avatarFile.value);
+            if (removeAvatar.value) {
+                formData.append('_remove_avatar', '1');
+            }
+            if (avatarFile.value) {
+                formData.append('avatar', avatarFile.value);
+                formData.append('photo', avatarFile.value);
+            }
 
             response = await fetch(`/api/petsitters/${props.petsitter.id}`, {
                 method: 'POST',
@@ -350,6 +365,14 @@ const submit = async () => {
                                 @click="triggerFileInput"
                             >
                                 Alterar foto
+                            </button>
+                            <button
+                                v-if="avatarPreview && !avatarFile"
+                                type="button"
+                                class="btn-patudo-remove-photo"
+                                @click="handleRemoveAvatar"
+                            >
+                                Remover foto
                             </button>
                             <span class="patudo-photo-hint">JPG ou PNG (máx. 20MB)</span>
                             <InputError :message="errors.avatar?.[0] || errors.photo?.[0]" />
@@ -739,6 +762,23 @@ const submit = async () => {
 
 .btn-patudo-photo:hover {
     background-color: #c4450c;
+    color: #ffffff;
+}
+
+.btn-patudo-remove-photo {
+    background-color: transparent;
+    color: #dc2626;
+    border: 1px solid #dc2626;
+    border-radius: 9999px;
+    padding: 0.28rem 0.9rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-patudo-remove-photo:hover {
+    background-color: #dc2626;
     color: #ffffff;
 }
 

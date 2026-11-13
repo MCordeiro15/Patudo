@@ -42,6 +42,7 @@ class BookingSeeder extends Seeder
                 'email' => 'client1@patudo.test',
                 'password' => bcrypt('password'),
                 'email_verified_at' => now(),
+                'phone' => '940000000',
             ]);
         }
 
@@ -51,6 +52,7 @@ class BookingSeeder extends Seeder
                 'email' => 'client2@patudo.test',
                 'password' => bcrypt('password'),
                 'email_verified_at' => now(),
+                'phone' => '950000000',
             ]);
         }
 
@@ -60,6 +62,7 @@ class BookingSeeder extends Seeder
                 'email' => 'client3@patudo.test',
                 'password' => bcrypt('password'),
                 'email_verified_at' => now(),
+                'phone' => '960000000',
             ]);
         }
 
