@@ -230,6 +230,10 @@ const canPost = computed(
     () => isOwnProfile.value && petsitter.value?.approval_status === 'approved',
 );
 
+function navigateToMyProfile() {
+    window.location.href = '/petsitters/profile';
+}
+
 // Carrega as publicações do petsitter a partir da API.
 // Loads the petsitter's posts from the API.
 const loadPosts = async () => {
@@ -423,16 +427,13 @@ const saveAvailability = async () => {
                     <a href="/notifications" class="text-dark">
                         <Bell :size="25" />
                     </a>
-                    <Link
-                        :href="
-                            petsitter
-                                ? `/petsitters/${petsitter.user_id}`
-                                : '/profile'
-                        "
-                        class="text-dark"
+                    <button
+                        type="button"
+                        class="text-dark p-0 border-0 bg-transparent"
+                        @click="navigateToMyProfile()"
                     >
                         <UserRound :size="25" />
-                    </Link>
+                    </button>
                 </div>
             </nav>
 
