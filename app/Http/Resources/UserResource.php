@@ -21,7 +21,7 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $avatarUrl = null;
+        $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($this->name ?? 'U') . '&background=random';
 
         // Se o usuário é petsitter, usa a foto do perfil do petsitter
         if ($this->isPetsitter() && $this->relationLoaded('petsitter')) {

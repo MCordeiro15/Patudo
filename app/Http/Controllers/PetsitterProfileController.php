@@ -64,7 +64,9 @@ class PetsitterProfileController extends Controller
                 'user_id' => $petsitter->user_id,
                 'name' => $petsitter->user->name,
                 'phone' => $petsitter->user->phone,
-                'avatar_url' => $petsitter->profile_photo ? Storage::disk('public')->url($petsitter->profile_photo) : null,
+                'avatar_url' => $petsitter->profile_photo
+                    ? Storage::disk('public')->url($petsitter->profile_photo)
+                    : 'https://ui-avatars.com/api/?name=' . urlencode($petsitter->user->name ?? 'P') . '&background=random',
                 'biography' => $petsitter->biography,
                 'experience' => $petsitter->experience ?? '',
                 'service_location' => $petsitter->service_location,
