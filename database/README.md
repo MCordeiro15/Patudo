@@ -38,7 +38,7 @@ A base de dados SQLite (`database.sqlite`) já está incluída no repositório G
 
 | Tipo | Email | Password |
 |------|-------|----------|
-| Admin | `admin@admin.com` | `password` |
+| Admin | `admin@admin.com` | `admin1234` |
 | Teste | `test@example.com` | `password` |
 | Sofia (Petsitter) | `sofia@patudo.test` | `password` |
 | Tiago (Petsitter) | `tiago@patudo.test` | `password` |
