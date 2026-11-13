@@ -32,9 +32,11 @@ class PetsitterResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
-            'avatar_url' => $this->profile_photo
-                ? Storage::disk('public')->url($this->profile_photo)
-                : 'https://ui-avatars.com/api/?name=' . urlencode($this->user->name ?? 'P') . '&background=random',
+            'avatar_url' => $this->profile_photo_data
+                ? rtrim($this->profile_photo_data, "\n")
+                : ($this->profile_photo
+                    ? Storage::disk('public')->url($this->profile_photo)
+                    : 'https://ui-avatars.com/api/?name=' . urlencode($this->user->name ?? 'P') . '&background=random'),
             'profile_photo' => $this->profile_photo,
             'short_bio' => $this->short_bio,
             'experience' => $this->experience,
