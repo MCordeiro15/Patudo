@@ -42,7 +42,7 @@ Os dados de teste são gerados pelos **seeders** do Laravel. Não versionamos o 
 
 ## O que é criado pelos seeders
 
-- **11 Users**: Admin, Test User, 6 Petsitters (Sofia, Tiago, João, Inês, Maria, Rui) e 3 Clientes (Ana, Pedro, Carla)
+- **12 Users**: Admin, Test User, Miguel, 6 Petsitters (Sofia, Tiago, João, Inês, Maria, Rui) e 3 Clientes (Ana, Pedro, Carla)
 - **7 Petsitters**: Perfis completos com biografia, experiência, preço, localização e avaliações
 - **10 Animais**: Pets associados a cada user
 - **15 Posts**: Posts de exemplo dos petsitters
@@ -61,6 +61,7 @@ Os dados de teste são gerados pelos **seeders** do Laravel. Não versionamos o 
 | Inês (Petsitter) | `ines@patudo.test` | `password` |
 | Maria (Petsitter) | `maria@patudo.test` | `password` |
 | Rui (Petsitter) | `rui@patudo.test` | `password` |
+| Miguel | `miguel@gmail.com` | `password` |
 | Ana (Cliente) | `client1@patudo.test` | `password` |
 | Pedro (Cliente) | `client2@patudo.test` | `password` |
 | Carla (Cliente) | `client3@patudo.test` | `password` |

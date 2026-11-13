@@ -107,7 +107,17 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 4. Create posts for petsitters
+        // 4. Create Miguel's user only if it doesn't exist
+        User::firstOrCreate(
+            ['email' => 'miguel@gmail.com'],
+            [
+                'name' => 'Miguel',
+                'password' => bcrypt('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // 5. Create posts for petsitters
         $this->call(PostSeeder::class);
 
         // 5. Create bookings and reviews
