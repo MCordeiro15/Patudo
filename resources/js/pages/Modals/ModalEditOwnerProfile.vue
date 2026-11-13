@@ -1,5 +1,3 @@
-<!-- Página de perfil do utilizador. Mostra e permite editar informações pessoais. -->
-<!-- User profile page. Shows and allows editing personal information. -->
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 
@@ -11,8 +9,6 @@ export interface OwnerProfileData {
     avatar_url?: string | null;
 }
 
-// Props recebidas do componente pai.
-// Props received from the parent component.
 const props = defineProps<{
     show: boolean;
     user?: OwnerProfileData;
@@ -65,8 +61,6 @@ const handleClose = () => {
     emit('close');
 };
 
-// Processa a submissão do formulário, valida os dados e envia para a API.
-// Processes form submission, validates data, and sends to the API.
 const handleSubmit = () => {
     isLoading.value = true;
 
@@ -122,8 +116,6 @@ const handleDeleteAccount = () => {
                     </button>
                 </div>
 
-                <!-- Formulário para entrada de dados do utilizador. -->
-                <!-- Form for user data input. -->
                 <form @submit.prevent="handleSubmit">
                     <div class="row g-4 mb-3">
                         <div class="col-12 col-md-6">
@@ -234,7 +226,6 @@ const handleDeleteAccount = () => {
     margin: 0;
 }
 
-/* Avatar Circular */
 .patudo-avatar-circle {
     width: 96px;
     height: 96px;
@@ -247,8 +238,7 @@ const handleDeleteAccount = () => {
     justify-content: center;
 }
 
-.patudo-avatar-img,
-.patudo-avatar-placeholder {
+.patudo-avatar-img, .patudo-avatar-placeholder {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -270,7 +260,6 @@ const handleDeleteAccount = () => {
     background-color: #ffc987;
 }
 
-/* Labels e Inputs com contorno terracota fino como no mockup */
 .patudo-field-label {
     font-size: 0.85rem;
     font-weight: 700;
@@ -313,7 +302,6 @@ const handleDeleteAccount = () => {
     box-shadow: 0 0 0 2px rgba(196, 69, 12, 0.18);
 }
 
-/* Botões do Rodapé */
 .btn-patudo-danger {
     display: inline-flex;
     align-items: center;
