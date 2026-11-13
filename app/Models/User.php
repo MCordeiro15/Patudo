@@ -119,4 +119,13 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     {
         return $this->hasMany(SupportTicket::class, 'reported_user_id');
     }
+
+    /**
+     * Relação hasMany com Notification. Retorna todas as notificações deste utilizador.
+     * HasMany relationship with Notification. Returns all notifications for this user.
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 }

@@ -14,6 +14,7 @@ import {
     Star,
     UserRound,
 } from '@lucide/vue';
+import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 interface PetsitterData {
     user_id: number;
@@ -37,6 +38,7 @@ interface PetsitterData {
 const favouritePetsitters = ref<PetsitterData[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
+const showNotifications = ref(false);
 
 function navigateToProfile(userId: number) {
     window.location.href = `/petsitters/${userId}`;
@@ -197,9 +199,9 @@ onMounted(() => {
                     <a href="/messages" class="text-dark">
                         <MessageCircle :size="25" />
                     </a>
-                    <a href="/notifications" class="text-dark">
+                    <button type="button" class="text-dark bg-transparent border-0 p-0" @click="showNotifications = true">
                         <Bell :size="25" />
-                    </a>
+                    </button>
                     <button
                         type="button"
                         class="text-dark p-0 border-0 bg-none"
@@ -342,6 +344,11 @@ onMounted(() => {
             </div>
         </div>
     </main>
+
+    <ModalNotifications
+        :show="showNotifications"
+        @close="showNotifications = false"
+    />
 </template>
 
 <style scoped>

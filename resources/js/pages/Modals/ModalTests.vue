@@ -9,6 +9,7 @@ import ModalEditOwnerProfile from '@/pages/Modals/ModalEditOwnerProfile.vue';
 import ModalEditPetsitterProfile from '@/pages/Modals/ModalEditPetsitterProfile.vue';
 import ModalFormPetsitter from '@/pages/Modals/ModalFormPetsitter.vue';
 import ModalNewPost from '@/pages/Modals/ModalNewPost.vue';
+import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import ModalPetDetails from '@/pages/Modals/ModalPetDetails.vue';
 import ModalReportPetsitter from '@/pages/Modals/ModalReportPetsitter.vue';
 import ModalReviewPetsitter from '@/pages/Modals/ModalReviewPetsitter.vue';
@@ -18,6 +19,7 @@ const showEditOwner = ref(false);
 const showEditPetsitter = ref(false);
 const showFormPetsitter = ref(false);
 const showNewPost = ref(false);
+const showNotifications = ref(false);
 const showPetDetails = ref(false);
 const showReport = ref(false);
 const showReview = ref(false);
@@ -63,7 +65,7 @@ const mockPet = {
             Bancada de Testes de Modais
         </h1>
         <p style="color: #6b7280; margin-bottom: 24px">
-            Testa a abertura, fecho e formulários dos 8 modais do Patudo:
+            Testa a abertura, fecho e formulários dos 9 modais do Patudo:
         </p>
 
         <div style="display: flex; gap: 12px; flex-wrap: wrap">
@@ -107,6 +109,9 @@ const mockPet = {
             <button type="button" class="btn-pill" @click="showReport = true">
                 8. Denunciar Petsitter
             </button>
+            <button type="button" class="btn-pill" @click="showNotifications = true">
+                9. Notificações
+            </button>
         </div>
 
         <ModalAddPet :show="showAddPet" @close="showAddPet = false" />
@@ -138,6 +143,8 @@ const mockPet = {
         <ModalReviewPetsitter :show="showReview" @close="showReview = false" />
 
         <ModalReportPetsitter :show="showReport" @close="showReport = false" />
+
+        <ModalNotifications :show="showNotifications" @close="showNotifications = false" />
     </div>
 </template>
 

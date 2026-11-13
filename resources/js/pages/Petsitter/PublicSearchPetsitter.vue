@@ -13,6 +13,7 @@ import {
     UserRound,
 } from '@lucide/vue';
 import { ref, onMounted } from 'vue';
+import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 //defineOptions({ layout: null });
 
@@ -47,6 +48,7 @@ const petsitters = ref<PetsitterApiData[]>([]);
 const favourites = ref<number[]>([]);
 const error = ref<string | null>(null);
 const loading = ref(true);
+const showNotifications = ref(false);
 
 function navigateToProfile(userId: number) {
     window.location.href = `/petsitters/${userId}`;
@@ -269,9 +271,9 @@ onMounted(() => {
                     <a href="/messages" class="text-dark"
                         ><MessageCircle :size="25"
                     /></a>
-                    <a href="/notifications" class="text-dark"
-                        ><Bell :size="25"
-                    /></a>
+                    <button type="button" class="text-dark bg-transparent border-0 p-0" @click="showNotifications = true">
+                        <Bell :size="25" />
+                    </button>
                     <button
                         type="button"
                         class="text-dark p-0 border-0 bg-none"
@@ -579,6 +581,11 @@ onMounted(() => {
             </div>
         </div>
     </main>
+
+    <ModalNotifications
+        :show="showNotifications"
+        @close="showNotifications = false"
+    />
 </template>
 
 <style scoped>

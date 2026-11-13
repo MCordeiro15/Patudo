@@ -8,6 +8,7 @@
 use App\Http\Controllers\API\AnimalController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\FavouriteController;
+use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\PetsitterAvailabilityController;
 use App\Http\Controllers\API\PetsitterController;
 use App\Http\Controllers\API\PostController;
@@ -59,7 +60,13 @@ Route::get('/petsitters/{id}/availability', [PetsitterAvailabilityController::cl
 // Rota pública para listar petsitters aprovados
 Route::get('/petsitters/public', [PetsitterController::class, 'publicIndex']);
 
-Route::middleware('auth:sanctum')->group(function () {
+// Authenticated API routes with session support for SPA
+Route::middleware([
+    'auth:sanctum',
+    \Illuminate\Cookie\Middleware\EncryptCookies::class,
+    \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    \Illuminate\Session\Middleware\StartSession::class,
+])->group(function () {
     extracted();
     Route::get('/petsitters/{petsitter}/posts', [PostController::class, 'byPetsitter']);
     Route::apiResource('posts', PostController::class);
@@ -88,4 +95,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/support-tickets/{ticket}', [SupportTicketsController::class, 'show']);
     Route::post('/support-tickets/{ticket}/claim', [SupportTicketsController::class, 'claim']);
     Route::post('/support-tickets/{ticket}/close', [SupportTicketsController::class, 'close']);
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications', [NotificationController::class, 'store']);
+    Route::get('/notifications/{notification}', [NotificationController::class, 'show']);
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
 });

@@ -15,6 +15,7 @@ import {
     UserRound,
 } from '@lucide/vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
+import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 //defineOptions({ layout: null });
 
@@ -35,6 +36,7 @@ const petsitters = ref<PetsitterApiData[]>([]);
 const favourites = ref<number[]>([]);
 const error = ref<string | null>(null);
 const loading = ref(true);
+const showNotifications = ref(false);
 
 function isFavourite(petsitterId: number): boolean {
     return favourites.value.includes(petsitterId);
@@ -256,9 +258,9 @@ onMounted(() => {
                     <a href="/messages" class="text-dark">
                         <MessageCircle :size="25" />
                     </a>
-                    <a href="/notifications" class="text-dark">
+                    <button type="button" class="text-dark bg-transparent border-0 p-0" @click="showNotifications = true">
                         <Bell :size="25" />
-                    </a>
+                    </button>
                     <button
                         type="button"
                         class="text-dark p-0 border-0 bg-transparent"
@@ -426,6 +428,11 @@ onMounted(() => {
             </div>
         </div>
     </main>
+
+    <ModalNotifications
+        :show="showNotifications"
+        @close="showNotifications = false"
+    />
 </template>
 
 <style scoped>

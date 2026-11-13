@@ -17,6 +17,7 @@ import logoPatudo from '@/../../assets/logoPatudo.svg';
 import { computed, onMounted, ref } from 'vue';
 import ModalEditPetsitterProfile from '@/pages/Modals/ModalEditPetsitterProfile.vue';
 import ModalNewPost from '@/pages/Modals/ModalNewPost.vue';
+import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import type { PetsitterProfile as PetsitterProfileType, Post } from '@/types';
 
 // Tipo TypeScript para PetsitterProfile.
@@ -71,6 +72,7 @@ const saveSuccess = ref(false);
 
 // Edit profile modal state
 const showEditProfileModal = ref(false);
+const showNotifications = ref(false);
 
 // Propriedade computada que retorna os dados do petsitter a partir das props.
 // Computed property that returns petsitter data from props.
@@ -424,9 +426,9 @@ const saveAvailability = async () => {
                     <a href="/messages" class="text-dark">
                         <MessageCircle :size="25" />
                     </a>
-                    <a href="/notifications" class="text-dark">
+                    <button type="button" class="text-dark bg-transparent border-0 p-0" @click="showNotifications = true">
                         <Bell :size="25" />
-                    </a>
+                    </button>
                     <button
                         type="button"
                         class="text-dark p-0 border-0 bg-transparent"
@@ -826,6 +828,12 @@ const saveAvailability = async () => {
             :show="showNewPostModal"
             @close="showNewPostModal = false"
             @created="onPostCreated"
+        />
+
+        <!-- Notifications Modal -->
+        <ModalNotifications
+            :show="showNotifications"
+            @close="showNotifications = false"
         />
     </main>
 </template>

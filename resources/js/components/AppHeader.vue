@@ -2,8 +2,8 @@
 <!-- Application header component. Contains navigation, search, and user menu. -->
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Folder, Home, LayoutGrid, Menu, Search } from '@lucide/vue';
-import { computed } from 'vue';
+import { Bell, BookOpen, Folder, Home, LayoutGrid, Menu, Search } from '@lucide/vue';
+import { computed, ref } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
@@ -33,11 +33,16 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import UserMenuContent from '@/components/UserMenuContent.vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { getInitials } from '@/composables/useInitials';
+import { useNotifications } from '@/composables/useNotifications';
 import { toUrl } from '@/lib/utils';
 import type { BreadcrumbItem, NavItem } from '@/types';
+
+const showNotifications = ref(false);
+const { unreadCount } = useNotifications();
 
 // Tipo TypeScript para Props.
 // TypeScript type for Props.
@@ -201,6 +206,23 @@ const rightNavItems: NavItem[] = [
                             />
                         </Button>
 
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            class="group h-9 w-9 cursor-pointer relative"
+                            @click="showNotifications = true"
+                        >
+                            <Bell
+                                class="size-5 opacity-80 group-hover:opacity-100"
+                            />
+                            <span
+                                v-if="unreadCount > 0"
+                                class="absolute top-1 right-1 inline-flex items-center justify-center h-4 w-4 rounded-full bg-red-500 text-[10px] font-bold text-white"
+                            >
+                                {{ unreadCount > 9 ? '9+' : unreadCount }}
+                            </span>
+                        </Button>
+
                         <div class="hidden space-x-1 lg:flex">
                             <template
                                 v-for="item in rightNavItems"
@@ -281,4 +303,10 @@ const rightNavItems: NavItem[] = [
             </div>
         </div>
     </div>
+
+    <ModalNotifications
+        :show="showNotifications"
+        @close="showNotifications = false"
+        @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
+    />
 </template>
