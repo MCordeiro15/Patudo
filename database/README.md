@@ -53,9 +53,16 @@ Quando fazes `git push`, um **git hook** exporta automaticamente todos os dados 
 5. O seeder é commitado e pushado
 6. Os colegas fazem `git pull` e `php artisan migrate:fresh --seed` para receberem tudo
 
-**Para os colegas configurarem o git hook:**
+**Para os colegas configurarem o git hook (uma vez após `git pull`):**
 
 ```bash
+bash scripts/setup-hooks.sh
+```
+
+Ou manualmente:
+
+```bash
+cp scripts/pre-push.sh .git/hooks/pre-push
 chmod +x .git/hooks/pre-push
 ```
 
