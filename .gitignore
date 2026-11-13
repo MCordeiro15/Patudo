@@ -1,5 +1,4 @@
 database/database.sqlite
-database/seeders/ExportedDataSeeder.php
 /.phpunit.cache
 /bootstrap/ssr
 /node_modules
