@@ -1,3 +1,5 @@
+<!-- Componente da barra lateral de navegação. Contém menu de links e atalhos. -->
+<!-- Sidebar navigation component. Contains link menu and shortcuts. -->
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { BookOpen, FolderGit2, LayoutGrid } from '@lucide/vue';

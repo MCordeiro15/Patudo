@@ -1,3 +1,5 @@
+// Componente UI sidebar do shadcn/ui. Parte da biblioteca de componentes base do projeto.
+// sidebar UI component from shadcn/ui. Part of the project's base component library.
 import type { ComputedRef, Ref } from "vue"
 import { createContext } from "reka-ui"
 

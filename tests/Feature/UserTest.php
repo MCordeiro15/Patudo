@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: UserTest.php
+ * PHP file: UserTest.php
+ */
 use App\Models\User;
 
 test('unauthenticated user cannot access user endpoints', function () {

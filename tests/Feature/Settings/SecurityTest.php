@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: SecurityTest.php
+ * PHP file: SecurityTest.php
+ */
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Testing\AssertableInertia as Assert;

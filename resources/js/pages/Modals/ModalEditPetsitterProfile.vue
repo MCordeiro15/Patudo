@@ -1,3 +1,5 @@
+<!-- Página de perfil do utilizador. Mostra e permite editar informações pessoais. -->
+<!-- User profile page. Shows and allows editing personal information. -->
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
 import { nextTick, ref, watch } from 'vue';
@@ -9,6 +11,8 @@ const emit = defineEmits<{
     (e: 'saved'): void;
 }>();
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<{
     show: boolean;
     petsitter: PetsitterProfile | null;
@@ -193,6 +197,8 @@ const submit = async () => {
 
                         <!-- Body -->
                         <div class="modal-body">
+                            <!-- Formulário para entrada de dados do utilizador. -->
+                            <!-- Form for user data input. -->
                             <form @submit.prevent="submit">
                                 <!-- General error -->
                                 <div

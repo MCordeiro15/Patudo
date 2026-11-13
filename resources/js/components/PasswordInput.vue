@@ -1,3 +1,5 @@
+<!-- Componente de campo de password com toggle de visibilidade. -->
+<!-- Password input field component with visibility toggle. -->
 <script setup lang="ts">
 import { Eye, EyeOff } from '@lucide/vue';
 import { ref, useTemplateRef } from 'vue';
@@ -7,6 +9,8 @@ import { cn } from '@/lib/utils';
 
 defineOptions({ inheritAttrs: false });
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<{
     class?: HTMLAttributes['class'];
     autofocus?: boolean;

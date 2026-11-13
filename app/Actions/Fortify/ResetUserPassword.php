@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ação personalizada do Laravel Fortify para redefinição de password. Atualiza a password do utilizador após validação do token.
+ * Custom Laravel Fortify action for password reset. Updates the user's password after token validation.
+ */
 namespace App\Actions\Fortify;
 
 use App\Concerns\PasswordValidationRules;

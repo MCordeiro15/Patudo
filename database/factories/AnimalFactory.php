@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Factory para gerar dados fictícios de animais nos testes. Cria animais com nome, espécie, raça e tamanho aleatórios.
+ * Factory to generate fake animal data in tests. Creates animals with random name, species, breed, and size.
+ */
 namespace Database\Factories;
 
 use App\Models\Animal;
@@ -7,6 +12,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
+ * @extends Factory<Animal>
  * @extends Factory<Animal>
  */
 class AnimalFactory extends Factory

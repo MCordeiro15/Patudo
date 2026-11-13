@@ -1,3 +1,5 @@
+<!-- Página de recuperação de password. Formulário para solicitar redefinição. -->
+<!-- Password recovery page. Form to request a password reset. -->
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
@@ -32,6 +34,8 @@ defineProps<{
     </div>
 
     <div class="space-y-6">
+        <!-- Formulário para entrada de dados do utilizador. -->
+        <!-- Form for user data input. -->
         <Form v-bind="email.form()" v-slot="{ errors, processing }">
             <div class="grid gap-2">
                 <Label for="email">Email address</Label>

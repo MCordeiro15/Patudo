@@ -1,3 +1,5 @@
+<!-- Componente que exibe o logotipo textual da aplicação Patudo. -->
+<!-- Component that displays the textual logo of the Patudo application. -->
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';

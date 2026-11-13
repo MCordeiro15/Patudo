@@ -1,3 +1,5 @@
+<!-- Componente para verificar uma passkey durante a autenticação. -->
+<!-- Component to verify a passkey during authentication. -->
 <script setup lang="ts">
 import type { UrlMethodPair } from '@inertiajs/core';
 import { router } from '@inertiajs/vue3';
@@ -8,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 
+// Tipo TypeScript para Props.
+// TypeScript type for Props.
 type Props = {
     routes?: {
         options: UrlMethodPair;
@@ -18,6 +22,8 @@ type Props = {
     separator?: string;
 };
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<Props>();
 
 const { verify, isLoading, error, isSupported } = usePasskeyVerify({

@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Modelo Eloquent para animais de estimação. Representa um animal com dados como espécie, raça, tamanho, necessidades especiais, peso e foto. Relaciona-se com o proprietário (User) e com reservas (Booking).
+ * Eloquent model for pets. Represents an animal with data like species, breed, size, special needs, weight, and photo. Relates to the owner (User) and bookings (Booking).
+ */
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,6 +34,10 @@ class Animal extends Model
 {
     use HasFactory;
 
+    /**
+     * Campos que podem ser preenchidos em massa via create() ou fill().
+     * Fields that can be mass-assigned via create() or fill().
+     */
     protected $fillable = [
         'user_id',
         'name',
@@ -43,15 +52,27 @@ class Animal extends Model
         'weight',
     ];
 
+    /**
+     * Definições de conversão automática de tipos para atributos do modelo.
+     * Automatic type casting definitions for model attributes.
+     */
     protected $casts = [
         'weight' => 'decimal:2',
     ];
 
+    /**
+     * Relação belongsTo com User. Retorna o proprietário/criador deste registo.
+     * BelongsTo relationship with User. Returns the owner/creator of this record.
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Relação belongsToMany com Booking via tabela intermédia animal_bookings. Retorna todas as reservas deste animal.
+     * BelongsToMany relationship with Booking via intermediate table animal_bookings. Returns all bookings of this animal.
+     */
     public function bookings(): BelongsToMany
     {
         return $this->belongsToMany(

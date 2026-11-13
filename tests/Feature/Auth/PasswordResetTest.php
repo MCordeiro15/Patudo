@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: PasswordResetTest.php
+ * PHP file: PasswordResetTest.php
+ */
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Notification;

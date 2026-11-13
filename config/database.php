@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: database.php
+ * PHP file: database.php
+ */
 use Illuminate\Support\Str;
 use Pdo\Mysql;
 

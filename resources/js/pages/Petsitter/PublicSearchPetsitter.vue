@@ -1,3 +1,5 @@
+<!-- Página Vue: PublicSearchPetsitter.vue -->
+<!-- Vue page: PublicSearchPetsitter.vue -->
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 import {
@@ -32,6 +34,8 @@ interface PetsitterApiData {
     };
 }
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<{
     auth: Auth;
 }>();
@@ -231,6 +235,8 @@ onMounted(() => {
     <!-- Para utilizador logado -->
     <main v-if="auth.user" class="min-vh-100 py-4 patudo-page">
         <div class="container">
+            <!-- Barra de navegação com links principais. -->
+            <!-- Navigation bar with main links. -->
             <nav
                 class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
             >

@@ -1,3 +1,5 @@
+<!-- Página Vue: ModalNewPost.vue -->
+<!-- Vue page: ModalNewPost.vue -->
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import InputError from '@/components/InputError.vue';
@@ -8,6 +10,8 @@ const emit = defineEmits<{
     (e: 'created', post: Post): void;
 }>();
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<{
     show: boolean;
 }>();
@@ -121,6 +125,8 @@ const submit = async () => {
                         </div>
 
                         <div class="modal-body">
+                            <!-- Formulário para entrada de dados do utilizador. -->
+                            <!-- Form for user data input. -->
                             <form @submit.prevent="submit">
                                 <div
                                     v-if="generalError"

@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Política de autorização para utilizadores. Define quem pode visualizar, atualizar e suspender utilizadores (apenas admin).
+ * Authorization policy for users. Defines who can view, update, and suspend users (only admin).
+ */
 namespace App\Policies;
 
 use App\Models\User;
@@ -7,8 +12,9 @@ use App\Models\User;
 class UserPolicy
 {
     /**
-     * Determine whether the user can view any models.
-     */
+ * Determine whether the user can view any models.
+ * Determine whether the user can view any models.
+ */
     public function viewAny(User $user): bool
     {
         return $user->isAdmin();

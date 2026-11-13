@@ -1,3 +1,5 @@
+<!-- Página de registo. Formulário para criar nova conta de utilizador. -->
+<!-- Registration page. Form to create a new user account. -->
 <script setup lang="ts">
 import {Link} from '@inertiajs/vue3';
 import {ref} from 'vue';
@@ -57,6 +59,8 @@ const register = async () => {
                     <h1 class="auth-title text-center">Registar</h1>
                     <p class="auth-subtitle text-center mb-4">Sê bem-vindo!</p>
 
+                    <!-- Formulário para entrada de dados do utilizador. -->
+                    <!-- Form for user data input. -->
                     <form @submit.prevent="register">
                         <div class="mb-3">
                             <input v-model="name" type="text" class="form-control auth-input" placeholder="Nome de utilizador" required/>

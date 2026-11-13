@@ -1,3 +1,5 @@
+<!-- Página Vue: Appearance.vue -->
+<!-- Vue page: Appearance.vue -->
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 import AppearanceTabs from '@/components/AppearanceTabs.vue';

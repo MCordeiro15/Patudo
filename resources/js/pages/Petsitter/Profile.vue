@@ -1,3 +1,5 @@
+<!-- Página de perfil do utilizador. Mostra e permite editar informações pessoais. -->
+<!-- User profile page. Shows and allows editing personal information. -->
 <script setup lang="ts">
 import {Head, Link} from '@inertiajs/vue3';
 import {
@@ -18,6 +20,8 @@ import ModalNewPost from '@/pages/Modals/ModalNewPost.vue';
 import type {PetsitterProfile as PetsitterProfileType, Post} from '@/types';
 
 
+// Tipo TypeScript para PetsitterProfile.
+// TypeScript type for PetsitterProfile.
 type PetsitterProfile = {
     id: number;
     user_id: number;
@@ -37,6 +41,8 @@ type PetsitterProfile = {
     updated_at: string;
 };
 
+// Opções de dias da semana para o seletor de disponibilidade.
+// Weekday options for the availability selector.
 const DAY_OPTIONS: Array<{ value: string; label: string }> = [
     {value: 'monday', label: 'Segunda'},
     {value: 'tuesday', label: 'Terça'},
@@ -47,6 +53,8 @@ const DAY_OPTIONS: Array<{ value: string; label: string }> = [
     {value: 'sunday', label: 'Domingo'},
 ];
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<{
     petsitter?: PetsitterProfile | null;
     isOwnProfile?: boolean;
@@ -63,11 +71,21 @@ const saveSuccess = ref(false);
 // Edit profile modal state
 const showEditProfileModal = ref(false);
 
+// Propriedade computada que retorna os dados do petsitter a partir das props.
+// Computed property that returns petsitter data from props.
 const petsitter = computed(() => props.petsitter);
+// Propriedade computada que verifica se o perfil pertence ao utilizador autenticado.
+// Computed property that checks if the profile belongs to the authenticated user.
 const isOwnProfile = computed(() => props.isOwnProfile ?? false);
+// Propriedade computada que verifica se o utilizador é administrador.
+// Computed property that checks if the user is an administrator.
 const isAdmin = computed(() => props.isAdmin ?? false);
+// Propriedade computada que determina se o utilizador pode editar o perfil.
+// Computed property that determines if the user can edit the profile.
 const canEdit = computed(() => isOwnProfile.value || isAdmin.value);
 
+// Propriedade computada que retorna os dias de disponibilidade atuais.
+// Computed property that returns the current availability days.
 const currentAvailabilityDays = computed(() => {
     return petsitter.value?.availability_days ?? [];
 });
@@ -85,6 +103,8 @@ const animalTypeLabelMap: Record<string, string> = {
     other: 'Outro',
 };
 
+// Propriedade computada que gera as tags de serviço a partir dos tamanhos e tipos de animal aceites.
+// Computed property that generates service tags from accepted animal sizes and types.
 const serviceTags = computed(() => {
     if (!petsitter.value) return ['Cuidador'];
     const sizeTags = (petsitter.value.accepted_sizes ?? []).map(
@@ -97,8 +117,12 @@ const serviceTags = computed(() => {
     return tags.length > 0 ? tags : ['Cuidador'];
 });
 
+// Formata um valor numérico como preço em euros.
+// Formats a numeric value as a price in euros.
 const formatPrice = (price: number) => `${price.toFixed(0)} €`;
 
+// Formata uma classificação numérica para exibição.
+// Formats a numeric rating for display.
 const formatRating = (rating: number | null) => {
     if (rating === null) {
         return 'Sem avaliações';
@@ -106,6 +130,8 @@ const formatRating = (rating: number | null) => {
     return rating.toString().replace('.', ',');
 };
 
+// Formata uma data/hora para exibição no formato pt-PT.
+// Formats a date/time for display in pt-PT format.
 const formatDateTime = (dateTime: string | null) => {
     if (!dateTime) {
         return '--';
@@ -120,6 +146,8 @@ const formatDateTime = (dateTime: string | null) => {
     )}`;
 };
 
+// Propriedade computada que formata a data de registo como string legível.
+// Computed property that formats the registration date as a readable string.
 const memberSinceLabel = computed(() => {
     if (!petsitter.value?.created_at) {
         return '--';
@@ -127,30 +155,44 @@ const memberSinceLabel = computed(() => {
     return new Date(petsitter.value.created_at).toLocaleDateString('pt-PT');
 });
 
+// Propriedade computada que retorna o nome de exibição do utilizador.
+// Computed property that returns the user's display name.
 const displayName = computed(() => {
     return petsitter.value?.name ?? 'Petsitter';
 });
 
+// Propriedade computada que retorna a localização de serviço.
+// Computed property that returns the service location.
 const displayLocation = computed(() => {
     return petsitter.value?.service_location ?? '--';
 });
 
+// Propriedade computada que retorna a biografia ou mensagem padrão.
+// Computed property that returns the biography or default message.
 const displayBiography = computed(() => {
     return petsitter.value?.biography ?? 'Este petsitter ainda não adicionou uma biografia.';
 });
 
+// Propriedade computada que retorna a experiência do petsitter.
+// Computed property that returns the petsitter's experience.
 const displayExperience = computed(() => {
     return petsitter.value?.experience ?? '';
 });
 
+// Propriedade computada que retorna o preço por dia.
+// Computed property that returns the price per day.
 const displayPricePerDay = computed(() => {
     return petsitter.value?.price_per_day ?? 0;
 });
 
+// Propriedade computada que retorna a classificação média.
+// Computed property that returns the average rating.
 const displayRating = computed(() => {
     return null;
 });
 
+// Propriedade computada que retorna o número de avaliações.
+// Computed property that returns the number of reviews.
 const displayReviewsCount = computed(() => {
     return 0;
 });
@@ -168,6 +210,8 @@ const canPost = computed(
         petsitter.value?.approval_status === 'approved',
 );
 
+// Carrega as publicações do petsitter a partir da API.
+// Loads the petsitter's posts from the API.
 const loadPosts = async () => {
     if (!petsitter.value) return;
 
@@ -207,8 +251,12 @@ const onPostCreated = (post: Post) => {
 
 onMounted(loadPosts);
 
+// Propriedade computada que verifica se o perfil existe.
+// Computed property that checks if the profile exists.
 const hasProfile = computed(() => petsitter.value != null);
 
+// Inicia o modo de edição da disponibilidade, copiando os dias atuais.
+// Starts availability edit mode, copying the current days.
 const startEditing = () => {
     editingDays.value = [...currentAvailabilityDays.value];
     isEditing.value = true;
@@ -216,12 +264,16 @@ const startEditing = () => {
     saveSuccess.value = false;
 };
 
+// Cancela o modo de edição e limpa mensagens de erro/sucesso.
+// Cancels edit mode and clears error/success messages.
 const cancelEditing = () => {
     isEditing.value = false;
     saveError.value = null;
     saveSuccess.value = false;
 };
 
+// Altera o estado de um dia na lista de edição (adiciona ou remove).
+// Toggles a day's state in the editing list (adds or removes).
 const toggleDay = (day: string) => {
     const index = editingDays.value.indexOf(day);
     if (index >= 0) {
@@ -231,6 +283,8 @@ const toggleDay = (day: string) => {
     }
 };
 
+// Guarda os dias de disponibilidade atualizados via API PUT.
+// Saves the updated availability days via API PUT.
 const saveAvailability = async () => {
     saving.value = true;
     saveError.value = null;
@@ -292,8 +346,12 @@ const saveAvailability = async () => {
 <template>
     <Head :title="isOwnProfile ? 'O meu perfil' : 'Perfil do Petsitter'"/>
 
+    <!-- Conteúdo principal da página. -->
+    <!-- Main content area of the page. -->
     <main class="min-vh-100 py-4 patudo-page">
         <div class="container">
+            <!-- Barra de navegação com links principais. -->
+            <!-- Navigation bar with main links. -->
             <nav
                 class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4 position-relative"
             >
@@ -364,6 +422,8 @@ const saveAvailability = async () => {
                     </section>
 
                     <template v-else>
+                        <!-- Secção de informações principais do perfil: nome, localização, tags de serviço, experiência, rating e data de membro. -->
+                        <!-- Main profile information section: name, location, service tags, experience, rating, and member since date. -->
                         <section
                             class="card border border-primary rounded-4 p-3 p-md-4 mb-3"
                         >
@@ -425,6 +485,8 @@ const saveAvailability = async () => {
                             </div>
                         </section>
 
+                        <!-- Secção de biografia do petsitter com botão de editar perfil. -->
+                        <!-- Petsitter biography section with edit profile button. -->
                         <section
                             class="card border border-primary rounded-4 p-3 p-md-4 mb-3"
                         >
@@ -447,6 +509,8 @@ const saveAvailability = async () => {
 
                         <div class="row g-3 mb-3">
                             <div class="col-12 col-lg-6">
+                                <!-- Secção de serviços e preços do petsitter. -->
+                                <!-- Petsitter services and pricing section. -->
                                 <section
                                     class="card border border-primary rounded-4 p-3 p-md-4 h-100"
                                 >
@@ -463,6 +527,8 @@ const saveAvailability = async () => {
                             </div>
 
                             <div class="col-12 col-lg-6">
+                                <!-- Secção de disponibilidade do petsitter com modo de visualização e edição. -->
+                                <!-- Petsitter availability section with view and edit modes. -->
                                 <section
                                     class="card border border-primary rounded-4 p-3 p-md-4 h-100"
                                 >
@@ -562,6 +628,8 @@ const saveAvailability = async () => {
                             </div>
                         </div>
 
+                        <!-- Secção de publicações do petsitter com lista de posts e botão para criar novo. -->
+                        <!-- Petsitter posts section with post list and create new button. -->
                         <section class="mt-5">
                             <h2 class="text-center fw-bold my-5">Publicações</h2>
 

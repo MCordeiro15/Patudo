@@ -1,3 +1,5 @@
+<!-- Componente UI tooltip do shadcn/ui. Parte da biblioteca de componentes base do projeto. -->
+<!-- tooltip UI component from shadcn/ui. Part of the project's base component library. -->
 <script setup lang="ts">
 import type { TooltipContentEmits, TooltipContentProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"

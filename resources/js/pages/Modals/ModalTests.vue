@@ -1,3 +1,5 @@
+<!-- Página Vue: ModalTests.vue -->
+<!-- Vue page: ModalTests.vue -->
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Head } from '@inertiajs/vue3';

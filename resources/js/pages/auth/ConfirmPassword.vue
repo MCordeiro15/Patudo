@@ -1,3 +1,5 @@
+<!-- Página Vue: ConfirmPassword.vue -->
+<!-- Vue page: ConfirmPassword.vue -->
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';

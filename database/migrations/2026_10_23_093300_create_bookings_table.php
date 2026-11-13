@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Migração que cria a tabela bookings com campos para datas (start_date, end_date), estado, preço total e notas.
+ * Migration that creates the bookings table with fields for dates (start_date, end_date), status, total price, and notes.
+ */
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -7,8 +12,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
-     */
+ * Run the migrations.
+ * Run the migrations.
+ */
     public function up(): void
     {
         Schema::create('bookings', function (Blueprint $table) {
@@ -27,8 +33,9 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
-     */
+         * Reverte a migração, removendo as alterações feitas pelo método up.
+         * Reverts the migration, removing the changes made by the up method.
+         */
     public function down(): void
     {
         Schema::dropIfExists('bookings');

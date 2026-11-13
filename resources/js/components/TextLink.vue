@@ -1,7 +1,11 @@
+<!-- Componente de link de texto estilizado. -->
+<!-- Styled text link component. -->
 <script setup lang="ts">
 import type { LinkComponentBaseProps, Method } from '@inertiajs/core';
 import { Link } from '@inertiajs/vue3';
 
+// Tipo TypeScript para Props.
+// TypeScript type for Props.
 type Props = {
     href: LinkComponentBaseProps['href'];
     tabindex?: number;

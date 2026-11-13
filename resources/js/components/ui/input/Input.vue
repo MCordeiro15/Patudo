@@ -1,8 +1,12 @@
+<!-- Componente UI input do shadcn/ui. Parte da biblioteca de componentes base do projeto. -->
+<!-- input UI component from shadcn/ui. Part of the project's base component library. -->
 <script setup lang="ts">
 import type { HTMLAttributes } from "vue"
 import { useVModel } from "@vueuse/core"
 import { cn } from "@/lib/utils"
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<{
   defaultValue?: string | number
   modelValue?: string | number

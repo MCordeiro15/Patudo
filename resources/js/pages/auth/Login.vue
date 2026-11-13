@@ -1,3 +1,5 @@
+<!-- Página de login. Formulário de autenticação com email e password. -->
+<!-- Login page. Authentication form with email and password. -->
 <script setup lang="ts">
 import {Link} from '@inertiajs/vue3';
 import {ref} from 'vue';
@@ -54,6 +56,8 @@ const login = async () => {
                         Bem-vindo de volta!
                     </p>
 
+                    <!-- Formulário para entrada de dados do utilizador. -->
+                    <!-- Form for user data input. -->
                     <form @submit.prevent="login">
                         <div class="mb-3">
                             <input v-model="email" type="email" class="form-control auth-input" placeholder="Email"

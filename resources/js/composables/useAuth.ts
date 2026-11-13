@@ -1,3 +1,5 @@
+// Composable para gestão de autenticação no front-end. Fornece estado reativo do utilizador logado, métodos de login/logout e verificação de permissões.
+// Composable for front-end authentication management. Provides reactive state of the logged-in user, login/logout methods, and permission checks.
 import { router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import type { User } from '@/types';

@@ -1,3 +1,5 @@
+<!-- Página Vue: ModalReportPetsitter.vue -->
+<!-- Vue page: ModalReportPetsitter.vue -->
 <script setup lang="ts">
 import { ref } from 'vue';
 
@@ -24,6 +26,8 @@ const handleClose = () => {
     emit('close');
 };
 
+// Processa a submissão do formulário, valida os dados e envia para a API.
+// Processes form submission, validates data, and sends to the API.
 const handleSubmit = () => {
     if (!selectedReason.value) return;
 
@@ -52,6 +56,8 @@ const handleSubmit = () => {
                     </p>
                 </div>
 
+                <!-- Formulário para entrada de dados do utilizador. -->
+                <!-- Form for user data input. -->
                 <form @submit.prevent="handleSubmit">
                      <div class="mb-3">
                         <label class="patudo-section-label d-block mb-2">

@@ -1,3 +1,5 @@
+<!-- Página Vue: ModalAddPet.vue -->
+<!-- Vue page: ModalAddPet.vue -->
 <script setup lang="ts">
 import { ref } from 'vue';
 import type { AnimalFormErrors } from '@/types';

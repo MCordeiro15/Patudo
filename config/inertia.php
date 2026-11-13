@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: inertia.php
+ * PHP file: inertia.php
+ */
 return [
 
     /*

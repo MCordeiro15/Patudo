@@ -1,3 +1,5 @@
+<!-- Layout Vue: AuthLayout.vue -->
+<!-- Vue layout: AuthLayout.vue -->
 <script setup lang="ts">
 import AuthLayout from '@/layouts/auth/AuthSimpleLayout.vue';
 

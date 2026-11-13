@@ -1,3 +1,5 @@
+<!-- Página Vue: Security.vue -->
+<!-- Vue page: Security.vue -->
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
@@ -18,6 +20,8 @@ type Props = {
 } & ManagePasskeysProps &
     ManageTwoFactorProps;
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<Props>();
 
 defineOptions({

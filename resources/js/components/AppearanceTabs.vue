@@ -1,3 +1,5 @@
+<!-- Componente que permite alternar entre temas de aparência (claro, escuro, sistema). -->
+<!-- Component that allows switching between appearance themes (light, dark, system). -->
 <script setup lang="ts">
 import { Monitor, Moon, Sun } from '@lucide/vue';
 import { useAppearance } from '@/composables/useAppearance';

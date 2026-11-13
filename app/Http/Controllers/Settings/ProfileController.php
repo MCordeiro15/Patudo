@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Controlador web para edição do perfil do utilizador. Permite atualizar nome e email, e eliminar a conta.
+ * Web controller for user profile editing. Allows updating name and email, and deleting the account.
+ */
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
@@ -15,8 +20,9 @@ use Inertia\Response;
 class ProfileController extends Controller
 {
     /**
-     * Show the user's profile settings page.
-     */
+ * Show the user's profile settings page.
+ * Show the user's profile settings page.
+ */
     public function edit(Request $request): Response
     {
         return Inertia::render('settings/Profile', [

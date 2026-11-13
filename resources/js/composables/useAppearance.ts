@@ -1,3 +1,5 @@
+// Composable para gerir a aparência (tema claro/escuro) da aplicação. Fornece estado e métodos para alternar temas.
+// Composable to manage the application's appearance (light/dark theme). Provides state and methods to switch themes.
 import type { ComputedRef, Ref } from 'vue';
 import { computed, onMounted, ref } from 'vue';
 import type { Appearance, ResolvedAppearance } from '@/types';
@@ -85,6 +87,8 @@ export function initializeTheme(): void {
 
 const appearance = ref<Appearance>('system');
 
+// Composable para gerir o tema de aparência (claro/escuro/sistema).
+// Composable to manage appearance theme (light/dark/system).
 export function useAppearance(): UseAppearanceReturn {
     onMounted(() => {
         const savedAppearance = localStorage.getItem(

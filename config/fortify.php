@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: fortify.php
+ * PHP file: fortify.php
+ */
 use Laravel\Fortify\Features;
 
 return [

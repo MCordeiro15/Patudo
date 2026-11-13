@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: queue.php
+ * PHP file: queue.php
+ */
 return [
 
     /*

@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Controlador API para gestão de reservas de petsitters. Permite criar reservas, listar reservas do utilizador, ver detalhes e alterar o estado (pending, approved, rejected, completed, cancelled).
+ * API controller for petsitter booking management. Allows creating bookings, listing user's bookings, viewing details, and changing status (pending, approved, rejected, completed, cancelled).
+ */
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
@@ -26,6 +31,10 @@ class BookingController extends Controller
     ];
 
     // Lista as reservas em que o utilizador é o dono OU o petsitter.
+    /**
+     * Lista todos os registos com paginação. Admin vê todos, utilizador normal vê apenas os seus.
+     * Lists all records with pagination. Admin sees all, normal user sees only their own.
+     */
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Booking::class);
@@ -41,6 +50,10 @@ class BookingController extends Controller
         );
     }
 
+    /**
+     * Cria um novo registo após validação dos dados do pedido. Retorna o recurso criado com status 201.
+     * Creates a new record after validating request data. Returns the created resource with status 201.
+     */
     public function store(Request $request)
     {
         Gate::authorize('create', Booking::class);
@@ -87,6 +100,10 @@ class BookingController extends Controller
         return (new BookingResource($booking->load('animals')))->response()->setStatusCode(201);
     }
 
+    /**
+     * Retorna os detalhes de um registo específico. Verifica permissão antes de exibir.
+     * Returns details of a specific record. Checks permission before displaying.
+     */
     public function show(Booking $booking)
     {
         Gate::authorize('view', $booking);
@@ -95,6 +112,10 @@ class BookingController extends Controller
     }
 
     // PATCH /api/bookings/{booking}/status
+    /**
+     * Altera o estado de uma reserva seguindo as transições permitidas (pending → approved/rejected, approved → completed).
+     * Changes a booking's status following allowed transitions (pending → approved/rejected, approved → completed).
+     */
     public function updateStatus(Request $request, Booking $booking)
     {
         // 403 se não for nem o dono nem o petsitter desta reserva

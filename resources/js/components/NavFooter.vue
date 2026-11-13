@@ -1,3 +1,5 @@
+<!-- Componente do rodapé da barra lateral de navegação. -->
+<!-- Navigation sidebar footer component. -->
 <script setup lang="ts">
 import {
     SidebarGroup,
@@ -9,6 +11,8 @@ import {
 import { toUrl } from '@/lib/utils';
 import type { NavItem } from '@/types';
 
+// Tipo TypeScript para Props.
+// TypeScript type for Props.
 type Props = {
     items: NavItem[];
     class?: string;

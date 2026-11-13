@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: TestCase.php
+ * PHP file: TestCase.php
+ */
 namespace Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;

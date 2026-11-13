@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ação personalizada do Laravel Fortify para criação de novo utilizador no registo. Preenche os campos do modelo User com os dados do formulário.
+ * Custom Laravel Fortify action for creating a new user during registration. Fills the User model fields with form data.
+ */
 namespace App\Actions\Fortify;
 
 use App\Concerns\PasswordValidationRules;

@@ -1,3 +1,5 @@
+<!-- Página Vue: ModalDeleteAnimal.vue -->
+<!-- Vue page: ModalDeleteAnimal.vue -->
 <script setup lang="ts">
 import { ref } from 'vue';
 
@@ -6,6 +8,8 @@ const emit = defineEmits<{
     (e: 'confirmed'): void;
 }>();
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<{
     show: boolean;
     animalName: string;

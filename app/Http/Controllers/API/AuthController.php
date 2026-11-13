@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Controlador API para autenticação. Lida com login, logout e obtenção do utilizador autenticado via tokens.
+ * API controller for authentication. Handles login, logout, and retrieving the authenticated user via tokens.
+ */
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
@@ -12,6 +17,10 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    /**
+     * Regista um novo utilizador, cria a conta e retorna o token de autenticação.
+     * Registers a new user, creates the account, and returns the authentication token.
+     */
     public function register(Request $request)
     {
         $data = $request->validate([
@@ -34,6 +43,10 @@ class AuthController extends Controller
         return (new UserResource($user))->response()->setStatusCode(201);
     }
 
+    /**
+     * Autentica o utilizador com email e password. Retorna token e dados do utilizador.
+     * Authenticates the user with email and password. Returns token and user data.
+     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -57,6 +70,10 @@ class AuthController extends Controller
         return new UserResource($request->user());
     }
 
+    /**
+     * Termina a sessão do utilizador, invalidando o token de autenticação.
+     * Ends the user's session, invalidating the authentication token.
+     */
     public function logout(Request $request)
     {
         Auth::guard('web')->logout();

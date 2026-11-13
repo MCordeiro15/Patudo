@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: logging.php
+ * PHP file: logging.php
+ */
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;

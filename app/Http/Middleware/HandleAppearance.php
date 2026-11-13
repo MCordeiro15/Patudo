@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Middleware que controla o tema de aparência (claro/escuro) do utilizador. Salva e restaura a preferência de tema.
+ * Middleware that controls the user's appearance theme (light/dark). Saves and restores theme preference.
+ */
 namespace App\Http\Middleware;
 
 use Closure;

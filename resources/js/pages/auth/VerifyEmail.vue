@@ -1,3 +1,5 @@
+<!-- Página de verificação de email. Mostra instruções para confirmar o email. -->
+<!-- Email verification page. Shows instructions to confirm the email. -->
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import { logout as authLogout } from '@/composables/useAuth';

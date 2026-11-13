@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Service provider para configurar o Laravel Fortify. Personaliza a autenticação, 2FA, passkeys e ações de registo/redefinição de password.
+ * Service provider to configure Laravel Fortify. Customizes authentication, 2FA, passkeys, and registration/password reset actions.
+ */
 namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
@@ -17,16 +22,18 @@ use Laravel\Fortify\Fortify;
 class FortifyServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
-     */
+ * Register any application services.
+ * Register any application services.
+ */
     public function register(): void
     {
         //
     }
 
     /**
-     * Bootstrap any application services.
-     */
+ * Inicializa o service provider, registando serviços e configurações.
+ * Initializes the service provider, registering services and configurations.
+ */
     public function boot(): void
     {
         $this->configureActions();

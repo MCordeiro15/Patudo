@@ -1,3 +1,5 @@
+<!-- Layout Vue: AuthSplitLayout.vue -->
+<!-- Vue layout: AuthSplitLayout.vue -->
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';

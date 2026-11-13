@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Classe base abstrata para todos os controladores da aplicação. Fornece funcionalidade comum.
+ * Abstract base class for all application controllers. Provides common functionality.
+ */
 namespace App\Http\Controllers;
 
 use App\Models\Petsitter;
@@ -9,8 +14,9 @@ use Inertia\Inertia;
 class PetsitterProfileController extends Controller
 {
     /**
-     * Display the petsitter profile page for the authenticated user.
-     */
+ * Display the petsitter profile page for the authenticated user.
+ * Display the petsitter profile page for the authenticated user.
+ */
     public function showOwn(Request $request)
     {
         $user = $request->user();

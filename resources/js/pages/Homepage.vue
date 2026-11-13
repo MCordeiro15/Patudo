@@ -1,3 +1,5 @@
+<!-- Página inicial da aplicação. Mostra a lista de petsitters disponíveis com pesquisa, filtros e cards de perfil. -->
+<!-- Application homepage. Shows the list of available petsitters with search, filters, and profile cards. -->
 <template>
     <div class="min-vh-100 d-flex flex-column bg-light bg-opacity-25 position-relative overflow-hidden">
 
@@ -6,7 +8,11 @@
 
         <div class="patudo-content d-flex flex-column flex-grow-1">
 
+            <!-- Cabeçalho da página com navegação principal e logotipo. -->
+            <!-- Page header with main navigation and logo. -->
             <header class="container py-4">
+                <!-- Barra de navegação com links para as secções principais da aplicação. -->
+                <!-- Navigation bar with links to the main sections of the application. -->
                 <nav class="d-flex align-items-center justify-content-between">
 
                     <a href="/login"
@@ -31,6 +37,8 @@
                 </nav>
             </header>
 
+            <!-- Conteúdo principal da página. -->
+            <!-- Main content area of the page. -->
             <main class="container flex-grow-1 d-flex align-items-center py-5">
 
                 <div class="row align-items-center g-5 w-100">

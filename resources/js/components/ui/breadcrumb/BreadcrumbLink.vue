@@ -1,3 +1,5 @@
+<!-- Componente UI breadcrumb do shadcn/ui. Parte da biblioteca de componentes base do projeto. -->
+<!-- breadcrumb UI component from shadcn/ui. Part of the project's base component library. -->
 <script lang="ts" setup>
 import type { PrimitiveProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"

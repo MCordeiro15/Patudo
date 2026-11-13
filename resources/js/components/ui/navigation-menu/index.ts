@@ -1,3 +1,5 @@
+// Componente UI navigation-menu do shadcn/ui. Parte da biblioteca de componentes base do projeto.
+// navigation-menu UI component from shadcn/ui. Part of the project's base component library.
 import { cva } from "class-variance-authority"
 
 export { default as NavigationMenu } from "./NavigationMenu.vue"

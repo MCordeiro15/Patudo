@@ -1,7 +1,11 @@
+<!-- Componente que exibe um card com informações resumidas de um animal de estimação. -->
+<!-- Component that displays a card with summarized pet information. -->
 <script setup lang="ts">
 import { Trash2 } from '@lucide/vue';
 import type { Animal } from '@/types';
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<{
     animal: Animal;
 }>();

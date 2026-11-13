@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: RegistrationTest.php
+ * PHP file: RegistrationTest.php
+ */
 use Laravel\Fortify\Features;
 
 beforeEach(function () {

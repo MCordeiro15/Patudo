@@ -1,3 +1,5 @@
+// Componente UI button do shadcn/ui. Parte da biblioteca de componentes base do projeto.
+// button UI component from shadcn/ui. Part of the project's base component library.
 import type { VariantProps } from "class-variance-authority"
 import { cva } from "class-variance-authority"
 

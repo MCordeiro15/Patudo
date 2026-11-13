@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Modelo Eloquent principal para utilizadores. Suporta autenticação, 2FA, passkeys, roles (admin, petsitter) e relações com animais, reservas, posts, petsitter, reviews e favoritos.
+ * Main Eloquent model for users. Supports authentication, 2FA, passkeys, roles (admin, petsitter), and relationships with animals, bookings, posts, petsitter, reviews, and favorites.
+ */
 namespace App\Models;
 
 use Database\Factories\UserFactory;
@@ -53,21 +58,37 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
         ];
     }
 
+    /**
+     * Verifica se o utilizador tem permissões de administrador.
+     * Checks if the user has administrator permissions.
+     */
     public function isAdmin(): bool
     {
         return (bool) $this->is_admin;
     }
 
+    /**
+     * Verifica se o utilizador tem perfil de petsitter ativo.
+     * Checks if the user has an active petsitter profile.
+     */
     public function isPetsitter(): bool
     {
         return (bool) $this->is_petsitter;
     }
 
+    /**
+     * Relação belongsToMany com Animal. Retorna todos os animais associados a este registo.
+     * BelongsToMany relationship with Animal. Returns all animals associated with this record.
+     */
     public function animals()
     {
         return $this->hasMany(Animal::class);
     }
 
+    /**
+     * Relação belongsTo com Petsitter. Retorna o perfil do petsitter associado.
+     * BelongsTo relationship with Petsitter. Returns the associated petsitter profile.
+     */
     public function petsitter()
     {
         return $this->hasOne(Petsitter::class);

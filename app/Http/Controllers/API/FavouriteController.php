@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Controlador API para gestão de favoritos. Permite adicionar/remover petsitters da lista de favoritos do utilizador.
+ * API controller for favorites management. Allows adding/removing petsitters from the user's favorites list.
+ */
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
@@ -14,8 +19,9 @@ use Illuminate\Http\Response;
 class FavouriteController extends Controller
 {
     /**
-     * Get the authenticated user's favourite petsitters.
-     */
+ * Get the authenticated user's favourite petsitters.
+ * Get the authenticated user's favourite petsitters.
+ */
     public function index(Request $request)
     {
         $user = $request->user();

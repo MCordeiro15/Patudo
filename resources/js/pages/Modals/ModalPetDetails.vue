@@ -1,3 +1,5 @@
+<!-- Página Vue: ModalPetDetails.vue -->
+<!-- Vue page: ModalPetDetails.vue -->
 <script setup lang="ts">
 export interface PetDetails {
     id?: number | string;

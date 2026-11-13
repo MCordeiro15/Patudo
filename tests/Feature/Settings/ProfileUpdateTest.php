@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: ProfileUpdateTest.php
+ * PHP file: ProfileUpdateTest.php
+ */
 use App\Models\User;
 
 test('profile page is displayed', function () {

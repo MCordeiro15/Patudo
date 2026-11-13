@@ -1,3 +1,5 @@
+// Componente UI select do shadcn/ui. Parte da biblioteca de componentes base do projeto.
+// select UI component from shadcn/ui. Part of the project's base component library.
 export { default as Select } from "./Select.vue"
 export { default as SelectContent } from "./SelectContent.vue"
 export { default as SelectGroup } from "./SelectGroup.vue"

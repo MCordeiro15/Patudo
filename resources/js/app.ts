@@ -1,3 +1,5 @@
+// Ponto de entrada principal da aplicação Vue.js. Inicializa o Inertia.js, configura o router e monta a aplicação.
+// Main entry point of the Vue.js application. Initializes Inertia.js, configures the router, and mounts the application.
 import { createInertiaApp, router } from '@inertiajs/vue3';
 import { initializeTheme } from '@/composables/useAppearance';
 import { loadUser } from '@/composables/useAuth';

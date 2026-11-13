@@ -1,3 +1,5 @@
+<!-- Layout Vue: Layout.vue -->
+<!-- Vue layout: Layout.vue -->
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import Heading from '@/components/Heading.vue';
@@ -36,7 +38,11 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
         />
 
         <div class="flex flex-col lg:flex-row lg:space-x-12">
+            <!-- Barra lateral com informações complementares. -->
+            <!-- Sidebar with complementary information. -->
             <aside class="w-full max-w-xl lg:w-48">
+                <!-- Barra de navegação com links principais. -->
+                <!-- Navigation bar with main links. -->
                 <nav
                     class="flex flex-col space-y-1 space-x-0"
                     aria-label="Settings"
@@ -62,6 +68,8 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
             <Separator class="my-6 lg:hidden" />
 
             <div class="flex-1 md:max-w-2xl">
+                <!-- Secção de conteúdo da página. -->
+                <!-- Content section of the page. -->
                 <section class="max-w-xl space-y-12">
                     <slot />
                 </section>

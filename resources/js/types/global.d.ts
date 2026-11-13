@@ -1,3 +1,5 @@
+// Declarações globais de TypeScript. Define tipos partilhados entre o front-end e back-end via Inertia.
+// Global TypeScript declarations. Defines types shared between front-end and back-end via Inertia.
 import type { Directive } from 'vue';
 import type { Auth } from '@/types/auth';
 

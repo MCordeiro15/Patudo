@@ -1,3 +1,5 @@
+<!-- Componente que exibe os códigos de recuperação 2FA. -->
+<!-- Component that displays 2FA recovery codes. -->
 <script setup lang="ts">
 import { Form } from '@inertiajs/vue3';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from '@lucide/vue';

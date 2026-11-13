@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: SupportTicketTest.php
+ * PHP file: SupportTicketTest.php
+ */
 use App\Models\SupportTicket;
 use App\Models\User;
 

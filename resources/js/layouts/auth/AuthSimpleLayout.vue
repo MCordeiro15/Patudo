@@ -1,3 +1,5 @@
+<!-- Layout Vue: AuthSimpleLayout.vue -->
+<!-- Vue layout: AuthSimpleLayout.vue -->
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';

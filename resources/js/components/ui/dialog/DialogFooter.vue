@@ -1,3 +1,5 @@
+<!-- Componente UI dialog do shadcn/ui. Parte da biblioteca de componentes base do projeto. -->
+<!-- dialog UI component from shadcn/ui. Part of the project's base component library. -->
 <script setup lang="ts">
 import type { HTMLAttributes } from "vue"
 import { DialogClose } from "reka-ui"

@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Ficheiro PHP: sanctum.php
+ * PHP file: sanctum.php
+ */
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Laravel\Sanctum\Http\Middleware\AuthenticateSession;

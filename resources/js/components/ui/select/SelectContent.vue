@@ -1,3 +1,5 @@
+<!-- Componente UI select do shadcn/ui. Parte da biblioteca de componentes base do projeto. -->
+<!-- select UI component from shadcn/ui. Part of the project's base component library. -->
 <script setup lang="ts">
 import type { SelectContentEmits, SelectContentProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"

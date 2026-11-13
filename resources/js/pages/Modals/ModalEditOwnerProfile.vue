@@ -1,3 +1,5 @@
+<!-- Página de perfil do utilizador. Mostra e permite editar informações pessoais. -->
+<!-- User profile page. Shows and allows editing personal information. -->
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 
@@ -9,6 +11,8 @@ export interface OwnerProfileData {
     avatar_url?: string | null;
 }
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<{
     show: boolean;
     user?: OwnerProfileData;
@@ -61,6 +65,8 @@ const handleClose = () => {
     emit('close');
 };
 
+// Processa a submissão do formulário, valida os dados e envia para a API.
+// Processes form submission, validates data, and sends to the API.
 const handleSubmit = () => {
     isLoading.value = true;
 
@@ -116,6 +122,8 @@ const handleDeleteAccount = () => {
                     </button>
                 </div>
 
+                <!-- Formulário para entrada de dados do utilizador. -->
+                <!-- Form for user data input. -->
                 <form @submit.prevent="handleSubmit">
                     <div class="row g-4 mb-3">
                         <div class="col-12 col-md-6">

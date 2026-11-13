@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Política de autorização para animais. Define quem pode visualizar, criar, atualizar e eliminar animais (apenas o proprietário ou admin).
+ * Authorization policy for animals. Defines who can view, create, update, and delete animals (only the owner or admin).
+ */
 namespace App\Policies;
 
 use App\Models\Animal;
@@ -8,8 +13,9 @@ use App\Models\User;
 class AnimalPolicy
 {
     /**
-     * Determine whether the user can view any models.
-     */
+ * Determine whether the user can view any models.
+ * Determine whether the user can view any models.
+ */
     public function viewAny(User $user): bool
     {
         return true;

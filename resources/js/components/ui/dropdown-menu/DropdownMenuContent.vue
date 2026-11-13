@@ -1,3 +1,5 @@
+<!-- Componente UI dropdown-menu do shadcn/ui. Parte da biblioteca de componentes base do projeto. -->
+<!-- dropdown-menu UI component from shadcn/ui. Part of the project's base component library. -->
 <script setup lang="ts">
 import type { DropdownMenuContentEmits, DropdownMenuContentProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"

@@ -1,3 +1,5 @@
+<!-- Componente de padrão de fundo decorativo para áreas vazias. -->
+<!-- Decorative background pattern component for empty areas. -->
 <script setup lang="ts">
 import { useId } from 'vue';
 

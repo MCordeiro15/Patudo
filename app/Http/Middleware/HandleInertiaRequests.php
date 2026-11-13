@@ -1,5 +1,10 @@
 <?php
 
+
+/**
+ * Middleware que configura os dados partilhados enviados para o front-end Vue via Inertia. Adiciona dados do utilizador, flash messages e configuração de aparência.
+ * Middleware that configures shared data sent to the Vue front-end via Inertia. Adds user data, flash messages, and appearance settings.
+ */
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
