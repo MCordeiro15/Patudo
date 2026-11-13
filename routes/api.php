@@ -27,7 +27,6 @@ if (! function_exists('extracted')) {
     {
     Route::get('/me', [AuthController::class, 'myInformation']);
     Route::get('/myInformation', [AuthController::class, 'myInformation']);
-    Route::post('/logout', [AuthController::class, 'logout']);
 
     // Users
     Route::post('/users/{user}/suspend', [UserController::class, 'suspend']);
@@ -55,18 +54,23 @@ Route::middleware([
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-Route::get('/petsitters/{id}/availability', [PetsitterAvailabilityController::class, 'availability']);
-
-// Rota pública para listar petsitters aprovados
-Route::get('/petsitters/public', [PetsitterController::class, 'publicIndex']);
-
-// Authenticated API routes with session support for SPA
+// Logout needs session middleware to invalidate the session
 Route::middleware([
     'auth:sanctum',
     \Illuminate\Cookie\Middleware\EncryptCookies::class,
     \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
     \Illuminate\Session\Middleware\StartSession::class,
 ])->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+
+Route::get('/petsitters/{id}/availability', [PetsitterAvailabilityController::class, 'availability']);
+
+// Rota pública para listar petsitters aprovados
+Route::get('/petsitters/public', [PetsitterController::class, 'publicIndex']);
+
+// Authenticated API routes — Sanctum statefulApi handles session cookies from web routes
+Route::middleware('auth:sanctum')->group(function () {
     extracted();
     Route::get('/petsitters/{petsitter}/posts', [PostController::class, 'byPetsitter']);
     Route::apiResource('posts', PostController::class);

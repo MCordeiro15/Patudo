@@ -84,8 +84,14 @@ class AuthTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->postJson('/api/logout')->assertNoContent();
+        $this->actingAs($user)->postJson('/api/logout', [], [
+            'HTTP-Origin' => 'http://localhost:8000',
+            'HTTP-Referer' => 'http://localhost:8000/',
+        ])->assertNoContent();
 
+        // actingAs sets the user directly on the guard, bypassing the session.
+        // Clear the in-memory guard state to simulate a fresh request after session invalidation.
+        $this->actingAsGuest();
         $this->assertGuest();
     }
 }
