@@ -19,17 +19,13 @@ cd "$PROJECT_ROOT"
 # Verificar se o ExportedDataSeeder mudou
 if git diff-tree -r --name-only HEAD^1 HEAD | grep -q "ExportedDataSeeder.php"; then
     echo "Detetadas mudanças nos dados do banco de dados..."
-    echo "Atualizando banco de dados automaticamente..."
+    echo "Atualizando tudo automaticamente..."
     
     php "$ARTISAN" migrate:fresh --seed --no-interaction
     
     if [ $? -eq 0 ]; then
-        echo "Banco de dados atualizado com sucesso!"
-        echo ""
-        echo "Agora roda:"
-        echo "  php artisan storage:link"
-        echo "  npm run dev"
-        echo "  php artisan serve"
+        php "$ARTISAN" storage:link 2>/dev/null
+        echo "Tudo atualizado com sucesso! Banco de dados e storage prontos."
     else
         echo "Erro ao atualizar o banco de dados."
         echo "Roda manualmente: php artisan migrate:fresh --seed"

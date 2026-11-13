@@ -25,16 +25,13 @@ php artisan serve
 
 ### Após `git pull` (atualizações futuras)
 
-Depois de configurar os hooks, só precisas de:
+Tudo é automático — o banco de dados e o storage link são atualizados sozinhos. Só precisas de:
 
 ```bash
 git pull origin main
-php artisan storage:link
 npm run dev
 php artisan serve
 ```
-
-O banco de dados é atualizado **automaticamente** pelo git hook.
 
 ## Como funciona o sistema automático
 
@@ -45,7 +42,8 @@ O banco de dados é atualizado **automaticamente** pelo git hook.
 **Quando os colegas fazem `git pull`:**
 - Um git hook deteta que os dados mudaram
 - Roda automaticamente `migrate:fresh --seed` para atualizar o banco de dados
-- Os colegas recebem todos os dados novos sem fazer nada
+- Cria automaticamente o storage link para as fotos aparecerem
+- Os colegas recebem tudo sem rodar nenhum comando manual
 
 **Resumo:** Criaste uma conta, fizeste uma reserva, subiste uma foto? Faz `git push` e todos os colegas recebem tudo com `git pull`.
 
@@ -85,6 +83,6 @@ O banco de dados é atualizado **automaticamente** pelo git hook.
 ## Importante
 
 - **Nunca** versiones `database/database.sqlite` no Git — está no `.gitignore`
-- Cada colega gera a sua própria base de dados com `migrate:fresh --seed`
-- O git hook exporta automaticamente os dados antes de cada push
-- Se as fotos de perfil não aparecem, roda `php artisan storage:link`
+- Tudo é automático: git push exporta os dados, git pull atualiza o banco de dados e o storage link
+- Zero comandos manuais necessários após `git pull`
+- `npm run dev` e `php artisan serve` são os únicos comandos para rodar a aplicação
