@@ -41,10 +41,27 @@ const handleSubmit = () => {
 
 <template>
     <Teleport to="body">
-        <div v-if="show" class="patudo-modal-backdrop" @click.self="handleClose">
+        <div
+            v-if="show"
+            class="patudo-modal-backdrop"
+            @click.self="handleClose"
+        >
             <div class="patudo-modal-card" role="dialog" aria-modal="true">
-                <button type="button" class="patudo-close-btn" aria-label="Fechar" @click="handleClose">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <button
+                    type="button"
+                    class="patudo-close-btn"
+                    aria-label="Fechar"
+                    @click="handleClose"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                    >
                         <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
                 </button>
@@ -59,31 +76,60 @@ const handleSubmit = () => {
                 <!-- Formulário para entrada de dados do utilizador. -->
                 <!-- Form for user data input. -->
                 <form @submit.prevent="handleSubmit">
-                     <div class="mb-3">
+                    <div class="mb-3">
                         <label class="patudo-section-label d-block mb-2">
                             Motivo da denúncia
                         </label>
 
                         <div class="d-flex flex-column gap-1 ps-2">
-                            <label v-for="reason in reasons" :key="reason" class="patudo-radio-option">
-                                <input v-model="selectedReason" type="radio" name="report_reason" :value="reason" class="patudo-radio-input"/>
-                                <span class="patudo-radio-text">{{ reason }}</span>
+                            <label
+                                v-for="reason in reasons"
+                                :key="reason"
+                                class="patudo-radio-option"
+                            >
+                                <input
+                                    v-model="selectedReason"
+                                    type="radio"
+                                    name="report_reason"
+                                    :value="reason"
+                                    class="patudo-radio-input"
+                                />
+                                <span class="patudo-radio-text">{{
+                                    reason
+                                }}</span>
                             </label>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="report-description" class="patudo-section-label d-block mb-2">
+                        <label
+                            for="report-description"
+                            class="patudo-section-label d-block mb-2"
+                        >
                             Descrição (opcional)
                         </label>
-                        <textarea id="report-description" v-model="description" rows="3" class="patudo-textarea" placeholder="Descreve brevemente o que aconteceu..."></textarea>
+                        <textarea
+                            id="report-description"
+                            v-model="description"
+                            rows="3"
+                            class="patudo-textarea"
+                            placeholder="Descreve brevemente o que aconteceu..."
+                        ></textarea>
                     </div>
 
                     <div class="patudo-modal-actions">
-                        <button type="button" class="btn-patudo-outline" @click="handleClose">
+                        <button
+                            type="button"
+                            class="btn-patudo-outline"
+                            @click="handleClose"
+                        >
                             Cancelar
                         </button>
-                        <button type="submit" class="btn-patudo-solid" :disabled="!selectedReason">
+                        <button
+                            type="submit"
+                            class="btn-patudo-solid"
+                            :disabled="!selectedReason"
+                        >
                             Enviar denúncia
                         </button>
                     </div>
@@ -181,7 +227,7 @@ const handleSubmit = () => {
 }
 
 .patudo-radio-input::before {
-    content: "";
+    content: '';
     width: 8px;
     height: 8px;
     border-radius: 50%;

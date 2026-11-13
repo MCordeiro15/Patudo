@@ -1,7 +1,7 @@
 <!-- Página de perfil do utilizador. Mostra e permite editar informações pessoais. -->
 <!-- User profile page. Shows and allows editing personal information. -->
 <script setup lang="ts">
-import {Head, Link} from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import {
     Bell,
     CirclePlus,
@@ -14,11 +14,10 @@ import {
     UserRound,
 } from '@lucide/vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
-import {computed, onMounted, ref} from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import ModalEditPetsitterProfile from '@/pages/Modals/ModalEditPetsitterProfile.vue';
 import ModalNewPost from '@/pages/Modals/ModalNewPost.vue';
-import type {PetsitterProfile as PetsitterProfileType, Post} from '@/types';
-
+import type { PetsitterProfile as PetsitterProfileType, Post } from '@/types';
 
 // Tipo TypeScript para PetsitterProfile.
 // TypeScript type for PetsitterProfile.
@@ -44,13 +43,13 @@ type PetsitterProfile = {
 // Opções de dias da semana para o seletor de disponibilidade.
 // Weekday options for the availability selector.
 const DAY_OPTIONS: Array<{ value: string; label: string }> = [
-    {value: 'monday', label: 'Segunda'},
-    {value: 'tuesday', label: 'Terça'},
-    {value: 'wednesday', label: 'Quarta'},
-    {value: 'thursday', label: 'Quinta'},
-    {value: 'friday', label: 'Sexta'},
-    {value: 'saturday', label: 'Sábado'},
-    {value: 'sunday', label: 'Domingo'},
+    { value: 'monday', label: 'Segunda' },
+    { value: 'tuesday', label: 'Terça' },
+    { value: 'wednesday', label: 'Quarta' },
+    { value: 'thursday', label: 'Quinta' },
+    { value: 'friday', label: 'Sexta' },
+    { value: 'saturday', label: 'Sábado' },
+    { value: 'sunday', label: 'Domingo' },
 ];
 
 // Props recebidas do componente pai.
@@ -170,7 +169,10 @@ const displayLocation = computed(() => {
 // Propriedade computada que retorna a biografia ou mensagem padrão.
 // Computed property that returns the biography or default message.
 const displayBiography = computed(() => {
-    return petsitter.value?.biography ?? 'Este petsitter ainda não adicionou uma biografia.';
+    return (
+        petsitter.value?.biography ??
+        'Este petsitter ainda não adicionou uma biografia.'
+    );
 });
 
 // Propriedade computada que retorna a experiência do petsitter.
@@ -205,9 +207,7 @@ const showNewPostModal = ref(false);
 
 // só o dono do perfil, se aprovado, pode publicar (o back-end devolve 403 aos outros)
 const canPost = computed(
-    () =>
-        isOwnProfile.value &&
-        petsitter.value?.approval_status === 'approved',
+    () => isOwnProfile.value && petsitter.value?.approval_status === 'approved',
 );
 
 // Carrega as publicações do petsitter a partir da API.
@@ -319,7 +319,8 @@ const saveAvailability = async () => {
             const data = await response.json();
             // Update the local petsitter data
             if (data.data && data.data.availability_days !== undefined) {
-                (props.petsitter as any).availability_days = data.data.availability_days;
+                (props.petsitter as any).availability_days =
+                    data.data.availability_days;
             }
             isEditing.value = false;
             saveSuccess.value = true;
@@ -332,7 +333,8 @@ const saveAvailability = async () => {
                 const messages = Object.values(errorData.errors).flat();
                 saveError.value = messages.join(' ');
             } else {
-                saveError.value = errorData.message || 'Erro ao guardar disponibilidade.';
+                saveError.value =
+                    errorData.message || 'Erro ao guardar disponibilidade.';
             }
         }
     } catch {
@@ -344,7 +346,7 @@ const saveAvailability = async () => {
 </script>
 
 <template>
-    <Head :title="isOwnProfile ? 'O meu perfil' : 'Perfil do Petsitter'"/>
+    <Head :title="isOwnProfile ? 'O meu perfil' : 'Perfil do Petsitter'" />
 
     <!-- Conteúdo principal da página. -->
     <!-- Main content area of the page. -->
@@ -372,7 +374,7 @@ const saveAvailability = async () => {
                     class="nav nav-pills border rounded-pill p-1 position-absolute start-50 translate-middle-x d-none d-lg-flex"
                 >
                     <a class="nav-link text-dark rounded-pill px-4" href="/"
-                    >Início</a
+                        >Início</a
                     >
                     <a
                         class="nav-link text-dark rounded-pill px-4"
@@ -396,13 +398,20 @@ const saveAvailability = async () => {
 
                 <div class="d-flex align-items-center gap-3 ms-auto">
                     <a href="/messages" class="text-dark">
-                        <MessageCircle :size="25"/>
+                        <MessageCircle :size="25" />
                     </a>
                     <a href="/notifications" class="text-dark">
-                        <Bell :size="25"/>
+                        <Bell :size="25" />
                     </a>
-                    <Link :href="petsitter ? `/petsitters/${petsitter.user_id}` : '/profile'" class="text-dark">
-                        <UserRound :size="25"/>
+                    <Link
+                        :href="
+                            petsitter
+                                ? `/petsitters/${petsitter.user_id}`
+                                : '/profile'
+                        "
+                        class="text-dark"
+                    >
+                        <UserRound :size="25" />
                     </Link>
                 </div>
             </nav>
@@ -410,7 +419,11 @@ const saveAvailability = async () => {
             <div class="row justify-content-center mt-5 pt-4">
                 <div class="col-12">
                     <h1 class="text-center fw-bold mb-4 pb-2">
-                        {{ isOwnProfile ? 'O meu perfil' : 'Perfil do Petsitter' }}
+                        {{
+                            isOwnProfile
+                                ? 'O meu perfil'
+                                : 'Perfil do Petsitter'
+                        }}
                     </h1>
 
                     <!-- No profile message -->
@@ -418,7 +431,9 @@ const saveAvailability = async () => {
                         v-if="!hasProfile"
                         class="card border border-warning rounded-4 p-4 text-center"
                     >
-                        <p class="mb-0">Ainda não tem um perfil de petsitter.</p>
+                        <p class="mb-0">
+                            Ainda não tem um perfil de petsitter.
+                        </p>
                     </section>
 
                     <template v-else>
@@ -471,7 +486,9 @@ const saveAvailability = async () => {
                                         <div>
                                             Rating
                                             <strong class="text-dark ms-1">
-                                                {{ formatRating(displayRating) }}
+                                                {{
+                                                    formatRating(displayRating)
+                                                }}
                                             </strong>
                                         </div>
                                         <div>
@@ -490,7 +507,9 @@ const saveAvailability = async () => {
                         <section
                             class="card border border-primary rounded-4 p-3 p-md-4 mb-3"
                         >
-                            <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div
+                                class="d-flex align-items-center justify-content-between mb-2"
+                            >
                                 <h3 class="h5 mb-0">Sobre mim</h3>
                                 <button
                                     v-if="canEdit"
@@ -498,7 +517,7 @@ const saveAvailability = async () => {
                                     class="btn btn-outline-primary btn-sm rounded-pill"
                                     @click="showEditProfileModal = true"
                                 >
-                                    <Pencil :size="14" class="me-1"/>
+                                    <Pencil :size="14" class="me-1" />
                                     Editar perfil
                                 </button>
                             </div>
@@ -520,8 +539,8 @@ const saveAvailability = async () => {
                                     >
                                         <span>Dog Sitting (diário)</span>
                                         <strong>{{
-                                                formatPrice(displayPricePerDay)
-                                            }}</strong>
+                                            formatPrice(displayPricePerDay)
+                                        }}</strong>
                                     </div>
                                 </section>
                             </div>
@@ -532,7 +551,9 @@ const saveAvailability = async () => {
                                 <section
                                     class="card border border-primary rounded-4 p-3 p-md-4 h-100"
                                 >
-                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div
+                                        class="d-flex align-items-center justify-content-between mb-3"
+                                    >
                                         <h3 class="h5 mb-0">Disponibilidade</h3>
                                         <template v-if="canEdit && !isEditing">
                                             <button
@@ -540,7 +561,10 @@ const saveAvailability = async () => {
                                                 class="btn btn-outline-secondary btn-sm rounded-pill"
                                                 @click="startEditing"
                                             >
-                                                <Pencil :size="14" class="me-1"/>
+                                                <Pencil
+                                                    :size="14"
+                                                    class="me-1"
+                                                />
                                                 Editar
                                             </button>
                                         </template>
@@ -549,7 +573,10 @@ const saveAvailability = async () => {
                                     <!-- View mode: show day labels -->
                                     <template v-if="!isEditing">
                                         <div
-                                            v-if="currentAvailabilityDays.length > 0"
+                                            v-if="
+                                                currentAvailabilityDays.length >
+                                                0
+                                            "
                                             class="d-flex flex-wrap gap-2"
                                         >
                                             <span
@@ -557,7 +584,9 @@ const saveAvailability = async () => {
                                                 :key="day.value"
                                                 class="badge rounded-pill px-3 py-2"
                                                 :class="
-                                                    currentAvailabilityDays.includes(day.value)
+                                                    currentAvailabilityDays.includes(
+                                                        day.value,
+                                                    )
                                                         ? 'text-bg-success'
                                                         : 'text-bg-light text-muted'
                                                 "
@@ -573,7 +602,8 @@ const saveAvailability = async () => {
                                     <!-- Edit mode: checkboxes -->
                                     <template v-else-if="canEdit">
                                         <p class="text-muted small mb-3">
-                                            Selecione os dias em que está disponível:
+                                            Selecione os dias em que está
+                                            disponível:
                                         </p>
                                         <div class="d-flex flex-column gap-2">
                                             <label
@@ -584,8 +614,14 @@ const saveAvailability = async () => {
                                                 <input
                                                     class="form-check-input me-2"
                                                     type="checkbox"
-                                                    :checked="editingDays.includes(day.value)"
-                                                    @change="toggleDay(day.value)"
+                                                    :checked="
+                                                        editingDays.includes(
+                                                            day.value,
+                                                        )
+                                                    "
+                                                    @change="
+                                                        toggleDay(day.value)
+                                                    "
                                                 />
                                                 <span>{{ day.label }}</span>
                                             </label>
@@ -598,8 +634,16 @@ const saveAvailability = async () => {
                                                 :disabled="saving"
                                                 @click="saveAvailability"
                                             >
-                                                <Save v-if="!saving" :size="14" class="me-1"/>
-                                                {{ saving ? 'A guardar...' : 'Guardar' }}
+                                                <Save
+                                                    v-if="!saving"
+                                                    :size="14"
+                                                    class="me-1"
+                                                />
+                                                {{
+                                                    saving
+                                                        ? 'A guardar...'
+                                                        : 'Guardar'
+                                                }}
                                             </button>
                                             <button
                                                 type="button"
@@ -621,7 +665,8 @@ const saveAvailability = async () => {
                                             v-if="saveSuccess"
                                             class="alert alert-success mt-2 py-2 small"
                                         >
-                                            Disponibilidade guardada com sucesso!
+                                            Disponibilidade guardada com
+                                            sucesso!
                                         </div>
                                     </template>
                                 </section>
@@ -631,7 +676,9 @@ const saveAvailability = async () => {
                         <!-- Secção de publicações do petsitter com lista de posts e botão para criar novo. -->
                         <!-- Petsitter posts section with post list and create new button. -->
                         <section class="mt-5">
-                            <h2 class="text-center fw-bold my-5">Publicações</h2>
+                            <h2 class="text-center fw-bold my-5">
+                                Publicações
+                            </h2>
 
                             <p v-if="postsLoading" class="text-center">
                                 A carregar publicações...
@@ -668,13 +715,18 @@ const saveAvailability = async () => {
                                         </div>
 
                                         <div class="col-12 col-md-8">
-                                            <h3 v-if="post.title" class="h4 mb-2">{{ post.title }}</h3>
+                                            <h3
+                                                v-if="post.title"
+                                                class="h4 mb-2"
+                                            >
+                                                {{ post.title }}
+                                            </h3>
                                             <p class="text-muted mb-3">
                                                 {{ post.description }}
                                             </p>
                                             <small class="text-muted">{{
-                                                    formatDateTime(post.created_at)
-                                                }}</small>
+                                                formatDateTime(post.created_at)
+                                            }}</small>
                                         </div>
 
                                         <div
@@ -685,20 +737,20 @@ const saveAvailability = async () => {
                                                 type="button"
                                                 class="btn btn-link text-dark p-0"
                                             >
-                                                <PenLine :size="18"/>
+                                                <PenLine :size="18" />
                                             </button>
                                             <button
                                                 v-if="canEdit"
                                                 type="button"
                                                 class="btn btn-link text-dark p-0"
                                             >
-                                                <Trash2 :size="18"/>
+                                                <Trash2 :size="18" />
                                             </button>
                                             <button
                                                 type="button"
                                                 class="btn btn-link text-primary p-0"
                                             >
-                                                <Heart :size="24"/>
+                                                <Heart :size="24" />
                                             </button>
                                         </div>
                                     </div>
@@ -714,13 +766,14 @@ const saveAvailability = async () => {
                                         :size="56"
                                         class="text-secondary mb-2"
                                     />
-                                    <p class="mb-0">Adicionar nova publicação</p>
+                                    <p class="mb-0">
+                                        Adicionar nova publicação
+                                    </p>
                                 </article>
                             </div>
                         </section>
 
-                        <div class="d-flex justify-content-end mt-3">
-                        </div>
+                        <div class="d-flex justify-content-end mt-3"></div>
                     </template>
                 </div>
             </div>

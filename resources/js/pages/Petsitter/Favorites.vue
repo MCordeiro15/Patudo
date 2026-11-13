@@ -73,7 +73,8 @@ async function fetchFavourites() {
         const data = await response.json();
         favouritePetsitters.value = data.data ?? data;
     } catch (e) {
-        error.value = e instanceof Error ? e.message : 'Erro ao carregar favoritos.';
+        error.value =
+            e instanceof Error ? e.message : 'Erro ao carregar favoritos.';
     } finally {
         loading.value = false;
     }
@@ -93,7 +94,9 @@ function getCsrfToken(): string | null {
 
 async function toggleFavourite(petsitterId: number) {
     const previousState = favouritePetsitters.value;
-    const index = favouritePetsitters.value.findIndex((p) => p.user_id === petsitterId);
+    const index = favouritePetsitters.value.findIndex(
+        (p) => p.user_id === petsitterId,
+    );
 
     if (index === -1) {
         return;
@@ -101,7 +104,7 @@ async function toggleFavourite(petsitterId: number) {
 
     // Optimistically remove from the list
     favouritePetsitters.value = favouritePetsitters.value.filter(
-        (p) => p.user_id !== petsitterId
+        (p) => p.user_id !== petsitterId,
     );
 
     try {
@@ -128,7 +131,8 @@ async function toggleFavourite(petsitterId: number) {
     } catch (e) {
         // Revert on error
         favouritePetsitters.value = previousState;
-        error.value = e instanceof Error ? e.message : 'Erro ao remover dos favoritos.';
+        error.value =
+            e instanceof Error ? e.message : 'Erro ao remover dos favoritos.';
     }
 }
 
@@ -246,10 +250,7 @@ onMounted(() => {
                 class="text-center my-5"
             >
                 <p class="text-muted">Ainda não tens petsitters favoritos.</p>
-                <a
-                    href="/petsitters"
-                    class="btn btn-primary rounded-pill"
-                >
+                <a href="/petsitters" class="btn btn-primary rounded-pill">
                     Procurar petsitters
                 </a>
             </div>

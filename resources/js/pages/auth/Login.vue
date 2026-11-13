@@ -1,9 +1,9 @@
 <!-- Página de login. Formulário de autenticação com email e password. -->
 <!-- Login page. Authentication form with email and password. -->
 <script setup lang="ts">
-import {Link} from '@inertiajs/vue3';
-import {ref} from 'vue';
-import {login as authLogin} from '@/composables/useAuth';
+import { Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import { login as authLogin } from '@/composables/useAuth';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import imgCao from '@/../../assets/caoLoginRegister.jpg';
 import '../../../css/login.css';
@@ -39,17 +39,25 @@ const login = async () => {
 </script>
 
 <template>
-    <div class="login-wrapper min-vh-100 d-flex align-items-center justify-content-center p-3">
+    <div
+        class="login-wrapper min-vh-100 d-flex align-items-center justify-content-center p-3"
+    >
         <div class="auth-card d-flex flex-column flex-md-row">
             <div class="brand-panel d-flex flex-column justify-content-between">
-                <img :src="imgCao" alt="Cão Patudo" class="brand-bg-cover"/>
+                <img :src="imgCao" alt="Cão Patudo" class="brand-bg-cover" />
                 <div class="brand-header d-flex align-items-center gap-2">
-                    <img :src="logoPatudo" alt="Logótipo Patudo" class="brand-icon"/>
+                    <img
+                        :src="logoPatudo"
+                        alt="Logótipo Patudo"
+                        class="brand-icon"
+                    />
                     <span class="brand-title">Patudo</span>
                 </div>
             </div>
 
-            <div class="form-panel d-flex flex-column justify-content-center align-items-center">
+            <div
+                class="form-panel d-flex flex-column justify-content-center align-items-center"
+            >
                 <div class="form-container w-100">
                     <h1 class="auth-title text-center">Login</h1>
                     <p class="auth-subtitle text-center mb-4">
@@ -60,21 +68,41 @@ const login = async () => {
                     <!-- Form for user data input. -->
                     <form @submit.prevent="login">
                         <div class="mb-3">
-                            <input v-model="email" type="email" class="form-control auth-input" placeholder="Email"
-                                   required/>
+                            <input
+                                v-model="email"
+                                type="email"
+                                class="form-control auth-input"
+                                placeholder="Email"
+                                required
+                            />
                         </div>
 
                         <div class="mb-4">
-                            <input v-model="password" type="password" class="form-control auth-input"
-                                   placeholder="Palavra-passe" required/>
+                            <input
+                                v-model="password"
+                                type="password"
+                                class="form-control auth-input"
+                                placeholder="Palavra-passe"
+                                required
+                            />
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 mb-3" :disabled="isLoading">
+                        <button
+                            type="submit"
+                            class="btn btn-primary w-100 mb-3"
+                            :disabled="isLoading"
+                        >
                             {{ isLoading ? 'A entrar...' : 'Entrar' }}
                         </button>
                     </form>
 
-                    <div v-if="msg" :class="['alert py-2 small mb-3 text-center',isError ? 'auth-error-alert' : 'auth-valid-alert']">
+                    <div
+                        v-if="msg"
+                        :class="[
+                            'alert py-2 small mb-3 text-center',
+                            isError ? 'auth-error-alert' : 'auth-valid-alert',
+                        ]"
+                    >
                         {{ msg }}
                     </div>
 

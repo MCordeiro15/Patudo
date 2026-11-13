@@ -1,3 +1,5 @@
+<!-- Página Vue: ModalDeleteAnimal.vue -->
+<!-- Vue page: ModalDeleteAnimal.vue -->
 <script setup lang="ts">
 import { ref } from 'vue';
 
@@ -6,6 +8,8 @@ const emit = defineEmits<{
     (e: 'confirmed'): void;
 }>();
 
+// Props recebidas do componente pai.
+// Props received from the parent component.
 const props = defineProps<{
     show: boolean;
     animalName: string;
@@ -24,29 +28,64 @@ const confirm = () => {
 <template>
     <Teleport to="body">
         <template v-if="show">
+            <!-- Backdrop -->
             <div class="modal-backdrop fade show"></div>
 
-            <div class="modal fade show d-block" tabindex="-1" role="dialog" @keydown.escape="close">
-                <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <!-- Modal -->
+            <div
+                class="modal fade show d-block"
+                tabindex="-1"
+                role="dialog"
+                @keydown.escape="close"
+            >
+                <div
+                    class="modal-dialog modal-dialog-centered modal-sm"
+                    role="document"
+                >
                     <div class="modal-content rounded-4 border border-danger">
+                        <!-- Header -->
                         <div class="modal-header border-bottom border-danger">
-                            <h5 class="modal-title fw-bold text-danger">Remover Animal</h5>
-                            <button type="button" class="btn-close" @click="close" aria-label="Fechar"></button>
+                            <h5 class="modal-title fw-bold text-danger">
+                                Remover Animal
+                            </h5>
+                            <button
+                                type="button"
+                                class="btn-close"
+                                @click="close"
+                                aria-label="Fechar"
+                            ></button>
                         </div>
 
+                        <!-- Body -->
                         <div class="modal-body text-center py-4">
                             <p class="mb-0">
                                 Tem a certeza que quer remover
-                                <strong>{{ animalName }}</strong>?
+                                <strong>{{ animalName }}</strong
+                                >?
                             </p>
-                            <p class="text-muted small">Esta ação não pode ser desfeita.</p>
+                            <p class="text-muted small">
+                                Esta ação não pode ser desfeita.
+                            </p>
                         </div>
 
-                        <div class="modal-footer border-top border-danger d-flex gap-2">
-                            <button type="button" class="btn btn-outline-secondary rounded-pill flex-fill" @click="close" :disabled="deleting">
+                        <!-- Footer -->
+                        <div
+                            class="modal-footer border-top border-danger d-flex gap-2"
+                        >
+                            <button
+                                type="button"
+                                class="btn btn-outline-secondary rounded-pill flex-fill"
+                                @click="close"
+                                :disabled="deleting"
+                            >
                                 Cancelar
                             </button>
-                            <button type="button" class="btn btn-danger rounded-pill flex-fill" @click="confirm" :disabled="deleting">
+                            <button
+                                type="button"
+                                class="btn btn-danger rounded-pill flex-fill"
+                                @click="confirm"
+                                :disabled="deleting"
+                            >
                                 {{ deleting ? 'A remover...' : 'Remover' }}
                             </button>
                         </div>

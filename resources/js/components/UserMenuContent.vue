@@ -32,7 +32,11 @@ defineProps<Props>();
     <DropdownMenuSeparator />
     <DropdownMenuGroup>
         <DropdownMenuItem v-if="user.is_petsitter" :as-child="true">
-            <Link class="block w-full cursor-pointer" href="/petsitters/profile" prefetch>
+            <Link
+                class="block w-full cursor-pointer"
+                href="/petsitters/profile"
+                prefetch
+            >
                 <Dog class="mr-2 h-4 w-4" />
                 My Petsitter Profile
             </Link>
