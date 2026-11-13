@@ -27,7 +27,9 @@ class UserResource extends JsonResource
         if ($this->isPetsitter() && $this->relationLoaded('petsitter')) {
             $petsitter = $this->petsitter;
             if ($petsitter && $petsitter->profile_photo) {
-                $avatarUrl = Storage::disk('public')->url($petsitter->profile_photo);
+                $avatarUrl = str_starts_with($petsitter->profile_photo, 'data:')
+                    ? $petsitter->profile_photo
+                    : Storage::disk('public')->url($petsitter->profile_photo);
             }
         }
 

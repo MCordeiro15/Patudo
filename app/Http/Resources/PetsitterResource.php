@@ -29,12 +29,17 @@ class PetsitterResource extends JsonResource
         $viewer = $request->user();
         $canSeePrivate = $viewer && ($viewer->isAdmin() || $viewer->id === $this->user_id);
 
+        $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($this->user->name ?? 'P') . '&background=random';
+        if ($this->profile_photo) {
+            $avatarUrl = str_starts_with($this->profile_photo, 'data:')
+                ? $this->profile_photo
+                : Storage::disk('public')->url($this->profile_photo);
+        }
+
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
-            'avatar_url' => $this->profile_photo
-                ? Storage::disk('public')->url($this->profile_photo)
-                : 'https://ui-avatars.com/api/?name=' . urlencode($this->user->name ?? 'P') . '&background=random',
+            'avatar_url' => $avatarUrl,
             'profile_photo' => $this->profile_photo,
             'short_bio' => $this->short_bio,
             'experience' => $this->experience,

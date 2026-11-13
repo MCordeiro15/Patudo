@@ -69,7 +69,7 @@ class ExportDatabase extends Command
             'updated_at' => $p->updated_at,
         ])->toArray();
 
-        // Export animals
+        // Export animals com fotos em base64
         $animals = Animal::all();
         $animalsArray = $animals->map(fn($a) => [
             'user_id' => $a->user_id,
@@ -79,19 +79,19 @@ class ExportDatabase extends Command
             'size' => $a->size,
             'sex' => $a->sex ?? null,
             'weight' => $a->weight ?? null,
-            'photo' => $a->photo ?? null,
+            'photo' => $this->exportPhoto($a->photo),
             'special_needs' => $a->special_needs ?? null,
             'aggression' => $a->aggression ?? null,
             'medication' => $a->medication ?? null,
         ])->toArray();
 
-        // Export posts
+        // Export posts com fotos em base64
         $posts = Post::all();
         $postsArray = $posts->map(fn($p) => [
             'petsitter_id' => $p->petsitter_id,
             'title' => $p->title ?? null,
             'description' => $p->description,
-            'photos' => $p->photos ?? null,
+            'photos' => $this->exportPhotos($p->photos),
         ])->toArray();
 
         // Export bookings
@@ -277,5 +277,26 @@ class ExportDatabase extends Command
         }
 
         return null;
+    }
+
+    /**
+     * Exporta um array de fotos (posts) para base64
+     */
+    protected function exportPhotos(?array $photoPaths): ?array
+    {
+        if (!$photoPaths || empty($photoPaths)) {
+            return null;
+        }
+
+        $exported = [];
+        foreach ($photoPaths as $path) {
+            if (is_string($path) && str_starts_with($path, 'data:')) {
+                $exported[] = $path;
+            } else {
+                $exported[] = $this->exportPhoto($path);
+            }
+        }
+
+        return $exported;
     }
 }

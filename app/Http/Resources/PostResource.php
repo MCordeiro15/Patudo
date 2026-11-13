@@ -31,7 +31,9 @@ class PostResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'photos' => collect($this->photos)
-                ->map(fn ($path) => Storage::disk('public')->url($path))
+                ->map(fn ($path) => str_starts_with($path, 'data:')
+                    ? $path
+                    : Storage::disk('public')->url($path))
                 ->all(),
             'created_at' => $this->created_at,
         ];
