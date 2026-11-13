@@ -2,7 +2,7 @@
 
 ## Como ter os dados de teste
 
-Tudo é **automático**. Quando alguém faz `git push`, todos os dados são exportados. Quando os colegas fazem `git pull`, o banco de dados é atualizado automaticamente.
+Tudo é **100% automático**. Zero comandos manuais para o banco de dados.
 
 ### Primeira configuração (após clonar o repositório)
 
@@ -16,7 +16,7 @@ cp .env.example .env
 php artisan key:generate
 
 # 3. Configurar os git hooks (só uma vez!)
-# Este comando apaga o banco de dados antigo e cria o novo com todos os dados
+# Este comando configura tudo automaticamente
 bash scripts/setup-hooks.sh
 
 # 4. Rodar a aplicação
@@ -26,7 +26,7 @@ php artisan serve
 
 ### Após `git pull` (atualizações futuras)
 
-Tudo é automático — o banco de dados antigo é apagado e substituído pelo novo a cada `git pull`. Só precisas de:
+**Tudo é automático.** Só precisas de:
 
 ```bash
 git pull origin main
@@ -34,7 +34,7 @@ npm run dev
 php artisan serve
 ```
 
-O `setup-hooks.sh` na primeira vez apaga o banco de dados antigo e cria o novo. A cada `git pull` seguinte, o banco de dados é automaticamente atualizado com os dados mais recentes.
+O banco de dados é atualizado automaticamente a cada `git pull`. O storage link é criado sozinho. Zero comandos manuais.
 
 ## Como funciona o sistema automático
 

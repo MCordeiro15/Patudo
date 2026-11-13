@@ -4,8 +4,8 @@
 # Isto garante que quando alguém faz push, todos os dados (users, petsitters, fotos, etc.)
 # são incluídos no commit para que os colegas recebam tudo com git pull
 
-# Caminho para o artisan (o hook está em .git/hooks/, o projeto está 2 níveis acima)
-PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# Caminho para o artisan (o hook está em scripts/, o projeto está 1 nível acima)
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 ARTISAN="$PROJECT_ROOT/artisan"
 
 # Verificar se o artisan existe
