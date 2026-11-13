@@ -117,10 +117,16 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 5. Create posts for petsitters
-        $this->call(PostSeeder::class);
+        // Se existir o ExportedDataSeeder (gerado automaticamente), usa-o
+        // Caso contrário, usa os seeders normais
+        if (file_exists(database_path('seeders/ExportedDataSeeder.php'))) {
+            $this->call(ExportedDataSeeder::class);
+        } else {
+            // 5. Create posts for petsitters
+            $this->call(PostSeeder::class);
 
-        // 5. Create bookings and reviews
-        $this->call(BookingSeeder::class);
+            // 6. Create bookings and reviews
+            $this->call(BookingSeeder::class);
+        }
     }
 }

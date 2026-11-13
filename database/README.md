@@ -40,6 +40,25 @@ Os dados de teste são gerados pelos **seeders** do Laravel. Não versionamos o 
    php artisan serve
    ```
 
+## Exportação automática de dados
+
+Quando fazes `git push`, um **git hook** exporta automaticamente todos os dados do teu banco de dados (users, petsitters, animais, posts, bookings, reviews, fotos) para um seeder.
+
+**Como funciona:**
+
+1. Criaste uma conta nova, fizeste uma reserva, subiste uma foto de perfil, etc.
+2. Rodas `git push origin main`
+3. O git hook roda `php artisan db:export` automaticamente
+4. Todos os dados são exportados para `ExportedDataSeeder.php`
+5. O seeder é commitado e pushado
+6. Os colegas fazem `git pull` e `php artisan migrate:fresh --seed` para receberem tudo
+
+**Para os colegas configurarem o git hook:**
+
+```bash
+chmod +x .git/hooks/pre-push
+```
+
 ## O que é criado pelos seeders
 
 - **12 Users**: Admin, Test User, Miguel, 6 Petsitters (Sofia, Tiago, João, Inês, Maria, Rui) e 3 Clientes (Ana, Pedro, Carla)
@@ -70,31 +89,12 @@ Os dados de teste são gerados pelos **seeders** do Laravel. Não versionamos o 
 
 - `php artisan migrate:fresh --seed` — Resetar tudo e recomeçar do zero
 - `php artisan db:seed` — Adicionar dados de teste sem apagar o que já existe
+- `php artisan db:export` — Exportar manualmente todos os dados para o seeder
 - `php artisan storage:link` — Criar symlink para as fotos aparecerem
-- `php artisan users:export-to-seeders` — Exportar users novos para os seeders automaticamente
-
-## Adicionar users novos automaticamente
-
-Se criaste uma conta nova e queres que os teus colegas também tenham:
-
-1. **Cria a conta** normalmente na aplicação
-2. **Roda o comando**:
-   ```bash
-   php artisan users:export-to-seeders
-   ```
-   O comando deteta automaticamente os users que não estão nos seeders e os adiciona.
-3. **Faz commit e push**:
-   ```bash
-   git add -A
-   git commit -m "Adicionar novos users aos seeders"
-   git push origin main
-   ```
-4. **Os colegas recebem** com `git pull origin main` e `php artisan migrate:fresh --seed`
 
 ## Importante
 
 - **Nunca** versiones `database/database.sqlite` no Git — está no `.gitignore`
 - Cada colega gera a sua própria base de dados com `migrate:fresh --seed`
-- Os seeders usam `firstOrCreate`, então rodar `db:seed` não apaga users que já existem
-- O admin usa `updateOrCreate` para garantir que a password é sempre `admin1234`
+- O git hook exporta automaticamente os dados antes de cada push
 - Se as fotos de perfil não aparecem, roda `php artisan storage:link`
