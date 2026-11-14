@@ -21,9 +21,15 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // 1) Por defeito: avatar gerado com as iniciais do nome
         $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($this->name ?? 'U') . '&background=random';
 
-        // Se o usuário é petsitter, usa a foto do perfil do petsitter
+        // 2) Se o user carregou uma foto própria (guardada em base64), usa-a
+        if ($this->avatar) {
+            $avatarUrl = $this->avatar;
+        }
+
+        // 3) Se é petsitter, a foto do perfil de petsitter tem prioridade
         if ($this->isPetsitter() && $this->relationLoaded('petsitter')) {
             $petsitter = $this->petsitter;
             if ($petsitter && $petsitter->profile_photo) {
@@ -38,6 +44,8 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
+            'location' => $this->location,
+            'about' => $this->about,
             'avatar_url' => $avatarUrl,
             'email_verified_at' => $this->email_verified_at,
             'is_petsitter' => $this->isPetsitter(),

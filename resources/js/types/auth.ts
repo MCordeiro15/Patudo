@@ -5,6 +5,8 @@ export type User = {
     name: string;
     email: string;
     phone?: string | null;
+    location?: string | null;
+    about?: string | null;
     avatar?: string;
     avatar_url?: string | null;
     email_verified_at: string | null;

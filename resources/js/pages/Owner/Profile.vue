@@ -10,6 +10,7 @@ import { useAuth } from '@/composables/useAuth';
 import AnimalCard from '@/components/AnimalCard.vue';
 import ModalAddPet from '@/pages/Modals/ModalAddPet.vue';
 import ModalDeleteAnimal from '@/pages/Modals/ModalDeleteAnimal.vue';
+import ModalEditOwnerProfile from '@/pages/Modals/ModalEditOwnerProfile.vue';
 
 const { user, logout } = useAuth();
 
@@ -34,6 +35,81 @@ function formatPhone(phone: string | null | undefined): string | null {
     const formatted = digits.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
     return `+351 ${formatted}`;
 }
+
+const showEditModal = ref(false);
+const profileError = ref('');
+
+// Dados que o modal precisa, já no formato que ele espera
+const editData = computed(() => ({
+    name: user.value?.name ?? '',
+    location: user.value?.location ?? '',
+    phone: user.value?.phone ?? '',
+    about: user.value?.about ?? '',
+    avatar_url: user.value?.avatar_url ?? null,
+}));
+
+function getXsrf(): string {
+    const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : '';
+}
+
+const handleSaveProfile = async (formData: FormData) => {
+    if (!user.value) return;
+    profileError.value = '';
+
+    // O Laravel só lê ficheiros em POST, por isso simulamos o PUT
+    formData.append('_method', 'PUT');
+
+    try {
+        const response = await fetch(`/api/users/${user.value.id}`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': getXsrf(),
+                // sem Content-Type: o browser define o multipart sozinho
+            },
+            body: formData,
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            user.value = data.data ?? data; // atualiza o estado global
+        } else {
+            const err = await response.json().catch(() => ({}));
+            profileError.value = err.errors
+                ? Object.values(err.errors).flat().join(' ')
+                : (err.message ?? 'Erro ao guardar o perfil.');
+        }
+    } catch {
+        profileError.value = 'Erro de conexão. Tente novamente.';
+    }
+};
+
+const handleDeleteAccount = async () => {
+    if (!user.value) return;
+    if (!window.confirm('Tens a certeza que queres eliminar a tua conta?')) return;
+
+    try {
+        const response = await fetch(`/api/users/${user.value.id}`, {
+            method: 'DELETE',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': getXsrf(),
+            },
+        });
+        if (response.ok) {
+            window.location.href = '/login';
+        } else {
+            profileError.value = 'Não foi possível eliminar a conta.';
+        }
+    } catch {
+        profileError.value = 'Erro de conexão. Tente novamente.';
+    }
+};
 
 const fetchAnimals = async () => {
     isLoading.value = true;
@@ -228,8 +304,28 @@ onMounted(() => {
                                         >
                                             {{ formatPhone(user.phone) }}
                                         </p>
+                                        <p v-if="user?.location" class="mb-0 text-muted small">
+                                            {{ user.location }}
+                                        </p>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="col-12 col-md-4 text-md-end">
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-primary rounded-pill"
+                                    @click="showEditModal = true"
+                                >
+                                    Editar perfil
+                                </button>
+                            </div>
+                            <div v-if="user?.about" class="col-12">
+                                <p class="mb-0 small" style="white-space: pre-line">
+                                    {{ user.about }}
+                                </p>
+                            </div>
+                            <div v-if="profileError" class="alert alert-danger py-2 small" role="alert">
+                                {{ profileError }}
                             </div>
                         </div>
                     </section>
@@ -318,6 +414,14 @@ onMounted(() => {
                 deletingAnimal = null;
             "
             @confirmed="confirmDeleteAnimal"
+        />
+
+        <ModalEditOwnerProfile
+            :show="showEditModal"
+            :user="editData"
+            @close="showEditModal = false"
+            @save="handleSaveProfile"
+            @delete-account="handleDeleteAccount"
         />
     </main>
 </template>

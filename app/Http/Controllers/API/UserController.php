@@ -54,7 +54,7 @@ class UserController extends Controller
             'password' => Hash::make($data['password']),
         ]);
 
-        return new UserResource($user)->response()->setStatusCode(201);
+        return (new UserResource($user))->response()->setStatusCode(201);
     }
 
     /**
@@ -77,20 +77,30 @@ class UserController extends Controller
         Gate::authorize('update', $user);
 
         $data = $request->validate([
-            'name' => 'sometimes|string|max:255',
+            'name' => 'sometimes|string|max:255|unique:users,name,' . $user->id,
             'email' => 'sometimes|email|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
+            'location' => 'nullable|string|max:255',
+            'about' => 'nullable|string|max:1000',
+            'avatar' => 'nullable|image|max:2048',
         ]);
 
         // Limpar o phone para apenas 9 dígitos numéricos
-        if (isset($data['phone'])) {
-            $data['phone'] = preg_replace('/\D/', '', $data['phone']);
-            $data['phone'] = substr($data['phone'], 0, 9);
+        if (!empty($data['phone'])) {
+            $data['phone'] = substr(preg_replace('/\D/', '', $data['phone']), 0, 9);
+        }
+
+        // Foto: guardar como base64 na base de dados
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            $data['avatar'] = 'data:' . $file->getMimeType() . ';base64,' . base64_encode($file->get());
+        } else {
+            unset($data['avatar']);
         }
 
         $user->update($data);
 
-        return new UserResource($user);
+        return new UserResource($user->load('petsitter'));
     }
 
     /**
