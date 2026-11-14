@@ -20,11 +20,6 @@ class PasswordUpdateRequest extends FormRequest
      * Defines validation rules for form fields.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
-     */|/**
-     * Define as regras de validação para os campos do formulário.
-     * Defines validation rules for form fields.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
