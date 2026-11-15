@@ -176,7 +176,7 @@ onMounted(() => {
                     </a>
                     <button
                         type="button"
-                        class="text-dark p-0 border-0 bg-none"
+                        class="text-dark p-0 border-0 bg-transparent shadow-none"
                     >
                         <UserRound :size="25" />
                     </button>
