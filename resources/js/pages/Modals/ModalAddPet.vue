@@ -183,12 +183,7 @@ const submit = async () => {
     }
 };
 
-const handlePhotoChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    if (target.files && target.files[0]) {
-        photoFile.value = target.files[0];
-    }
-};
+
 </script>
 
 <template>
