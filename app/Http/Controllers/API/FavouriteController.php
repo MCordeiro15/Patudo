@@ -43,6 +43,26 @@ class FavouriteController extends Controller
         $user = $request->user();
         $petsitter = Petsitter::where('user_id', $data['petsitter_id'])->first();
 
+        if ($petsitter->approval_status !== 'approved') {
+            return response()->json([
+                'message' => 'Petsitter is not approved.'
+            ], 422);
+        }
+
+        if ($petsitter->user_id === $user->id) {
+            return response()->json([
+                'message' => 'You cannot add your own profile to favourites.'
+            ], 422);
+        }
+
+        if (Favourite::where('user_id', $user->id)
+            ->where('petsitter_id', $petsitter->user_id)
+            ->exists()) {
+            return response()->json([
+                'message' => 'Favourite already exists.'
+            ], 409);
+        }
+
         $favourite = Favourite::firstOrCreate(
             ['user_id' => $user->id, 'petsitter_id' => $petsitter->user_id],
             ['user_id' => $user->id, 'petsitter_id' => $petsitter->user_id]
