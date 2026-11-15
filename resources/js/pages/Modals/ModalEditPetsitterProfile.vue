@@ -887,8 +887,8 @@ const submit = async () => {
 
 .btn-patudo-outline {
     background-color: #ffffff;
-    color: #231810;
-    border: 1px solid #c4450c;
+    color: var(--patudo-terracota);
+    border: 1px solid var(--patudo-terracota);
     border-radius: 12px;
     padding: 0.5rem 1.35rem;
     font-size: 0.85rem;
@@ -914,7 +914,7 @@ const submit = async () => {
 }
 
 .btn-patudo-solid:hover:not(:disabled) {
-    background-color: #a83908;
+    background-color: var(--patudo-laranjaVivo);
 }
 
 .btn-patudo-outline:disabled,
