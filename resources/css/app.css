@@ -39,6 +39,7 @@
 }
 
 .btn-outline-primary {
+    /* --bs-btn-bg: #ffffff; */
     --bs-btn-color: var(--patudo-terracota);
     --bs-btn-border-color: var(--patudo-terracota);
     --bs-btn-hover-bg: var(--patudo-bege);
