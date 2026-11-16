@@ -9,9 +9,10 @@ const emit = defineEmits<{
     (e: 'saved'): void;
 }>();
 
-defineProps<{
+const props = defineProps<{
     show: boolean;
 }>();
+
 
 const name = ref('');
 const species = ref('');
@@ -187,13 +188,12 @@ const submit = async () => {
 </script>
 
 <template>
-    <Teleport to="body">
-        <div
-            v-if="show"
-            class="patudo-modal-backdrop position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3"
-            @click.self="close"
-            @keydown.escape="close"
-        >
+    <div
+        v-if="show"
+        class="patudo-modal-backdrop position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3"
+        @click.self="close"
+        @keydown.escape="close"
+    >
             <div
                 class="patudo-modal modal-content w-100 border border-primary shadow overflow-hidden"
                 role="dialog"
@@ -527,9 +527,8 @@ const submit = async () => {
                         </div>
                     </div>
                 </form>
-            </div>
         </div>
-    </Teleport>
+    </div>
 </template>
 
 <style scoped>

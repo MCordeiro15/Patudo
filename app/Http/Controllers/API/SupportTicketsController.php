@@ -9,18 +9,19 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SupportTicketsResource;
 use App\Models\SupportTicket;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 
 class SupportTicketsController extends Controller
 {
     /**
      * Open a new support ticket (complaint or help request).
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
+        Gate::authorize('create', SupportTicket::class);
+
         $data = $request->validate([
             'reported_user_id' => 'nullable|exists:users,id',
             'subject' => 'required|string|max:255',
@@ -34,32 +35,28 @@ class SupportTicketsController extends Controller
         $ticket = SupportTicket::create($data);
         $ticket->refresh();
 
-        return new SupportTicketsResource($ticket->load(['creator', 'reportedUser']))->response()->setStatusCode(201);
+        return (new SupportTicketsResource($ticket->load(['creator', 'reportedUser'])))->response()->setStatusCode(201);
     }
 
     /**
      * Allow an admin to claim (take ownership of) a support ticket.
      */
-    public function claim(Request $request, SupportTicket $ticket): JsonResponse|Response
+    public function claim(Request $request, SupportTicket $ticket)
     {
-        $user = $request->user();
-
-        if (! $user->isAdmin()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        Gate::authorize('claim', $ticket);
 
         if ($ticket->claimed_by !== null) {
             return response()->json(['message' => 'Ticket already claimed'], 409);
         }
 
         $ticket->update([
-            'claimed_by' => $user->id,
+            'claimed_by' => $request->user()->id,
             'status' => 'in_progress',
         ]);
 
         $ticket->refresh();
 
-        return new SupportTicketsResource($ticket->load(['creator', 'claimant', 'reportedUser']))->response();
+        return new SupportTicketsResource($ticket->load(['creator', 'claimant', 'reportedUser']));
     }
 
     /**
@@ -67,47 +64,39 @@ class SupportTicketsController extends Controller
      */
     public function index(Request $request): ResourceCollection
     {
+        Gate::authorize('viewAny', SupportTicket::class);
+
         $user = $request->user();
 
-        if ($user->isAdmin()) {
-            $tickets = SupportTicket::with(['creator', 'claimant', 'reportedUser'])->get();
-        } else {
-            $tickets = SupportTicket::where('user_id', $user->id)
-                ->with(['creator', 'claimant', 'reportedUser'])
-                ->get();
+        $query = SupportTicket::with(['creator', 'claimant', 'reportedUser']);
+
+        if (! $user->isAdmin()) {
+            $query->where('user_id', $user->id);
         }
 
-        return SupportTicketsResource::collection($tickets);
+        return SupportTicketsResource::collection($query->get());
     }
 
     /**
      * Show a single support ticket.
      */
-    public function show(Request $request, SupportTicket $ticket): JsonResponse|Response
+    public function show(SupportTicket $ticket)
     {
-        $user = $request->user();
+        Gate::authorize('view', $ticket);
 
-        if (! $user->isAdmin() && $ticket->user_id !== $user->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        return new SupportTicketsResource($ticket->load(['creator', 'claimant', 'reportedUser']))->response();
+        return new SupportTicketsResource($ticket->load(['creator', 'claimant', 'reportedUser']));
     }
 
     /**
      * Close a support ticket (admin only).
      */
-    public function close(Request $request, SupportTicket $ticket): JsonResponse|Response
+    public function close(SupportTicket $ticket)
     {
-        $user = $request->user();
-
-        if (! $user->isAdmin()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        Gate::authorize('close', $ticket);
 
         $ticket->update(['status' => 'closed']);
         $ticket->refresh();
 
-        return new SupportTicketsResource($ticket->load(['creator', 'claimant', 'reportedUser']))->response();
+        return new SupportTicketsResource($ticket->load(['creator', 'claimant', 'reportedUser']));
     }
 }

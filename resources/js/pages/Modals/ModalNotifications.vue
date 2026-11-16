@@ -132,13 +132,12 @@ const timeAgo = (dateString: string) => {
 </script>
 
 <template>
-    <Teleport to="body">
-        <div
-            v-if="show"
-            class="patudo-modal-backdrop"
-            @click.self="handleClose"
-            @keydown.escape="handleClose"
-        >
+    <div
+        v-if="show"
+        class="patudo-modal-backdrop"
+        @click.self="handleClose"
+        @keydown.escape="handleClose"
+    >
             <div class="patudo-modal-card patudo-modal-wide" role="dialog" aria-modal="true">
                 <!-- Cabeçalho -->
                 <div class="patudo-modal-header">
@@ -339,9 +338,8 @@ const timeAgo = (dateString: string) => {
                         Fechar
                     </button>
                 </div>
-            </div>
         </div>
-    </Teleport>
+    </div>
 </template>
 
 <style scoped>

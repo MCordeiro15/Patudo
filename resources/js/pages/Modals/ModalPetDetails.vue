@@ -1,6 +1,7 @@
 <!-- Página Vue: ModalPetDetails.vue -->
 <!-- Vue page: ModalPetDetails.vue -->
 <script setup lang="ts">
+
 export interface PetDetails {
     id?: number | string;
     name?: string;
@@ -19,7 +20,7 @@ export interface PetDetails {
     photos?: string[];
 }
 
-defineProps<{
+const props = defineProps<{
     show: boolean;
     pet?: PetDetails;
 }>();
@@ -34,13 +35,12 @@ const handleClose = () => {
 </script>
 
 <template>
-    <Teleport to="body">
-        <div
-            v-if="show"
-            class="patudo-modal-backdrop"
-            @click.self="handleClose"
-            @keydown.escape="handleClose"
-        >
+    <div
+        v-if="show"
+        class="patudo-modal-backdrop"
+        @click.self="handleClose"
+        @keydown.escape="handleClose"
+    >
             <div class="patudo-modal-card" role="dialog" aria-modal="true">
                 <button
                     type="button"
@@ -282,9 +282,8 @@ const handleClose = () => {
                         </p>
                     </div>
                 </div>
-            </div>
         </div>
-    </Teleport>
+    </div>
 </template>
 
 <style scoped>

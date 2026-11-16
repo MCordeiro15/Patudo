@@ -1,32 +1,63 @@
 <?php
 
-
-/**
- * Ficheiro PHP: api.php
- * PHP file: api.php
- */
 use App\Http\Controllers\API\AnimalController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\BookingController;
 use App\Http\Controllers\API\FavouriteController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\PetsitterAvailabilityController;
 use App\Http\Controllers\API\PetsitterController;
 use App\Http\Controllers\API\PostController;
-use App\Http\Controllers\API\SupportTicketsController;
-use App\Http\Controllers\API\BookingController;
 use App\Http\Controllers\API\ReviewController;
+use App\Http\Controllers\API\SupportTicketsController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Route;
 
-/**
- * @return void
- * @return void
- */
-if (! function_exists('extracted')) {
-    function extracted(): void
-    {
+/*
+|--------------------------------------------------------------------------
+| Rotas públicas — não requerem autenticação
+|--------------------------------------------------------------------------
+*/
+
+// Rota pública para listar petsitters aprovados
+Route::get('/petsitters/public', [PetsitterController::class, 'publicIndex']);
+
+// Disponibilidade de um petsitter (pública)
+Route::get('/petsitters/{id}/availability', [PetsitterAvailabilityController::class, 'availability']);
+
+/*
+|--------------------------------------------------------------------------
+| Rotas de autenticação — precisam de sessão para Auth::attempt()
+|--------------------------------------------------------------------------
+*/
+Route::middleware([
+    \Illuminate\Cookie\Middleware\EncryptCookies::class,
+    \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    \Illuminate\Session\Middleware\StartSession::class,
+])->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+});
+
+// Logout precisa de sessão para invalidar
+Route::middleware([
+    'auth:sanctum',
+    \Illuminate\Cookie\Middleware\EncryptCookies::class,
+    \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    \Illuminate\Session\Middleware\StartSession::class,
+])->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Rotas autenticadas — requerem auth:sanctum
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:sanctum')->group(function () {
+
+    // Auth
     Route::get('/me', [AuthController::class, 'myInformation']);
-    Route::get('/myInformation', [AuthController::class, 'myInformation']);
 
     // Users
     Route::post('/users/{user}/suspend', [UserController::class, 'suspend']);
@@ -41,37 +72,8 @@ if (! function_exists('extracted')) {
     Route::post('/petsitters/{petsitter}/approve', [PetsitterController::class, 'approve']);
     Route::post('/petsitters/{petsitter}/reject', [PetsitterController::class, 'reject']);
     Route::apiResource('petsitters', PetsitterController::class);
-    }
-}
 
-// SPA authentication routes — need session middleware for Auth::attempt() and session()->regenerate()
-Route::middleware([
-    \Illuminate\Cookie\Middleware\EncryptCookies::class,
-    \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-    \Illuminate\Session\Middleware\StartSession::class,
-])->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
-});
-
-// Logout needs session middleware to invalidate the session
-Route::middleware([
-    'auth:sanctum',
-    \Illuminate\Cookie\Middleware\EncryptCookies::class,
-    \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-    \Illuminate\Session\Middleware\StartSession::class,
-])->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-});
-
-Route::get('/petsitters/{id}/availability', [PetsitterAvailabilityController::class, 'availability']);
-
-// Rota pública para listar petsitters aprovados
-Route::get('/petsitters/public', [PetsitterController::class, 'publicIndex']);
-
-// Authenticated API routes — Sanctum statefulApi handles session cookies from web routes
-Route::middleware('auth:sanctum')->group(function () {
-    extracted();
+    // Posts
     Route::get('/petsitters/{petsitter}/posts', [PostController::class, 'byPetsitter']);
     Route::apiResource('posts', PostController::class);
 

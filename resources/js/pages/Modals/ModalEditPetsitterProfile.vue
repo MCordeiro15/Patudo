@@ -141,11 +141,12 @@ const close = () => {
 
 watch(
     () => props.show,
-    async (newVal) => {
+    (newVal) => {
         if (newVal) {
             resetForm();
-            await nextTick();
-            populateForm();
+            nextTick(() => {
+                populateForm();
+            });
         }
     },
 );
@@ -280,13 +281,12 @@ const submit = async () => {
 </script>
 
 <template>
-    <Teleport to="body">
-        <div
-            v-if="show"
-            class="patudo-modal-backdrop"
-            @click.self="close"
-            @keydown.escape="close"
-        >
+    <div
+        v-if="show"
+        class="patudo-modal-backdrop"
+        @click.self="close"
+        @keydown.escape="close"
+    >
             <div class="patudo-modal-card" role="dialog" aria-modal="true">
                 <!-- Botão Fechar (X) -->
                 <button
@@ -639,9 +639,8 @@ const submit = async () => {
                         </button>
                     </div>
                 </form>
-            </div>
         </div>
-    </Teleport>
+    </div>
 </template>
 
 <style scoped>

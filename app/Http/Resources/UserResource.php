@@ -21,6 +21,9 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $viewer = $request->user();
+        $canSeePrivate = $viewer && ($viewer->isAdmin() || $viewer->id === $this->id);
+
         // 1) Por defeito: avatar gerado com as iniciais do nome
         $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($this->name ?? 'U') . '&background=random';
 
@@ -42,10 +45,10 @@ class UserResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'email' => $this->email,
-            'phone' => $this->phone,
-            'location' => $this->location,
-            'about' => $this->about,
+            'email' => $this->when($canSeePrivate, $this->email),
+            'phone' => $this->when($canSeePrivate, $this->phone),
+            'location' => $this->when($canSeePrivate, $this->location),
+            'about' => $this->when($canSeePrivate, $this->about),
             'avatar_url' => $avatarUrl,
             'email_verified_at' => $this->email_verified_at,
             'is_petsitter' => $this->isPetsitter(),

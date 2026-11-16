@@ -41,8 +41,9 @@ class Petsitter extends Model
 
     public $incrementing = false;
 
-    /*The `approval_status` is not in `$fillable`, for the same reason as `is_admin`.
-     Only an administrator should be able to change it, and it should not be possible to submit it via a form.*/
+    /* `approval_status` is not in `$fillable`.
+     Only an administrator should be able to change it, and it should not be possible to submit it via a form.
+     `average_rating` is calculated automatically by `refreshAverageRating()`. */
     /**
      * Campos que podem ser preenchidos em massa via create() ou fill().
      * Fields that can be mass-assigned via create() or fill().
@@ -50,8 +51,8 @@ class Petsitter extends Model
     protected $fillable = [
         'user_id', 'biography', 'profile_photo', 'short_bio', 'experience', 'service_location', 'city',
         'age',
-        'price_per_day', 'average_rating', 'accepted_sizes', 'sex', 'accepted_animal_types',
-        'identification_documents', 'availability_days',
+        'price_per_day', 'accepted_sizes', 'sex', 'accepted_animal_types',
+        'availability_days', 'identification_documents',
     ];
 
     protected function casts(): array

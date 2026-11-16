@@ -41,6 +41,7 @@ class PetsitterResource extends JsonResource
             'user_id' => $this->user_id,
             'avatar_url' => $avatarUrl,
             'profile_photo' => $this->profile_photo,
+            'biography' => $this->biography,
             'short_bio' => $this->short_bio,
             'experience' => $this->experience,
             'service_location' => $this->service_location,

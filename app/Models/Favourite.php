@@ -12,6 +12,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Favourite extends Model
 {
+    public $incrementing = false;
+
+    protected $primaryKey = ['user_id', 'petsitter_id'];
+
     /**
      * Campos que podem ser preenchidos em massa via create() ou fill().
      * Fields that can be mass-assigned via create() or fill().

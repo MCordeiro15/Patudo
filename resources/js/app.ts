@@ -62,3 +62,4 @@ initializeFlashToast();
 // Load the authenticated user once on app initialization so all pages
 // have access to the session data without repeating the request.
 void loadUser();
+

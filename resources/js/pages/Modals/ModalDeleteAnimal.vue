@@ -1,7 +1,6 @@
 <!-- Página Vue: ModalDeleteAnimal.vue -->
 <!-- Vue page: ModalDeleteAnimal.vue -->
 <script setup lang="ts">
-import { ref } from 'vue';
 
 const emit = defineEmits<{
     (e: 'close'): void;
@@ -26,10 +25,9 @@ const confirm = () => {
 </script>
 
 <template>
-    <Teleport to="body">
-        <template v-if="show">
-            <!-- Backdrop -->
-            <div class="modal-backdrop fade show"></div>
+    <div v-if="show" class="patudo-modal-backdrop">
+        <!-- Backdrop -->
+        <div class="modal-backdrop fade show"></div>
 
             <!-- Modal -->
             <div
@@ -92,6 +90,18 @@ const confirm = () => {
                     </div>
                 </div>
             </div>
-        </template>
-    </Teleport>
+    </div>
 </template>
+
+<style scoped>
+.patudo-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 10000000;
+}
+</style>

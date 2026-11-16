@@ -38,7 +38,9 @@ const close = () => {
 watch(
     () => props.show,
     (open) => {
-        if (open) reset();
+        if (open) {
+            reset();
+        }
     },
 );
 
@@ -101,9 +103,8 @@ const submit = async () => {
 </script>
 
 <template>
-    <Teleport to="body">
-        <template v-if="show">
-            <div class="modal-backdrop fade show"></div>
+    <div v-if="show" class="patudo-modal-backdrop">
+        <div class="modal-backdrop fade show"></div>
 
             <div
                 class="modal fade show d-block"
@@ -196,12 +197,22 @@ const submit = async () => {
                         </form>
                     </div>
                 </div>
-            </div>
-        </template>
-    </Teleport>
+        </div>
+    </div>
 </template>
 
 <style scoped>
+.patudo-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 10000000;
+}
+
 .patudo-new-post-dialog { max-width: 480px; }
 
 .patudo-new-post-content {

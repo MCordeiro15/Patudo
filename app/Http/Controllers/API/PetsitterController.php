@@ -25,7 +25,7 @@ class PetsitterController extends Controller
     {
         Gate::authorize('viewAny', Petsitter::class);
 
-        $query = Petsitter::with('user')->where('approval_status', 'approved');
+        $query = Petsitter::with('user');
 
         if (! $request->user()?->isAdmin()) {
             $query->where('approval_status', 'approved');
@@ -98,18 +98,17 @@ class PetsitterController extends Controller
 
         $data = $request->validate([
             'name' => 'sometimes|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'biography' => 'nullable|string',
+            'phone' => 'sometimes|nullable|string|max:20',
+            'biography' => 'sometimes|nullable|string',
             'experience' => 'sometimes|string',
             'service_location' => 'sometimes|string|max:255',
             'price_per_day' => 'sometimes|numeric|min:0',
             'age' => 'sometimes|integer|min:18|max:99',
-            'accepted_sizes' => 'nullable|array',
+            'accepted_sizes' => 'sometimes|nullable|array',
             'accepted_sizes.*' => 'string',
             'sex' => 'sometimes|string|in:male,female,other',
-            'accepted_animal_types' => 'nullable|array',
+            'accepted_animal_types' => 'sometimes|nullable|array',
             'accepted_animal_types.*' => 'string',
-            'identification_documents' => 'sometimes|string|max:255',
             'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:20480',
         ]);
 

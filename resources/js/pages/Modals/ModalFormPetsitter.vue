@@ -1,25 +1,30 @@
 <!-- Página Vue: ModalFormPetsitter.vue -->
 <!-- Vue page: ModalFormPetsitter.vue -->
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
     show: boolean;
 }>();
 
 const emit = defineEmits(['close']);
+
+const close = () => {
+    emit('close');
+};
 </script>
 
 <template>
-    <div
-        v-if="show"
-        class="modal fade show d-block"
-        tabindex="-1"
-        style="
-            background-color: rgba(0, 0, 0, 0.5);
-            position: fixed;
-            inset: 0;
-            z-index: 10000000;
-        "
-    >
+        <div
+            v-if="show"
+            :key="'form-petsitter-' + Date.now()"
+            class="modal fade show d-block"
+            tabindex="-1"
+            style="
+                background-color: rgba(0, 0, 0, 0.5);
+                position: fixed;
+                inset: 0;
+                z-index: 10000000;
+            "
+        >
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content p-4 rounded-4 bg-white">
                 <div
@@ -29,7 +34,7 @@ const emit = defineEmits(['close']);
                     <button
                         type="button"
                         class="btn-close"
-                        @click="emit('close')"
+                        @click="close"
                     ></button>
                 </div>
 
@@ -41,7 +46,7 @@ const emit = defineEmits(['close']);
                     <button
                         type="button"
                         class="btn btn-secondary rounded-pill"
-                        @click="emit('close')"
+                        @click="close"
                     >
                         Fechar
                     </button>

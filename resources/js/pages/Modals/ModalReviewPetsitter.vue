@@ -99,13 +99,12 @@ const handleSubmit = () => {
 </script>
 
 <template>
-    <Teleport to="body">
-        <div
-            v-if="show"
-            class="patudo-modal-backdrop"
-            @click.self="handleClose"
-            @keydown.escape="handleClose"
-        >
+    <div
+        v-if="show"
+        class="patudo-modal-backdrop"
+        @click.self="handleClose"
+        @keydown.escape="handleClose"
+    >
             <div class="patudo-modal-card" role="dialog" aria-modal="true">
                 <!-- Cabeçalho com linha divisória a toda a largura -->
                 <div class="patudo-modal-header">
@@ -298,9 +297,8 @@ const handleSubmit = () => {
                         </div>
                     </div>
                 </form>
-            </div>
         </div>
-    </Teleport>
+    </div>
 </template>
 
 <style scoped>

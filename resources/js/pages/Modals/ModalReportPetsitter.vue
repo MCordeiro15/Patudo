@@ -3,7 +3,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-defineProps<{
+const props = defineProps<{
     show: boolean;
     petsitterId?: number | string;
 }>();
@@ -40,12 +40,11 @@ const handleSubmit = () => {
 </script>
 
 <template>
-    <Teleport to="body">
-        <div
-            v-if="show"
-            class="patudo-modal-backdrop"
-            @click.self="handleClose"
-        >
+    <div
+        v-if="show"
+        class="patudo-modal-backdrop"
+        @click.self="handleClose"
+    >
             <div class="patudo-modal-card" role="dialog" aria-modal="true">
                 <button
                     type="button"
@@ -134,9 +133,8 @@ const handleSubmit = () => {
                         </button>
                     </div>
                 </form>
-            </div>
         </div>
-    </Teleport>
+    </div>
 </template>
 
 <style scoped>

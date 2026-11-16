@@ -34,7 +34,6 @@ class PetsitterFactory extends Factory
             'service_location' => fake()->city(),
             'city' => fake()->city(),
             'price_per_day' => fake()->randomFloat(2, 10, 100),
-            'average_rating' => null,
             'accepted_sizes' => ['small', 'medium'],
             'accepted_animal_types' => ['dog', 'cat'],
             'approval_status' => 'pending',
