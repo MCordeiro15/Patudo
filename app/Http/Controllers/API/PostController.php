@@ -91,7 +91,25 @@ class PostController extends Controller
         $data = $request->validate([
             'title' => 'sometimes|required|string|max:100',
             'description' => 'sometimes|string|max:2000',
+            'remove_photo' => 'nullable|boolean',
+            'photos' => 'nullable|array|max:5',
+            'photos.*' => 'image|mimes:jpg,jpeg,png|max:5120',
         ]);
+
+        // Se o utilizador pediu para remover a foto
+        if ($request->boolean('remove_photo')) {
+            $data['photos'] = [];
+        }
+        // Se foram enviadas novas fotos, substituir as existentes
+        elseif ($request->hasFile('photos')) {
+            $paths = [];
+            foreach ($request->file('photos') as $file) {
+                $content = file_get_contents($file->getRealPath());
+                $mimeType = $file->getMimeType();
+                $paths[] = 'data:' . $mimeType . ';base64,' . base64_encode($content);
+            }
+            $data['photos'] = $paths;
+        }
 
         $post->update($data);
 
