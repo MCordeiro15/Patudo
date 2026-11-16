@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Hash;
 /**
  * SEEDER GERADO AUTOMATICAMENTE - NÃO EDITE MANUALMENTE
  * Este arquivo é gerado pelo comando php artisan db:export
- * Última atualização: 2026-11-16 15:44:17
+ * Última atualização: 2026-11-16 15:50:47
  */
 class ExportedDataSeeder extends Seeder
 {
@@ -1415,7 +1415,6 @@ class ExportedDataSeeder extends Seeder
     array (
       0 => 'small',
       1 => 'medium',
-      2 => 'large',
     ),
     'sex' => 'male',
     'accepted_animal_types' => 
@@ -1429,10 +1428,8 @@ class ExportedDataSeeder extends Seeder
     array (
       0 => 'monday',
       1 => 'tuesday',
-      2 => 'wednesday',
-      3 => 'thursday',
-      4 => 'friday',
-      5 => 'saturday',
+      2 => 'saturday',
+      3 => 'sunday',
     ),
     'profile_photo' => NULL,
     'created_at' => 
@@ -1487,7 +1484,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-16 12:49:40.000000',
+       'date' => '2026-11-16 15:45:07.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
