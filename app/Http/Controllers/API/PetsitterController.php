@@ -25,7 +25,7 @@ class PetsitterController extends Controller
     {
         Gate::authorize('viewAny', Petsitter::class);
 
-        $query = Petsitter::with('user');
+        $query = Petsitter::with('user')->where('approval_status', 'approved');
 
         if (! $request->user()?->isAdmin()) {
             $query->where('approval_status', 'approved');
