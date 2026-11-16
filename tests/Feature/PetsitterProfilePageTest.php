@@ -93,3 +93,11 @@ test('admin without petsitter profile is redirected to owner profile', function 
         ->get('/petsitters/profile')
         ->assertRedirect(route('owner.profile'));
 });
+
+test('nonexistent petsitter profile returns 404', function () {
+    $viewer = User::factory()->create();
+
+    $this->actingAs($viewer)
+        ->get('/petsitters/999999')
+        ->assertNotFound();
+});

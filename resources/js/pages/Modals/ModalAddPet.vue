@@ -1,5 +1,6 @@
+
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onBeforeUnmount } from 'vue';
 import type { AnimalFormErrors } from '@/types';
 import InputError from '@/components/InputError.vue';
 
@@ -22,6 +23,8 @@ const medication = ref('');
 const sex = ref('');
 const weight = ref('');
 const photoFile = ref<File | null>(null);
+const photoPreview = ref<string | null>(null);
+const photoInput = ref<HTMLInputElement | null>(null);
 
 const errors = ref<AnimalFormErrors>({});
 const isLoading = ref(false);
@@ -45,6 +48,50 @@ const sexOptions = [
     { value: 'femea', label: 'Fêmea' },
 ];
 
+const clearPhotoPreview = () => {
+    if (photoPreview.value) {
+        URL.revokeObjectURL(photoPreview.value);
+        photoPreview.value = null;
+    }
+};
+
+const removePhoto = () => {
+    clearPhotoPreview();
+    photoFile.value = null;
+
+    if (photoInput.value) {
+        photoInput.value.value = '';
+    }
+};
+
+const handlePhotoChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png'];
+
+    if (!allowedTypes.includes(file.type)) {
+        generalError.value = 'Seleciona uma imagem JPG ou PNG.';
+        target.value = '';
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        generalError.value = 'A fotografia não pode ultrapassar 5 MB.';
+        target.value = '';
+        return;
+    }
+
+    clearPhotoPreview();
+
+    photoFile.value = file;
+    photoPreview.value = URL.createObjectURL(file);
+
+    generalError.value = '';
+};
+
 const resetForm = () => {
     name.value = '';
     species.value = '';
@@ -55,7 +102,14 @@ const resetForm = () => {
     medication.value = '';
     sex.value = '';
     weight.value = '';
+
+    clearPhotoPreview();
     photoFile.value = null;
+
+    if (photoInput.value) {
+        photoInput.value.value = '';
+    }
+
     errors.value = {};
     generalError.value = '';
 };
@@ -64,6 +118,10 @@ const close = () => {
     resetForm();
     emit('close');
 };
+
+onBeforeUnmount(() => {
+    clearPhotoPreview();
+});
 
 const submit = async () => {
     errors.value = {};
@@ -125,288 +183,348 @@ const submit = async () => {
     }
 };
 
-const handlePhotoChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    if (target.files && target.files[0]) {
-        photoFile.value = target.files[0];
-    }
-};
+
 </script>
 
 <template>
     <Teleport to="body">
         <div
             v-if="show"
-            class="patudo-modal-backdrop"
+            class="patudo-modal-backdrop position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3"
             @click.self="close"
             @keydown.escape="close"
         >
-            <div class="patudo-modal-card" role="dialog" aria-modal="true">
-                <button
-                    type="button"
-                    class="patudo-close-btn"
-                    aria-label="Fechar"
-                    @click="close"
-                >
-                    <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                    >
-                        <path d="M18 6L6 18M6 6l12 12" />
-                    </svg>
-                </button>
+            <div
+                class="patudo-modal modal-content w-100 border border-primary shadow overflow-hidden"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="modal-add-animal-title"
+            >
+                <div class="d-flex justify-content-between align-items-center flex-shrink-0 px-4 py-3 border-bottom border-primary">
+                    <h2 id="modal-add-animal-title" class="h5 fw-bold mb-0">
+                        Adicionar animal
+                    </h2>
 
-                <div class="mb-3">
-                    <h2 class="patudo-modal-title">Adicionar animal</h2>
-                    <p class="patudo-modal-subtitle">
-                        Preenche os dados do teu patudo para o associares ao teu
-                        perfil.
-                    </p>
+                    <button
+                        type="button"
+                        class="btn border-0 p-1 text-body"
+                        aria-label="Fechar"
+                        @click="close"
+                    >
+                        <svg
+                            width="30"
+                            height="30"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                        >
+                            <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
 
-                <form @submit.prevent="submit">
-                    <div
-                        v-if="generalError"
-                        class="patudo-alert-error mb-3"
-                        role="alert"
-                    >
-                        {{ generalError }}
-                    </div>
-                    <div class="mb-3">
-                        <label
-                            for="animal-name"
-                            class="patudo-section-label d-block mb-1"
+                <form class="d-flex flex-column flex-grow-1 min-h-0" @submit.prevent="submit">
+                    <div class="flex-grow-1 min-h-0 overflow-y-auto px-4 py-3">
+                        <div
+                            v-if="generalError"
+                            class="alert alert-danger rounded-3 py-2 small mb-3"
+                            role="alert"
                         >
-                            Nome *
-                        </label>
-                        <input
-                            id="animal-name"
-                            v-model="name"
-                            type="text"
-                            class="patudo-input"
-                            :class="{ 'is-invalid': errors.name }"
-                            placeholder="Ex: Rex"
-                            required
-                        />
-                        <InputError :message="errors.name?.[0]" />
-                    </div>
-
-                    <div class="row g-2 mb-3">
-                        <div class="col-6">
-                            <label
-                                for="animal-species"
-                                class="patudo-section-label d-block mb-1"
-                            >
-                                Espécie *
-                            </label>
-                            <input
-                                id="animal-species"
-                                v-model="species"
-                                type="text"
-                                class="patudo-input"
-                                :class="{ 'is-invalid': errors.species }"
-                                placeholder="Ex: Cão, Gato"
-                                required
-                            />
-                            <InputError :message="errors.species?.[0]" />
+                            {{ generalError }}
                         </div>
 
-                        <div class="col-6">
-                            <label
-                                for="animal-breed"
-                                class="patudo-section-label d-block mb-1"
-                            >
-                                Raça *
-                            </label>
-                            <input
-                                id="animal-breed"
-                                v-model="breed"
-                                type="text"
-                                class="patudo-input"
-                                :class="{ 'is-invalid': errors.breed }"
-                                placeholder="Ex: Labrador"
-                                required
-                            />
-                            <InputError :message="errors.breed?.[0]" />
-                        </div>
-                    </div>
+                        <div class="mb-3">
+                            <span class="d-block fw-bold small mb-2">
+                                Fotos
+                            </span>
 
-                    <div class="mb-3">
-                        <label
-                            for="animal-size"
-                            class="patudo-section-label d-block mb-1"
-                        >
-                            Porte *
-                        </label>
-                        <select
-                            id="animal-size"
-                            v-model="size"
-                            class="patudo-input patudo-select"
-                            :class="{ 'is-invalid': errors.size }"
-                            required
-                        >
-                            <option value="" disabled>Seleciona o porte</option>
-                            <option
-                                v-for="option in sizeOptions"
-                                :key="option.value"
-                                :value="option.value"
-                            >
-                                {{ option.label }}
-                            </option>
-                        </select>
-                        <InputError :message="errors.size?.[0]" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label
-                            for="animal-special-needs"
-                            class="patudo-section-label d-block mb-1"
-                        >
-                            Necessidades especiais / Sobre o animal
-                            <span class="patudo-optional">(opcional)</span>
-                        </label>
-                        <textarea
-                            id="animal-special-needs"
-                            v-model="specialNeeds"
-                            rows="2"
-                            class="patudo-textarea"
-                            placeholder="Ex: Medicação diária, dieta especial, comportamento..."
-                        ></textarea>
-                        <InputError :message="errors.special_needs?.[0]" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label
-                            for="animal-aggression"
-                            class="patudo-section-label d-block mb-1"
-                        >
-                            Agressividade
-                            <span class="patudo-optional">(opcional)</span>
-                        </label>
-                        <select
-                            id="animal-aggression"
-                            v-model="aggression"
-                            class="patudo-input patudo-select"
-                            :class="{ 'is-invalid': errors.aggression }"
-                        >
-                            <option value="" disabled>Seleciona o nível</option>
-                            <option
-                                v-for="option in aggressionOptions"
-                                :key="option.value"
-                                :value="option.value"
-                            >
-                                {{ option.label }}
-                            </option>
-                        </select>
-                        <InputError :message="errors.aggression?.[0]" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label
-                            for="animal-medication"
-                            class="patudo-section-label d-block mb-1"
-                        >
-                            Medicação
-                            <span class="patudo-optional">(opcional)</span>
-                        </label>
-                        <textarea
-                            id="animal-medication"
-                            v-model="medication"
-                            rows="2"
-                            class="patudo-textarea"
-                            placeholder="Ex: Anti-inflamatório, 1x ao dia..."
-                        ></textarea>
-                        <InputError :message="errors.medication?.[0]" />
-                    </div>
-
-                    <div class="row g-2 mb-3">
-                        <div class="col-6">
-                            <label
-                                for="animal-sex"
-                                class="patudo-section-label d-block mb-1"
-                            >
-                                Sexo
-                                <span class="patudo-optional">(opcional)</span>
-                            </label>
-                            <select
-                                id="animal-sex"
-                                v-model="sex"
-                                class="patudo-input patudo-select"
-                                :class="{ 'is-invalid': errors.sex }"
-                            >
-                                <option value="" disabled>Seleciona</option>
-                                <option
-                                    v-for="option in sexOptions"
-                                    :key="option.value"
-                                    :value="option.value"
+                            <div class="d-flex align-items-center gap-3">
+                                <label
+                                    for="animal-photo"
+                                    class="animal-photo-upload d-flex align-items-center justify-content-center flex-shrink-0"
                                 >
-                                    {{ option.label }}
-                                </option>
-                            </select>
-                            <InputError :message="errors.sex?.[0]" />
-                        </div>
+                                    <img
+                                        v-if="photoPreview"
+                                        :src="photoPreview"
+                                        alt="Fotografia do animal"
+                                        class="animal-photo-image"
+                                    />
 
-                        <div class="col-6">
-                            <label
-                                for="animal-weight"
-                                class="patudo-section-label d-block mb-1"
-                            >
-                                Peso (kg)
-                                <span class="patudo-optional">(opcional)</span>
-                            </label>
+                                    <svg
+                                        v-else
+                                        width="25"
+                                        height="25"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                    >
+                                        <path d="M12 5v14M5 12h14" />
+                                    </svg>
+                                </label>
+
+                                <div>
+                                    <p class="small text-secondary mb-1">
+                                        {{ photoPreview ? 'Fotografia selecionada.' : 'Adiciona fotografias do teu animal.' }}
+                                    </p>
+
+                                    <p class="small text-secondary mb-0">
+                                        Até 5 fotos. A primeira é a foto principal.<br />
+                                        JPG ou PNG, até 5 MB cada.
+                                    </p>
+
+                                    <button
+                                        v-if="photoPreview"
+                                        type="button"
+                                        class="animal-photo-remove mt-1"
+                                        @click="removePhoto"
+                                    >
+                                        Remover fotografia
+                                    </button>
+                                </div>
+                            </div>
+
                             <input
-                                id="animal-weight"
-                                v-model="weight"
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                class="patudo-input"
-                                :class="{ 'is-invalid': errors.weight }"
-                                placeholder="Ex: 12.5"
+                                id="animal-photo"
+                                ref="photoInput"
+                                type="file"
+                                accept="image/png, image/jpeg"
+                                class="d-none"
+                                @change="handlePhotoChange"
                             />
-                            <InputError :message="errors.weight?.[0]" />
+
+                            <InputError :message="errors.photo?.[0]" />
+                        </div>
+
+                        <span class="d-block fw-bold small mb-2">
+                            Informações
+                        </span>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-12 col-md-8">
+                                <label for="animal-name" class="form-label fw-bold small mb-1">
+                                    Nome do animal *
+                                </label>
+
+                                <input
+                                    id="animal-name"
+                                    v-model="name"
+                                    type="text"
+                                    class="form-control patudo-field rounded-3"
+                                    :class="{ 'is-invalid': errors.name }"
+                                    placeholder="Ex.: Max"
+                                    autocomplete="off"
+                                    required
+                                    aria-required="true"
+                                />
+
+                                <InputError :message="errors.name?.[0]" />
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="animal-species" class="form-label fw-bold small mb-1">
+                                    Tipo de animal *
+                                </label>
+
+                                <select
+                                    id="animal-species"
+                                    v-model="species"
+                                    class="form-select patudo-field rounded-3"
+                                    :class="[{ 'is-invalid': errors.species }, species ? 'text-body' : 'text-secondary']"
+                                    required
+                                    aria-required="true"
+                                >
+                                    <option value="" disabled>Selecionar</option>
+                                    <option value="Cão" class="text-body">Cão</option>
+                                    <option value="Gato" class="text-body">Gato</option>
+                                    <option value="Outro" class="text-body">Outro</option>
+                                </select>
+
+                                <InputError :message="errors.species?.[0]" />
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-12 col-md-4">
+                                <label for="animal-breed" class="form-label fw-bold small mb-1">
+                                    Raça
+                                </label>
+
+                                <input
+                                    id="animal-breed"
+                                    v-model="breed"
+                                    type="text"
+                                    class="form-control patudo-field rounded-3"
+                                    :class="{ 'is-invalid': errors.breed }"
+                                    placeholder="Ex.: Labrador"
+                                    autocomplete="off"
+                                />
+
+                                <InputError :message="errors.breed?.[0]" />
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="animal-sex" class="form-label fw-bold small mb-1">
+                                    Sexo
+                                </label>
+
+                                <select
+                                    id="animal-sex"
+                                    v-model="sex"
+                                    class="form-select patudo-field rounded-3"
+                                    :class="[{ 'is-invalid': errors.sex }, sex ? 'text-body' : 'text-secondary']"
+                                >
+                                    <option value="" disabled>Selecionar</option>
+
+                                    <option
+                                        v-for="option in sexOptions"
+                                        :key="option.value"
+                                        :value="option.value"
+                                        class="text-body"
+                                    >
+                                        {{ option.label }}
+                                    </option>
+                                </select>
+
+                                <InputError :message="errors.sex?.[0]" />
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="animal-age" class="form-label fw-bold small mb-1">
+                                    Idade
+                                </label>
+
+                                <input
+                                    id="animal-age"
+                                    type="text"
+                                    class="form-control patudo-field rounded-3"
+                                    placeholder="Ex.: 3 anos"
+                                    autocomplete="off"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-12 col-md-4">
+                                <label for="animal-size" class="form-label fw-bold small mb-1">
+                                    Porte
+                                </label>
+
+                                <select
+                                    id="animal-size"
+                                    v-model="size"
+                                    class="form-select patudo-field rounded-3"
+                                    :class="[{ 'is-invalid': errors.size }, size ? 'text-body' : 'text-secondary']"
+                                >
+                                    <option value="" disabled>Selecionar</option>
+
+                                    <option
+                                        v-for="option in sizeOptions"
+                                        :key="option.value"
+                                        :value="option.value"
+                                        class="text-body"
+                                    >
+                                        {{ option.label }}
+                                    </option>
+                                </select>
+
+                                <InputError :message="errors.size?.[0]" />
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="animal-weight" class="form-label fw-bold small mb-1">
+                                    Peso (kg)
+                                </label>
+
+                                <input
+                                    id="animal-weight"
+                                    v-model="weight"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    class="form-control patudo-field rounded-3"
+                                    :class="{ 'is-invalid': errors.weight }"
+                                    placeholder="Ex.: 9"
+                                />
+
+                                <InputError :message="errors.weight?.[0]" />
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="animal-aggression" class="form-label fw-bold small mb-1">
+                                    Agressividade
+                                </label>
+
+                                <select
+                                    id="animal-aggression"
+                                    v-model="aggression"
+                                    class="form-select patudo-field rounded-3"
+                                    :class="[{ 'is-invalid': errors.aggression }, aggression ? 'text-body' : 'text-secondary']"
+                                >
+                                    <option value="" disabled>Selecionar</option>
+
+                                    <option
+                                        v-for="option in aggressionOptions"
+                                        :key="option.value"
+                                        :value="option.value"
+                                        class="text-body"
+                                    >
+                                        {{ option.label }}
+                                    </option>
+                                </select>
+
+                                <InputError :message="errors.aggression?.[0]" />
+                            </div>
+                        </div>
+
+                        <div class="mb-1">
+                            <label for="animal-special-needs" class="form-label fw-bold small mb-1">
+                                Sobre o animal/Cuidados a ter
+                            </label>
+
+                            <textarea
+                                id="animal-special-needs"
+                                v-model="specialNeeds"
+                                rows="7"
+                                maxlength="300"
+                                class="form-control patudo-field patudo-textarea rounded-4 bg-white"
+                                placeholder="Personalidade, hábitos, gostos e preferências, necessidades especiais, medicação ou cuidados específicos..."
+                            ></textarea>
+
+                            <div class="text-end small text-secondary mt-1">
+                                {{ specialNeeds.length }}/300
+                            </div>
+
+                            <InputError :message="errors.special_needs?.[0]" />
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label
-                            for="animal-photo"
-                            class="patudo-section-label d-block mb-1"
-                        >
-                            Foto do animal
-                            <span class="patudo-optional">(opcional)</span>
-                        </label>
-                        <input
-                            id="animal-photo"
-                            type="file"
-                            accept="image/*"
-                            class="patudo-input"
-                            @change="handlePhotoChange"
-                        />
-                        <InputError :message="errors.photo?.[0]" />
-                    </div>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 flex-shrink-0 px-4 py-3 border-top border-primary">
+                        <span class="patudo-note text-secondary">
+                            * Campos obrigatórios
+                        </span>
 
-                    <div class="patudo-modal-actions">
-                        <button
-                            type="button"
-                            class="btn-patudo-outline"
-                            :disabled="isLoading"
-                            @click="close"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            type="submit"
-                            class="btn-patudo-solid"
-                            :disabled="isLoading"
-                        >
-                            {{ isLoading ? 'A guardar...' : 'Adicionar' }}
-                        </button>
+                        <div class="d-flex align-items-center gap-2">
+                            <button
+                                type="button"
+                                class="btn btn-outline-primary rounded-pill px-4 fw-semibold bg-white"
+                                :disabled="isLoading"
+                                @click="close"
+                            >
+                                Cancelar
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary rounded-pill px-4 fw-semibold"
+                                :disabled="isLoading"
+                            >
+                                {{ isLoading ? 'A guardar...' : 'Guardar animal' }}
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -416,161 +534,75 @@ const handlePhotoChange = (event: Event) => {
 
 <style scoped>
 .patudo-modal-backdrop {
-    position: fixed;
-    inset: 0;
     background-color: rgba(0, 0, 0, 0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
     z-index: 10000000;
 }
 
-.patudo-modal-card {
-    position: relative;
-    width: 100%;
-    max-width: 480px;
-    background-color: #fff8f1;
-    border: 1.5px solid #c4450c;
-    border-radius: 18px;
-    padding: 1.5rem 1.75rem;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-    font-family: 'Plus Jakarta Sans', sans-serif;
+.patudo-modal {
+    max-width: 640px;
+    max-height: 92vh;
 }
 
-.patudo-close-btn {
-    position: absolute;
-    top: 1.25rem;
-    right: 1.25rem;
-    background: transparent;
-    border: none;
-    color: #2b211a;
+.min-h-0 {
+    min-height: 0;
+}
+
+.animal-photo-upload {
+    width: 56px;
+    height: 56px;
+    border: 1.5px dashed var(--patudo-terracota);
+    border-radius: 11px;
+    background-color: #fff;
+    color: var(--patudo-terracota);
     cursor: pointer;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.15s ease;
+    overflow: hidden;
+    transition: background-color 0.2s ease;
 }
 
-.patudo-close-btn:hover {
-    opacity: 0.65;
+.animal-photo-upload:hover {
+    background-color: #fbf2ec;
 }
 
-.patudo-modal-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #231810;
-    margin: 0 0 0.25rem 0;
-}
-
-.patudo-modal-subtitle {
-    font-size: 0.85rem;
-    color: #8c7a6b;
-    margin: 0;
-}
-
-.patudo-section-label {
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: #231810;
-}
-
-.patudo-optional {
-    font-weight: 400;
-    color: #8c7a6b;
-    font-size: 0.82rem;
-}
-
-.patudo-alert-error {
-    background-color: #fee2e2;
-    color: #991b1b;
-    border-radius: 12px;
-    padding: 0.6rem 0.9rem;
-    font-size: 0.84rem;
-}
-
-.patudo-input,
-.patudo-textarea {
+.animal-photo-image {
     width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.animal-photo-remove {
+    border: none;
+    padding: 0;
+    background: transparent;
+    color: var(--patudo-terracota);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.patudo-note {
+    font-size: 0.7rem;
+}
+
+.patudo-field {
+    border: 1.5px solid var(--patudo-terracota);
     background-color: #ffffff;
-    border: 1px solid transparent;
-    border-radius: 14px;
-    padding: 0.65rem 0.95rem;
-    font-size: 0.86rem;
-    color: #231810;
-    outline: none;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-    transition:
-        box-shadow 0.15s ease,
-        border-color 0.15s ease;
+    font-size: 0.9rem;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    padding-left: 0.95rem;
+}
+
+.patudo-field:focus {
+    border-color: var(--patudo-terracota);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.patudo-field.is-invalid {
+    border-color: var(--bs-danger);
 }
 
 .patudo-textarea {
     resize: none;
-}
-
-.patudo-input::placeholder,
-.patudo-textarea::placeholder {
-    color: #9e8e80;
-}
-
-.patudo-input:focus,
-.patudo-textarea:focus {
-    box-shadow: 0 0 0 2px rgba(196, 69, 12, 0.25);
-}
-
-.patudo-input.is-invalid {
-    border-color: #dc2626;
-}
-
-.patudo-select {
-    cursor: pointer;
-}
-
-.patudo-modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 0.65rem;
-    margin-top: 1.25rem;
-}
-
-.btn-patudo-outline {
-    background-color: #ffffff;
-    color: #231810;
-    border: 1px solid #c4450c;
-    border-radius: 12px;
-    padding: 0.55rem 1.75rem;
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.btn-patudo-outline:hover:not(:disabled) {
-    background-color: #fdf2ea;
-}
-
-.btn-patudo-solid {
-    background-color: #c4450c;
-    color: #ffffff;
-    border: 1px solid #c4450c;
-    border-radius: 12px;
-    padding: 0.55rem 1.5rem;
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.btn-patudo-solid:hover:not(:disabled) {
-    background-color: #a83908;
-}
-
-.btn-patudo-outline:disabled,
-.btn-patudo-solid:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    padding: 0.95rem;
 }
 </style>

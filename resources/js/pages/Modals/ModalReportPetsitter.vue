@@ -307,7 +307,7 @@ const handleSubmit = () => {
 }
 
 .btn-patudo-solid:hover:not(:disabled) {
-    background-color: #a83908;
+    background-color: var(--patudo-laranjaVivo);
 }
 
 .btn-patudo-solid:disabled {
