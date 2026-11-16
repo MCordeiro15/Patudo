@@ -34,7 +34,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property bool $is_petsitter
  * @property-read Petsitter|null $petsitter
  */
-#[Fillable(['name', 'email', 'password', 'phone', 'is_admin', 'is_petsitter', 'account_status'])]
+#[Fillable(['name', 'email', 'password', 'phone', 'location', 'about', 'avatar', 'is_admin', 'is_petsitter', 'account_status'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {

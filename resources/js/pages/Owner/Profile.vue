@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { CirclePlus, LogOut, UserRound, MessageCircle, Bell ,SquarePen } from '@lucide/vue';
@@ -9,6 +8,7 @@ import { useAuth } from '@/composables/useAuth';
 import AnimalCard from '@/components/AnimalCard.vue';
 import ModalAddPet from '@/pages/Modals/ModalAddPet.vue';
 import ModalDeleteAnimal from '@/pages/Modals/ModalDeleteAnimal.vue';
+import ModalEditOwnerProfile from '@/pages/Modals/ModalEditOwnerProfile.vue';
 
 const { user, logout } = useAuth();
 
@@ -33,6 +33,81 @@ function formatPhone(phone: string | null | undefined): string | null {
     const formatted = digits.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
     return `+351 ${formatted}`;
 }
+
+const showEditModal = ref(false);
+const profileError = ref('');
+
+// Dados que o modal precisa, já no formato que ele espera
+const editData = computed(() => ({
+    name: user.value?.name ?? '',
+    location: user.value?.location ?? '',
+    phone: user.value?.phone ?? '',
+    about: user.value?.about ?? '',
+    avatar_url: user.value?.avatar_url ?? null,
+}));
+
+function getXsrf(): string {
+    const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : '';
+}
+
+const handleSaveProfile = async (formData: FormData) => {
+    if (!user.value) return;
+    profileError.value = '';
+
+    // O Laravel só lê ficheiros em POST, por isso simulamos o PUT
+    formData.append('_method', 'PUT');
+
+    try {
+        const response = await fetch(`/api/users/${user.value.id}`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': getXsrf(),
+                // sem Content-Type: o browser define o multipart sozinho
+            },
+            body: formData,
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            user.value = data.data ?? data; // atualiza o estado global
+        } else {
+            const err = await response.json().catch(() => ({}));
+            profileError.value = err.errors
+                ? Object.values(err.errors).flat().join(' ')
+                : (err.message ?? 'Erro ao guardar o perfil.');
+        }
+    } catch {
+        profileError.value = 'Erro de conexão. Tente novamente.';
+    }
+};
+
+const handleDeleteAccount = async () => {
+    if (!user.value) return;
+    if (!window.confirm('Tens a certeza que queres eliminar a tua conta?')) return;
+
+    try {
+        const response = await fetch(`/api/users/${user.value.id}`, {
+            method: 'DELETE',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': getXsrf(),
+            },
+        });
+        if (response.ok) {
+            window.location.href = '/login';
+        } else {
+            profileError.value = 'Não foi possível eliminar a conta.';
+        }
+    } catch {
+        profileError.value = 'Erro de conexão. Tente novamente.';
+    }
+};
 
 const fetchAnimals = async () => {
     isLoading.value = true;
@@ -195,12 +270,21 @@ onMounted(() => {
 
             <h1 class="text-center fw-bold display-5 mt-5 pt-4 mb-4">O meu perfil</h1>
 
+            <div
+                v-if="profileError"
+                class="alert alert-danger py-2 small"
+                role="alert"
+            >
+                {{ profileError }}
+            </div>
+
             <section
                 class="card bg-white border border-primary rounded-4 p-3 p-md-4 mb-3 position-relative"
             >
                 <button
                     type="button"
                     class="btn btn-primary btn-sm d-flex align-items-center gap-2 position-absolute top-0 end-0 mt-3 me-3 px-4"
+                    @click="showEditModal = true"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -213,9 +297,15 @@ onMounted(() => {
                     <div class="col-12 col-md-8">
                         <div class="d-flex align-items-center gap-4">
                             <div
-                                class="profile-avatar d-flex align-items-center justify-content-center rounded-circle border border-primary flex-shrink-0"
+                                class="profile-avatar d-flex align-items-center justify-content-center rounded-circle border border-primary flex-shrink-0 overflow-hidden"
                             >
-                                <UserRound :size="64" class="text-primary" />
+                                <img
+                                    v-if="user?.avatar_url"
+                                    :src="user.avatar_url"
+                                    alt="Foto de perfil"
+                                    class="profile-avatar-img"
+                                />
+                                <UserRound v-else :size="64" class="text-primary" />
                             </div>
 
                             <div>
@@ -326,6 +416,14 @@ onMounted(() => {
             @close="showDeleteModal = false; deletingAnimal = null"
             @confirmed="confirmDeleteAnimal"
         />
+
+        <ModalEditOwnerProfile
+            :show="showEditModal"
+            :user="editData"
+            @close="showEditModal = false"
+            @save="handleSaveProfile"
+            @delete-account="handleDeleteAccount"
+        />
     </main>
 </template>
 
@@ -337,6 +435,12 @@ onMounted(() => {
 .profile-avatar {
     width: 140px;
     height: 140px;
+}
+
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .tag-pill {
