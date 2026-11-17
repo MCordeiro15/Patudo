@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Hash;
 /**
  * SEEDER GERADO AUTOMATICAMENTE - NÃO EDITE MANUALMENTE
  * Este arquivo é gerado pelo comando php artisan db:export
- * Última atualização: 2026-11-17 16:45:24
+ * Última atualização: 2026-11-17 16:39:05
  */
 class ExportedDataSeeder extends Seeder
 {
@@ -25,7 +25,7 @@ class ExportedDataSeeder extends Seeder
         // Desabilitar eventos durante o seed
         \Illuminate\Support\Facades\Event::fake();
 
-        // Export Users (15 users)
+        // Export Users (14 users)
         $users = array (
   0 => 
   array (
@@ -37,7 +37,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 2081,
+       'constructedObjectId' => 2083,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -68,7 +68,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 2075,
+       'constructedObjectId' => 2077,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -96,7 +96,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1581,
+       'constructedObjectId' => 1583,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -131,7 +131,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 2082,
+       'constructedObjectId' => 2084,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -162,7 +162,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 2061,
+       'constructedObjectId' => 2064,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -190,7 +190,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 2060,
+       'constructedObjectId' => 2063,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -225,7 +225,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1603,
+       'constructedObjectId' => 1606,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -256,7 +256,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1601,
+       'constructedObjectId' => 1604,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -284,7 +284,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1621,
+       'constructedObjectId' => 1624,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -319,7 +319,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1613,
+       'constructedObjectId' => 1616,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -350,7 +350,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1614,
+       'constructedObjectId' => 1617,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -378,7 +378,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1612,
+       'constructedObjectId' => 1615,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -413,7 +413,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1611,
+       'constructedObjectId' => 1614,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -444,7 +444,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1606,
+       'constructedObjectId' => 1609,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -472,7 +472,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1607,
+       'constructedObjectId' => 1610,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -507,7 +507,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1608,
+       'constructedObjectId' => 1611,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -538,7 +538,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1610,
+       'constructedObjectId' => 1613,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -566,7 +566,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 2059,
+       'constructedObjectId' => 2062,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -601,7 +601,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1609,
+       'constructedObjectId' => 1612,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -632,101 +632,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1616,
-       'clock' => NULL,
-       'localMonthsOverflow' => NULL,
-       'localYearsOverflow' => NULL,
-       'localStrictModeEnabled' => NULL,
-       'localHumanDiffOptions' => NULL,
-       'localToStringFormat' => NULL,
-       'localSerializer' => NULL,
-       'localMacros' => NULL,
-       'localGenericMacros' => NULL,
-       'localFormatFunction' => NULL,
-       'localTranslator' => NULL,
-       'dumpProperties' => 
-      array (
-        0 => 'date',
-        1 => 'timezone_type',
-        2 => 'timezone',
-      ),
-       'dumpLocale' => NULL,
-       'dumpDateProperties' => NULL,
-       'date' => '2026-11-17 16:30:56.000000',
-       'timezone_type' => 3,
-       'timezone' => 'UTC',
-    )),
-    'updated_at' => 
-    \Carbon\CarbonImmutable::__set_state(array(
-       'endOfTime' => false,
-       'startOfTime' => false,
-       'constructedObjectId' => 1622,
-       'clock' => NULL,
-       'localMonthsOverflow' => NULL,
-       'localYearsOverflow' => NULL,
-       'localStrictModeEnabled' => NULL,
-       'localHumanDiffOptions' => NULL,
-       'localToStringFormat' => NULL,
-       'localSerializer' => NULL,
-       'localMacros' => NULL,
-       'localGenericMacros' => NULL,
-       'localFormatFunction' => NULL,
-       'localTranslator' => NULL,
-       'dumpProperties' => 
-      array (
-        0 => 'date',
-        1 => 'timezone_type',
-        2 => 'timezone',
-      ),
-       'dumpLocale' => NULL,
-       'dumpDateProperties' => NULL,
-       'date' => '2026-11-17 16:30:56.000000',
-       'timezone_type' => 3,
-       'timezone' => 'UTC',
-    )),
-  ),
-  7 => 
-  array (
-    'id' => 8,
-    'name' => 'Test User',
-    'email' => 'test@example.com',
-    'password' => '$2y$12$g0k6EdxAGUcG80sERS5uKu0oq8WAdKVBgCMsoEC.c2CHZPlbvYvUq',
-    'email_verified_at' => 
-    \Carbon\CarbonImmutable::__set_state(array(
-       'endOfTime' => false,
-       'startOfTime' => false,
-       'constructedObjectId' => 1623,
-       'clock' => NULL,
-       'localMonthsOverflow' => NULL,
-       'localYearsOverflow' => NULL,
-       'localStrictModeEnabled' => NULL,
-       'localHumanDiffOptions' => NULL,
-       'localToStringFormat' => NULL,
-       'localSerializer' => NULL,
-       'localMacros' => NULL,
-       'localGenericMacros' => NULL,
-       'localFormatFunction' => NULL,
-       'localTranslator' => NULL,
-       'dumpProperties' => 
-      array (
-        0 => 'date',
-        1 => 'timezone_type',
-        2 => 'timezone',
-      ),
-       'dumpLocale' => NULL,
-       'dumpDateProperties' => NULL,
-       'date' => '2026-11-13 20:25:04.000000',
-       'timezone_type' => 3,
-       'timezone' => 'UTC',
-    )),
-    'phone' => '920000000',
-    'is_admin' => false,
-    'is_petsitter' => false,
-    'created_at' => 
-    \Carbon\CarbonImmutable::__set_state(array(
-       'endOfTime' => false,
-       'startOfTime' => false,
-       'constructedObjectId' => 1624,
+       'constructedObjectId' => 1619,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -779,12 +685,12 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
   ),
-  8 => 
+  7 => 
   array (
-    'id' => 9,
-    'name' => 'Miguel',
-    'email' => 'miguel@gmail.com',
-    'password' => '$2y$12$ufBsw1MZEwUtMddozFg25egymq1kkDFKfnPRWcRpbxn3gSRjd5h7u',
+    'id' => 8,
+    'name' => 'Test User',
+    'email' => 'test@example.com',
+    'password' => '$2y$12$g0k6EdxAGUcG80sERS5uKu0oq8WAdKVBgCMsoEC.c2CHZPlbvYvUq',
     'email_verified_at' => 
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
@@ -813,7 +719,7 @@ class ExportedDataSeeder extends Seeder
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
-    'phone' => '918726319',
+    'phone' => '920000000',
     'is_admin' => false,
     'is_petsitter' => false,
     'created_at' => 
@@ -873,12 +779,12 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
   ),
-  9 => 
+  8 => 
   array (
-    'id' => 10,
-    'name' => 'Ana Silva',
-    'email' => 'client1@patudo.test',
-    'password' => '$2y$12$ct5EekjbmHWli5/7v7OuGeRDAu3kHZSxjcq7qD8gAdF1wytfAwFNy',
+    'id' => 9,
+    'name' => 'Miguel',
+    'email' => 'miguel@gmail.com',
+    'password' => '$2y$12$ufBsw1MZEwUtMddozFg25egymq1kkDFKfnPRWcRpbxn3gSRjd5h7u',
     'email_verified_at' => 
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
@@ -907,7 +813,7 @@ class ExportedDataSeeder extends Seeder
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
-    'phone' => '940000000',
+    'phone' => '918726319',
     'is_admin' => false,
     'is_petsitter' => false,
     'created_at' => 
@@ -967,12 +873,12 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
   ),
-  10 => 
+  9 => 
   array (
-    'id' => 11,
-    'name' => 'Pedro Costa',
-    'email' => 'client2@patudo.test',
-    'password' => '$2y$12$W.z4zYHQpC.4tYQE/VmFtOpi4vpPIhSP/t/JjfiNrUvb/6zqroelC',
+    'id' => 10,
+    'name' => 'Ana Silva',
+    'email' => 'client1@patudo.test',
+    'password' => '$2y$12$ct5EekjbmHWli5/7v7OuGeRDAu3kHZSxjcq7qD8gAdF1wytfAwFNy',
     'email_verified_at' => 
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
@@ -1001,7 +907,7 @@ class ExportedDataSeeder extends Seeder
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
-    'phone' => '950000000',
+    'phone' => '940000000',
     'is_admin' => false,
     'is_petsitter' => false,
     'created_at' => 
@@ -1061,12 +967,12 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
   ),
-  11 => 
+  10 => 
   array (
-    'id' => 12,
-    'name' => 'Carla Mendes',
-    'email' => 'client3@patudo.test',
-    'password' => '$2y$12$swonSgYOpWJSFt3b25rQ8eC9F5/Y9pOyejqPb8X1eOSHTx.ZdsyE2',
+    'id' => 11,
+    'name' => 'Pedro Costa',
+    'email' => 'client2@patudo.test',
+    'password' => '$2y$12$W.z4zYHQpC.4tYQE/VmFtOpi4vpPIhSP/t/JjfiNrUvb/6zqroelC',
     'email_verified_at' => 
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
@@ -1095,7 +1001,7 @@ class ExportedDataSeeder extends Seeder
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
-    'phone' => '960000000',
+    'phone' => '950000000',
     'is_admin' => false,
     'is_petsitter' => false,
     'created_at' => 
@@ -1155,21 +1061,48 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
   ),
-  12 => 
+  11 => 
   array (
-    'id' => 13,
-    'name' => 'Administrador',
-    'email' => 'admin@patudo.test',
-    'password' => '$2y$12$yo8DxTX0E3Dv2MghxffaG.cJsPxlDPXZ1yHYB.yP0b4oHJ8bXDQS6',
-    'email_verified_at' => NULL,
-    'phone' => NULL,
+    'id' => 12,
+    'name' => 'Carla Mendes',
+    'email' => 'client3@patudo.test',
+    'password' => '$2y$12$swonSgYOpWJSFt3b25rQ8eC9F5/Y9pOyejqPb8X1eOSHTx.ZdsyE2',
+    'email_verified_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 1638,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-13 20:25:04.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+    'phone' => '960000000',
     'is_admin' => false,
     'is_petsitter' => false,
     'created_at' => 
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1638,
+       'constructedObjectId' => 1639,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1197,7 +1130,74 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1639,
+       'constructedObjectId' => 1640,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-17 16:30:56.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+  ),
+  12 => 
+  array (
+    'id' => 13,
+    'name' => 'Administrador',
+    'email' => 'admin@patudo.test',
+    'password' => '$2y$12$yo8DxTX0E3Dv2MghxffaG.cJsPxlDPXZ1yHYB.yP0b4oHJ8bXDQS6',
+    'email_verified_at' => NULL,
+    'phone' => NULL,
+    'is_admin' => false,
+    'is_petsitter' => false,
+    'created_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 1641,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-17 16:30:56.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+    'updated_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 1642,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1236,101 +1236,6 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1640,
-       'clock' => NULL,
-       'localMonthsOverflow' => NULL,
-       'localYearsOverflow' => NULL,
-       'localStrictModeEnabled' => NULL,
-       'localHumanDiffOptions' => NULL,
-       'localToStringFormat' => NULL,
-       'localSerializer' => NULL,
-       'localMacros' => NULL,
-       'localGenericMacros' => NULL,
-       'localFormatFunction' => NULL,
-       'localTranslator' => NULL,
-       'dumpProperties' => 
-      array (
-        0 => 'date',
-        1 => 'timezone_type',
-        2 => 'timezone',
-      ),
-       'dumpLocale' => NULL,
-       'dumpDateProperties' => NULL,
-       'date' => '2026-11-17 16:30:56.000000',
-       'timezone_type' => 3,
-       'timezone' => 'UTC',
-    )),
-    'updated_at' => 
-    \Carbon\CarbonImmutable::__set_state(array(
-       'endOfTime' => false,
-       'startOfTime' => false,
-       'constructedObjectId' => 1641,
-       'clock' => NULL,
-       'localMonthsOverflow' => NULL,
-       'localYearsOverflow' => NULL,
-       'localStrictModeEnabled' => NULL,
-       'localHumanDiffOptions' => NULL,
-       'localToStringFormat' => NULL,
-       'localSerializer' => NULL,
-       'localMacros' => NULL,
-       'localGenericMacros' => NULL,
-       'localFormatFunction' => NULL,
-       'localTranslator' => NULL,
-       'dumpProperties' => 
-      array (
-        0 => 'date',
-        1 => 'timezone_type',
-        2 => 'timezone',
-      ),
-       'dumpLocale' => NULL,
-       'dumpDateProperties' => NULL,
-       'date' => '2026-11-17 16:30:56.000000',
-       'timezone_type' => 3,
-       'timezone' => 'UTC',
-    )),
-  ),
-  14 => 
-  array (
-    'id' => 15,
-    'name' => 'marco',
-    'email' => 'marco@gmail.com',
-    'password' => '$2y$12$2lZFfyUvV1VpFsjsmcETBup.jQpBjoNkuq6A9mUTrWYo95db3TAL2',
-    'email_verified_at' => NULL,
-    'phone' => NULL,
-    'is_admin' => false,
-    'is_petsitter' => false,
-    'created_at' => 
-    \Carbon\CarbonImmutable::__set_state(array(
-       'endOfTime' => false,
-       'startOfTime' => false,
-       'constructedObjectId' => 1642,
-       'clock' => NULL,
-       'localMonthsOverflow' => NULL,
-       'localYearsOverflow' => NULL,
-       'localStrictModeEnabled' => NULL,
-       'localHumanDiffOptions' => NULL,
-       'localToStringFormat' => NULL,
-       'localSerializer' => NULL,
-       'localMacros' => NULL,
-       'localGenericMacros' => NULL,
-       'localFormatFunction' => NULL,
-       'localTranslator' => NULL,
-       'dumpProperties' => 
-      array (
-        0 => 'date',
-        1 => 'timezone_type',
-        2 => 'timezone',
-      ),
-       'dumpLocale' => NULL,
-       'dumpDateProperties' => NULL,
-       'date' => '2026-11-17 16:41:06.000000',
-       'timezone_type' => 3,
-       'timezone' => 'UTC',
-    )),
-    'updated_at' => 
-    \Carbon\CarbonImmutable::__set_state(array(
-       'endOfTime' => false,
-       'startOfTime' => false,
        'constructedObjectId' => 1643,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
@@ -1351,7 +1256,35 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-17 16:41:06.000000',
+       'date' => '2026-11-17 16:30:56.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+    'updated_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 1644,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-17 16:30:56.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1413,7 +1346,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 2079,
+       'constructedObjectId' => 2081,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1441,7 +1374,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1654,
+       'constructedObjectId' => 1655,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1503,7 +1436,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1653,
+       'constructedObjectId' => 1654,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1531,7 +1464,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1652,
+       'constructedObjectId' => 1653,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1596,7 +1529,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1651,
+       'constructedObjectId' => 1652,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1624,7 +1557,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1650,
+       'constructedObjectId' => 1651,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1689,7 +1622,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1648,
+       'constructedObjectId' => 1649,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1717,7 +1650,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1649,
+       'constructedObjectId' => 1650,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1782,7 +1715,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1647,
+       'constructedObjectId' => 1648,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1810,7 +1743,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1645,
+       'constructedObjectId' => 1646,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1875,7 +1808,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1646,
+       'constructedObjectId' => 1647,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1903,7 +1836,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1663,
+       'constructedObjectId' => 1664,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1966,7 +1899,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1664,
+       'constructedObjectId' => 1665,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1994,7 +1927,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1665,
+       'constructedObjectId' => 1666,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,

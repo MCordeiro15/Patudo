@@ -46,6 +46,12 @@ class PetsitterProfileController extends Controller
 
         $petsitter->load('user');
 
+        if (! $isOwnProfile && ! $viewer->isAdmin()) {
+            return Inertia::render('Petsitter/ProfileOwnerView', [
+                'petsitterId' => $petsitter->user_id,
+            ]);
+        }
+
         return $this->renderProfile(
             $petsitter,
             $isOwnProfile,
