@@ -4,6 +4,7 @@ import { Bell, Check, Heart, MessageCircle, Star, UserRound, X } from '@lucide/v
 import { computed, onMounted, ref } from 'vue';
 import ModalReportPetsitter from '@/pages/Modals/ModalReportPetsitter.vue';
 import type { Post } from '@/types/post';
+import ModalReviewPetsitter from "@/pages/Modals/ModalReviewPetsitter.vue";
 
 // O id vem do controller (/petsitters/{id}) ou do URL: /profile-owner-view?petsitter=ID
 const props = defineProps<{ petsitterId?: number | string }>();
@@ -90,6 +91,11 @@ const toggleFavourite = async () => {
 
 const showReportModal = ref(false);
 
+const showReviewModal = ref(false);
+const openReviewModal = () => {
+    showReviewModal.value = true
+}
+
 const submitReport = async (payload: { reason: string; description: string }) => {
     if (!petsitterId) return;
     feedback.value = '';
@@ -106,6 +112,23 @@ const submitReport = async (payload: { reason: string; description: string }) =>
     feedback.value = res.ok
         ? 'Denúncia enviada. Obrigado!'
         : 'Não foi possível enviar a denúncia.';
+};
+
+const submitReview = async (payload: { rating: number; comment: string }) => {
+    if (!petsitterId) return;
+    feedback.value = '';
+    await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
+    const res = await apiFetch(`/api/petsitters/${petsitterId}/reviews`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+        feedback.value = 'Avaliação enviada com sucesso!';
+        showReviewModal.value = false;
+        await loadPetsitter(); // Recarrega o perfil para atualizar o rating médio
+    } else {
+        feedback.value = (await res.json().catch(() => ({}))).message ?? 'Não foi possível enviar a avaliação.';
+    }
 };
 
 onMounted(() => {
@@ -281,7 +304,7 @@ const displayPrice = computed(() =>
 
                                 <div class="actions-row">
                                     <button type="button" class="action-btn">Reservar</button>
-                                    <button type="button" class="action-btn">Avaliar</button>
+                                    <button type="button" class="action-btn" @click="openReviewModal">Avaliar</button>
                                     <button type="button" class="action-btn">Chat</button>
                                 </div>
                             </div>
@@ -371,6 +394,13 @@ const displayPrice = computed(() =>
             :petsitter-id="petsitterId ?? undefined"
             @close="showReportModal = false"
             @submit="submitReport"
+        />
+
+        <ModalReviewPetsitter
+            :show="showReviewModal"
+            :petsitter-id="petsitterId ?? undefined"
+            @close="showReviewModal = false"
+            @submit="submitReview"
         />
     </main>
 </template>
