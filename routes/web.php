@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Ficheiro PHP: web.php
  * PHP file: web.php
