@@ -387,6 +387,8 @@ const displayPrice = computed(() =>
     background-color: #587257;
     color: #fff;
     text-align: center;
+    padding: 0.25rem 1rem;
+    display: inline-block;
 }
 .about-card {
     min-height: 210px;
@@ -397,14 +399,16 @@ const displayPrice = computed(() =>
 .report-btn {
     border-radius: 6px;
 }
-.tags-row,
-.actions-row {
+.tags-row, .actions-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.25rem;
 }
 .tags-row {
-    width: 94%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: 100%;
 }
 .action-btn {
     background: #fbd5a5;
@@ -414,12 +418,14 @@ const displayPrice = computed(() =>
     padding: 2px 0;
 }
 .days-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    display: flex;
+    justify-content: flex-start;
     gap: 8px;
-    padding: 0 1.5rem;
+    padding: 0;
+    width: 100%;
 }
 .day {
+    flex: 1;
     height: 71px;
     border-radius: 14px;
     color: #fff;
