@@ -20,6 +20,7 @@ import ModalEditPetsitterProfile from '@/pages/Modals/ModalEditPetsitterProfile.
 import ModalEditPost from '@/pages/Modals/ModalEditPost.vue';
 import ModalNewPost from '@/pages/Modals/ModalNewPost.vue';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
+import { useNotifications } from '@/composables/useNotifications';
 import type { PetsitterProfile as PetsitterProfileType, Post } from '@/types';
 
 // Tipo TypeScript para PetsitterProfile.
@@ -75,6 +76,7 @@ const saveSuccess = ref(false);
 // Edit profile modal state
 const showEditProfileModal = ref(false);
 const showNotifications = ref(false);
+const { unreadCount } = useNotifications();
 
 // Propriedade computada que retorna os dados do petsitter a partir das props.
 // Computed property that returns petsitter data from props.
@@ -518,8 +520,11 @@ const saveAvailability = async () => {
                     <a href="/messages" class="text-dark">
                         <MessageCircle :size="25" />
                     </a>
-                    <button type="button" class="text-dark bg-transparent border-0 p-0" @click="showNotifications = true">
+                    <button type="button" class="text-dark bg-transparent border-0 p-0 position-relative" @click="showNotifications = true">
                         <Bell :size="25" />
+                        <span v-if="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                            {{ unreadCount > 9 ? '9+' : unreadCount }}
+                        </span>
                     </button>
                     <button
                         type="button"
@@ -925,6 +930,7 @@ const saveAvailability = async () => {
         <ModalNotifications
             :show="showNotifications"
             @close="showNotifications = false"
+            @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
         />
 
         <!-- Delete Post Modal -->

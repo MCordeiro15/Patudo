@@ -13,7 +13,9 @@ import {
     UserRound,
 } from '@lucide/vue';
 import { ref, onMounted } from 'vue';
+import logoPatudo from '@/../../assets/logoPatudo.svg';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
+import { useNotifications } from '@/composables/useNotifications';
 
 //defineOptions({ layout: null });
 
@@ -49,6 +51,7 @@ const favourites = ref<number[]>([]);
 const error = ref<string | null>(null);
 const loading = ref(true);
 const showNotifications = ref(false);
+const { unreadCount } = useNotifications();
 
 function navigateToProfile(userId: number) {
     window.location.href = `/petsitters/${userId}`;
@@ -238,11 +241,12 @@ onMounted(() => {
                     href="/"
                 >
                     <img
-                        src="/images/patudo-logo.svg"
+                        :src="logoPatudo"
                         alt="Patudo"
-                        width="190"
-                        height="62"
+                        width="70"
+                        height="70"
                     />
+                    <span>Patudo</span>
                 </a>
                 <div class="nav nav-pills border rounded-pill p-1 mx-auto">
                     <a class="nav-link active rounded-pill px-4" href="/"
@@ -271,8 +275,11 @@ onMounted(() => {
                     <a href="/messages" class="text-dark"
                         ><MessageCircle :size="25"
                     /></a>
-                    <button type="button" class="text-dark bg-transparent border-0 p-0" @click="showNotifications = true">
+                    <button type="button" class="text-dark bg-transparent border-0 p-0 position-relative" @click="showNotifications = true">
                         <Bell :size="25" />
+                        <span v-if="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                            {{ unreadCount > 9 ? '9+' : unreadCount }}
+                        </span>
                     </button>
                     <button
                         type="button"
@@ -442,11 +449,12 @@ onMounted(() => {
                     href="/"
                 >
                     <img
-                        src="/images/patudo-logo.svg"
+                        :src="logoPatudo"
                         alt="Patudo"
-                        width="190"
-                        height="62"
+                        width="70"
+                        height="70"
                     />
+                    <span>Patudo</span>
                 </a>
                 <div class="d-flex gap-2 col-6 col-md-4 col-lg-3">
                     <a
@@ -585,6 +593,7 @@ onMounted(() => {
     <ModalNotifications
         :show="showNotifications"
         @close="showNotifications = false"
+        @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
     />
 </template>
 

@@ -140,7 +140,11 @@ const mockPet = {
 
         <ModalNewPost :show="showNewPost" @close="showNewPost = false" />
 
-        <ModalReviewPetsitter :show="showReview" @close="showReview = false" />
+        <ModalReviewPetsitter
+            :show="showReview"
+            :petsitter="{ id: 1, name: 'João Silva', avatar_url: null, service_summary: 'Cuidado de cães · 12/11 – 15/11/2026' }"
+            @close="showReview = false"
+        />
 
         <ModalReportPetsitter :show="showReport" @close="showReport = false" />
 

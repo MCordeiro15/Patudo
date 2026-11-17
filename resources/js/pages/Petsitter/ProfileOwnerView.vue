@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
-import { Bell, Check, Heart, MessageCircle, Star, UserRound, X } from '@lucide/vue';
+import { Head, Link } from '@inertiajs/vue3';
+import { Bell, Check, Heart, LogOut, MessageCircle, Star, UserRound, X } from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
+import logoPatudo from '@/../../assets/logoPatudo.svg';
+import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import ModalReportPetsitter from '@/pages/Modals/ModalReportPetsitter.vue';
+import { useNotifications } from '@/composables/useNotifications';
 import type { Post } from '@/types/post';
 import ModalReviewPetsitter from "@/pages/Modals/ModalReviewPetsitter.vue";
 
@@ -90,6 +93,8 @@ const toggleFavourite = async () => {
 };
 
 const showReportModal = ref(false);
+const showNotifications = ref(false);
+const { unreadCount } = useNotifications();
 
 const showReviewModal = ref(false);
 const openReviewModal = () => {
@@ -114,7 +119,7 @@ const submitReport = async (payload: { reason: string; description: string }) =>
         : 'Não foi possível enviar a denúncia.';
 };
 
-const submitReview = async (payload: { rating: number; comment: string }) => {
+const submitReview = async (payload: { petsitter_id?: number | string; rating: number; tags: string[]; comment: string }) => {
     if (!petsitterId) return;
     feedback.value = '';
     await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
@@ -225,23 +230,66 @@ const displayPrice = computed(() =>
             <nav
                 class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
             >
-                <a class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2" href="/">
-                    <img src="/images/patudo-logo.svg" alt="Patudo" width="190" height="62" />
+                <a
+                    class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2"
+                    href="/"
+                >
+                    <img
+                        :src="logoPatudo"
+                        alt="Patudo"
+                        width="70"
+                        height="70"
+                    />
+                    <span>Patudo</span>
                 </a>
-
                 <div class="nav nav-pills border rounded-pill p-1 mx-auto">
-                    <a class="nav-link active rounded-pill px-4" href="/">Início</a>
-                    <a class="nav-link text-dark rounded-pill px-4" href="/orders">Pedidos</a>
-                    <a class="nav-link text-dark rounded-pill px-4" href="/favorites">Favoritos</a>
-                    <a class="nav-link text-dark rounded-pill px-4" href="/reservations">Reservas</a>
+                    <a class="nav-link active rounded-pill px-4" href="/"
+                        >Início</a
+                    >
+                    <a
+                        class="nav-link text-dark rounded-pill px-4"
+                        href="/orders"
+                        >Pedidos</a
+                    >
+                    <a
+                        class="nav-link text-dark rounded-pill px-4"
+                        href="/favorites"
+                    >
+                        Favoritos
+                    </a>
+                    <a
+                        class="nav-link text-dark rounded-pill px-4"
+                        href="/reservations"
+                    >
+                        Reservas
+                    </a>
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark"><MessageCircle :size="25" /></a>
-                    <a href="/notifications" class="text-dark"><Bell :size="25" /></a>
-                    <button type="button" class="text-dark p-0 border-0 bg-transparent shadow-none">
+                    <a href="/messages" class="text-dark"
+                        ><MessageCircle :size="25"
+                    /></a>
+                    <button type="button" class="text-dark bg-transparent border-0 p-0 position-relative" @click="showNotifications = true">
+                        <Bell :size="25" />
+                        <span v-if="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                            {{ unreadCount > 9 ? '9+' : unreadCount }}
+                        </span>
+                    </button>
+                    <button
+                        type="button"
+                        class="text-dark p-0 border-0 bg-none"
+                    >
                         <UserRound :size="25" />
                     </button>
+                    <Link
+                        href="/logout"
+                        method="post"
+                        as="button"
+                        class="btn btn-outline-danger rounded-pill d-flex align-items-center gap-2 px-3"
+                    >
+                        <LogOut :size="16" />
+                        <span>Sair</span>
+                    </Link>
                 </div>
             </nav>
 
@@ -398,9 +446,20 @@ const displayPrice = computed(() =>
 
         <ModalReviewPetsitter
             :show="showReviewModal"
-            :petsitter-id="petsitterId ?? undefined"
+            :petsitter="{
+                id: petsitterId ?? undefined,
+                name: displayName,
+                avatar_url: petsitter?.avatar_url ?? null,
+                service_summary: 'Cuidado de animais'
+            }"
             @close="showReviewModal = false"
             @submit="submitReview"
+        />
+
+        <ModalNotifications
+            :show="showNotifications"
+            @close="showNotifications = false"
+            @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
         />
     </main>
 </template>
@@ -408,6 +467,15 @@ const displayPrice = computed(() =>
 <style scoped>
 .patudo-page {
     background-color: #fffaf3;
+}
+
+.nav-pills .nav-link.active {
+    background-color: var(--patudo-terracota, #c2410c) !important;
+    color: #ffffff !important;
+}
+
+.nav-pills .nav-link:not(.active):hover {
+    color: var(--patudo-terracota, #c2410c) !important;
 }
 .profile-avatar {
     width: 140px;

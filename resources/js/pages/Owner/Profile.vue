@@ -5,10 +5,12 @@ import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import type { Animal } from '@/types';
 import { useAuth } from '@/composables/useAuth';
+import { useNotifications } from '@/composables/useNotifications';
 import AnimalCard from '@/components/AnimalCard.vue';
 import ModalAddPet from '@/pages/Modals/ModalAddPet.vue';
 import ModalDeleteAnimal from '@/pages/Modals/ModalDeleteAnimal.vue';
 import ModalEditOwnerProfile from '@/pages/Modals/ModalEditOwnerProfile.vue';
+import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 const { user, logout } = useAuth();
 
@@ -17,6 +19,8 @@ const isLoading = ref(false);
 const loadError = ref('');
 const showAddModal = ref(false);
 const showDeleteModal = ref(false);
+const showNotifications = ref(false);
+const { unreadCount } = useNotifications();
 const deletingAnimal = ref<{ id: number; name: string } | null>(null);
 const deletingAnimalLoading = ref(false);
 
@@ -211,23 +215,23 @@ onMounted(() => {
                     href="/"
                 >
                     <img
-                        src="/images/patudo-logo.svg"
+                        :src="logoPatudo"
                         alt="Patudo"
-                        width="190"
-                        height="62"
+                        width="70"
+                        height="70"
                     />
+                    <span>Patudo</span>
                 </a>
 
                 <div class="nav nav-pills border rounded-pill p-1 mx-auto">
-                    <a class="nav-link active rounded-pill px-4" href="/">
-                        Início
-                    </a>
+                    <a class="nav-link active rounded-pill px-4" href="/"
+                        >Início</a
+                    >
                     <a
                         class="nav-link text-dark rounded-pill px-4"
                         href="/orders"
+                        >Pedidos</a
                     >
-                        Pedidos
-                    </a>
                     <a
                         class="nav-link text-dark rounded-pill px-4"
                         href="/favorites"
@@ -243,24 +247,26 @@ onMounted(() => {
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark">
-                        <MessageCircle :size="25" />
-                    </a>
-                    <a href="/notifications" class="text-dark">
+                    <a href="/messages" class="text-dark"
+                        ><MessageCircle :size="25"
+                    /></a>
+                    <button type="button" class="text-dark bg-transparent border-0 p-0 position-relative" @click="showNotifications = true">
                         <Bell :size="25" />
-                    </a>
+                        <span v-if="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                            {{ unreadCount > 9 ? '9+' : unreadCount }}
+                        </span>
+                    </button>
                     <button
                         type="button"
-                        class="text-dark p-0 border-0 bg-transparent shadow-none"
+                        class="text-dark p-0 border-0 bg-none"
                     >
                         <UserRound :size="25" />
                     </button>
-
                     <Link
                         href="/logout"
                         method="post"
                         as="button"
-                        class="btn btn-outline-danger btn-sm rounded-pill d-flex align-items-center gap-2 px-3 py-1 ms-1"
+                        class="btn btn-outline-danger rounded-pill d-flex align-items-center gap-2 px-3"
                     >
                         <LogOut :size="16" />
                         <span>Sair</span>
@@ -423,6 +429,12 @@ onMounted(() => {
             @close="showEditModal = false"
             @save="handleSaveProfile"
             @delete-account="handleDeleteAccount"
+        />
+
+        <ModalNotifications
+            :show="showNotifications"
+            @close="showNotifications = false"
+            @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
         />
     </main>
 </template>
