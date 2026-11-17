@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Ficheiro PHP: web.php
  * PHP file: web.php
@@ -34,6 +33,10 @@ Route::get('/petsitters/{petsitter}', [PetsitterProfileController::class, 'show'
     ->middleware('auth')
     ->whereNumber('petsitter')
     ->name('petsitters.show');
+Route::get('/profile-owner-view', fn () => Inertia::render('Petsitter/ProfileOwnerView'))
+    ->middleware('auth')
+    ->name('profile.owner-view');
+
 Route::get('/profile', function () {
     $user = auth()->user();
     if ($user->isPetsitter()) {

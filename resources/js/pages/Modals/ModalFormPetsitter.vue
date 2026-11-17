@@ -13,18 +13,18 @@ const close = () => {
 </script>
 
 <template>
-        <div
-            v-if="show"
-            :key="'form-petsitter-' + Date.now()"
-            class="modal fade show d-block"
-            tabindex="-1"
-            style="
-                background-color: rgba(0, 0, 0, 0.5);
-                position: fixed;
-                inset: 0;
-                z-index: 10000000;
-            "
-        >
+    <div
+        v-if="show"
+        :key="'form-petsitter-' + Date.now()"
+        class="modal fade show d-block"
+        tabindex="-1"
+        style="
+            background-color: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            inset: 0;
+            z-index: 10000000;
+        "
+    >
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content p-4 rounded-4 bg-white">
                 <div
