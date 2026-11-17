@@ -15,7 +15,9 @@ import {
 } from '@lucide/vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import { computed, onMounted, ref } from 'vue';
+import ModalDeletePost from '@/pages/Modals/ModalDeletePost.vue';
 import ModalEditPetsitterProfile from '@/pages/Modals/ModalEditPetsitterProfile.vue';
+import ModalEditPost from '@/pages/Modals/ModalEditPost.vue';
 import ModalNewPost from '@/pages/Modals/ModalNewPost.vue';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import type { PetsitterProfile as PetsitterProfileType, Post } from '@/types';
@@ -227,6 +229,15 @@ const postsLoading = ref(false);
 const postsError = ref('');
 const showNewPostModal = ref(false);
 
+// Estado do modal de eliminação de post
+const showDeletePostModal = ref(false);
+const deletingPostId = ref<number | null>(null);
+const deletingPost = ref(false);
+
+// Estado do modal de edição de post
+const showEditPostModal = ref(false);
+const editingPostId = ref<number | null>(null);
+
 // só o dono do perfil, se aprovado, pode publicar (o back-end devolve 403 aos outros)
 const canPost = computed(
     () => isOwnProfile.value && petsitter.value?.approval_status === 'approved',
@@ -273,6 +284,87 @@ const loadPosts = async () => {
 // o post novo entra no topo da lista, sem recarregar a página
 const onPostCreated = (post: Post) => {
     posts.value.unshift(post);
+};
+
+// Abre o modal de confirmação para eliminar uma publicação.
+// Opens the confirmation modal to delete a post.
+const deletePost = (postId: number) => {
+    deletingPostId.value = postId;
+    showDeletePostModal.value = true;
+};
+
+// Confirma a eliminação de uma publicação via API DELETE.
+// Confirms the deletion of a post via API DELETE.
+const confirmDeletePost = async () => {
+    if (deletingPostId.value === null) return;
+
+    deletingPost.value = true;
+
+    try {
+        // Get CSRF token
+        await fetch('/sanctum/csrf-cookie', {
+            method: 'GET',
+            credentials: 'same-origin',
+        });
+
+        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+        const xsrfToken = match ? decodeURIComponent(match[1]) : '';
+
+        const response = await fetch(`/api/posts/${deletingPostId.value}`, {
+            method: 'DELETE',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': xsrfToken,
+            },
+        });
+
+        if (response.ok || response.status === 204) {
+            // Remove o post da lista local
+            posts.value = posts.value.filter((post) => post.id !== deletingPostId.value);
+            showDeletePostModal.value = false;
+            deletingPostId.value = null;
+        } else {
+            const data = await response.json().catch(() => ({}));
+            alert(data.message ?? 'Erro ao eliminar a publicação.');
+        }
+    } catch {
+        alert('Erro de rede ao eliminar a publicação.');
+    } finally {
+        deletingPost.value = false;
+    }
+};
+
+// Cancela a eliminação e fecha o modal.
+// Cancels the deletion and closes the modal.
+const cancelDeletePost = () => {
+    showDeletePostModal.value = false;
+    deletingPostId.value = null;
+};
+
+// Abre o modal de edição para uma publicação.
+// Opens the edit modal for a post.
+const editPost = (postId: number) => {
+    editingPostId.value = postId;
+    showEditPostModal.value = true;
+};
+
+// Cancela a edição e fecha o modal.
+// Cancels the edit and closes the modal.
+const cancelEditPost = () => {
+    showEditPostModal.value = false;
+    editingPostId.value = null;
+};
+
+// Atualiza um post na lista local após edição bem-sucedida.
+// Updates a post in the local list after successful edit.
+const onPostUpdated = (updatedPost: Post) => {
+    const index = posts.value.findIndex((post) => post.id === updatedPost.id);
+    if (index !== -1) {
+        posts.value[index] = updatedPost;
+    }
+    cancelEditPost();
 };
 
 onMounted(loadPosts);
@@ -738,18 +830,15 @@ const saveAvailability = async () => {
                                     class="card border border-primary rounded-4 p-3"
                                 >
                                     <div class="row g-3 align-items-stretch">
-                                        <div class="col-12 col-md-3">
+                                        <div v-if="post.photos && post.photos.length > 0" class="col-12 col-md-3">
                                             <img
-                                                :src="
-                                                    post.photos[0] ??
-                                                    'https://images.unsplash.com/photo-1583512603877-2005f1f46c74?q=80&w=900&auto=format&fit=crop'
-                                                "
+                                                :src="post.photos[0]"
                                                 alt="Imagem da publicação"
                                                 class="img-fluid rounded-4 h-100 object-fit-cover"
                                             />
                                         </div>
 
-                                        <div class="col-12 col-md-8">
+                                        <div :class="post.photos && post.photos.length > 0 ? 'col-12 col-md-8' : 'col-12'">
                                             <h3
                                                 v-if="post.title"
                                                 class="h4 mb-2"
@@ -771,6 +860,7 @@ const saveAvailability = async () => {
                                                 v-if="canEdit"
                                                 type="button"
                                                 class="btn btn-link text-dark p-0"
+                                                @click="editPost(post.id)"
                                             >
                                                 <PenLine :size="18" />
                                             </button>
@@ -778,6 +868,7 @@ const saveAvailability = async () => {
                                                 v-if="canEdit"
                                                 type="button"
                                                 class="btn btn-link text-dark p-0"
+                                                @click="deletePost(post.id)"
                                             >
                                                 <Trash2 :size="18" />
                                             </button>
@@ -834,6 +925,23 @@ const saveAvailability = async () => {
         <ModalNotifications
             :show="showNotifications"
             @close="showNotifications = false"
+        />
+
+        <!-- Delete Post Modal -->
+        <ModalDeletePost
+            :show="showDeletePostModal"
+            :post-title="deletingPostId !== null ? posts.find(p => p.id === deletingPostId)?.title : undefined"
+            :deleting="deletingPost"
+            @close="cancelDeletePost"
+            @confirmed="confirmDeletePost"
+        />
+
+        <!-- Edit Post Modal -->
+        <ModalEditPost
+            :show="showEditPostModal"
+            :post="editingPostId !== null ? posts.find(p => p.id === editingPostId) ?? null : null"
+            @close="cancelEditPost"
+            @updated="onPostUpdated"
         />
     </main>
 </template>

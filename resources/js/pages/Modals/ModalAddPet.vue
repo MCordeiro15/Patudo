@@ -399,9 +399,11 @@ const submit = async () => {
 
                                 <input
                                     id="animal-age"
-                                    type="text"
+                                    type="number"
+                                    min="0"
+                                    step="1"
                                     class="form-control patudo-field rounded-3"
-                                    placeholder="Ex.: 3 anos"
+                                    placeholder="Ex.: 3"
                                     autocomplete="off"
                                 />
                             </div>

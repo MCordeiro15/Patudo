@@ -13,10 +13,9 @@
 .auth-card {
     background-color: var(--patudo-bege-card);
     border-radius: 28px;
-    padding: 24px;
+    padding: 20px;
     width: 100%;
     max-width: 880px;
-    min-height: 520px;
     gap: 24px;
     position: relative;
     overflow: hidden;
@@ -26,11 +25,12 @@
     position: relative;
     overflow: hidden;
     background-color: var(--patudo-fundo-amarelo);
-    border-radius: 42px;
+    border-radius: 24px;
     border: 1px solid var(--patudo-terracota);
-    padding: 32px 28px;
+    padding: 16px 20px;
     flex: 1;
-    min-height: 520px;
+    min-height: 220px; /* Altura segura e compacta para telemóveis */
+    max-height: 260px; /* Impede que a imagem fique gigante em mobile */
 }
 
 .brand-bg-cover {
@@ -49,12 +49,12 @@
 }
 
 .brand-icon {
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
 }
 
 .brand-title {
-    font-size: 1.6rem;
+    font-size: 1.25rem; /* Mais compacto em mobile */
     font-weight: 700;
     color: var(--patudo-castanhoDark);
 }
@@ -113,6 +113,8 @@
 
 .footer-text {
     color: var(--patudo-castanhoDark);
+    white-space: nowrap;
+    font-size: 0.82rem;
 }
 
 .auth-link {
@@ -143,4 +145,26 @@
     padding: 10px 14px;
     font-size: 0.875rem;
     font-weight: 500;
+}
+
+@media (min-width: 768px) {
+    .auth-card {
+        min-height: 520px;
+        padding: 24px;
+    }
+
+    .brand-panel {
+        min-height: 520px;
+        max-height: none;
+        border-radius: 42px;
+        padding: 32px 28px;
+    }
+
+    .brand-icon {
+        width: 32px;
+        height: 32px;
+    }
+    .brand-title {
+        font-size: 1.6rem;
+    }
 }

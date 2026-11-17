@@ -1,5 +1,3 @@
-<!-- Página inicial da aplicação. Mostra a lista de petsitters disponíveis com pesquisa, filtros e cards de perfil. -->
-<!-- Application homepage. Shows the list of available petsitters with search, filters, and profile cards. -->
 <template>
     <div
         class="min-vh-100 d-flex flex-column bg-light bg-opacity-25 position-relative overflow-hidden"
@@ -8,34 +6,31 @@
         <div class="patudo-glow patudo-glow-bottom"></div>
 
         <div class="patudo-content d-flex flex-column flex-grow-1">
-            <!-- Cabeçalho da página com navegação principal e logotipo. -->
-            <!-- Page header with main navigation and logo. -->
             <header class="container py-4">
-                <!-- Barra de navegação com links para as secções principais da aplicação. -->
-                <!-- Navigation bar with links to the main sections of the application. -->
-                <nav class="d-flex align-items-center justify-content-between">
+                <!-- Navbar adaptativa: empilhada em mobile, em linha em desktop -->
+                <nav class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
                     <a
                         href="/login"
-                        class="navbar-brand fw-bolder fs-2 text-decoration-none text-body d-flex align-items-center gap-2"
+                        class="navbar-brand fw-bolder fs-2 text-decoration-none text-body d-flex align-items-center gap-2 m-0"
                     >
                         <img
                             src="/images/patudo-logo.svg"
                             alt="Logo Patudo"
-                            width="190"
+                            class="patudo-logo-img"
                         />
                     </a>
 
-                    <div class="d-flex gap-2 col-6 col-md-4 col-lg-3">
+                    <div class="d-flex gap-2 w-100 w-md-auto justify-content-center justify-content-md-end">
                         <a
                             href="/login"
-                            class="btn btn-primary rounded-pill w-50 py-2 fw-bold"
+                            class="btn btn-primary rounded-pill px-4 py-2 fw-bold"
                         >
                             Login
                         </a>
 
                         <a
                             href="/register"
-                            class="btn btn-outline-primary rounded-pill w-50 py-2 fw-bold"
+                            class="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold"
                         >
                             Registar
                         </a>
@@ -43,8 +38,6 @@
                 </nav>
             </header>
 
-            <!-- Conteúdo principal da página. -->
-            <!-- Main content area of the page. -->
             <main class="container flex-grow-1 d-flex align-items-center py-5">
                 <div class="row align-items-center g-5 w-100">
                     <div class="col-lg-6">
@@ -60,7 +53,7 @@
 
                         <a
                             href="/find-petsitter"
-                            class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-semibold shadow patudo-cta"
+                            class="btn btn-primary btn-lg rounded-pill px-4 py-2 fw-semibold shadow patudo-cta w-auto align-self-start"
                         >
                             Procurar cuidador
                             <i class="bi bi-arrow-right ms-2"></i>
