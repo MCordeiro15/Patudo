@@ -23,6 +23,10 @@ class Booking extends Model
         'end_date',
         'status',
         'total_price',
+        'message',
+        'zone',
+        'entrance_hour',
+        'exit_hour',
     ];
 
     public function animalBookings()
