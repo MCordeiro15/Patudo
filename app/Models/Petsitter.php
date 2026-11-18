@@ -141,4 +141,9 @@ class Petsitter extends Model
     {
         return ! empty($this->identification_documents);
     }
+
+    public function services(): HasMany
+    {
+        return $this->hasMany(PetsitterService::class, 'petsitter_id', 'user_id');
+    }
 }

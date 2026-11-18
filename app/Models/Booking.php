@@ -18,6 +18,7 @@ class Booking extends Model
     protected $fillable = [
         'user_id',
         'petsitter_id',
+        'service_id',
         'start_date',
         'end_date',
         'status',
@@ -46,6 +47,15 @@ class Booking extends Model
     {
         return $this->belongsTo(Petsitter::class, 'petsitter_id', 'user_id'
         );
+    }
+
+    /**
+     * Relação belongsTo com PetsitterService. Retorna o serviço escolhido nesta reserva (pode ser nulo em reservas antigas).
+     * BelongsTo relationship with PetsitterService. Returns the service chosen in this booking (may be null on old bookings).
+     */
+    public function service()
+    {
+        return $this->belongsTo(PetsitterService::class, 'service_id');
     }
 
     /**

@@ -11,6 +11,7 @@ use App\Http\Controllers\API\PostController;
 use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\SupportTicketsController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\PetsitterServiceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -94,6 +95,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/petsitters/{petsitter}/reviews', [ReviewController::class, 'byPetsitter']);
     Route::patch('/reviews/{review}/hide', [ReviewController::class, 'hide']);
     Route::apiResource('reviews', ReviewController::class)->only(['show', 'update', 'destroy']);
+
+    // Services
+    Route::get('/petsitters/{petsitter}/services', [PetsitterServiceController::class, 'index']);
+    Route::post('/petsitters/{petsitter}/services', [PetsitterServiceController::class, 'store']);
+    Route::match(['put', 'patch'], '/services/{service}', [PetsitterServiceController::class, 'update']);
+    Route::delete('/services/{service}', [PetsitterServiceController::class, 'destroy']);
 
     // Support Tickets
     Route::get('/support-tickets', [SupportTicketsController::class, 'index']);

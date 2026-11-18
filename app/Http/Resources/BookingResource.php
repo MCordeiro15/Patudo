@@ -24,6 +24,13 @@ class BookingResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'petsitter_id' => $this->petsitter_id,
+            'service_id' => $this->service_id,
+            // null em reservas antigas, criadas antes de existirem serviços
+            'service' => $this->whenLoaded('service', fn () => $this->service ? [
+                'id' => $this->service->id,
+                'name' => $this->service->type,
+                'price' => (float) $this->service->price,
+            ] : null),
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'status' => $this->status,
