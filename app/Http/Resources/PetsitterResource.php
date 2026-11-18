@@ -44,6 +44,7 @@ class PetsitterResource extends JsonResource
             'biography' => $this->biography,
             'short_bio' => $this->short_bio,
             'experience' => $this->experience,
+            'services' => PetsitterServiceResource::collection($this->whenLoaded('services')),
             'service_location' => $this->service_location,
             'city' => $this->city,
             'age' => $this->age,

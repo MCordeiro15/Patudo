@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BookingResource;
 use App\Models\Booking;
 use App\Models\Petsitter;
+use App\Models\PetsitterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +42,7 @@ class BookingController extends Controller
         $userId = $request->user()->id;
 
         return BookingResource::collection(
-            Booking::with('animals')
+            Booking::with('animals', 'service')
                 // o where com função agrupa o OR entre parênteses
                 ->where(fn ($q) => $q->where('user_id', $userId)->orWhere('petsitter_id', $userId))
                 ->latest()
@@ -69,25 +70,32 @@ class BookingController extends Controller
             ],
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after_or_equal:start_date',
+            'service_id' => [
+                'required', 'integer',
+                // o serviço tem de existir E ser do petsitter escolhido
+                Rule::exists('petsitter_services', 'id')->where('petsitter_id', $request->input('petsitter_id')),
+            ],
             'animal_ids' => 'required|array|min:1',
             // cada animal tem de existir E ser do utilizador autenticado
             'animal_ids.*' => ['integer', 'distinct', Rule::exists('animals', 'id')->where('user_id', $user->id)],
         ]);
 
         $petsitter = Petsitter::findOrFail($data['petsitter_id']);
+        $service = PetsitterService::findOrFail($data['service_id']);
 
         // +1 porque os dois dias contam (1 a 3 dezembro = 3 dias)
         $days = (int) Carbon::parse($data['start_date'])->diffInDays(Carbon::parse($data['end_date'])) + 1;
 
         // transaction: ou grava a reserva E os animais, ou não grava nada
-        $booking = DB::transaction(function () use ($data, $user, $petsitter, $days) {
+        $booking = DB::transaction(function () use ($data, $user, $petsitter, $service, $days) {
             $booking = Booking::create([
                 'user_id' => $user->id,            // vem da sessão, não do pedido
                 'petsitter_id' => $petsitter->user_id,
+                'service_id' => $service->id,
                 'start_date' => $data['start_date'],
                 'end_date' => $data['end_date'],
                 'status' => 'pending',             // sempre pending ao criar
-                'total_price' => $petsitter->price_per_day * $days, // calculado no servidor
+                'total_price' => $service->price * $days, // calculado no servidor, com o preço do serviço
             ]);
 
             // escreve as linhas na tabela animal_bookings
@@ -96,7 +104,7 @@ class BookingController extends Controller
             return $booking;
         });
 
-        return (new BookingResource($booking->load('animals')))->response()->setStatusCode(201);
+        return (new BookingResource($booking->load('animals', 'service')))->response()->setStatusCode(201);
     }
 
     /**
@@ -107,7 +115,7 @@ class BookingController extends Controller
     {
         Gate::authorize('view', $booking);
 
-        return new BookingResource($booking->load('animals', 'review'));
+        return new BookingResource($booking->load('animals', 'service', 'review'));
     }
 
     // PATCH /api/bookings/{booking}/status
