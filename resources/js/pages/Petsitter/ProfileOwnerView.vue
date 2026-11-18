@@ -277,7 +277,7 @@ const displayPrice = computed(() =>
                     </button>
                     <button
                         type="button"
-                        class="text-dark p-0 border-0 bg-none"
+                        class="text-dark p-0 border-0 bg-transparent"
                     >
                         <UserRound :size="25" />
                     </button>
