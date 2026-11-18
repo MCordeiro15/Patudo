@@ -119,9 +119,20 @@ test('listing and showing bookings include the service', function () {
 });
 
 test('an old booking without a service returns service as null', function () {
-    $booking = Booking::factory()->create(['status' => 'pending']);
+    $owner = User::factory()->create();
+    $petsitter = Petsitter::factory()->approved()->create();
 
-    $this->actingAs($booking->user)->getJson("/api/bookings/{$booking->id}")
+    // reserva antiga: criada sem service_id
+    $booking = Booking::create([
+        'user_id' => $owner->id,
+        'petsitter_id' => $petsitter->user_id,
+        'start_date' => now()->addDays(3)->toDateString(),
+        'end_date' => now()->addDays(5)->toDateString(),
+        'status' => 'pending',
+        'total_price' => 30,
+    ]);
+
+    $this->actingAs($owner)->getJson("/api/bookings/{$booking->id}")
         ->assertOk()
         ->assertJsonPath('data.service_id', null)
         ->assertJsonPath('data.service', null);
