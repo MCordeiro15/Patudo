@@ -9,6 +9,8 @@ import ModalEditOwnerProfile from '@/pages/Modals/ModalEditOwnerProfile.vue';
 import ModalEditPetsitterProfile from '@/pages/Modals/ModalEditPetsitterProfile.vue';
 import ModalFormPetsitter from '@/pages/Modals/ModalFormPetsitter.vue';
 import ModalNewPost from '@/pages/Modals/ModalNewPost.vue';
+import AcceptPaymentRequest from '@/pages/Modals/AcceptPaymentRequest.vue';
+import ModalBookingPageAddPet from '@/pages/Modals/ModalBookingPageAddPet.vue';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import ModalPetDetails from '@/pages/Modals/ModalPetDetails.vue';
 import ModalReportPetsitter from '@/pages/Modals/ModalReportPetsitter.vue';
@@ -23,6 +25,8 @@ const showNotifications = ref(false);
 const showPetDetails = ref(false);
 const showReport = ref(false);
 const showReview = ref(false);
+const showAcceptBooking = ref(false);
+const showAddPetToBooking = ref(false);
 
 const mockPet = {
     id: 1,
@@ -65,7 +69,7 @@ const mockPet = {
             Bancada de Testes de Modais
         </h1>
         <p style="color: #6b7280; margin-bottom: 24px">
-            Testa a abertura, fecho e formulários dos 9 modais do Patudo:
+            Testa a abertura, fecho e formulários dos 11 modais do Patudo:
         </p>
 
         <div style="display: flex; gap: 12px; flex-wrap: wrap">
@@ -112,6 +116,12 @@ const mockPet = {
             <button type="button" class="btn-pill" @click="showNotifications = true">
                 9. Notificações
             </button>
+            <button type="button" class="btn-pill" @click="showAcceptBooking = true">
+                10. Aceitar Pedido de Pagamento
+            </button>
+            <button type="button" class="btn-pill" @click="showAddPetToBooking = true">
+                11. Adicionar Animal à Reserva
+            </button>
         </div>
 
         <ModalAddPet :show="showAddPet" @close="showAddPet = false" />
@@ -149,6 +159,18 @@ const mockPet = {
         <ModalReportPetsitter :show="showReport" @close="showReport = false" />
 
         <ModalNotifications :show="showNotifications" @close="showNotifications = false" />
+
+        <AcceptPaymentRequest
+            :show="showAcceptBooking"
+            :bookingId="1"
+            @close="showAcceptBooking = false"
+        />
+
+        <ModalBookingPageAddPet
+            :show="showAddPetToBooking"
+            :bookingId="1"
+            @close="showAddPetToBooking = false"
+        />
     </div>
 </template>
 
