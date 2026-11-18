@@ -370,7 +370,7 @@ onMounted(() => {
             <section
                 class="card bg-white border border-primary rounded-4 p-3 p-md-4 mb-4"
             >
-                <h2 class="h6 fw-semibold mb-3">Os meus animais</h2>
+                <h2 class="h5 fw-semibold mb-3">Os meus animais</h2>
 
                 <div v-if="isLoading" class="text-center py-5">
                     <div class="spinner-border text-primary" role="status">
