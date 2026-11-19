@@ -117,6 +117,11 @@ class ExportDatabase extends Command
             'end_date' => $b->end_date,
             'status' => $b->status ?? 'pending',
             'total_price' => $b->total_price ?? 0,
+            // campos extra da reserva (PR booking-extra-fields)
+            'message' => $b->message,
+            'zone' => $b->zone,
+            'entrance_hour' => $b->entrance_hour,
+            'exit_hour' => $b->exit_hour,
         ])->toArray();
 
         // Export reviews
@@ -243,8 +248,10 @@ class ExportDatabase extends Command
         $content .= "        \$serviceIds = PetsitterService::pluck('id')->all();\n\n";
 
         $content .= "        \$bookings = " . var_export($bookingsArray, true) . ";\n";
+        $content .= "        // só usa as colunas que existem na tabela (evita erro se uma migration ainda não estiver no branch)\n";
+        $content .= "        \$bookingColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('bookings'));\n";
         $content .= "        foreach (\$bookings as \$bookingData) {\n";
-        $content .= "            \$bookingCreateData = \$bookingData;\n";
+        $content .= "            \$bookingCreateData = array_intersect_key(\$bookingData, \$bookingColumns);\n";
         $content .= "            unset(\$bookingCreateData['id']);\n";
         $content .= "            // se o serviço não foi recriado, fica sem serviço em vez de falhar a FK\n";
         $content .= "            if (!in_array(\$bookingCreateData['service_id'] ?? null, \$serviceIds)) {\n";
