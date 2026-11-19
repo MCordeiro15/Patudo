@@ -14,6 +14,7 @@ use App\Models\Post;
 use App\Models\Booking;
 use App\Models\Review;
 use App\Models\AnimalBooking;
+use App\Models\PetsitterService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -39,6 +40,9 @@ class ExportDatabase extends Command
             'password' => $u->password,
             'email_verified_at' => $u->email_verified_at,
             'phone' => $u->phone,
+            // avatar fica de fora de propósito: é base64 e tornaria o seeder enorme
+            'location' => $u->location,
+            'about' => $u->about,
             'is_admin' => $u->is_admin ?? false,
             'is_petsitter' => $u->is_petsitter ?? false,
             'created_at' => $u->created_at,
@@ -94,11 +98,21 @@ class ExportDatabase extends Command
             'photos' => $this->exportPhotos($p->photos),
         ])->toArray();
 
+        // Export petsitter_services (com id, porque bookings.service_id aponta para ele)
+        $services = PetsitterService::orderBy('id')->get();
+        $servicesArray = $services->map(fn($s) => [
+            'id' => $s->id,
+            'petsitter_id' => $s->petsitter_id,
+            'type' => $s->type,
+            'price' => (float) $s->price,
+        ])->toArray();
+
         // Export bookings
         $bookings = Booking::all();
         $bookingsArray = $bookings->map(fn($b) => [
             'petsitter_id' => $b->petsitter_id,
             'user_id' => $b->user_id,
+            'service_id' => $b->service_id,
             'start_date' => $b->start_date,
             'end_date' => $b->end_date,
             'status' => $b->status ?? 'pending',
@@ -132,6 +146,7 @@ class ExportDatabase extends Command
         $content .= "use App\Models\Booking;\n";
         $content .= "use App\Models\Review;\n";
         $content .= "use App\Models\AnimalBooking;\n";
+        $content .= "use App\Models\PetsitterService;\n";
         $content .= "use Illuminate\Database\Seeder;\n";
         $content .= "use Illuminate\Support\Facades\Hash;\n\n";
         $content .= "/**\n";
@@ -157,6 +172,8 @@ class ExportDatabase extends Command
         $content .= "                    'password' => \$userData['password'],\n";
         $content .= "                    'email_verified_at' => \$userData['email_verified_at'],\n";
         $content .= "                    'phone' => \$userData['phone'],\n";
+        $content .= "                    'location' => \$userData['location'] ?? null,\n";
+        $content .= "                    'about' => \$userData['about'] ?? null,\n";
         $content .= "                    'is_admin' => \$userData['is_admin'],\n";
         $content .= "                    'is_petsitter' => \$userData['is_petsitter'],\n";
         $content .= "                ]\n";
@@ -211,11 +228,28 @@ class ExportDatabase extends Command
 
         // Bookings (delete all first, then recreate)
         $content .= "        // Export Bookings (" . count($bookingsArray) . " bookings)\n";
-        $content .= "        Booking::query()->delete();\n";
+        $content .= "        Booking::query()->delete();\n\n";
+
+        // Petsitter services: depois de apagar as bookings (FK restrictOnDelete) e antes de as recriar
+        $content .= "        // Export Petsitter Services (" . count($servicesArray) . " services)\n";
+        $content .= "        PetsitterService::query()->delete();\n";
+        $content .= "        \$services = " . var_export($servicesArray, true) . ";\n";
+        $content .= "        foreach (\$services as \$sData) {\n";
+        $content .= "            // só cria se o petsitter existir (FK para petsitters.user_id)\n";
+        $content .= "            if (Petsitter::where('user_id', \$sData['petsitter_id'])->exists()) {\n";
+        $content .= "                PetsitterService::forceCreate(\$sData); // mantém o id original\n";
+        $content .= "            }\n";
+        $content .= "        }\n";
+        $content .= "        \$serviceIds = PetsitterService::pluck('id')->all();\n\n";
+
         $content .= "        \$bookings = " . var_export($bookingsArray, true) . ";\n";
         $content .= "        foreach (\$bookings as \$bookingData) {\n";
         $content .= "            \$bookingCreateData = \$bookingData;\n";
         $content .= "            unset(\$bookingCreateData['id']);\n";
+        $content .= "            // se o serviço não foi recriado, fica sem serviço em vez de falhar a FK\n";
+        $content .= "            if (!in_array(\$bookingCreateData['service_id'] ?? null, \$serviceIds)) {\n";
+        $content .= "                \$bookingCreateData['service_id'] = null;\n";
+        $content .= "            }\n";
         $content .= "            Booking::create(\$bookingCreateData);\n";
         $content .= "        }\n\n";
 
@@ -249,6 +283,7 @@ class ExportDatabase extends Command
         $this->info("Petsitters: " . count($petsittersArray));
         $this->info("Animais: " . count($animalsArray));
         $this->info("Posts: " . count($postsArray));
+        $this->info("Services: " . count($servicesArray));
         $this->info("Bookings: " . count($bookingsArray));
         $this->info("Reviews: " . count($reviewsArray));
         $this->info("Animal Bookings: " . count($animalBookingsArray));
