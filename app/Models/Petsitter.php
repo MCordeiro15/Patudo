@@ -49,7 +49,7 @@ class Petsitter extends Model
      * Fields that can be mass-assigned via create() or fill().
      */
     protected $fillable = [
-        'user_id', 'biography', 'profile_photo', 'short_bio', 'experience', 'service_location', 'city',
+        'user_id', 'biography', 'profile_photo', 'short_bio', 'experience', 'service_location', 'city', 'postal_code',
         'age',
         'price_per_day', 'accepted_sizes', 'sex', 'accepted_animal_types',
         'availability_days', 'identification_documents',
@@ -123,6 +123,9 @@ class Petsitter extends Model
     {
         $this->approval_status = 'approved';
         $this->save();
+
+        // o utilizador passa a ser petsitter (usado no /profile, na pesquisa e no UserResource)
+        $this->user()->update(['is_petsitter' => true]);
     }
 
     /**
@@ -132,6 +135,9 @@ class Petsitter extends Model
     {
         $this->approval_status = 'rejected';
         $this->save();
+
+        // se tinha sido aprovado antes, deixa de ser petsitter
+        $this->user()->update(['is_petsitter' => false]);
     }
 
     /**

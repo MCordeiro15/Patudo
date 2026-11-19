@@ -9,8 +9,12 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PetsitterResource;
 use App\Models\Petsitter;
+use App\Models\PetsitterService;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -54,27 +58,64 @@ class PetsitterController extends Controller
 
         $data = $request->validate([
             'user_id' => 'sometimes|exists:users,id|unique:petsitters,user_id',
+            'name' => 'sometimes|string|max:255',
             'biography' => 'nullable|string',
-            'experience' => 'required|string',
+            'experience' => 'required|string|max:500',
             'service_location' => 'required|string|max:255',
+            'postal_code' => ['required', 'string', 'regex:/^\d{4}-\d{3}$/'],
             'age' => 'required|integer|min:18|max:99',
             'price_per_day' => 'required|numeric|min:0',
             'accepted_sizes' => 'nullable|array',
-            'accepted_sizes.*' => 'string',
+            'accepted_sizes.*' => 'string|in:small,medium,large',
             'accepted_animal_types' => 'nullable|array',
             'accepted_animal_types.*' => 'string',
-            'sex' => 'string|in:male,female,other',
-            'identification_documents' => 'required|string|max:255',
+            'sex' => 'nullable|string|in:male,female,other',
+            // o serviço é criado logo, ligado ao novo petsitter, com o preço de price_per_day
+            'service' => ['required', Rule::in(PetsitterService::TYPES)],
+            // Cartão de Cidadão: JPG, PNG ou PDF até 10 MB
+            'identification_documents' => 'required|file|mimes:jpg,jpeg,png,pdf|max:10240',
         ]);
 
         if (! $request->user()?->isAdmin() || empty($data['user_id'])) {
             $data['user_id'] = $request->user()->id;
         }
 
-        $petsitter = Petsitter::create($data);
+        // sem isto, um segundo pedido do mesmo utilizador dava erro 500 (user_id é a chave primária)
+        if (Petsitter::where('user_id', $data['user_id'])->exists()) {
+            return response()->json(['message' => 'Este utilizador já tem um perfil de petsitter.'], 409);
+        }
+
+        // guarda o documento no disco privado (storage/app/private), nunca no público
+        $documentPath = $request->file('identification_documents')
+            ->store('identification-documents/'.$data['user_id'], 'local');
+
+        try {
+            $petsitter = DB::transaction(function () use ($data, $documentPath) {
+                if (isset($data['name'])) {
+                    User::whereKey($data['user_id'])->update(['name' => $data['name']]);
+                }
+
+                $petsitter = Petsitter::create([
+                    ...Arr::except($data, ['name', 'service']),
+                    'identification_documents' => $documentPath,
+                ]);
+
+                $petsitter->services()->create([
+                    'type' => $data['service'],
+                    'price' => $data['price_per_day'],
+                ]);
+
+                return $petsitter;
+            });
+        } catch (\Throwable $e) {
+            // se a base de dados falhar, não deixa o ficheiro perdido no disco
+            Storage::disk('local')->delete($documentPath);
+            throw $e;
+        }
+
         $petsitter->refresh();
 
-        return (new PetsitterResource($petsitter->load('user')))->response()->setStatusCode(201);
+        return (new PetsitterResource($petsitter->load(['user', 'services'])))->response()->setStatusCode(201);
     }
 
     /**
@@ -102,11 +143,12 @@ class PetsitterController extends Controller
             'biography' => 'sometimes|nullable|string',
             'experience' => 'sometimes|string',
             'service_location' => 'sometimes|string|max:255',
+            'postal_code' => ['sometimes', 'nullable', 'string', 'regex:/^\d{4}-\d{3}$/'],
             'price_per_day' => 'sometimes|numeric|min:0',
             'age' => 'sometimes|integer|min:18|max:99',
             'accepted_sizes' => 'sometimes|nullable|array',
             'accepted_sizes.*' => 'string',
-            'sex' => 'sometimes|string|in:male,female,other',
+            'sex' => 'sometimes|nullable|string|in:male,female,other',
             'accepted_animal_types' => 'sometimes|nullable|array',
             'accepted_animal_types.*' => 'string',
             'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:20480',
@@ -256,5 +298,24 @@ class PetsitterController extends Controller
         $petsitter->reject();
 
         return new PetsitterResource($petsitter->load('user'));
+    }
+
+    /**
+     * Mostra o documento de identificação do petsitter (apenas admin), para validar a candidatura.
+     * Shows the petsitter's identification document (admin only), to review the application.
+     */
+    public function identificationDocument(Petsitter $petsitter)
+    {
+        // mesma permissão de aprovar/rejeitar: só admin
+        Gate::authorize('approve', $petsitter);
+
+        $path = $petsitter->identification_documents;
+
+        if (! $path || ! Storage::disk('local')->exists($path)) {
+            return response()->json(['message' => 'Documento de identificação não encontrado.'], 404);
+        }
+
+        // response() abre no browser (PDF/imagem) em vez de forçar o download
+        return Storage::disk('local')->response($path);
     }
 }

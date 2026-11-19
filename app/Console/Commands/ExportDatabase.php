@@ -59,6 +59,7 @@ class ExportDatabase extends Command
             'experience' => $p->experience,
             'service_location' => $p->service_location,
             'city' => $p->city,
+            'postal_code' => $p->postal_code,
             'age' => $p->age,
             'price_per_day' => $p->price_per_day,
             'average_rating' => $p->average_rating,
@@ -188,15 +189,18 @@ class ExportDatabase extends Command
         // Petsitters
         $content .= "        // Export Petsitters (" . count($petsittersArray) . " petsitters)\n";
         $content .= "        \$petsitters = " . var_export($petsittersArray, true) . ";\n";
+        $content .= "        // só usa as colunas que existem na tabela (evita erro se uma migration ainda não estiver no branch)\n";
+        $content .= "        \$petsitterColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('petsitters'));\n";
         $content .= "        foreach (\$petsitters as \$pData) {\n";
         $content .= "            \$petsitter = Petsitter::where('user_id', \$pData['user_id'])->first();\n";
         $content .= "            if (\$petsitter) {\n";
-        $content .= "                \$petsitter->update([\n";
+        $content .= "                \$petsitter->update(array_intersect_key([\n";
         $content .= "                    'biography' => \$pData['biography'],\n";
         $content .= "                    'short_bio' => \$pData['short_bio'],\n";
         $content .= "                    'experience' => \$pData['experience'],\n";
         $content .= "                    'service_location' => \$pData['service_location'],\n";
         $content .= "                    'city' => \$pData['city'],\n";
+        $content .= "                    'postal_code' => \$pData['postal_code'] ?? null,\n";
         $content .= "                    'age' => \$pData['age'],\n";
         $content .= "                    'price_per_day' => \$pData['price_per_day'],\n";
         $content .= "                    'average_rating' => \$pData['average_rating'],\n";
@@ -207,7 +211,7 @@ class ExportDatabase extends Command
         $content .= "                    'approval_status' => \$pData['approval_status'],\n";
         $content .= "                    'availability_days' => \$pData['availability_days'],\n";
         $content .= "                    'profile_photo' => \$pData['profile_photo'],\n";
-        $content .= "                ]);\n";
+        $content .= "                ], \$petsitterColumns));\n";
         $content .= "            }\n";
         $content .= "        }\n\n";
 

@@ -20,9 +20,10 @@ class PetsitterProfileController extends Controller
     {
         $user = $request->user();
 
-        // Se não tem perfil de petsitter, redireciona para o perfil de utilizador
+        // Se não tem perfil de petsitter, ou a candidatura ainda não foi aprovada,
+        // redireciona para o perfil de utilizador (owner)
         $petsitter = Petsitter::where('user_id', $user->id)->first();
-        if ( ! $petsitter) {
+        if ( ! $petsitter || $petsitter->approval_status !== 'approved') {
             return redirect()->route('owner.profile');
         }
 
@@ -38,6 +39,11 @@ class PetsitterProfileController extends Controller
     {
         $viewer = $request->user();
         $isOwnProfile = $viewer->id === $petsitter->user_id;
+
+        // o próprio, com a candidatura pendente ou recusada, vê o perfil de owner
+        if ($isOwnProfile && $petsitter->approval_status !== 'approved' && ! $viewer->isAdmin()) {
+            return redirect()->route('owner.profile');
+        }
 
         abort_unless(
             $viewer->isAdmin() || $isOwnProfile || $petsitter->approval_status === 'approved',

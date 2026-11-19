@@ -44,17 +44,21 @@ test('admin user sees all petsitters regardless of approval status', function ()
 test('authenticated user can register as a petsitter', function () {
     $user = User::factory()->create();
 
+    \Illuminate\Support\Facades\Storage::fake('local');
+
     $data = [
         'experience' => '5 years caring for dogs and cats',
         'service_location' => 'Ponta Delgada',
+        'postal_code' => '9500-123',
         'price_per_day' => 25.50,
         'age' => 30,
         'accepted_sizes' => ['small', 'medium'],
         'accepted_animal_types' => ['dog', 'cat'],
-        'identification_documents' => 'id_card.pdf',
+        'service' => 'pet-sitting',
+        'identification_documents' => \Illuminate\Http\UploadedFile::fake()->create('id_card.pdf', 100, 'application/pdf'),
     ];
 
-    $response = $this->actingAs($user)->postJson('/api/petsitters', $data);
+    $response = $this->actingAs($user)->post('/api/petsitters', $data, ['Accept' => 'application/json']);
 
     $response->assertCreated()
         ->assertJsonFragment([
