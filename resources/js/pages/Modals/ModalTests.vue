@@ -4,13 +4,16 @@
 import { ref } from 'vue';
 import { Head } from '@inertiajs/vue3';
 
+import AcceptPaymentRequest from '@/pages/Modals/AcceptPaymentRequest.vue';
 import ModalAddPet from '@/pages/Modals/ModalAddPet.vue';
+import ModalBookingPageAddPet from '@/pages/Modals/ModalBookingPageAddPet.vue';
+import ModalDeleteAnimal from "@/pages/Modals/ModalDeleteAnimal.vue";
+import ModalDeletePost from "@/pages/Modals/ModalDeletePost.vue";
 import ModalEditOwnerProfile from '@/pages/Modals/ModalEditOwnerProfile.vue';
 import ModalEditPetsitterProfile from '@/pages/Modals/ModalEditPetsitterProfile.vue';
+import ModalEditPost from "@/pages/Modals/ModalEditPost.vue";
 import ModalFormPetsitter from '@/pages/Modals/ModalFormPetsitter.vue';
 import ModalNewPost from '@/pages/Modals/ModalNewPost.vue';
-import AcceptPaymentRequest from '@/pages/Modals/AcceptPaymentRequest.vue';
-import ModalBookingPageAddPet from '@/pages/Modals/ModalBookingPageAddPet.vue';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import ModalPetDetails from '@/pages/Modals/ModalPetDetails.vue';
 import ModalReportPetsitter from '@/pages/Modals/ModalReportPetsitter.vue';
@@ -27,6 +30,9 @@ const showReport = ref(false);
 const showReview = ref(false);
 const showAcceptBooking = ref(false);
 const showAddPetToBooking = ref(false);
+const showDeleteAnimal = ref (false);
+const showDeletePost = ref (false);
+const showEditPost = ref (false);
 
 const mockPet = {
     id: 1,
@@ -122,55 +128,45 @@ const mockPet = {
             <button type="button" class="btn-pill" @click="showAddPetToBooking = true">
                 11. Adicionar Animal à Reserva
             </button>
+            <button type="button" class="btn-pill" @click="showDeleteAnimal = true">
+                12. Eliminar Animal
+            </button>
+            <button type="button" class="btn-pill" @click="showDeletePost = true">
+                12. Eliminar Post
+            </button>
+            <button type="button" class="btn-pill" @click="showEditPost = true">
+                12. Editar Post
+            </button>
         </div>
 
         <ModalAddPet :show="showAddPet" @close="showAddPet = false" />
 
-        <ModalPetDetails
-            :show="showPetDetails"
-            :pet="mockPet"
-            @close="showPetDetails = false"
-        />
+        <ModalPetDetails :show="showPetDetails" :pet="mockPet" @close="showPetDetails = false"/>
 
-        <ModalEditOwnerProfile
-            :show="showEditOwner"
-            @close="showEditOwner = false"
-        />
+        <ModalEditOwnerProfile :show="showEditOwner" @close="showEditOwner = false"/>
 
-        <ModalEditPetsitterProfile
-            :show="showEditPetsitter"
-            :petsitter="null"
-            @close="showEditPetsitter = false"
-        />
+        <ModalEditPetsitterProfile :show="showEditPetsitter" :petsitter="null" @close="showEditPetsitter = false"/>
 
-        <ModalFormPetsitter
-            :show="showFormPetsitter"
-            @close="showFormPetsitter = false"
-        />
+        <ModalFormPetsitter :show="showFormPetsitter" @close="showFormPetsitter = false"/>
 
         <ModalNewPost :show="showNewPost" @close="showNewPost = false" />
 
-        <ModalReviewPetsitter
-            :show="showReview"
-            :petsitter="{ id: 1, name: 'João Silva', avatar_url: null, service_summary: 'Cuidado de cães · 12/11 – 15/11/2026' }"
-            @close="showReview = false"
-        />
+        <ModalReviewPetsitter :show="showReview" :petsitter="{ id: 1, name: 'João Silva', avatar_url: null, service_summary: 'Cuidado de cães · 12/11 – 15/11/2026' }" @close="showReview = false"/>
 
         <ModalReportPetsitter :show="showReport" @close="showReport = false" />
 
         <ModalNotifications :show="showNotifications" @close="showNotifications = false" />
 
-        <AcceptPaymentRequest
-            :show="showAcceptBooking"
-            :bookingId="1"
-            @close="showAcceptBooking = false"
-        />
+        <AcceptPaymentRequest :show="showAcceptBooking" :bookingId="1" @close="showAcceptBooking = false"/>
 
-        <ModalBookingPageAddPet
-            :show="showAddPetToBooking"
-            :bookingId="1"
-            @close="showAddPetToBooking = false"
-        />
+        <ModalBookingPageAddPet :show="showAddPetToBooking" :bookingId="1" @close="showAddPetToBooking = false"/>
+
+        <ModalDeleteAnimal :show="showDeleteAnimal" :pet="mockPet" @close="showDeleteAnimal = false"/>
+
+        <ModalDeletePost :show="showDeletePost" post-title="Título de teste da publicação" @close="showDeletePost = false"/>
+
+        <ModalEditPost :show="showEditPost" :post="null" @close="showEditPost = false"/>
+
     </div>
 </template>
 
