@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import logoPatudo from '@/../../assets/logoPatudo.svg';
+</script>
+
 <template>
     <div
         class="min-vh-100 d-flex flex-column bg-light bg-opacity-25 position-relative overflow-hidden"
@@ -14,23 +18,25 @@
                         class="navbar-brand fw-bolder fs-2 text-decoration-none text-body d-flex align-items-center gap-2 m-0"
                     >
                         <img
-                            src="/images/patudo-logo.svg"
-                            alt="Logo Patudo"
-                            class="patudo-logo-img"
+                            :src="logoPatudo"
+                            alt="Patudo"
+                            width="70"
+                            height="70"
                         />
+                        <span>Patudo</span>
                     </a>
 
-                    <div class="d-flex gap-2 w-100 w-md-auto justify-content-center justify-content-md-end">
+                    <div class="d-flex gap-2 col-6 col-md-4 col-lg-3">
                         <a
                             href="/login"
-                            class="btn btn-primary rounded-pill px-4 py-2 fw-bold"
+                            class="btn btn-primary rounded-pill w-50 py-2 fw-bold"
                         >
                             Login
                         </a>
 
                         <a
                             href="/register"
-                            class="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold"
+                            class="btn btn-outline-primary rounded-pill w-50 py-2 fw-bold"
                         >
                             Registar
                         </a>
