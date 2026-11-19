@@ -29,6 +29,7 @@ Route::inertia('/favorites', 'Petsitter/Favorites')->middleware('auth')->name('f
 Route::get('/petsitters/profile', [PetsitterProfileController::class, 'showOwn'])
     ->middleware('auth')
     ->name('petsitters.profile');
+Route::inertia('/messages', 'Messages')->middleware('auth')->name('messages');
 Route::get('/petsitters/{petsitter}', [PetsitterProfileController::class, 'show'])
     ->middleware('auth')
     ->whereNumber('petsitter')
