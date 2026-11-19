@@ -58,6 +58,17 @@
     --bs-btn-hover-border-color: var(--patudo-castanhoMid);
 }
 
+.btn-outline-danger {
+    --bs-btn-bg: #fff;
+    --bs-btn-border-color: #EF4444;
+    --bs-btn-active-bg: #DC2626;
+    --bs-btn-color: #EF4444;
+    --bs-btn-hover-bg: #DC2626;
+    --bs-btn-hover-border-color: #DC2626;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-color: #fff;
+}
+
 .card {
     background-color: #ffffff;
     border: 1px solid var(--patudo-terracota);

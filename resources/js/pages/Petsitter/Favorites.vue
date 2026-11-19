@@ -2,6 +2,7 @@
 import { Head, router } from '@inertiajs/vue3';
 import { Bell, Heart, LogOut, MessageCircle, Star, UserRound } from '@lucide/vue';
 import { onMounted, ref } from 'vue';
+import "../../../css/app.css"
 import logoPatudo from "../../../../assets/logoPatudo.svg";
 import { useNotifications } from "@/composables/useNotifications";
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
@@ -142,7 +143,7 @@ onMounted(() => {
                     </button>
                     <button
                         type="button"
-                        class="btn btn-outline-danger btn-sm rounded-pill px-3 d-flex align-items-center gap-1 ms-2 logout-btn"
+                        class="btn btn-outline-danger btn-sm rounded-pill px-3 d-flex align-items-center gap-1 ms-2"
                         @click="logout"
                     >
                         <LogOut :size="16" />
@@ -265,14 +266,7 @@ onMounted(() => {
     border-radius: 11px;
     font-weight: 600;
 }
-.logout-btn {
-    border-color: #c8470f;
-    color: #c8470f;
-}
-.logout-btn:hover {
-    background-color: #c8470f;
-    color: #fff;
-}
+
 h1, h2, p {
     color: #3a1a0a;
 }
