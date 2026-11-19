@@ -1,8 +1,9 @@
-<!-- Página Vue: ModalTests.vue -->
+nao <!-- Página Vue: ModalTests.vue -->
 <!-- Vue page: ModalTests.vue -->
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
+import ModalPayment from '@/pages/Modals/ModalPayment.vue';
 
 import ModalAddPet from '@/pages/Modals/ModalAddPet.vue';
 import ModalEditOwnerProfile from '@/pages/Modals/ModalEditOwnerProfile.vue';
@@ -27,6 +28,7 @@ const showReport = ref(false);
 const showReview = ref(false);
 const showAcceptBooking = ref(false);
 const showAddPetToBooking = ref(false);
+const showPayment = ref(false);
 
 const mockPet = {
     id: 1,
@@ -122,6 +124,9 @@ const mockPet = {
             <button type="button" class="btn-pill" @click="showAddPetToBooking = true">
                 11. Adicionar Animal à Reserva
             </button>
+            <button type="button" class="btn-pill" @click="showPayment = true">
+                12. Pagamento da Reserva
+            </button>
         </div>
 
         <ModalAddPet :show="showAddPet" @close="showAddPet = false" />
@@ -164,6 +169,14 @@ const mockPet = {
             :show="showAcceptBooking"
             :bookingId="1"
             @close="showAcceptBooking = false"
+        />
+
+        <ModalPayment
+            :show="showPayment"
+            service-label="Serviço de Pet Sitting - Petsitter João"
+            :amount="50"
+            @close="showPayment = false"
+            @paid="router.visit('/payment-confirmed')"
         />
 
         <ModalBookingPageAddPet

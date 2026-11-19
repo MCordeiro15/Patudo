@@ -47,5 +47,7 @@ Route::get('/profile', function () {
     }
     return Inertia::render('Owner/Profile');
 })->middleware('auth')->name('owner.profile');
+Route::inertia('/payment-confirmed', 'Payment/PaymentConfirmed')->middleware('auth')->name('payment.confirmed');
+
 Route::inertia('/dev/modals', 'Modals/ModalTests');
 require __DIR__ . '/settings.php';
