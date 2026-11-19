@@ -10,6 +10,7 @@ import AnimalCard from '@/components/AnimalCard.vue';
 import ModalAddPet from '@/pages/Modals/ModalAddPet.vue';
 import ModalDeleteAnimal from '@/pages/Modals/ModalDeleteAnimal.vue';
 import ModalEditOwnerProfile from '@/pages/Modals/ModalEditOwnerProfile.vue';
+import ModalFormPetsitter from '@/pages/Modals/ModalFormPetsitter.vue';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 const { user, logout } = useAuth();
@@ -20,6 +21,14 @@ const loadError = ref('');
 const showAddModal = ref(false);
 const showDeleteModal = ref(false);
 const showNotifications = ref(false);
+
+// "Quero ser petsitter" — botão placeholder: no futuro passa para a navbar
+const showFormPetsitter = ref(false);
+const petsitterApplicationSent = ref(false);
+
+const handlePetsitterApplicationSaved = () => {
+    petsitterApplicationSent.value = true;
+};
 const { unreadCount } = useNotifications();
 const deletingAnimal = ref<{ id: number; name: string } | null>(null);
 const deletingAnimalLoading = ref(false);
@@ -284,6 +293,25 @@ onMounted(() => {
                 {{ profileError }}
             </div>
 
+            <!-- PLACEHOLDER: o botão "Quero ser petsitter" vai passar para a navbar -->
+            <div class="d-flex justify-content-end mb-3">
+                <div
+                    v-if="petsitterApplicationSent"
+                    class="alert alert-success py-2 px-3 small mb-0"
+                    role="status"
+                >
+                    Candidatura enviada! Aguarda a aprovação de um administrador.
+                </div>
+                <button
+                    v-else
+                    type="button"
+                    class="btn btn-outline-primary btn-sm rounded-pill px-4"
+                    @click="showFormPetsitter = true"
+                >
+                    Quero ser petsitter
+                </button>
+            </div>
+
             <section
                 class="card bg-white border border-primary rounded-4 p-3 p-md-4 mb-3 position-relative"
             >
@@ -429,6 +457,12 @@ onMounted(() => {
             @close="showEditModal = false"
             @save="handleSaveProfile"
             @delete-account="handleDeleteAccount"
+        />
+
+        <ModalFormPetsitter
+            :show="showFormPetsitter"
+            @close="showFormPetsitter = false"
+            @saved="handlePetsitterApplicationSaved"
         />
 
         <ModalNotifications
