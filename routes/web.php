@@ -41,13 +41,17 @@ Route::get('/profile-owner-view', fn () => Inertia::render('Petsitter/ProfileOwn
 
 Route::get('/profile', function () {
     $user = auth()->user();
-    if ($user->isPetsitter()) {
-        $petsitter = \App\Models\Petsitter::where('user_id', $user->id)->first();
-        if ($petsitter) {
-            return redirect()->route('petsitters.profile');
-        }
+    $petsitter = \App\Models\Petsitter::where('user_id', $user->id)->first();
+
+    // só vai para o perfil de petsitter depois de o admin aprovar
+    if ($petsitter && $petsitter->approval_status === 'approved') {
+        return redirect()->route('petsitters.profile');
     }
-    return Inertia::render('Owner/Profile');
+
+    return Inertia::render('Owner/Profile', [
+        // null (sem candidatura), 'pending' ou 'rejected' -> o perfil mostra o botão ou o estado
+        'petsitterApplicationStatus' => $petsitter?->approval_status,
+    ]);
 })->middleware('auth')->name('owner.profile');
 
 // Página de reserva confirmada (dono). O id vem no URL: /booking-confirmed?booking=ID

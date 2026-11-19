@@ -299,4 +299,23 @@ class PetsitterController extends Controller
 
         return new PetsitterResource($petsitter->load('user'));
     }
+
+    /**
+     * Mostra o documento de identificação do petsitter (apenas admin), para validar a candidatura.
+     * Shows the petsitter's identification document (admin only), to review the application.
+     */
+    public function identificationDocument(Petsitter $petsitter)
+    {
+        // mesma permissão de aprovar/rejeitar: só admin
+        Gate::authorize('approve', $petsitter);
+
+        $path = $petsitter->identification_documents;
+
+        if (! $path || ! Storage::disk('local')->exists($path)) {
+            return response()->json(['message' => 'Documento de identificação não encontrado.'], 404);
+        }
+
+        // response() abre no browser (PDF/imagem) em vez de forçar o download
+        return Storage::disk('local')->response($path);
+    }
 }

@@ -23,11 +23,16 @@ const showDeleteModal = ref(false);
 const showNotifications = ref(false);
 
 // "Quero ser petsitter" — botão placeholder: no futuro passa para a navbar
+// O estado vem do servidor (rota /profile): null = sem candidatura, 'pending' ou 'rejected'
+const props = defineProps<{
+    petsitterApplicationStatus?: 'pending' | 'rejected' | null;
+}>();
+
 const showFormPetsitter = ref(false);
-const petsitterApplicationSent = ref(false);
+const petsitterApplicationStatus = ref(props.petsitterApplicationStatus ?? null);
 
 const handlePetsitterApplicationSaved = () => {
-    petsitterApplicationSent.value = true;
+    petsitterApplicationStatus.value = 'pending';
 };
 const { unreadCount } = useNotifications();
 const deletingAnimal = ref<{ id: number; name: string } | null>(null);
@@ -296,11 +301,18 @@ onMounted(() => {
             <!-- PLACEHOLDER: o botão "Quero ser petsitter" vai passar para a navbar -->
             <div class="d-flex justify-content-end mb-3">
                 <div
-                    v-if="petsitterApplicationSent"
+                    v-if="petsitterApplicationStatus === 'pending'"
                     class="alert alert-success py-2 px-3 small mb-0"
                     role="status"
                 >
                     Candidatura enviada! Aguarda a aprovação de um administrador.
+                </div>
+                <div
+                    v-else-if="petsitterApplicationStatus === 'rejected'"
+                    class="alert alert-danger py-2 px-3 small mb-0"
+                    role="status"
+                >
+                    A tua candidatura a petsitter foi recusada.
                 </div>
                 <button
                     v-else

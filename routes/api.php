@@ -72,6 +72,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/petsitters/{petsitter}/availability/{date}', [PetsitterAvailabilityController::class, 'destroy']);
     Route::post('/petsitters/{petsitter}/approve', [PetsitterController::class, 'approve']);
     Route::post('/petsitters/{petsitter}/reject', [PetsitterController::class, 'reject']);
+    // documento de identificação (disco privado): só o admin o pode abrir
+    Route::get('/petsitters/{petsitter}/identification-document', [PetsitterController::class, 'identificationDocument']);
     Route::apiResource('petsitters', PetsitterController::class);
 
     // Posts

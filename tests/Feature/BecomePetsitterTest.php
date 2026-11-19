@@ -10,6 +10,7 @@ use App\Models\Petsitter;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
     Storage::fake('local');
@@ -130,6 +131,68 @@ test('a user who is already a petsitter gets 409 and nothing is stored', functio
 
     // não fica nenhum documento perdido no disco
     expect(Storage::disk('local')->allFiles())->toBeEmpty();
+});
+
+test('a pending or rejected petsitter sees the owner profile, with the application status', function (string $status) {
+    $petsitter = Petsitter::factory()->create(['approval_status' => $status]);
+
+    // o perfil de petsitter (o próprio e pelo id) manda para o perfil de owner
+    $this->actingAs($petsitter->user)->get('/petsitters/profile')->assertRedirect(route('owner.profile'));
+    $this->actingAs($petsitter->user)->get('/petsitters/'.$petsitter->user_id)->assertRedirect(route('owner.profile'));
+
+    // o perfil de owner sabe o estado da candidatura (para não mostrar o botão outra vez)
+    $this->actingAs($petsitter->user)
+        ->get('/profile')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Owner/Profile')
+            ->where('petsitterApplicationStatus', $status));
+})->with(['pending', 'rejected']);
+
+test('a user without application gets no application status on the owner profile', function () {
+    $this->actingAs(User::factory()->create())
+        ->get('/profile')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Owner/Profile')
+            ->where('petsitterApplicationStatus', null));
+});
+
+test('an approved petsitter goes from /profile to the petsitter profile', function () {
+    $petsitter = Petsitter::factory()->approved()->create();
+
+    $this->actingAs($petsitter->user)->get('/profile')->assertRedirect(route('petsitters.profile'));
+});
+
+test('approving sets is_petsitter and rejecting clears it', function () {
+    $admin = User::factory()->admin()->create();
+    $petsitter = Petsitter::factory()->create(['approval_status' => 'pending']);
+
+    $this->actingAs($admin)->postJson('/api/petsitters/'.$petsitter->user_id.'/approve')->assertOk();
+    expect($petsitter->user->fresh()->is_petsitter)->toBeTrue();
+
+    $this->actingAs($admin)->postJson('/api/petsitters/'.$petsitter->user_id.'/reject')->assertOk();
+    expect($petsitter->user->fresh()->is_petsitter)->toBeFalse();
+});
+
+test('only an admin can open the identification document', function () {
+    $user = User::factory()->create();
+    submitBecomePetsitter($this, $user, becomePetsitterPayload())->assertCreated();
+    $url = '/api/petsitters/'.$user->id.'/identification-document';
+
+    $this->actingAs(User::factory()->admin()->create())->get($url)->assertOk();
+
+    // nem o próprio nem outros utilizadores
+    $this->actingAs($user)->getJson($url)->assertForbidden();
+    $this->actingAs(User::factory()->create())->getJson($url)->assertForbidden();
+});
+
+test('identification document returns 404 when the file does not exist', function () {
+    $petsitter = Petsitter::factory()->create(['identification_documents' => 'nao-existe.pdf']);
+
+    $this->actingAs(User::factory()->admin()->create())
+        ->getJson('/api/petsitters/'.$petsitter->user_id.'/identification-document')
+        ->assertNotFound();
 });
 
 test('the postal code is not shown to other users', function () {
