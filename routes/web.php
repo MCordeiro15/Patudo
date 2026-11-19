@@ -5,9 +5,7 @@
  * PHP file: web.php
  */
 use App\Http\Controllers\PetsitterProfileController;
-use App\Models\Booking;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -60,20 +58,16 @@ Route::inertia('/booking-confirmed', 'Owner/BookingConfirmed')
     ->middleware('auth')
     ->name('bookings.confirmed');
 
-// Detalhe/notificação de uma reserva: o mesmo URL serve o dono e o petsitter.
-// /reservation-notification?booking=ID -> mostra a página certa conforme o papel na reserva.
-Route::get('/reservation-notification', function (Request $request) {
-    $booking = Booking::findOrFail($request->query('booking'));
+// Pedidos de reserva recebidos (petsitter): aceitar / recusar.
+// Os dados são carregados pela página via API, que já verifica permissões.
+Route::inertia('/orders', 'Petsitter/ReservationNotification')
+    ->middleware('auth')
+    ->name('bookings.orders');
 
-    // 403 se não for o dono, o petsitter da reserva ou admin
-    Gate::authorize('view', $booking);
-
-    if ($request->user()->id === $booking->petsitter_id) {
-        return Inertia::render('Petsitter/ReservationNotification');
-    }
-
-    return Inertia::render('Owner/ReservationNotificationToOwner');
-})->middleware('auth')->name('bookings.notification');
+// Reservas feitas pelo utilizador (dono): estado, cancelar.
+Route::inertia('/reservations', 'Owner/ReservationNotificationToOwner')
+    ->middleware('auth')
+    ->name('bookings.reservations');
 
 Route::inertia('/dev/modals', 'Modals/ModalTests');
 require __DIR__ . '/settings.php';
