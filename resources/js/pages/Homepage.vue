@@ -3,9 +3,7 @@ import logoPatudo from '@/../../assets/logoPatudo.svg';
 </script>
 
 <template>
-    <div
-        class="min-vh-100 d-flex flex-column bg-light bg-opacity-25 position-relative overflow-hidden"
-    >
+    <div class="min-vh-100 d-flex flex-column bg-light bg-opacity-25 position-relative overflow-hidden">
         <div class="patudo-glow patudo-glow-top"></div>
         <div class="patudo-glow patudo-glow-bottom"></div>
 

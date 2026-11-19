@@ -95,12 +95,14 @@ onMounted(() => {
 
 <template>
     <Head title="Petsitters Favoritos" />
-
-    <main class="min-vh-100 py-4 patudo-page">
+    <main>
+    <div class="min-vh-100 d-flex flex-column bg-light bg-opacity-25 position-relative overflow-hidden">
+        <div class="patudo-glow patudo-glow-top"></div>
+        <div class="patudo-glow patudo-glow-bottom"></div>
         <div class="container">
             <!-- Navbar Superior com Logout -->
             <nav
-                class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4 position-relative"
+                class="navbar navbar-expand-lg bg-white border border-primary rounded-4 mt-lg-4 px-3 px-md-4 position-relative"
             >
                 <a
                     class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2"
@@ -235,6 +237,7 @@ onMounted(() => {
             @close="showNotifications = false"
             @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
         />
+    </div>
     </main>
 </template>
 
