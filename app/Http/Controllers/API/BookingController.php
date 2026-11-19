@@ -39,14 +39,21 @@ class BookingController extends Controller
     {
         Gate::authorize('viewAny', Booking::class);
 
+        // ?pending=1 -> só pendentes (página Pedidos); ?pending=0 -> todas menos as pendentes (página Reservas)
+        $request->validate(['pending' => 'sometimes|boolean']);
+
         $userId = $request->user()->id;
 
         return BookingResource::collection(
-            Booking::with('animals', 'service')
+            Booking::with('animals', 'service', 'user', 'petsitter.user')
                 // o where com função agrupa o OR entre parênteses
                 ->where(fn ($q) => $q->where('user_id', $userId)->orWhere('petsitter_id', $userId))
+                ->when($request->has('pending'), fn ($q) => $request->boolean('pending')
+                    ? $q->where('status', 'pending')
+                    : $q->where('status', '!=', 'pending'))
                 ->latest()
                 ->paginate(15)
+                ->withQueryString()
         );
     }
 

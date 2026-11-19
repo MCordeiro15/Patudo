@@ -47,6 +47,8 @@ class PetsitterResource extends JsonResource
             'services' => PetsitterServiceResource::collection($this->whenLoaded('services')),
             'service_location' => $this->service_location,
             'city' => $this->city,
+            // dado de morada: só o próprio e o admin veem
+            'postal_code' => $this->when($canSeePrivate, $this->postal_code),
             'age' => $this->age,
             'price_per_day' => $this->price_per_day,
             'average_rating' => $this->average_rating,

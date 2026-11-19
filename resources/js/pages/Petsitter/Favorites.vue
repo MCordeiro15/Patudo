@@ -41,6 +41,18 @@ interface FavoritePetsitter {
     user?: { name: string };
 }
 
+const animalLabelMap: Record<string, string> = {
+    dog: 'Dogs',
+    dogs: 'Dogs',
+    cat: 'Cats',
+    cats: 'Cats',
+};
+
+function formatAnimalTag(animal: string): string {
+    const key = animal.toLowerCase();
+    return animalLabelMap[key] ?? animal;
+}
+
 const favourites = ref<FavoritePetsitter[]>([]);
 const feedback = ref('');
 const showNotifications = ref(false);
@@ -139,8 +151,8 @@ onMounted(() => {
                 </div>
             </nav>
 
-            <h1 class="text-center fw-bold display-5 mb-2 mt-xl-4">Petsitters favoritos</h1>
-            <p class="text-center text-muted mb-4">Aqui podes ver os petsitters que guardaste nos teus favoritos.</p>
+            <h1 class="text-center fw-semibold display-5 mb-2 mt-xl-4">Petsitters favoritos</h1>
+            <p class="text-muted mt-3 mb-4">Aqui podes ver os petsitters que guardaste nos teus favoritos.</p>
 
             <div v-if="feedback" class="alert alert-info text-center mb-4">
                 {{ feedback }}
@@ -154,8 +166,9 @@ onMounted(() => {
             <div
                 v-for="fav in favourites"
                 :key="fav.id"
-                class="card bg-white border border-primary rounded-4 p-4 mb-3 align-items-center flex-row justify-content-between shadow-sm favorite-card"
+                class="card bg-white border border-primary rounded-4 p-4 mb-3 align-items-center flex-column flex-xl-row justify-content-between gap-3 shadow-sm favorite-card"
             >
+                <!-- Esquerda: Avatar + Info -->
                 <div class="d-flex align-items-center gap-4">
                     <div class="profile-avatar rounded-circle border border-primary overflow-hidden d-flex align-items-center justify-content-center flex-shrink-0">
                         <img
@@ -178,18 +191,20 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <div class="d-flex align-items-center gap-4">
-                    <div class="d-flex gap-2">
-                        <span
-                            v-for="animal in (fav.accepted_animal_types ?? ['cats', 'dogs'])"
-                            :key="animal"
-                            class="tag-pill rounded-pill px-3 py-1 small text-white text-capitalize"
-                        >
-                            {{ animal }}
-                        </span>
-                    </div>
+                <!-- Centro: Tags maiores entre o nome e o preço -->
+                <div class="d-flex align-items-center justify-content-center flex-wrap gap-3 mx-xl-auto px-3">
+                    <span
+                        v-for="animal in (fav.accepted_animal_types ?? ['cats', 'dogs'])"
+                        :key="animal"
+                        class="tag-pill"
+                    >
+                        {{ formatAnimalTag(animal) }}
+                    </span>
+                </div>
 
-                    <div class="text-end px-3">
+                <!-- Direita: Preço + Ver perfil + Coração -->
+                <div class="d-flex align-items-center gap-4">
+                    <div class="text-end px-2">
                         <p class="fw-bold fs-5 mb-0">{{ fav.price_per_hour ?? fav.price_per_day ?? 10 }} €/hora</p>
                         <small class="text-muted">Disponível esta semana</small>
                     </div>
@@ -234,9 +249,11 @@ onMounted(() => {
     background-color: #587257 !important;
     color: #ffffff !important;
     border-radius: 50rem;
-    font-size: 0.85rem;
-    padding: 0.25rem 1rem;
-    text-transform: lowercase;
+    font-size: 0.9rem;
+    padding: 0.35rem 2.2rem;
+    min-width: 118px;
+    text-align: center;
+    line-height: 1.25;
 }
 .favorite-card {
     border-color: #e8c08f !important;
@@ -245,7 +262,7 @@ onMounted(() => {
 .profile-btn {
     background-color: #c8470f;
     border-color: #c8470f;
-    border-radius: 6px;
+    border-radius: 11px;
     font-weight: 600;
 }
 .logout-btn {
