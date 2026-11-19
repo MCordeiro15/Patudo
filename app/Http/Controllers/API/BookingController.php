@@ -78,7 +78,27 @@ class BookingController extends Controller
             'animal_ids' => 'required|array|min:1',
             // cada animal tem de existir E ser do utilizador autenticado
             'animal_ids.*' => ['integer', 'distinct', Rule::exists('animals', 'id')->where('user_id', $user->id)],
+            'message' => ['nullable', 'string', 'max:1000'],
+            'zone' => ['nullable', 'string', 'max:255'],
+            'entrance_hour' => ['nullable', 'date_format:H:i'],
+            'exit_hour' => ['nullable', 'date_format:H:i'],
         ]);
+
+        if (
+            $data['start_date'] === $data['end_date'] &&
+            !empty($data['entrance_hour']) &&
+            !empty($data['exit_hour']) &&
+            $data['exit_hour'] <= $data['entrance_hour']
+        ) {
+            return response()->json([
+                'message' => 'A hora de saída deve ser posterior à hora de entrada.',
+                'errors' => [
+                    'exit_hour' => [
+                        'A hora de saída deve ser posterior à hora de entrada.',
+                    ],
+                ],
+            ], 422);
+        }
 
         $petsitter = Petsitter::findOrFail($data['petsitter_id']);
         $service = PetsitterService::findOrFail($data['service_id']);
@@ -96,6 +116,10 @@ class BookingController extends Controller
                 'end_date' => $data['end_date'],
                 'status' => 'pending',             // sempre pending ao criar
                 'total_price' => $service->price * $days, // calculado no servidor, com o preço do serviço
+                'message' => $data['message'] ?? null,
+                'zone' => $data['zone'] ?? null,
+                'entrance_hour' => $data['entrance_hour'] ?? null,
+                'exit_hour' => $data['exit_hour'] ?? null,
             ]);
 
             // escreve as linhas na tabela animal_bookings

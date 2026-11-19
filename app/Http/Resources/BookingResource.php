@@ -39,6 +39,10 @@ class BookingResource extends JsonResource
             'animals' => AnimalResource::collection($this->whenLoaded('animals')),
             'review' => new ReviewResource($this->whenLoaded('review')),
             'created_at' => $this->created_at,
+            'message' => $this->message,
+            'zone' => $this->zone,
+            'entrance_hour' => $this->entrance_hour,
+            'exit_hour' => $this->exit_hour,
         ];
     }
 }
