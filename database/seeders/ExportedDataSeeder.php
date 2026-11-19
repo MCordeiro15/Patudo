@@ -10,13 +10,14 @@ use App\Models\Post;
 use App\Models\Booking;
 use App\Models\Review;
 use App\Models\AnimalBooking;
+use App\Models\PetsitterService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 /**
  * SEEDER GERADO AUTOMATICAMENTE - NÃO EDITE MANUALMENTE
  * Este arquivo é gerado pelo comando php artisan db:export
- * Última atualização: 2026-11-18 21:23:17
+ * Última atualização: 2026-11-19 10:04:52
  */
 class ExportedDataSeeder extends Seeder
 {
@@ -62,6 +63,8 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
     'phone' => '912345678',
+    'location' => NULL,
+    'about' => NULL,
     'is_admin' => false,
     'is_petsitter' => true,
     'created_at' => 
@@ -88,7 +91,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:28.000000',
+       'date' => '2026-11-18 21:24:29.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -116,7 +119,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -156,6 +159,8 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
     'phone' => '923456789',
+    'location' => NULL,
+    'about' => NULL,
     'is_admin' => false,
     'is_petsitter' => true,
     'created_at' => 
@@ -182,7 +187,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:28.000000',
+       'date' => '2026-11-18 21:24:29.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -210,7 +215,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -250,6 +255,8 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
     'phone' => '000000000',
+    'location' => NULL,
+    'about' => NULL,
     'is_admin' => false,
     'is_petsitter' => true,
     'created_at' => 
@@ -276,7 +283,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:28.000000',
+       'date' => '2026-11-18 21:24:29.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -304,7 +311,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -344,6 +351,8 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
     'phone' => '945678901',
+    'location' => NULL,
+    'about' => NULL,
     'is_admin' => false,
     'is_petsitter' => true,
     'created_at' => 
@@ -370,7 +379,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:28.000000',
+       'date' => '2026-11-18 21:24:30.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -398,7 +407,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -438,6 +447,8 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
     'phone' => '956789012',
+    'location' => NULL,
+    'about' => NULL,
     'is_admin' => false,
     'is_petsitter' => true,
     'created_at' => 
@@ -464,7 +475,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:29.000000',
+       'date' => '2026-11-18 21:24:30.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -492,7 +503,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -532,6 +543,8 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
     'phone' => '967890123',
+    'location' => NULL,
+    'about' => NULL,
     'is_admin' => false,
     'is_petsitter' => true,
     'created_at' => 
@@ -558,7 +571,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:29.000000',
+       'date' => '2026-11-18 21:24:30.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -586,7 +599,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -626,6 +639,8 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
     'phone' => '910000000',
+    'location' => NULL,
+    'about' => NULL,
     'is_admin' => true,
     'is_petsitter' => true,
     'created_at' => 
@@ -652,7 +667,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -680,7 +695,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -720,6 +735,8 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
     'phone' => '920000000',
+    'location' => NULL,
+    'about' => NULL,
     'is_admin' => false,
     'is_petsitter' => false,
     'created_at' => 
@@ -746,7 +763,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -774,7 +791,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -814,6 +831,8 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
     'phone' => '918726319',
+    'location' => NULL,
+    'about' => NULL,
     'is_admin' => false,
     'is_petsitter' => false,
     'created_at' => 
@@ -840,7 +859,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -868,7 +887,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -908,6 +927,8 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
     'phone' => '940000000',
+    'location' => NULL,
+    'about' => NULL,
     'is_admin' => false,
     'is_petsitter' => false,
     'created_at' => 
@@ -934,7 +955,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -962,7 +983,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1002,6 +1023,8 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
     'phone' => '950000000',
+    'location' => NULL,
+    'about' => NULL,
     'is_admin' => false,
     'is_petsitter' => false,
     'created_at' => 
@@ -1028,7 +1051,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1056,7 +1079,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1096,6 +1119,8 @@ class ExportedDataSeeder extends Seeder
        'timezone' => 'UTC',
     )),
     'phone' => '960000000',
+    'location' => NULL,
+    'about' => NULL,
     'is_admin' => false,
     'is_petsitter' => false,
     'created_at' => 
@@ -1122,7 +1147,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1150,7 +1175,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1163,6 +1188,8 @@ class ExportedDataSeeder extends Seeder
     'password' => '$2y$12$yo8DxTX0E3Dv2MghxffaG.cJsPxlDPXZ1yHYB.yP0b4oHJ8bXDQS6',
     'email_verified_at' => NULL,
     'phone' => NULL,
+    'location' => NULL,
+    'about' => NULL,
     'is_admin' => false,
     'is_petsitter' => false,
     'created_at' => 
@@ -1189,7 +1216,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1217,7 +1244,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1230,6 +1257,8 @@ class ExportedDataSeeder extends Seeder
     'password' => '$2y$12$TNC9BZslUyUTyDw2mmc9AemrScfdv3MO8qQqdrbuKhY71t68t1xYO',
     'email_verified_at' => NULL,
     'phone' => '926676967',
+    'location' => NULL,
+    'about' => NULL,
     'is_admin' => false,
     'is_petsitter' => false,
     'created_at' => 
@@ -1256,7 +1285,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1284,7 +1313,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1297,6 +1326,8 @@ class ExportedDataSeeder extends Seeder
     'password' => '$2y$12$2lZFfyUvV1VpFsjsmcETBup.jQpBjoNkuq6A9mUTrWYo95db3TAL2',
     'email_verified_at' => NULL,
     'phone' => NULL,
+    'location' => NULL,
+    'about' => NULL,
     'is_admin' => false,
     'is_petsitter' => false,
     'created_at' => 
@@ -1323,7 +1354,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1351,7 +1382,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1365,6 +1396,8 @@ class ExportedDataSeeder extends Seeder
                     'password' => $userData['password'],
                     'email_verified_at' => $userData['email_verified_at'],
                     'phone' => $userData['phone'],
+                    'location' => $userData['location'] ?? null,
+                    'about' => $userData['about'] ?? null,
                     'is_admin' => $userData['is_admin'],
                     'is_petsitter' => $userData['is_petsitter'],
                 ]
@@ -1433,7 +1466,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:28.000000',
+       'date' => '2026-11-18 21:24:29.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1461,7 +1494,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1523,7 +1556,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:28.000000',
+       'date' => '2026-11-18 21:24:29.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1551,7 +1584,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1616,7 +1649,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:28.000000',
+       'date' => '2026-11-18 21:24:29.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1644,7 +1677,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1709,7 +1742,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:28.000000',
+       'date' => '2026-11-18 21:24:30.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1737,7 +1770,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1802,7 +1835,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:29.000000',
+       'date' => '2026-11-18 21:24:30.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1830,7 +1863,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:31.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1895,7 +1928,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:29.000000',
+       'date' => '2026-11-18 21:24:30.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1923,7 +1956,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:31.000000',
+       'date' => '2026-11-18 21:24:32.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1986,7 +2019,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:30.000000',
+       'date' => '2026-11-18 21:24:31.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -2014,7 +2047,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-18 21:06:31.000000',
+       'date' => '2026-11-18 21:24:32.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -2229,11 +2262,25 @@ class ExportedDataSeeder extends Seeder
 
         // Export Bookings (7 bookings)
         Booking::query()->delete();
+
+        // Export Petsitter Services (0 services)
+        PetsitterService::query()->delete();
+        $services = array (
+);
+        foreach ($services as $sData) {
+            // só cria se o petsitter existir (FK para petsitters.user_id)
+            if (Petsitter::where('user_id', $sData['petsitter_id'])->exists()) {
+                PetsitterService::forceCreate($sData); // mantém o id original
+            }
+        }
+        $serviceIds = PetsitterService::pluck('id')->all();
+
         $bookings = array (
   0 => 
   array (
     'petsitter_id' => 1,
     'user_id' => 10,
+    'service_id' => NULL,
     'start_date' => '2026-10-22',
     'end_date' => '2026-10-27',
     'status' => 'completed',
@@ -2243,6 +2290,7 @@ class ExportedDataSeeder extends Seeder
   array (
     'petsitter_id' => 2,
     'user_id' => 11,
+    'service_id' => NULL,
     'start_date' => '2026-10-28',
     'end_date' => '2026-10-30',
     'status' => 'completed',
@@ -2252,6 +2300,7 @@ class ExportedDataSeeder extends Seeder
   array (
     'petsitter_id' => 3,
     'user_id' => 12,
+    'service_id' => NULL,
     'start_date' => '2026-10-26',
     'end_date' => '2026-10-31',
     'status' => 'completed',
@@ -2261,6 +2310,7 @@ class ExportedDataSeeder extends Seeder
   array (
     'petsitter_id' => 4,
     'user_id' => 10,
+    'service_id' => NULL,
     'start_date' => '2026-11-03',
     'end_date' => '2026-11-06',
     'status' => 'completed',
@@ -2270,6 +2320,7 @@ class ExportedDataSeeder extends Seeder
   array (
     'petsitter_id' => 5,
     'user_id' => 11,
+    'service_id' => NULL,
     'start_date' => '2026-10-27',
     'end_date' => '2026-11-01',
     'status' => 'completed',
@@ -2279,6 +2330,7 @@ class ExportedDataSeeder extends Seeder
   array (
     'petsitter_id' => 6,
     'user_id' => 12,
+    'service_id' => NULL,
     'start_date' => '2026-10-16',
     'end_date' => '2026-10-18',
     'status' => 'completed',
@@ -2288,6 +2340,7 @@ class ExportedDataSeeder extends Seeder
   array (
     'petsitter_id' => 7,
     'user_id' => 10,
+    'service_id' => NULL,
     'start_date' => '2026-10-24',
     'end_date' => '2026-10-29',
     'status' => 'completed',
@@ -2297,6 +2350,10 @@ class ExportedDataSeeder extends Seeder
         foreach ($bookings as $bookingData) {
             $bookingCreateData = $bookingData;
             unset($bookingCreateData['id']);
+            // se o serviço não foi recriado, fica sem serviço em vez de falhar a FK
+            if (!in_array($bookingCreateData['service_id'] ?? null, $serviceIds)) {
+                $bookingCreateData['service_id'] = null;
+            }
             Booking::create($bookingCreateData);
         }
 
