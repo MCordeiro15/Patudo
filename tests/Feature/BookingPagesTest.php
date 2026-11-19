@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Testes das rotas web das páginas de reserva: reserva confirmada e notificação de reserva (dono vs petsitter).
- * Tests for the booking web pages routes: booking confirmed and booking notification (owner vs petsitter).
+ * Testes das rotas web das páginas de reserva: reserva confirmada, pedidos (petsitter) e reservas (dono).
+ * Tests for the booking web pages routes: booking confirmed, orders (petsitter) and reservations (owner).
  */
 use App\Models\Booking;
 use App\Models\Petsitter;
@@ -24,7 +24,8 @@ function makeBookingForPages(User $owner, Petsitter $petsitter): Booking
 
 test('guest is redirected to login on the booking pages', function () {
     $this->get('/booking-confirmed?booking=1')->assertRedirect(route('login'));
-    $this->get('/reservation-notification?booking=1')->assertRedirect(route('login'));
+    $this->get('/orders')->assertRedirect(route('login'));
+    $this->get('/reservations')->assertRedirect(route('login'));
 });
 
 test('authenticated user sees the booking confirmed page', function () {
@@ -36,42 +37,81 @@ test('authenticated user sees the booking confirmed page', function () {
         ->assertInertia(fn (Assert $page) => $page->component('Owner/BookingConfirmed'));
 });
 
-test('booking owner sees the owner notification page', function () {
-    $owner = User::factory()->create();
-    $petsitter = Petsitter::factory()->approved()->create();
-    $booking = makeBookingForPages($owner, $petsitter);
-
-    $this->actingAs($owner)
-        ->get('/reservation-notification?booking='.$booking->id)
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->component('Owner/ReservationNotificationToOwner'));
-});
-
-test('booking petsitter sees the petsitter notification page', function () {
+test('petsitter sees the orders page', function () {
     $owner = User::factory()->create();
     $petsitter = Petsitter::factory()->approved()->create();
     $booking = makeBookingForPages($owner, $petsitter);
 
     $this->actingAs($petsitter->user)
-        ->get('/reservation-notification?booking='.$booking->id)
+        ->get('/orders?booking='.$booking->id)
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page->component('Petsitter/ReservationNotification'));
 });
 
-test('a user outside the booking cannot see the notification page', function () {
+test('owner sees the reservations page', function () {
+    $owner = User::factory()->create();
+    $petsitter = Petsitter::factory()->approved()->create();
+    $booking = makeBookingForPages($owner, $petsitter);
+
+    $this->actingAs($owner)
+        ->get('/reservations?booking='.$booking->id)
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('Owner/ReservationNotificationToOwner'));
+});
+
+test('pending filter splits orders (pending) from reservations (not pending), as owner and as petsitter', function () {
+    $owner = User::factory()->create();
+    $petsitter = Petsitter::factory()->approved()->create();
+
+    $pending = makeBookingForPages($owner, $petsitter);
+    $approved = makeBookingForPages($owner, $petsitter);
+    $approved->update(['status' => 'approved']);
+    $cancelled = makeBookingForPages($owner, $petsitter);
+    $cancelled->update(['status' => 'cancelled']);
+
+    // reserva de outras pessoas: nunca aparece
+    makeBookingForPages(User::factory()->create(), Petsitter::factory()->approved()->create());
+
+    foreach ([$owner, $petsitter->user] as $viewer) {
+        $orders = $this->actingAs($viewer)->getJson('/api/bookings?pending=1')->assertOk();
+        expect(collect($orders->json('data'))->pluck('id')->all())->toBe([$pending->id]);
+
+        $reservations = $this->actingAs($viewer)->getJson('/api/bookings?pending=0')->assertOk();
+        expect(collect($reservations->json('data'))->pluck('id')->sort()->values()->all())
+            ->toBe([$approved->id, $cancelled->id]);
+
+        // sem filtro continuam a vir todas
+        $this->actingAs($viewer)->getJson('/api/bookings')->assertOk()->assertJsonCount(3, 'data');
+    }
+});
+
+test('booking list includes owner and petsitter names', function () {
+    $owner = User::factory()->create(['name' => 'Ana Dona']);
+    $petsitter = Petsitter::factory()->approved()->create();
+    makeBookingForPages($owner, $petsitter);
+
+    $this->actingAs($petsitter->user)
+        ->getJson('/api/bookings?pending=1')
+        ->assertOk()
+        ->assertJsonPath('data.0.owner.name', 'Ana Dona')
+        ->assertJsonPath('data.0.petsitter.name', $petsitter->user->name);
+});
+
+test('pending filter must be a boolean', function () {
+    $this->actingAs(User::factory()->create())
+        ->getJson('/api/bookings?pending=talvez')
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('pending');
+});
+
+test('a user outside the booking cannot load its data through the api', function () {
     $owner = User::factory()->create();
     $petsitter = Petsitter::factory()->approved()->create();
     $booking = makeBookingForPages($owner, $petsitter);
     $stranger = User::factory()->create();
 
+    // a página abre, mas a API que carrega a reserva recusa quem não faz parte dela
     $this->actingAs($stranger)
-        ->get('/reservation-notification?booking='.$booking->id)
+        ->getJson('/api/bookings/'.$booking->id)
         ->assertForbidden();
-});
-
-test('notification page returns 404 for a missing or unknown booking', function () {
-    $owner = User::factory()->create();
-
-    $this->actingAs($owner)->get('/reservation-notification')->assertNotFound();
-    $this->actingAs($owner)->get('/reservation-notification?booking=999999')->assertNotFound();
 });

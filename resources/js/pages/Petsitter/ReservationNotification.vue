@@ -6,8 +6,10 @@ import logoPatudo from '@/../../assets/logoPatudo.svg';
 import type { Animal } from '@/types';
 import { useNotifications } from '@/composables/useNotifications';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
+import BookingList from '@/components/BookingList.vue';
 
-// O id da reserva vem do URL: /reservation-notification?booking=ID
+// /orders            -> lista dos pedidos pendentes (BookingList)
+// /orders?booking=ID -> detalhe de um pedido (abaixo)
 const bookingId = new URLSearchParams(window.location.search).get('booking');
 
 function getXsrf(): string {
@@ -146,8 +148,9 @@ onMounted(() => {
 
                 <div class="nav nav-pills border rounded-pill p-1 mx-auto">
                     <a class="nav-link rounded-pill px-4" href="/">Início</a>
-                    <a class="nav-link active rounded-pill px-4" href="/reservations">Reservas</a>
-                    <a class="nav-link rounded-pill px-4" href="/profile-petsitter">Perfil</a>
+                    <a class="nav-link active rounded-pill px-4" href="/orders">Pedidos</a>
+                    <a class="nav-link rounded-pill px-4" href="/favorites">Favoritos</a>
+                    <a class="nav-link rounded-pill px-4" href="/reservations">Reservas</a>
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
@@ -178,18 +181,21 @@ onMounted(() => {
                 </div>
             </nav>
 
-            <!-- Botão de voltar -->
-            <div class="mt-4">
+            <!-- Botão de voltar (só no detalhe de um pedido) -->
+            <div v-if="bookingId" class="mt-4">
                 <a
-                    href="/reservations"
+                    href="/orders"
                     class="btn btn-outline-secondary rounded-pill d-inline-flex align-items-center gap-2"
                 >
                     <ChevronLeft :size="16" />
-                    Voltar às reservas
+                    Voltar aos pedidos
                 </a>
             </div>
 
-            <h1 class="text-center fw-bold display-5 mt-3 mb-4">Pedido de Reserva</h1>
+            <h1 class="text-center fw-bold display-5 mt-3 mb-4">{{ bookingId ? 'Pedido de Reserva' : 'Pedidos de reserva' }}</h1>
+
+            <!-- Sem ?booking no URL: lista dos pedidos pendentes -->
+            <BookingList v-if="!bookingId" :pending="true" />
 
             <!-- Feedback -->
             <div v-if="feedback" class="alert py-2 small" :class="feedback.includes('sucesso') || feedback.includes('confirmada') ? 'alert-success' : 'alert-danger'" role="alert">
