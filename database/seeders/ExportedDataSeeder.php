@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Hash;
 /**
  * SEEDER GERADO AUTOMATICAMENTE - NÃO EDITE MANUALMENTE
  * Este arquivo é gerado pelo comando php artisan db:export
- * Última atualização: 2026-11-20 17:31:00
+ * Última atualização: 2026-11-20 18:00:52
  */
 class ExportedDataSeeder extends Seeder
 {

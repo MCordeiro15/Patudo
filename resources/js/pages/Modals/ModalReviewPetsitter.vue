@@ -282,14 +282,14 @@ const handleSubmit = () => {
                         <div class="d-flex align-items-center gap-2">
                             <button
                                 type="button"
-                                class="btn-patudo-outline-pill"
+                                class="btn btn-outline-danger"
                                 @click="handleClose"
                             >
                                 Cancelar
                             </button>
                             <button
                                 type="submit"
-                                class="btn-patudo-solid-pill"
+                                class="btn btn-primary"
                                 :disabled="isLoading"
                             >
                                 {{ isLoading ? 'A submeter...' : 'Submeter' }}
@@ -533,42 +533,5 @@ const handleSubmit = () => {
 .patudo-required-note {
     font-size: 0.7rem;
     color: #3d3229;
-}
-
-.btn-patudo-outline-pill {
-    background-color: #ffffff;
-    color: var(--patudo-terracota);
-    border: 1.3px solid var(--patudo-terracota);
-    border-radius: 9999px;
-    padding: 0.38rem 1.15rem;
-    font-size: 0.8rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.btn-patudo-outline-pill:hover {
-    background-color: #fdf2ea;
-}
-
-.btn-patudo-solid-pill {
-    background-color: #c4450c;
-    color: #ffffff;
-    border: 1.3px solid #c4450c;
-    border-radius: 9999px;
-    padding: 0.38rem 1.6rem;
-    font-size: 0.8rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.btn-patudo-solid-pill:hover:not(:disabled) {
-    background-color: var(--patudo-laranjaVivo);
-}
-
-.btn-patudo-solid-pill:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
 }
 </style>
