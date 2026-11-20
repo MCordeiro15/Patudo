@@ -19,6 +19,8 @@ interface Candidate {
     approval_status?: Status;
     services?: { id: number; type: string }[];
     user?: { name?: string; email?: string; phone?: string | null };
+    // caminho do documento de identificação (só o admin o recebe da API)
+    identification_documents?: string | null;
 }
 
 function getXsrf(): string {
@@ -130,6 +132,44 @@ const setTab =  (key: Status) => {
 const select = (c: Candidate) => {
     selectedId.value = c.user_id;
     actionError.value = '';
+    docError.value = '';
+};
+
+// Documento de identificação: tipo pela extensão do ficheiro guardado (PDF, JPG, PNG)
+const docError = ref('');
+const openingDoc = ref(false);
+
+const docType = (path: string) => path.split('.').pop()?.toUpperCase() ?? 'Ficheiro';
+
+// Abre o documento num separador novo. Vai buscar o ficheiro pela API (só o admin tem acesso)
+// e mostra-o a partir do browser. O separador abre logo no clique para não ser bloqueado.
+const openDocument = async (c: Candidate) => {
+    docError.value = '';
+    openingDoc.value = true;
+    const tab = window.open('', '_blank');
+
+    try {
+        const res = await apiFetch(`/api/petsitters/${c.user_id}/identification-document`, {
+            headers: { Accept: '*/*' },
+        });
+
+        if (!res.ok) {
+            tab?.close();
+            docError.value = res.status === 404
+                ? 'O ficheiro do documento não foi encontrado.'
+                : 'Não foi possível abrir o documento.';
+            return;
+        }
+
+        const url = URL.createObjectURL(await res.blob());
+        if (tab) tab.location.href = url;
+        else window.open(url, '_blank');
+    } catch {
+        tab?.close();
+        docError.value = 'Não foi possível abrir o documento.';
+    } finally {
+        openingDoc.value = false;
+    }
 };
 
 const act = async (action: 'approve' | 'reject') => {
@@ -303,15 +343,24 @@ onMounted(() => {
 
                         <h3>Documentos enviados</h3>
                         <div class="docs">
-                            <div v-for="doc in ['Identificação', 'Comprovativo']" :key="doc" class="doc">
+                            <div v-if="selected.identification_documents" class="doc">
                                 <FileText :size="34" stroke-width="1.5" />
                                 <div class="doc-text">
-                                    <strong>{{ doc }}</strong>
-                                    <small>PDF · 1,2 MB</small>
+                                    <strong>Identificação</strong>
+                                    <small>{{ docType(selected.identification_documents) }}</small>
                                 </div>
-                                <button type="button" class="open-btn">Abrir</button>
+                                <button
+                                    type="button"
+                                    class="open-btn"
+                                    :disabled="openingDoc"
+                                    @click="openDocument(selected)"
+                                >
+                                    {{ openingDoc ? 'A abrir...' : 'Abrir' }}
+                                </button>
                             </div>
+                            <p v-else class="state">Este cuidador não enviou documento de identificação.</p>
                         </div>
+                        <p v-if="docError" class="action-error">{{ docError }}</p>
 
                         <h3>Lista de verificação</h3>
                         <label v-for="item in checklist" :key="item.label" class="check">
