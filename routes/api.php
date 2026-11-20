@@ -12,6 +12,7 @@ use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\SupportTicketsController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\PetsitterServiceController;
+use App\Http\Controllers\API\PostFavouriteController;
 use App\Http\Controllers\API\ChatController;
 use Illuminate\Support\Facades\Route;
 
@@ -80,6 +81,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Posts
     Route::get('/petsitters/{petsitter}/posts', [PostController::class, 'byPetsitter']);
     Route::apiResource('posts', PostController::class);
+
+    // Post Favourites
+    Route::get('/post-favourites', [PostFavouriteController::class, 'index']);
+    Route::post('/posts/{post}/favourite', [PostFavouriteController::class, 'store']);
+    Route::delete('/posts/{post}/favourite', [PostFavouriteController::class, 'destroy']);
 
     // Animals
     Route::apiResource('animals', AnimalController::class);

@@ -39,4 +39,14 @@ class Post extends Model
     {
         return $this->belongsTo(Petsitter::class, 'petsitter_id', 'user_id');
     }
+
+    public function favouritedBy()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'post_favourites',
+            'post_id',
+            'user_id'
+        );
+    }
 }
