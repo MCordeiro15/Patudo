@@ -36,6 +36,9 @@ class PostResource extends JsonResource
                     : Storage::disk('public')->url($path))
                 ->all(),
             'created_at' => $this->created_at,
+            'is_favourite' => $request->user()
+                ? $request->user()->favouritePosts()->whereKey($this->id)->exists()
+                : false,
         ];
     }
 }
