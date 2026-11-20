@@ -146,7 +146,7 @@ onMounted(() => {
                         </button>
                         <button
                             type="button"
-                            class="btn btn-outline-danger btn-sm rounded-pill px-3 d-flex align-items-center gap-1 ms-2"
+                            class="btn btn-outline-danger rounded-pill d-flex align-items-center gap-2 px-3"
                             @click="logout"
                         >
                             <LogOut :size="16" />
