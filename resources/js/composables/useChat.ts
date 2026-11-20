@@ -10,6 +10,8 @@ export interface ChatPerson {
     id: string;
     name: string;
     role: string;
+    // URL da foto de perfil (vem do Laravel ou do TalkJS); null se não tiver
+    photo_url?: string | null;
 }
 
 export interface ChatListItem extends ChatPerson {
@@ -103,6 +105,7 @@ export function useChat() {
                         id: otherId,
                         name: snapshot.name,
                         role: snapshot.custom['papel'] || 'Dono',
+                        photo_url: snapshot.photoUrl,
                     },
                 };
             }),
@@ -155,6 +158,16 @@ export function useChat() {
             await session.currentUser.createIfNotExists({
                 name: info.user.name,
                 custom: { papel: info.user.role },
+                photoUrl: info.user.photo_url ?? undefined,
+            });
+
+            // createIfNotExists não altera quem já existe: atualiza o nome e a foto em cada entrada no chat
+            // createIfNotExists does not update existing users: refresh name and photo on every chat start
+            await session.currentUser.set({
+                name: info.user.name,
+                photoUrl: info.user.photo_url ?? null,
+                // textos do TalkJS em português ("Hoje", "Ontem"...); o TalkJS só tem pt-BR
+                locale: 'pt-BR',
             });
 
             conversationsSub = session.subscribeConversations((snapshots) => {
@@ -203,6 +216,7 @@ export function useChat() {
                 id: person.id,
                 name: person.name,
                 role: person.role,
+                photo_url: person.photo_url ?? null,
                 lastText: last ? (last.sender?.id === myId ? 'Tu: ' : '') + last.plaintext : '',
                 lastAt: last ? last.createdAt : null,
                 unread: otherId === activeOtherId.value ? 0 : conversation.unreadMessageCount,
@@ -253,7 +267,17 @@ export function useChat() {
                 await session.user(otherId).createIfNotExists({
                     name: contact.name,
                     custom: { papel: contact.role },
+                    photoUrl: contact.photo_url ?? undefined,
                 });
+
+                // Atualiza a foto de quem já existia no TalkJS sem ela. Se o TalkJS não deixar (autenticação
+                // ligada), ignora: a foto atualiza-se quando essa pessoa abrir o chat.
+                // Updates the photo of users who already existed without it; ignored if TalkJS does not allow it.
+                try {
+                    await session.user(otherId).set({ photoUrl: contact.photo_url ?? null });
+                } catch {
+                    // sem permissão para alterar outro utilizador
+                }
                 await conversation.createIfNotExists();
                 await conversation.participant(otherId).createIfNotExists();
             }

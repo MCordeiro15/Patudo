@@ -64,7 +64,7 @@ test('contacts do not expose email or phone', function () {
 
     $contact = $this->actingAs($owner)->getJson('/api/chat/contacts')->assertOk()->json('data.0');
 
-    expect(array_keys($contact))->toBe(['id', 'name', 'role']);
+    expect(array_keys($contact))->toBe(['id', 'name', 'role', 'photo_url']);
 });
 
 test('a petsitter has no contact list and only replies', function () {
@@ -83,4 +83,50 @@ test('a petsitter session reports the Petsitter role', function () {
     $this->actingAs($user)->getJson('/api/chat/session')
         ->assertOk()
         ->assertJsonPath('user.role', 'Petsitter');
+});
+// PNG de 1x1 píxel em base64, como as fotos ficam guardadas na base de dados
+const CHAT_TEST_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+
+test('contacts and session include the photo url, or null without a photo', function () {
+    $owner = User::factory()->create(['avatar' => CHAT_TEST_PNG]);
+    $withPhoto = Petsitter::factory()->approved()->create(['profile_photo' => CHAT_TEST_PNG]);
+    $withoutPhoto = Petsitter::factory()->approved()->create(['profile_photo' => null]);
+
+    $contacts = collect($this->actingAs($owner)->getJson('/api/chat/contacts')->assertOk()->json('data'))
+        ->keyBy('id');
+
+    expect($contacts[(string) $withPhoto->user_id]['photo_url'])->toContain('/users/'.$withPhoto->user_id.'/avatar')
+        ->and($contacts[(string) $withoutPhoto->user_id]['photo_url'])->toBeNull();
+
+    $this->actingAs($owner)->getJson('/api/chat/session')
+        ->assertJsonPath('user.photo_url', fn ($url) => str_contains($url, '/users/'.$owner->id.'/avatar'));
+});
+
+test('the avatar route returns the stored photo as an image', function () {
+    $owner = User::factory()->create(['avatar' => CHAT_TEST_PNG]);
+    $petsitter = Petsitter::factory()->approved()->create(['profile_photo' => CHAT_TEST_PNG]);
+
+    $this->actingAs(User::factory()->create())
+        ->get('/users/'.$owner->id.'/avatar')
+        ->assertOk()
+        ->assertHeader('Content-Type', 'image/png');
+
+    $this->actingAs(User::factory()->create())
+        ->get('/users/'.$petsitter->user_id.'/avatar')
+        ->assertOk()
+        ->assertHeader('Content-Type', 'image/png');
+});
+
+test('the avatar route returns 404 without a photo or with a non-image type', function () {
+    $noPhoto = User::factory()->create(['avatar' => null]);
+    $svg = User::factory()->create(['avatar' => 'data:image/svg+xml;base64,'.base64_encode('<svg></svg>')]);
+
+    $this->actingAs($noPhoto)->get('/users/'.$noPhoto->id.'/avatar')->assertNotFound();
+    $this->actingAs($noPhoto)->get('/users/'.$svg->id.'/avatar')->assertNotFound();
+});
+
+test('the avatar route requires authentication', function () {
+    $user = User::factory()->create(['avatar' => CHAT_TEST_PNG]);
+
+    $this->get('/users/'.$user->id.'/avatar')->assertRedirect(route('login'));
 });

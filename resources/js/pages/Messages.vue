@@ -40,6 +40,12 @@ function avatarClass(id: string): string {
     return `avatar-v${Number(id) % 3}`;
 }
 
+// Foto de perfil por cima do avatar ilustrado, quando o utilizador tem foto.
+// Profile photo over the illustrated avatar, when the user has one.
+function photoStyle(photoUrl?: string | null): Record<string, string> | undefined {
+    return photoUrl ? { backgroundImage: `url("${photoUrl}")` } : undefined;
+}
+
 function timeLabel(timestamp: number): string {
     return new Date(timestamp).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
 }
@@ -131,7 +137,7 @@ onMounted(async () => {
                             :class="{ active: item.id === activeOtherId }"
                             @click="openConversation(item.id)"
                         >
-                            <span :class="['chat-avatar', avatarClass(item.id)]">{{ initial(item.name) }}</span>
+                            <span :class="['chat-avatar', avatarClass(item.id)]" :style="photoStyle(item.photo_url)">{{ initial(item.name) }}</span>
                             <span class="chat-item-info">
                                 <strong>{{ item.name }} • {{ item.role }}</strong>
                                 <span class="chat-preview">{{ item.lastText || 'Sem mensagens' }}</span>
@@ -150,7 +156,7 @@ onMounted(async () => {
 
                     <template v-else>
                         <div class="chat-header">
-                            <span :class="['chat-avatar', 'chat-avatar-lg', avatarClass(activePerson.id)]">{{ initial(activePerson.name) }}</span>
+                            <span :class="['chat-avatar', 'chat-avatar-lg', avatarClass(activePerson.id)]" :style="photoStyle(activePerson.photo_url)">{{ initial(activePerson.name) }}</span>
                             <div>
                                 <strong class="chat-header-name">{{ activePerson.name }} • {{ activePerson.role }}</strong>
                                 <span class="chat-status">
@@ -174,6 +180,8 @@ onMounted(async () => {
                             :user-id="me.id"
                             :conversation-id="activeConversationId"
                             :token-fetcher.prop="tokenFetcher"
+                            :chat-header-visible.prop="false"
+                            message-field-placeholder="Escrever mensagem..."
                         />
                     </template>
                 </section>
@@ -340,13 +348,96 @@ onMounted(async () => {
     width: 100%;
     min-height: 0;
     overflow: hidden;
-    border: 1px solid var(--bs-primary);
-    border-radius: 1rem;
+    /* o TalkJS põe uma moldura à volta da caixa; o mockup não tem */
+    border: 0;
 
     --t-color-brand-primary: var(--bs-primary);
     --t-color-bg: var(--patudo-branco);
     --t-color-border: var(--bs-primary);
     --t-radius-md: 0.75rem;
+    --t-font-family: inherit;
+}
+
+/* Estilos da caixa do TalkJS para ficar igual ao mockup (o TalkJS desenha o HTML, por isso usa-se :deep). */
+/* TalkJS box styles to match the mockup (TalkJS renders the HTML, hence :deep). */
+
+/* separador de data ("Hoje"): só a pastilha, sem as linhas */
+.chat-box :deep(.t-message-divider .t-line) {
+    visibility: hidden;
+}
+
+.chat-box :deep(.t-message-divider > span) {
+    height: auto;
+    padding: 0.2rem 2rem;
+    color: var(--patudo-castanhoDark);
+    background: var(--patudo-bege);
+    border: 1px solid var(--patudo-terracota);
+    border-radius: 999px;
+}
+
+/* mensagens recebidas: bege com contorno, com a foto à esquerda */
+.chat-box :deep(.t-theme-message .t-message-body) {
+    padding: 0.5rem 1rem;
+    color: var(--patudo-castanhoDark);
+    background-color: var(--patudo-bege);
+    border: 1px solid var(--patudo-terracota);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+.chat-box :deep(.t-theme-message > .t-avatar-wrapper > .t-theme-avatar) {
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--patudo-castanhoDark);
+    border-radius: 50%;
+}
+
+/* mensagens enviadas: castanho-escuro, sem foto */
+.chat-box :deep(.t-theme-message[t-sender='currentUser'] .t-message-body) {
+    color: #fff;
+    background-color: var(--patudo-castanhoDark);
+    border-color: var(--patudo-castanhoDark);
+}
+
+.chat-box :deep(.t-theme-message[t-sender='currentUser'] > .t-avatar-wrapper) {
+    display: none;
+}
+
+.chat-box :deep(.t-theme-message[t-sender='currentUser'] .t-message-status) {
+    justify-self: end;
+}
+
+/* campo de escrever: sem linha por cima, caixa arredondada e botões redondos */
+.chat-box :deep(.t-theme-message-field .t-wrapper) {
+    border-top: 0;
+}
+
+.chat-box :deep(.t-theme-message-field .t-editor) {
+    border: 1px solid var(--patudo-terracota);
+    border-radius: 0.6rem;
+    background: #fff;
+}
+
+/* a caixa de texto lá dentro tem outra borda cinzenta: fica só a de fora */
+.chat-box :deep(.t-theme-message-field .t-text-input) {
+    border: 0;
+}
+
+.chat-box :deep(.t-theme-message-field .t-attachment-button) {
+    width: 2.6rem;
+    height: 2.6rem;
+    padding: 0.55rem;
+    color: var(--patudo-castanhoDark);
+    background: #fff;
+    border: 1px solid var(--patudo-terracota);
+    border-radius: 50%;
+}
+
+.chat-box :deep(.t-theme-message-field .t-send-button),
+.chat-box :deep(.t-theme-message-field .t-record-button) {
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
 }
 
 @media (max-width: 991px) {

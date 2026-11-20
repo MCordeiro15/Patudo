@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\UserAvatarController;
 use App\Models\Petsitter;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -61,7 +62,11 @@ class ChatController extends Controller
             ->get()
             ->filter(fn (Petsitter $petsitter) => $petsitter->user !== null
                 && $petsitter->user->account_status === 'active')
-            ->map(fn (Petsitter $petsitter) => $this->chatUser($petsitter->user, 'Petsitter'))
+            // liga o perfil já carregado ao user, para a foto não fazer uma query por petsitter
+            ->map(fn (Petsitter $petsitter) => $this->chatUser(
+                $petsitter->user->setRelation('petsitter', $petsitter),
+                'Petsitter',
+            ))
             ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
             ->values();
 
@@ -78,6 +83,8 @@ class ChatController extends Controller
             'id' => (string) $user->id,
             'name' => $user->name,
             'role' => $role ?? ($user->isPetsitter() ? 'Petsitter' : 'Dono'),
+            // URL da foto de perfil (null se não tiver), para o TalkJS e para a lista de conversas
+            'photo_url' => UserAvatarController::urlFor($user),
         ];
     }
 
