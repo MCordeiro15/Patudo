@@ -1,14 +1,10 @@
-// Composable do chat (TalkJS). Liga ao TalkJS com os dados do Laravel e expõe a lista de conversas, as mensagens
-// e as ações de abrir conversa e enviar mensagem. As mensagens não passam pelo Laravel.
-// Chat composable (TalkJS). Connects to TalkJS using the data from Laravel and exposes the conversation list,
-// the messages and the open-conversation and send-message actions. Messages do not go through Laravel.
+// Composable do chat (TalkJS). Liga ao TalkJS com os dados do Laravel e expõe a lista de conversas e a ação de
+// abrir conversa. As mensagens (enviar, editar, apagar, reagir) são tratadas pela caixa <t-chatbox>.
+// Chat composable (TalkJS). Connects to TalkJS using the data from Laravel and exposes the conversation list
+// and the open-conversation action. Messages (send, edit, delete, react) are handled by the <t-chatbox> box.
 import { getTalkSession } from '@talkjs/core';
-import type { ConversationSnapshot, MessageSnapshot, TalkSession } from '@talkjs/core';
+import type { ConversationSnapshot, TalkSession } from '@talkjs/core';
 import { computed, onBeforeUnmount, ref, shallowRef } from 'vue';
-
-// Reações disponíveis. Cada pessoa pode dar cada reação uma vez por mensagem.
-// Available reactions. Each person can give each reaction once per message.
-export const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '🙏'];
 
 export interface ChatPerson {
     id: string;
@@ -51,15 +47,17 @@ export function useChat() {
     const contacts = ref<ChatPerson[]>([]);
     const conversations = shallowRef<ConversationSnapshot[]>([]);
     const knownPeople = ref<Record<string, ChatPerson>>({});
-    const messages = shallowRef<MessageSnapshot[]>([]);
     const activeOtherId = ref<string | null>(null);
     const activeOnline = ref(false);
     const ready = ref(false);
     const error = ref<string | null>(null);
+    const appId = ref<string | null>(null);
+    // Só existe quando a autenticação do TalkJS está ligada; a caixa usa-o para pedir um token novo.
+    // Only set when TalkJS authentication is on; the chatbox uses it to ask for a fresh token.
+    const tokenFetcher = ref<(() => Promise<string>) | undefined>(undefined);
 
     let session: TalkSession | null = null;
     let conversationsSub: Unsubscribable | null = null;
-    let messagesSub: Unsubscribable | null = null;
     let onlineSub: Unsubscribable | null = null;
     const userSubs = new Map<string, Unsubscribable>();
 
@@ -130,6 +128,15 @@ export function useChat() {
 
             me.value = info.user;
             contacts.value = list.data;
+            appId.value = info.app_id;
+
+            if (info.token) {
+                tokenFetcher.value = async () => {
+                    const fresh = await getJson<SessionInfo>('/api/chat/session');
+
+                    return fresh.token ?? '';
+                };
+            }
 
             session = getTalkSession({
                 appId: info.app_id,
@@ -247,14 +254,7 @@ export function useChat() {
             }
 
             activeOtherId.value = otherId;
-            messages.value = [];
             activeOnline.value = false;
-
-            messagesSub?.unsubscribe();
-            messagesSub = conversation.subscribeMessages((snapshot) => {
-                messages.value = (snapshot ?? []).filter((message) => message.type === 'UserMessage').reverse();
-                conversation.markAsRead().catch(() => undefined);
-            });
 
             onlineSub?.unsubscribe();
             onlineSub = session.user(otherId).subscribeOnline((snapshot) => {
@@ -266,104 +266,14 @@ export function useChat() {
         }
     }
 
-    async function sendMessage(text: string): Promise<void> {
-        const trimmed = text.trim();
-
-        if (!session || !activeOtherId.value || trimmed === '') {
-            return;
-        }
-
-        try {
-            error.value = null;
-            await session.conversation(conversationIdFor(activeOtherId.value)).send(trimmed);
-        } catch (e) {
-            error.value = 'Não foi possível enviar a mensagem.';
-            console.error(e);
-        }
-    }
-
-    // Referência a uma mensagem da conversa aberta.
-    // Reference to a message in the open conversation.
-    function messageRef(messageId: string) {
-        if (!session || !activeOtherId.value) {
-            return null;
-        }
-
-        return session.conversation(conversationIdFor(activeOtherId.value)).message(messageId);
-    }
-
-    // Edita uma mensagem tua. Devolve true se correu bem.
-    // Edits one of your messages. Returns true on success.
-    async function editMessage(messageId: string, text: string): Promise<boolean> {
-        const trimmed = text.trim();
-        const message = messageRef(messageId);
-
-        if (!message || trimmed === '') {
-            return false;
-        }
-
-        try {
-            error.value = null;
-            await message.edit(trimmed);
-
-            return true;
-        } catch (e) {
-            error.value = 'Não foi possível editar a mensagem.';
-            console.error(e);
-
-            return false;
-        }
-    }
-
-    // Apaga uma mensagem tua. Devolve true se correu bem.
-    // Deletes one of your messages. Returns true on success.
-    async function deleteMessage(messageId: string): Promise<boolean> {
-        const message = messageRef(messageId);
-
-        if (!message) {
-            return false;
-        }
-
-        try {
-            error.value = null;
-            await message.delete();
-
-            return true;
-        } catch (e) {
-            error.value = 'Não foi possível apagar a mensagem.';
-            console.error(e);
-
-            return false;
-        }
-    }
-
-    // Dá ou retira a tua reação a uma mensagem (de qualquer pessoa da conversa).
-    // Adds or removes your reaction to a message (from anyone in the conversation).
-    async function toggleReaction(messageId: string, emoji: string, alreadyReacted: boolean): Promise<void> {
-        const message = messageRef(messageId);
-
-        if (!message) {
-            return;
-        }
-
-        try {
-            error.value = null;
-            const reaction = message.reactions(emoji);
-
-            if (alreadyReacted) {
-                await reaction.remove();
-            } else {
-                await reaction.add();
-            }
-        } catch (e) {
-            error.value = 'Não foi possível reagir à mensagem.';
-            console.error(e);
-        }
-    }
+    // ID da conversa aberta, para a caixa <t-chatbox>.
+    // ID of the open conversation, for the <t-chatbox> box.
+    const activeConversationId = computed<string | null>(() =>
+        activeOtherId.value ? conversationIdFor(activeOtherId.value) : null,
+    );
 
     onBeforeUnmount(() => {
         conversationsSub?.unsubscribe();
-        messagesSub?.unsubscribe();
         onlineSub?.unsubscribe();
         userSubs.forEach((subscription) => subscription.unsubscribe());
         userSubs.clear();
@@ -371,19 +281,17 @@ export function useChat() {
 
     return {
         me,
+        appId,
         items,
-        messages,
         activeOtherId,
+        activeConversationId,
         activePerson,
         activeOnline,
+        tokenFetcher,
         totalUnread,
         ready,
         error,
         start,
         openConversation,
-        sendMessage,
-        editMessage,
-        deleteMessage,
-        toggleReaction,
     };
 }

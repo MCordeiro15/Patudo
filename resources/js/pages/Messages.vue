@@ -1,117 +1,33 @@
 <script setup lang="ts">
-// Página de mensagens: lista de conversas à esquerda e a conversa selecionada à direita.
-// Messages page: conversation list on the left and the selected conversation on the right.
+// Página de mensagens: lista de conversas à esquerda e a caixa de chat do TalkJS (<t-chatbox>) à direita.
+// Messages page: conversation list on the left and the TalkJS chat box (<t-chatbox>) on the right.
+import '@talkjs/web-components';
+import '@talkjs/web-components/default.css';
 import { Head, Link } from '@inertiajs/vue3';
-import { Bell, Ellipsis, LogOut, MessageCircle, Pencil, Send, SmilePlus, Trash2, UserRound } from '@lucide/vue';
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { Bell, LogOut, MessageCircle, UserRound } from '@lucide/vue';
+import { onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
-import { REACTION_EMOJIS, useChat } from '@/composables/useChat';
+import { useChat } from '@/composables/useChat';
 import { useNotifications } from '@/composables/useNotifications';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
-
-interface ReactionChip {
-    emoji: string;
-    count: number;
-    mine: boolean;
-}
-
-type Row =
-    | { kind: 'day'; key: string; label: string }
-    | {
-          kind: 'msg';
-          key: string;
-          id: string;
-          mine: boolean;
-          text: string;
-          time: string;
-          edited: boolean;
-          reactions: ReactionChip[];
-      };
 
 const showNotifications = ref(false);
 const { unreadCount, fetchNotifications } = useNotifications();
 
 const {
     me,
+    appId,
     items,
-    messages,
     activeOtherId,
+    activeConversationId,
     activePerson,
     activeOnline,
+    tokenFetcher,
     ready,
     error,
     start,
     openConversation,
-    sendMessage,
-    editMessage,
-    deleteMessage,
-    toggleReaction,
 } = useChat();
-
-const draft = ref('');
-const messagesEl = ref<HTMLElement | null>(null);
-
-// Menus abertos (editar/apagar e escolher emoji) e mensagem em edição.
-// Open menus (edit/delete and emoji picker) and the message being edited.
-const openMenuId = ref<string | null>(null);
-const pickerId = ref<string | null>(null);
-const editingId = ref<string | null>(null);
-const editDraft = ref('');
-
-function closePopups(): void {
-    openMenuId.value = null;
-    pickerId.value = null;
-}
-
-function toggleMenu(id: string): void {
-    const open = openMenuId.value !== id;
-    closePopups();
-    openMenuId.value = open ? id : null;
-}
-
-function togglePicker(id: string): void {
-    const open = pickerId.value !== id;
-    closePopups();
-    pickerId.value = open ? id : null;
-}
-
-function startEdit(id: string, text: string): void {
-    closePopups();
-    editingId.value = id;
-    editDraft.value = text;
-}
-
-function cancelEdit(): void {
-    editingId.value = null;
-    editDraft.value = '';
-}
-
-async function saveEdit(): Promise<void> {
-    if (editingId.value && (await editMessage(editingId.value, editDraft.value))) {
-        cancelEdit();
-    }
-}
-
-async function removeMessage(id: string): Promise<void> {
-    closePopups();
-
-    if (window.confirm('Apagar esta mensagem?')) {
-        await deleteMessage(id);
-    }
-}
-
-async function react(id: string, emoji: string, alreadyReacted: boolean): Promise<void> {
-    closePopups();
-    await toggleReaction(id, emoji, alreadyReacted);
-}
-
-// Dá o foco ao campo de edição quando ele aparece.
-// Focuses the edit field when it appears.
-function focusEl(el: unknown): void {
-    if (el instanceof HTMLInputElement) {
-        el.focus();
-    }
-}
 
 function initial(name: string): string {
     return name.trim().charAt(0).toUpperCase();
@@ -127,76 +43,7 @@ function timeLabel(timestamp: number): string {
     return new Date(timestamp).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
 }
 
-function dayLabel(timestamp: number): string {
-    const day = new Date(timestamp);
-    const today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(today.getDate() - 1);
-
-    if (day.toDateString() === today.toDateString()) {
-        return 'Hoje';
-    }
-
-    return day.toDateString() === yesterday.toDateString() ? 'Ontem' : day.toLocaleDateString('pt-PT');
-}
-
-// Mensagens com um separador de dia sempre que o dia muda.
-// Messages with a day separator whenever the day changes.
-const rows = computed<Row[]>(() => {
-    const result: Row[] = [];
-    let previousDay = '';
-
-    messages.value.forEach((message) => {
-        const day = new Date(message.createdAt).toDateString();
-
-        if (day !== previousDay) {
-            previousDay = day;
-            result.push({ kind: 'day', key: `day-${day}`, label: dayLabel(message.createdAt) });
-        }
-
-        result.push({
-            kind: 'msg',
-            key: message.id,
-            id: message.id,
-            mine: message.sender?.id === me.value?.id,
-            text: message.plaintext,
-            time: timeLabel(message.createdAt),
-            edited: message.editedAt !== null,
-            reactions: message.reactions.map((reaction) => ({
-                emoji: reaction.emoji,
-                count: reaction.count,
-                mine: reaction.currentUserReacted,
-            })),
-        });
-    });
-
-    return result;
-});
-
-watch(rows, async (newRows, oldRows) => {
-    if (newRows.length <= (oldRows?.length ?? 0)) {
-        return;
-    }
-
-    await nextTick();
-
-    if (messagesEl.value) {
-        messagesEl.value.scrollTop = messagesEl.value.scrollHeight;
-    }
-});
-
-async function submit(): Promise<void> {
-    const text = draft.value;
-    draft.value = '';
-    await sendMessage(text);
-}
-
-onBeforeUnmount(() => {
-    document.removeEventListener('click', closePopups);
-});
-
 onMounted(async () => {
-    document.addEventListener('click', closePopups);
     void fetchNotifications();
     await start();
 
@@ -311,114 +158,21 @@ onMounted(async () => {
                             </div>
                         </div>
 
-                        <div ref="messagesEl" class="chat-messages">
-                            <template v-for="row in rows" :key="row.key">
-                                <div v-if="row.kind === 'day'" class="chat-day">{{ row.label }}</div>
-                                <div v-else class="chat-row" :class="row.mine ? 'mine' : 'theirs'">
-                                    <span v-if="!row.mine" :class="['chat-avatar', avatarClass(activePerson.id)]">{{ initial(activePerson.name) }}</span>
-                                    <div class="chat-col">
-                                        <div class="chat-bubble-line">
-                                            <form
-                                                v-if="editingId === row.id"
-                                                class="chat-edit"
-                                                autocomplete="off"
-                                                @submit.prevent="saveEdit"
-                                            >
-                                                <input
-                                                    :ref="focusEl"
-                                                    v-model="editDraft"
-                                                    type="text"
-                                                    class="chat-input chat-edit-input"
-                                                    maxlength="2000"
-                                                    @keydown.esc="cancelEdit"
-                                                />
-                                                <button type="submit" class="chat-edit-save">Guardar</button>
-                                                <button type="button" class="chat-edit-cancel" @click="cancelEdit">
-                                                    Cancelar
-                                                </button>
-                                            </form>
+                        <p v-if="error" class="text-danger small mb-0 pb-2 px-2">{{ error }}</p>
 
-                                            <template v-else>
-                                                <div class="chat-bubble">{{ row.text }}</div>
+                        
 
-                                                <div class="chat-actions">
-                                                    <button
-                                                        type="button"
-                                                        class="chat-action"
-                                                        aria-label="Reagir"
-                                                        @click.stop="togglePicker(row.id)"
-                                                    >
-                                                        <SmilePlus :size="18" />
-                                                    </button>
-                                                    <button
-                                                        v-if="row.mine"
-                                                        type="button"
-                                                        class="chat-action"
-                                                        aria-label="Mais opções"
-                                                        @click.stop="toggleMenu(row.id)"
-                                                    >
-                                                        <Ellipsis :size="18" />
-                                                    </button>
-                                                </div>
-
-                                                <div v-if="pickerId === row.id" class="chat-popup chat-picker" @click.stop>
-                                                    <button
-                                                        v-for="emoji in REACTION_EMOJIS"
-                                                        :key="emoji"
-                                                        type="button"
-                                                        class="chat-emoji"
-                                                        @click="react(row.id, emoji, row.reactions.some((r) => r.emoji === emoji && r.mine))"
-                                                    >
-                                                        {{ emoji }}
-                                                    </button>
-                                                </div>
-
-                                                <div v-if="openMenuId === row.id" class="chat-popup chat-menu" @click.stop>
-                                                    <button type="button" @click="startEdit(row.id, row.text)">
-                                                        <Pencil :size="16" /> Editar
-                                                    </button>
-                                                    <button type="button" @click="removeMessage(row.id)">
-                                                        <Trash2 :size="16" /> Apagar
-                                                    </button>
-                                                </div>
-                                            </template>
-                                        </div>
-
-                                        <div v-if="row.reactions.length > 0" class="chat-reactions">
-                                            <button
-                                                v-for="reaction in row.reactions"
-                                                :key="reaction.emoji"
-                                                type="button"
-                                                class="chat-chip"
-                                                :class="{ mine: reaction.mine }"
-                                                @click="react(row.id, reaction.emoji, reaction.mine)"
-                                            >
-                                                {{ reaction.emoji }} {{ reaction.count }}
-                                            </button>
-                                        </div>
-
-                                        <small class="chat-hour">
-                                            {{ row.time }}<span v-if="row.edited"> (editada)</span>
-                                        </small>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-
-                        <p v-if="error" class="text-danger small mb-0 pt-2 px-2">{{ error }}</p>
-
-                        <form class="chat-form" autocomplete="off" @submit.prevent="submit">
-                            <input
-                                v-model="draft"
-                                type="text"
-                                class="chat-input"
-                                placeholder="Escrever mensagem..."
-                                maxlength="2000"
-                            />
-                            <button type="submit" class="chat-send" aria-label="Enviar">
-                                <Send :size="22" />
-                            </button>
-                        </form>
+                        <!-- Caixa de chat do TalkJS: envia, edita, apaga, reage e anexa ficheiros. -->
+                        <!-- TalkJS chat box: sends, edits, deletes, reacts and attaches files. -->
+                        <t-chatbox
+                            v-if="appId && me && activeConversationId"
+                            :key="activeConversationId"
+                            class="chat-box"
+                            :app-id="appId"
+                            :user-id="me.id"
+                            :conversation-id="activeConversationId"
+                            :token-fetcher.prop="tokenFetcher"
+                        />
                     </template>
                 </section>
             </div>
@@ -578,257 +332,19 @@ onMounted(async () => {
     background: var(--patudo-verde);
 }
 
-.chat-messages {
-    display: flex;
+.chat-box {
+    display: block;
     flex: 1;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 0.5rem 0.75rem;
-    overflow-y: auto;
-}
-
-.chat-day {
-    align-self: center;
-    padding: 0.2rem 2rem;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
     border: 1px solid var(--bs-primary);
-    border-radius: 999px;
-    background: var(--patudo-bege);
-    font-size: 0.9rem;
-}
+    border-radius: 1rem;
 
-.chat-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    max-width: 75%;
-}
-
-.chat-row.theirs {
-    align-self: flex-start;
-}
-
-.chat-row.mine {
-    align-self: flex-end;
-    flex-direction: row-reverse;
-}
-
-.chat-row .chat-avatar {
-    width: 3.6rem;
-    height: 3.6rem;
-}
-
-.chat-col {
-    display: flex;
-    flex-direction: column;
-}
-
-.chat-row.mine .chat-col {
-    align-items: flex-end;
-}
-
-.chat-bubble {
-    padding: 0.7rem 1.4rem;
-    border-radius: 0.5rem;
-    overflow-wrap: anywhere;
-    white-space: pre-wrap;
-}
-
-.theirs .chat-bubble {
-    border: 1px solid var(--bs-primary);
-    background: var(--patudo-bege);
-}
-
-.mine .chat-bubble {
-    background: var(--patudo-castanhoDark);
-    color: #fff;
-}
-
-.chat-hour {
-    margin: 0.35rem 0.75rem 0;
-}
-
-.chat-bubble-line {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-
-.chat-row.mine .chat-bubble-line {
-    flex-direction: row-reverse;
-}
-
-.chat-actions {
-    display: flex;
-    gap: 0.15rem;
-    opacity: 0.35;
-    transition: opacity 0.15s;
-}
-
-.chat-bubble-line:hover .chat-actions,
-.chat-actions:focus-within {
-    opacity: 1;
-}
-
-.chat-action {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.8rem;
-    height: 1.8rem;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    background: transparent;
-    color: var(--patudo-castanhoMid);
-}
-
-.chat-action:hover {
-    background: var(--patudo-bege);
-    color: var(--patudo-castanhoDark);
-}
-
-.chat-popup {
-    position: absolute;
-    top: 100%;
-    z-index: 5;
-    margin-top: 0.25rem;
-    border: 1px solid var(--bs-primary);
-    border-radius: 0.75rem;
-    background: var(--patudo-branco);
-    box-shadow: 0 4px 14px rgb(46 29 20 / 15%);
-}
-
-.chat-row.theirs .chat-popup {
-    left: 0;
-}
-
-.chat-row.mine .chat-popup {
-    right: 0;
-}
-
-.chat-picker {
-    display: flex;
-    gap: 0.15rem;
-    padding: 0.3rem 0.4rem;
-}
-
-.chat-emoji {
-    padding: 0.1rem 0.3rem;
-    border: 0;
-    border-radius: 0.5rem;
-    background: transparent;
-    font-size: 1.3rem;
-    line-height: 1.4;
-}
-
-.chat-emoji:hover {
-    background: var(--patudo-bege);
-}
-
-.chat-menu {
-    display: flex;
-    flex-direction: column;
-    min-width: 8rem;
-    padding: 0.25rem;
-}
-
-.chat-menu button {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 0.6rem;
-    border: 0;
-    border-radius: 0.5rem;
-    background: transparent;
-    color: var(--patudo-castanhoDark);
-    text-align: left;
-}
-
-.chat-menu button:hover {
-    background: var(--patudo-bege);
-}
-
-.chat-reactions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem;
-    margin-top: 0.35rem;
-}
-
-.chat-chip {
-    padding: 0.05rem 0.55rem;
-    border: 1px solid var(--bs-primary);
-    border-radius: 999px;
-    background: transparent;
-    color: inherit;
-    font-size: 0.9rem;
-}
-
-.chat-chip.mine {
-    background: var(--patudo-bege);
-    font-weight: 700;
-}
-
-.chat-edit {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.chat-edit-input {
-    flex: 1;
-    min-width: 12rem;
-    height: 2.6rem;
-}
-
-.chat-edit-save,
-.chat-edit-cancel {
-    padding: 0.35rem 0.8rem;
-    border-radius: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.chat-edit-save {
-    border: 0;
-    background: var(--bs-primary);
-    color: #fff;
-}
-
-.chat-edit-cancel {
-    border: 1px solid var(--bs-primary);
-    background: transparent;
-    color: inherit;
-}
-
-.chat-form {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding-top: 1rem;
-}
-
-.chat-input {
-    flex: 1;
-    height: 3.4rem;
-    padding: 0 1rem;
-    border: 1px solid var(--bs-primary);
-    border-radius: 0.5rem;
-    background: transparent;
-    color: inherit;
-}
-
-.chat-send {
-    display: flex;
-    flex: none;
-    align-items: center;
-    justify-content: center;
-    width: 3.4rem;
-    height: 3.4rem;
-    border: 0;
-    border-radius: 50%;
-    background: var(--bs-primary);
-    color: #fff;
+    --t-color-brand-primary: var(--bs-primary);
+    --t-color-bg: var(--patudo-branco);
+    --t-color-border: var(--bs-primary);
+    --t-radius-md: 0.75rem;
 }
 
 @media (max-width: 991px) {
@@ -837,8 +353,8 @@ onMounted(async () => {
         height: auto;
     }
 
-    .chat-messages {
-        min-height: 320px;
+    .chat-box {
+        min-height: 420px;
     }
 }
 </style>
