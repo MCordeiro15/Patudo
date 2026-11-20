@@ -36,6 +36,12 @@
     --bs-btn-hover-bg: var(--patudo-laranjaVivo);
     --bs-btn-hover-border-color: var(--patudo-laranjaVivo);
     --bs-btn-color: #ffffff;
+    --bs-btn-padding-y: 0.45rem;
+    --bs-btn-padding-x: 1.6rem;
+    --bs-btn-font-size: 0.8rem;
+    --bs-btn-font-weight: 600;
+    border-radius: 25px;
+    line-height: normal;
 }
 
 .btn-outline-primary {
@@ -43,11 +49,17 @@
     --bs-btn-color: var(--patudo-terracota);
     --bs-btn-border-color: var(--patudo-terracota);
     --bs-btn-hover-bg: var(--patudo-bege);
-    --bs-btn-hover-border-color: var(--patudo-terracota);
+    --bs-btn-hover-border-color: var(--patudo-laranjaVivo);
     --bs-btn-hover-color: var(--patudo-terracota);
     --bs-btn-active-bg: var(--patudo-bege);
-    --bs-btn-active-border-color: var(--patudo-terracota);
+    --bs-btn-active-border-color: var(--patudo-laranjaVivo);
     --bs-btn-active-color: var(--patudo-terracota);
+    --bs-btn-padding-y: 0.45rem;
+    --bs-btn-padding-x: 1.6rem;
+    --bs-btn-font-size: 0.8rem;
+    --bs-btn-font-weight: 600;
+    border-radius: 25px;
+    line-height: normal;
 }
 
 .btn-outline-secondary {
@@ -56,16 +68,29 @@
     --bs-btn-hover-bg: #ffffff;
     --bs-btn-hover-color: var(--patudo-castanhoDark);
     --bs-btn-hover-border-color: var(--patudo-castanhoMid);
+    --bs-btn-padding-y: 0.45rem;
+    --bs-btn-padding-x: 1.6rem;
+    --bs-btn-font-size: 0.8rem;
+    --bs-btn-font-weight: 600;
+    border-radius: 25px;
+    line-height: normal;
 }
+
 .btn-outline-danger {
-    --bs-btn-bg: #fff;
-    --bs-btn-border-color: #EF4444;
-    --bs-btn-active-bg: #DC2626;
-    --bs-btn-color: #EF4444;
-    --bs-btn-hover-bg: #DC2626;
-    --bs-btn-hover-border-color: #DC2626;
+    --bs-btn-bg: #A64B43;
+    --bs-btn-border-color: #A64B43;
+    --bs-btn-active-bg: #A64B43;
+    --bs-btn-color: #fff;
+    --bs-btn-hover-bg: #9E3D3D;
+    --bs-btn-hover-border-color: #9E3D3D;
     --bs-btn-hover-color: #fff;
     --bs-btn-active-color: #fff;
+    --bs-btn-padding-y: 0.45rem;
+    --bs-btn-padding-x: 1.6rem;
+    --bs-btn-font-size: 0.8rem;
+    --bs-btn-font-weight: 600;
+    border-radius: 25px;
+    line-height: normal;
 }
 
 .card {
