@@ -78,7 +78,11 @@ Route::inertia('/reservations', 'Owner/ReservationNotificationToOwner')
 Route::inertia('/admin/petsitters/pending', 'Admin/PendingPetsitters')
     ->middleware(['auth', 'can:admin'])
     ->name('admin.petsitters.pending');
-Route::inertia('/payment-confirmed', 'Payment/PaymentConfirmed')->middleware('auth')->name('payment.confirmed');
 
-Route::inertia('/dev/modals', 'Modals/ModalTests');
+// Pagamento confirmado (dono)
+Route::inertia('/payment-confirmed', 'Payment/PaymentConfirmed')
+    ->middleware('auth')
+    ->name('payment.confirmed');
+
+Route::inertia('/dev/modals', 'Modals/ModalTests')->name('dev.modals');
 require __DIR__ . '/settings.php';
