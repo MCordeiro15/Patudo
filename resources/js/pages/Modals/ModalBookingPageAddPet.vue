@@ -146,19 +146,120 @@ onBeforeUnmount(clearPreview);
 
                 <div class="photo-row mb-2">
                     <label for="reservation-pet-photo" class="photo-circle" title="Escolher fotografia">
-                        <img v-if="photoPreview" :src="photoPreview" alt="Pré-visualização do animal" />
-                        <svg v-else viewBox="0 0 80 80" class="dog-illustration" aria-hidden="true">
-                            <circle cx="40" cy="40" r="38" fill="#f5d0a9" />
-                            <ellipse cx="22" cy="36" rx="8" ry="15" transform="rotate(-14 22 36)" fill="#c68642" stroke="#231712" stroke-width="2.5" />
-                            <ellipse cx="58" cy="36" rx="8" ry="15" transform="rotate(14 58 36)" fill="#c68642" stroke="#231712" stroke-width="2.5" />
-                            <ellipse cx="40" cy="44" rx="18" ry="16" fill="#e0a96d" stroke="#231712" stroke-width="2.5" />
-                            <ellipse cx="40" cy="49" rx="9" ry="7" fill="#fff3e0" />
-                            <circle cx="34" cy="41" r="2.3" fill="#231712" />
-                            <circle cx="46" cy="41" r="2.3" fill="#231712" />
-                            <ellipse cx="40" cy="46.5" rx="3.2" ry="2.2" fill="#231712" />
-                            <path d="M27 58 Q40 65 53 58 L55 72 L25 72 Z" fill="#e0a96d" stroke="#231712" stroke-width="2.5" />
-                            <path d="M28 58 Q40 64 52 58" fill="none" stroke="#2563eb" stroke-width="4" />
-                        </svg>
+                        <div class="col-12">
+                            <div class="patudo-photo-box">
+                                <img
+                                    v-if="pet?.photos?.[0]"
+                                    :src="pet.photos[0]"
+                                    :alt="`Foto de ${pet?.name || 'animal'}`"
+                                    class="patudo-pet-photo"
+                                />
+                                <svg
+                                    v-else
+                                    viewBox="0 0 100 100"
+                                    class="patudo-dog-placeholder"
+                                    aria-hidden="true"
+                                >
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="46"
+                                        fill="#fbe2c4"
+                                        stroke="#231810"
+                                        stroke-width="1.2"
+                                    />
+                                    <path
+                                        d="M30 22 C20 22, 18 42, 26 48 C30 42, 34 32, 34 25 Z"
+                                        fill="#d9934c"
+                                        stroke="#231810"
+                                        stroke-width="1.5"
+                                    />
+                                    <path
+                                        d="M70 22 C80 22, 82 42, 74 48 C70 42, 66 32, 66 25 Z"
+                                        fill="#d9934c"
+                                        stroke="#231810"
+                                        stroke-width="1.5"
+                                    />
+                                    <path
+                                        d="M72 78 C84 74, 88 58, 82 52 C78 58, 76 66, 70 70 Z"
+                                        fill="#e5a967"
+                                        stroke="#231810"
+                                        stroke-width="1.5"
+                                    />
+                                    <path
+                                        d="M32 54 C28 68, 28 84, 34 90 L66 90 C72 84, 72 68, 68 54 Z"
+                                        fill="#e5a967"
+                                        stroke="#231810"
+                                        stroke-width="1.5"
+                                    />
+                                    <path
+                                        d="M41 58 C39 70, 41 84, 44 90 L56 90 C59 84, 61 70, 59 58 Z"
+                                        fill="#f7dec2"
+                                    />
+                                    <path
+                                        d="M36 66 L36 90 M43 72 L43 90 M64 66 L64 90 M57 72 L57 90"
+                                        stroke="#231810"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                    />
+                                    <path
+                                        d="M36 52 Q50 58 64 52"
+                                        fill="none"
+                                        stroke="#1d70b8"
+                                        stroke-width="4"
+                                        stroke-linecap="round"
+                                    />
+                                    <circle
+                                        cx="50"
+                                        cy="56"
+                                        r="2.5"
+                                        fill="#d1d5db"
+                                        stroke="#231810"
+                                        stroke-width="1"
+                                    />
+                                    <path
+                                        d="M32 32 C32 18, 68 18, 68 32 C68 46, 60 52, 50 52 C40 52, 32 46, 32 32 Z"
+                                        fill="#e5a967"
+                                        stroke="#231810"
+                                        stroke-width="1.5"
+                                    />
+                                    <ellipse
+                                        cx="50"
+                                        cy="42"
+                                        rx="10"
+                                        ry="7.5"
+                                        fill="#f7dec2"
+                                    />
+                                    <path
+                                        d="M39 32 Q42 29 45 32"
+                                        fill="none"
+                                        stroke="#231810"
+                                        stroke-width="1.6"
+                                        stroke-linecap="round"
+                                    />
+                                    <path
+                                        d="M55 32 Q58 29 61 32"
+                                        fill="none"
+                                        stroke="#231810"
+                                        stroke-width="1.6"
+                                        stroke-linecap="round"
+                                    />
+                                    <ellipse
+                                        cx="50"
+                                        cy="39"
+                                        rx="3.5"
+                                        ry="2.5"
+                                        fill="#231810"
+                                    />
+                                    <path
+                                        d="M47 45 C47 50, 53 50, 53 45 Z"
+                                        fill="#ef4444"
+                                        stroke="#231810"
+                                        stroke-width="1"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
                     </label>
 
                     <label for="reservation-pet-photo" class="add-photo-btn">
@@ -271,7 +372,6 @@ onBeforeUnmount(clearPreview);
                     <button
                         type="submit"
                         class="btn-save-pill"
-                        :disabled="!isValid || submitting"
                     >
                         {{ submitting ? 'A guardar...' : 'Guardar animal' }}
                     </button>
@@ -342,12 +442,12 @@ onBeforeUnmount(clearPreview);
 
 .add-photo-btn {
     background: #ffffff;
-    color: #231209;
+    color: var(--patudo-castanhoDark);
     border: 1.5px solid #c2410c;
     border-radius: 9px;
     padding: 0.35rem 1rem;
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 400;
     cursor: pointer;
 }
 
@@ -407,8 +507,8 @@ onBeforeUnmount(clearPreview);
 
 .btn-cancel-pill {
     background: #ffffff;
-    color: #231209;
-    border: 1.5px solid #231209;
+    color: var(--patudo-terracota);
+    border: 1.5px solid var(--patudo-terracota, #c2410c);
     border-radius: 14px;
     padding: 0.38rem 1.1rem;
     font-size: 0.86rem;
