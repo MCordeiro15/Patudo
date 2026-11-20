@@ -57,7 +57,6 @@
     --bs-btn-hover-color: var(--patudo-castanhoDark);
     --bs-btn-hover-border-color: var(--patudo-castanhoMid);
 }
-
 .btn-outline-danger {
     --bs-btn-bg: #fff;
     --bs-btn-border-color: #EF4444;

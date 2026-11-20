@@ -53,6 +53,12 @@ Route::get('/profile', function () {
     ]);
 })->middleware('auth')->name('owner.profile');
 
+// Página de pedir reserva (dono). O petsitter vem no URL: /booking?petsitter=ID
+// Os dados são carregados pela página via API, que já valida tudo ao criar a reserva.
+Route::inertia('/booking', 'Owner/BookingPage')
+    ->middleware('auth')
+    ->name('bookings.create');
+
 // Página de reserva confirmada (dono). O id vem no URL: /booking-confirmed?booking=ID
 // Os dados são carregados pela página via /api/bookings/{id}, que já verifica permissões.
 Route::inertia('/booking-confirmed', 'Owner/BookingConfirmed')

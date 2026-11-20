@@ -7,13 +7,17 @@ import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import ModalReportPetsitter from '@/pages/Modals/ModalReportPetsitter.vue';
 import { useNotifications } from '@/composables/useNotifications';
 import type { Post } from '@/types/post';
-import ModalReviewPetsitter from "@/pages/Modals/ModalReviewPetsitter.vue";
+import ModalReviewPetsitter from '@/pages/Modals/ModalReviewPetsitter.vue';
 
 // O id vem do controller (/petsitters/{id}) ou do URL: /profile-owner-view?petsitter=ID
 const props = defineProps<{ petsitterId?: number | string }>();
 const petsitterId = props.petsitterId
     ? String(props.petsitterId)
     : new URLSearchParams(window.location.search).get('petsitter');
+
+const bookingUrl = computed(() =>
+    petsitterId ? `/booking?petsitter=${encodeURIComponent(petsitterId)}` : '/booking',
+);
 
 function getXsrf(): string {
     const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
@@ -82,9 +86,9 @@ const toggleFavourite = async () => {
     const res = isFavourite.value
         ? await apiFetch(`/api/favourites/${petsitterId}`, { method: 'DELETE' })
         : await apiFetch('/api/favourites', {
-              method: 'POST',
-              body: JSON.stringify({ petsitter_id: Number(petsitterId) }),
-          });
+            method: 'POST',
+            body: JSON.stringify({ petsitter_id: Number(petsitterId) }),
+        });
     if (res.ok) {
         isFavourite.value = !isFavourite.value;
     } else {
@@ -98,8 +102,8 @@ const { unreadCount } = useNotifications();
 
 const showReviewModal = ref(false);
 const openReviewModal = () => {
-    showReviewModal.value = true
-}
+    showReviewModal.value = true;
+};
 
 const submitReport = async (payload: { reason: string; description: string }) => {
     if (!petsitterId) return;
@@ -130,7 +134,7 @@ const submitReview = async (payload: { petsitter_id?: number | string; rating: n
     if (res.ok) {
         feedback.value = 'Avaliação enviada com sucesso!';
         showReviewModal.value = false;
-        await loadPetsitter(); // Recarrega o perfil para atualizar o rating médio
+        await loadPetsitter();
     } else {
         feedback.value = (await res.json().catch(() => ({}))).message ?? 'Não foi possível enviar a avaliação.';
     }
@@ -225,243 +229,262 @@ const displayPrice = computed(() =>
 <template>
     <Head title="Perfil do Petsitter" />
 
-    <main class="min-vh-100 py-4 patudo-page">
-        <div class="container">
-            <nav
-                class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
-            >
-                <a
-                    class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2"
-                    href="/"
-                >
-                    <img
-                        :src="logoPatudo"
-                        alt="Patudo"
-                        width="70"
-                        height="70"
-                    />
-                    <span>Patudo</span>
-                </a>
-                <div class="nav nav-pills border rounded-pill p-1 mx-auto">
-                    <a class="nav-link active rounded-pill px-4" href="/"
-                        >Início</a
-                    >
-                    <a
-                        class="nav-link text-dark rounded-pill px-4"
-                        href="/orders"
-                        >Pedidos</a
-                    >
-                    <a
-                        class="nav-link text-dark rounded-pill px-4"
-                        href="/favorites"
-                    >
-                        Favoritos
-                    </a>
-                    <a
-                        class="nav-link text-dark rounded-pill px-4"
-                        href="/reservations"
-                    >
-                        Reservas
-                    </a>
-                </div>
+    <div class="min-vh-100 d-flex flex-column position-relative overflow-hidden patudo-page">
+        <div class="patudo-glow patudo-glow-top"></div>
+        <div class="patudo-glow patudo-glow-bottom"></div>
 
-                <div class="d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark"
+        <main class="patudo-content flex-grow-1 py-4">
+            <div class="container">
+                <nav
+                    class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
+                >
+                    <a
+                        class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2"
+                        href="/"
+                    >
+                        <img
+                            :src="logoPatudo"
+                            alt="Patudo"
+                            width="70"
+                            height="70"
+                        />
+                        <span>Patudo</span>
+                    </a>
+                    <div class="nav nav-pills border rounded-pill p-1 mx-auto">
+                        <a class="nav-link active rounded-pill px-4" href="/"
+                        >Início</a
+                        >
+                        <a
+                            class="nav-link text-dark rounded-pill px-4"
+                            href="/orders"
+                        >Pedidos</a
+                        >
+                        <a
+                            class="nav-link text-dark rounded-pill px-4"
+                            href="/favorites"
+                        >
+                            Favoritos
+                        </a>
+                        <a
+                            class="nav-link text-dark rounded-pill px-4"
+                            href="/reservations"
+                        >
+                            Reservas
+                        </a>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="/messages" class="text-dark"
                         ><MessageCircle :size="25"
-                    /></a>
-                    <button type="button" class="text-dark bg-transparent border-0 p-0 position-relative" @click="showNotifications = true">
-                        <Bell :size="25" />
-                        <span v-if="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                            {{ unreadCount > 9 ? '9+' : unreadCount }}
-                        </span>
-                    </button>
+                        /></a>
+                        <button type="button" class="text-dark bg-transparent border-0 p-0 position-relative" @click="showNotifications = true">
+                            <Bell :size="25" />
+                            <span v-if="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                                {{ unreadCount > 9 ? '9+' : unreadCount }}
+                            </span>
+                        </button>
+                        <button
+                            type="button"
+                            class="text-dark p-0 border-0 bg-transparent"
+                        >
+                            <UserRound :size="25" />
+                        </button>
+                        <Link
+                            href="/logout"
+                            method="post"
+                            as="button"
+                            class="btn btn-outline-danger rounded-pill d-flex align-items-center gap-2 px-3"
+                        >
+                            <LogOut :size="16" />
+                            <span>Sair</span>
+                        </Link>
+                    </div>
+                </nav>
+
+                <h1 class="text-center fw-bold display-5 mt-5 pt-4 mb-4">Perfil do Petsitter</h1>
+
+                <section
+                    class="card bg-white border border-primary rounded-4 p-3 p-md-4 mb-3 position-relative"
+                >
                     <button
                         type="button"
-                        class="text-dark p-0 border-0 bg-transparent"
+                        class="btn btn-primary btn-sm position-absolute top-0 end-0 mt-3 me-3 px-4 report-btn"
+                        @click="showReportModal = true"
                     >
-                        <UserRound :size="25" />
+                        Denunciar
                     </button>
-                    <Link
-                        href="/logout"
-                        method="post"
-                        as="button"
-                        class="btn btn-outline-danger rounded-pill d-flex align-items-center gap-2 px-3"
-                    >
-                        <LogOut :size="16" />
-                        <span>Sair</span>
-                    </Link>
-                </div>
-            </nav>
 
-            <h1 class="text-center fw-bold display-5 mt-5 pt-4 mb-4">Perfil do Petsitter</h1>
+                    <div class="row g-4 align-items-center">
+                        <div class="col-12 col-md-8">
+                            <div class="d-flex align-items-center gap-4">
+                                <div
+                                    class="profile-avatar d-flex align-items-center justify-content-center rounded-circle border border-primary flex-shrink-0 overflow-hidden"
+                                >
+                                    <img
+                                        v-if="petsitter?.avatar_url"
+                                        :src="petsitter.avatar_url"
+                                        alt="Foto de perfil"
+                                        class="w-100 h-100 object-fit-cover"
+                                    />
+                                    <UserRound v-else :size="64" class="text-primary" />
+                                </div>
 
-            <section
-                class="card bg-white border border-primary rounded-4 p-3 p-md-4 mb-3 position-relative"
-            >
-                <button
-                    type="button"
-                    class="btn btn-primary btn-sm position-absolute top-0 end-0 mt-3 me-3 px-4 report-btn"
-                    @click="showReportModal = true"
+                                <div class="flex-grow-1">
+                                    <h2 class="h5 fw-bold mb-0 d-flex align-items-center gap-2">
+                                        {{ displayName }}
+                                        <button
+                                            type="button"
+                                            class="p-0 border-0 bg-transparent shadow-none d-flex"
+                                            aria-label="Favorito"
+                                            @click="toggleFavourite"
+                                        >
+                                            <Star
+                                                :size="20"
+                                                :fill="isFavourite ? '#f5b301' : 'none'"
+                                            />
+                                        </button>
+                                    </h2>
+                                    <p class="text-muted small mb-2">{{ displayLocation }}</p>
+
+                                    <div class="tags-row mb-2">
+                                        <span
+                                            v-for="t in tags"
+                                            :key="t"
+                                            class="tag-pill rounded-pill py-1 small"
+                                        >
+                                            {{ t }}
+                                        </span>
+                                    </div>
+
+                                    <p class="text-muted small mb-2">{{ displayShortBio }}</p>
+
+                                    <div class="actions-row">
+                                        <Link
+                                            v-if="petsitterId"
+                                            :href="bookingUrl"
+                                            class="action-btn text-decoration-none text-dark d-flex align-items-center justify-content-center"
+                                        >
+                                            Reservar
+                                        </Link>
+                                        <button
+                                            v-else
+                                            type="button"
+                                            class="action-btn"
+                                            disabled
+                                        >
+                                            Reservar
+                                        </button>
+                                        <button type="button" class="action-btn" @click="openReviewModal">Avaliar</button>
+                                        <button type="button" class="action-btn">Chat</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <div class="border-start border-secondary ps-4 py-2">
+                                <p class="fs-5 text-muted mb-1">Rating {{ displayRating }}</p>
+                                <p class="text-muted mb-2">Avaliações {{ displayReviews }}</p>
+                                <p class="text-muted mb-0">Membro desde:<br />{{ displayMemberSince }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section
+                    class="card bg-white border border-primary rounded-4 p-3 px-md-4 mb-3 about-card"
                 >
-                    Denunciar
-                </button>
+                    <h2 class="h5 fw-semibold mb-3">Sobre mim</h2>
+                    <p class="text-muted fs-5 mb-0 ps-md-2">{{ displayAbout }}</p>
+                </section>
 
-                <div class="row g-4 align-items-center">
-                    <div class="col-12 col-md-8">
-                        <div class="d-flex align-items-center gap-4">
-                            <div
-                                class="profile-avatar d-flex align-items-center justify-content-center rounded-circle border border-primary flex-shrink-0 overflow-hidden"
-                            >
-                                <img
-                                    v-if="petsitter?.avatar_url"
-                                    :src="petsitter.avatar_url"
-                                    alt="Foto de perfil"
-                                    class="w-100 h-100 object-fit-cover"
-                                />
-                                <UserRound v-else :size="64" class="text-primary" />
+                <div class="row g-3 mb-5">
+                    <div class="col-12 col-md-6">
+                        <section class="card bg-white border border-primary rounded-4 p-3 h-100 info-card">
+                            <h2 class="h6 fw-semibold mb-2">Serviços e preços</h2>
+                            <div class="d-flex justify-content-between border-bottom pb-1">
+                                <span>Dog Sitting (diária)</span><span>€ {{ displayPrice }}</span>
                             </div>
-
-                            <div class="flex-grow-1">
-                                <h2 class="h5 fw-bold mb-0 d-flex align-items-center gap-2">
-                                    {{ displayName }}
-                                    <button
-                                        type="button"
-                                        class="p-0 border-0 bg-transparent shadow-none d-flex"
-                                        aria-label="Favorito"
-                                        @click="toggleFavourite"
-                                    >
-                                        <Star
-                                            :size="20"
-                                            :fill="isFavourite ? '#f5b301' : 'none'"
-                                        />
-                                    </button>
-                                </h2>
-                                <p class="text-muted small mb-2">{{ displayLocation }}</p>
-
-                                <div class="tags-row mb-2">
-                                    <span
-                                        v-for="t in tags"
-                                        :key="t"
-                                        class="tag-pill rounded-pill py-1 small"
-                                    >
-                                        {{ t }}
-                                    </span>
-                                </div>
-
-                                <p class="text-muted small mb-2">{{ displayShortBio }}</p>
-
-                                <div class="actions-row">
-                                    <button type="button" class="action-btn">Reservar</button>
-                                    <button type="button" class="action-btn" @click="openReviewModal">Avaliar</button>
-                                    <button type="button" class="action-btn">Chat</button>
+                        </section>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <section class="card bg-white border border-primary rounded-4 p-3 h-100 info-card">
+                            <h2 class="h6 fw-semibold mb-3">Disponibilidade</h2>
+                            <div class="days-grid">
+                                <div
+                                    v-for="d in days"
+                                    :key="d.label"
+                                    class="day"
+                                    :class="d.ok ? 'day-ok' : 'day-no'"
+                                >
+                                    <span class="small fw-semibold">{{ d.label }}</span>
+                                    <Check v-if="d.ok" :size="18" />
+                                    <X v-else :size="18" />
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-md-4">
-                        <div class="border-start border-secondary ps-4 py-2">
-                            <p class="fs-5 text-muted mb-1">Rating {{ displayRating }}</p>
-                            <p class="text-muted mb-2">Avaliações {{ displayReviews }}</p>
-                            <p class="text-muted mb-0">Membro desde:<br />{{ displayMemberSince }}</p>
-                        </div>
+                        </section>
                     </div>
                 </div>
-            </section>
 
-            <section
-                class="card bg-white border border-primary rounded-4 p-3 px-md-4 mb-3 about-card"
-            >
-                <h2 class="h5 fw-semibold mb-3">Sobre mim</h2>
-                <p class="text-muted fs-5 mb-0 ps-md-2">{{ displayAbout }}</p>
-            </section>
+                <h1 class="text-center fw-bold display-5 mb-4">Publicações</h1>
 
-            <div class="row g-3 mb-5">
-                <div class="col-12 col-md-6">
-                    <section class="card bg-white border border-primary rounded-4 p-3 h-100 info-card">
-                        <h2 class="h6 fw-semibold mb-2">Serviços e preços</h2>
-                        <div class="d-flex justify-content-between border-bottom pb-1">
-                            <span>Dog Sitting (diária)</span><span>€ {{ displayPrice }}</span>
+                <p v-if="petsitterId && !visiblePosts.length" class="text-center text-muted">
+                    Ainda não há publicações.
+                </p>
+
+                <section
+                    v-for="post in visiblePosts"
+                    :key="post.id"
+                    class="card bg-white border border-primary rounded-4 p-2 mb-4 mx-auto post-card"
+                >
+                    <div class="d-flex gap-3">
+                        <img
+                            :src="post.photos[0] ?? '/images/patudo-logo.svg'"
+                            alt="Post"
+                            class="post-img rounded-3"
+                        />
+                        <div class="flex-grow-1 d-flex flex-column py-2 pe-2 position-relative">
+                            <h3 class="fs-2 mb-2">{{ post.title }}</h3>
+                            <p class="text-muted mb-auto post-text small">{{ post.description }}</p>
+                            <small class="text-muted">{{ formatDate(post.created_at) }}</small>
+                            <button type="button" class="like-btn position-absolute bottom-0 end-0">
+                                <Heart :size="26" />
+                            </button>
                         </div>
-                    </section>
-                </div>
-                <div class="col-12 col-md-6">
-                    <section class="card bg-white border border-primary rounded-4 p-3 h-100 info-card">
-                        <h2 class="h6 fw-semibold mb-3">Disponibilidade</h2>
-                        <div class="days-grid">
-                            <div
-                                v-for="d in days"
-                                :key="d.label"
-                                class="day"
-                                :class="d.ok ? 'day-ok' : 'day-no'"
-                            >
-                                <span class="small fw-semibold">{{ d.label }}</span>
-                                <Check v-if="d.ok" :size="18" />
-                                <X v-else :size="18" />
-                            </div>
-                        </div>
-                    </section>
-                </div>
+                    </div>
+                </section>
             </div>
 
-            <h1 class="text-center fw-bold display-5 mb-4">Publicações</h1>
+            <div v-if="feedback" class="alert alert-info position-fixed bottom-0 start-50 translate-middle-x mb-3 py-2">
+                {{ feedback }}
+            </div>
 
-            <p v-if="petsitterId && !visiblePosts.length" class="text-center text-muted">
-                Ainda não há publicações.
-            </p>
+            <ModalReportPetsitter
+                :show="showReportModal"
+                :petsitter-id="petsitterId ?? undefined"
+                @close="showReportModal = false"
+                @submit="submitReport"
+            />
 
-            <section
-                v-for="post in visiblePosts"
-                :key="post.id"
-                class="card bg-white border border-primary rounded-4 p-2 mb-4 mx-auto post-card"
-            >
-                <div class="d-flex gap-3">
-                    <img
-                        :src="post.photos[0] ?? '/images/patudo-logo.svg'"
-                        alt="Post"
-                        class="post-img rounded-3"
-                    />
-                    <div class="flex-grow-1 d-flex flex-column py-2 pe-2 position-relative">
-                        <h3 class="fs-2 mb-2">{{ post.title }}</h3>
-                        <p class="text-muted mb-auto post-text small">{{ post.description }}</p>
-                        <small class="text-muted">{{ formatDate(post.created_at) }}</small>
-                        <button type="button" class="like-btn position-absolute bottom-0 end-0">
-                            <Heart :size="26" />
-                        </button>
-                    </div>
-                </div>
-            </section>
-        </div>
+            <ModalReviewPetsitter
+                :show="showReviewModal"
+                :petsitter="{
+                    id: petsitterId ?? undefined,
+                    name: displayName,
+                    avatar_url: petsitter?.avatar_url ?? null,
+                    service_summary: 'Cuidado de animais'
+                }"
+                @close="showReviewModal = false"
+                @submit="submitReview"
+            />
 
-        <div v-if="feedback" class="alert alert-info position-fixed bottom-0 start-50 translate-middle-x mb-3 py-2">
-            {{ feedback }}
-        </div>
-
-        <ModalReportPetsitter
-            :show="showReportModal"
-            :petsitter-id="petsitterId ?? undefined"
-            @close="showReportModal = false"
-            @submit="submitReport"
-        />
-
-        <ModalReviewPetsitter
-            :show="showReviewModal"
-            :petsitter="{
-                id: petsitterId ?? undefined,
-                name: displayName,
-                avatar_url: petsitter?.avatar_url ?? null,
-                service_summary: 'Cuidado de animais'
-            }"
-            @close="showReviewModal = false"
-            @submit="submitReview"
-        />
-
-        <ModalNotifications
-            :show="showNotifications"
-            @close="showNotifications = false"
-            @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
-        />
-    </main>
+            <ModalNotifications
+                :show="showNotifications"
+                @close="showNotifications = false"
+                @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
+            />
+        </main>
+    </div>
 </template>
 
 <style scoped>

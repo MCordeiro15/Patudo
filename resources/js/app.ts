@@ -36,6 +36,7 @@ void createInertiaApp({
             case name === 'Petsitter/ReservationNotification':
             case name === 'Owner/ReservationNotificationToOwner':
             case name === 'Messages':
+            case name === 'Owner/BookingPage':
                 return null;
             case name.startsWith('settings/'):
                 return [AppLayout, SettingsLayout];
