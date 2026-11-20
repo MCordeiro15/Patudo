@@ -2,16 +2,31 @@
 // Página de mensagens: lista de conversas à esquerda e a conversa selecionada à direita.
 // Messages page: conversation list on the left and the selected conversation on the right.
 import { Head, Link } from '@inertiajs/vue3';
-import { Bell, LogOut, MessageCircle, Send, UserRound } from '@lucide/vue';
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { Bell, Ellipsis, LogOut, MessageCircle, Pencil, Send, SmilePlus, Trash2, UserRound } from '@lucide/vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
-import { useChat } from '@/composables/useChat';
+import { REACTION_EMOJIS, useChat } from '@/composables/useChat';
 import { useNotifications } from '@/composables/useNotifications';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
+interface ReactionChip {
+    emoji: string;
+    count: number;
+    mine: boolean;
+}
+
 type Row =
     | { kind: 'day'; key: string; label: string }
-    | { kind: 'msg'; key: string; mine: boolean; text: string; time: string };
+    | {
+          kind: 'msg';
+          key: string;
+          id: string;
+          mine: boolean;
+          text: string;
+          time: string;
+          edited: boolean;
+          reactions: ReactionChip[];
+      };
 
 const showNotifications = ref(false);
 const { unreadCount, fetchNotifications } = useNotifications();
@@ -28,13 +43,84 @@ const {
     start,
     openConversation,
     sendMessage,
+    editMessage,
+    deleteMessage,
+    toggleReaction,
 } = useChat();
 
 const draft = ref('');
 const messagesEl = ref<HTMLElement | null>(null);
 
+// Menus abertos (editar/apagar e escolher emoji) e mensagem em edição.
+// Open menus (edit/delete and emoji picker) and the message being edited.
+const openMenuId = ref<string | null>(null);
+const pickerId = ref<string | null>(null);
+const editingId = ref<string | null>(null);
+const editDraft = ref('');
+
+function closePopups(): void {
+    openMenuId.value = null;
+    pickerId.value = null;
+}
+
+function toggleMenu(id: string): void {
+    const open = openMenuId.value !== id;
+    closePopups();
+    openMenuId.value = open ? id : null;
+}
+
+function togglePicker(id: string): void {
+    const open = pickerId.value !== id;
+    closePopups();
+    pickerId.value = open ? id : null;
+}
+
+function startEdit(id: string, text: string): void {
+    closePopups();
+    editingId.value = id;
+    editDraft.value = text;
+}
+
+function cancelEdit(): void {
+    editingId.value = null;
+    editDraft.value = '';
+}
+
+async function saveEdit(): Promise<void> {
+    if (editingId.value && (await editMessage(editingId.value, editDraft.value))) {
+        cancelEdit();
+    }
+}
+
+async function removeMessage(id: string): Promise<void> {
+    closePopups();
+
+    if (window.confirm('Apagar esta mensagem?')) {
+        await deleteMessage(id);
+    }
+}
+
+async function react(id: string, emoji: string, alreadyReacted: boolean): Promise<void> {
+    closePopups();
+    await toggleReaction(id, emoji, alreadyReacted);
+}
+
+// Dá o foco ao campo de edição quando ele aparece.
+// Focuses the edit field when it appears.
+function focusEl(el: unknown): void {
+    if (el instanceof HTMLInputElement) {
+        el.focus();
+    }
+}
+
 function initial(name: string): string {
     return name.trim().charAt(0).toUpperCase();
+}
+
+// Um de três avatares ilustrados, conforme o id da pessoa (sempre o mesmo para a mesma pessoa).
+// One of three illustrated avatars, chosen by the person's id (always the same for the same person).
+function avatarClass(id: string): string {
+    return `avatar-v${Number(id) % 3}`;
 }
 
 function timeLabel(timestamp: number): string {
@@ -71,16 +157,27 @@ const rows = computed<Row[]>(() => {
         result.push({
             kind: 'msg',
             key: message.id,
+            id: message.id,
             mine: message.sender?.id === me.value?.id,
             text: message.plaintext,
             time: timeLabel(message.createdAt),
+            edited: message.editedAt !== null,
+            reactions: message.reactions.map((reaction) => ({
+                emoji: reaction.emoji,
+                count: reaction.count,
+                mine: reaction.currentUserReacted,
+            })),
         });
     });
 
     return result;
 });
 
-watch(rows, async () => {
+watch(rows, async (newRows, oldRows) => {
+    if (newRows.length <= (oldRows?.length ?? 0)) {
+        return;
+    }
+
     await nextTick();
 
     if (messagesEl.value) {
@@ -94,7 +191,12 @@ async function submit(): Promise<void> {
     await sendMessage(text);
 }
 
+onBeforeUnmount(() => {
+    document.removeEventListener('click', closePopups);
+});
+
 onMounted(async () => {
+    document.addEventListener('click', closePopups);
     void fetchNotifications();
     await start();
 
@@ -130,7 +232,7 @@ onMounted(async () => {
 
                 <div class="d-flex align-items-center gap-3">
                     <a href="/messages" class="text-primary">
-                        <MessageCircle :size="25" />
+                        <MessageCircle :size="25" fill="currentColor" />
                     </a>
                     <button
                         type="button"
@@ -180,7 +282,7 @@ onMounted(async () => {
                             :class="{ active: item.id === activeOtherId }"
                             @click="openConversation(item.id)"
                         >
-                            <span class="chat-avatar">{{ initial(item.name) }}</span>
+                            <span :class="['chat-avatar', avatarClass(item.id)]">{{ initial(item.name) }}</span>
                             <span class="chat-item-info">
                                 <strong>{{ item.name }} • {{ item.role }}</strong>
                                 <span class="chat-preview">{{ item.lastText || 'Sem mensagens' }}</span>
@@ -199,7 +301,7 @@ onMounted(async () => {
 
                     <template v-else>
                         <div class="chat-header">
-                            <span class="chat-avatar chat-avatar-lg">{{ initial(activePerson.name) }}</span>
+                            <span :class="['chat-avatar', 'chat-avatar-lg', avatarClass(activePerson.id)]">{{ initial(activePerson.name) }}</span>
                             <div>
                                 <strong class="chat-header-name">{{ activePerson.name }} • {{ activePerson.role }}</strong>
                                 <span class="chat-status">
@@ -213,14 +315,97 @@ onMounted(async () => {
                             <template v-for="row in rows" :key="row.key">
                                 <div v-if="row.kind === 'day'" class="chat-day">{{ row.label }}</div>
                                 <div v-else class="chat-row" :class="row.mine ? 'mine' : 'theirs'">
-                                    <span v-if="!row.mine" class="chat-avatar">{{ initial(activePerson.name) }}</span>
+                                    <span v-if="!row.mine" :class="['chat-avatar', avatarClass(activePerson.id)]">{{ initial(activePerson.name) }}</span>
                                     <div class="chat-col">
-                                        <div class="chat-bubble">{{ row.text }}</div>
-                                        <small class="chat-hour">{{ row.time }}</small>
+                                        <div class="chat-bubble-line">
+                                            <form
+                                                v-if="editingId === row.id"
+                                                class="chat-edit"
+                                                autocomplete="off"
+                                                @submit.prevent="saveEdit"
+                                            >
+                                                <input
+                                                    :ref="focusEl"
+                                                    v-model="editDraft"
+                                                    type="text"
+                                                    class="chat-input chat-edit-input"
+                                                    maxlength="2000"
+                                                    @keydown.esc="cancelEdit"
+                                                />
+                                                <button type="submit" class="chat-edit-save">Guardar</button>
+                                                <button type="button" class="chat-edit-cancel" @click="cancelEdit">
+                                                    Cancelar
+                                                </button>
+                                            </form>
+
+                                            <template v-else>
+                                                <div class="chat-bubble">{{ row.text }}</div>
+
+                                                <div class="chat-actions">
+                                                    <button
+                                                        type="button"
+                                                        class="chat-action"
+                                                        aria-label="Reagir"
+                                                        @click.stop="togglePicker(row.id)"
+                                                    >
+                                                        <SmilePlus :size="18" />
+                                                    </button>
+                                                    <button
+                                                        v-if="row.mine"
+                                                        type="button"
+                                                        class="chat-action"
+                                                        aria-label="Mais opções"
+                                                        @click.stop="toggleMenu(row.id)"
+                                                    >
+                                                        <Ellipsis :size="18" />
+                                                    </button>
+                                                </div>
+
+                                                <div v-if="pickerId === row.id" class="chat-popup chat-picker" @click.stop>
+                                                    <button
+                                                        v-for="emoji in REACTION_EMOJIS"
+                                                        :key="emoji"
+                                                        type="button"
+                                                        class="chat-emoji"
+                                                        @click="react(row.id, emoji, row.reactions.some((r) => r.emoji === emoji && r.mine))"
+                                                    >
+                                                        {{ emoji }}
+                                                    </button>
+                                                </div>
+
+                                                <div v-if="openMenuId === row.id" class="chat-popup chat-menu" @click.stop>
+                                                    <button type="button" @click="startEdit(row.id, row.text)">
+                                                        <Pencil :size="16" /> Editar
+                                                    </button>
+                                                    <button type="button" @click="removeMessage(row.id)">
+                                                        <Trash2 :size="16" /> Apagar
+                                                    </button>
+                                                </div>
+                                            </template>
+                                        </div>
+
+                                        <div v-if="row.reactions.length > 0" class="chat-reactions">
+                                            <button
+                                                v-for="reaction in row.reactions"
+                                                :key="reaction.emoji"
+                                                type="button"
+                                                class="chat-chip"
+                                                :class="{ mine: reaction.mine }"
+                                                @click="react(row.id, reaction.emoji, reaction.mine)"
+                                            >
+                                                {{ reaction.emoji }} {{ reaction.count }}
+                                            </button>
+                                        </div>
+
+                                        <small class="chat-hour">
+                                            {{ row.time }}<span v-if="row.edited"> (editada)</span>
+                                        </small>
                                     </div>
                                 </div>
                             </template>
                         </div>
+
+                        <p v-if="error" class="text-danger small mb-0 pt-2 px-2">{{ error }}</p>
 
                         <form class="chat-form" autocomplete="off" @submit.prevent="submit">
                             <input
@@ -304,14 +489,28 @@ onMounted(async () => {
     height: 3.4rem;
     border: 1px solid var(--patudo-castanhoDark);
     border-radius: 50%;
-    background: var(--patudo-bege);
-    font-weight: 700;
+    background-color: var(--patudo-branco);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    font-size: 0;
 }
 
 .chat-avatar-lg {
     width: 5.5rem;
     height: 5.5rem;
-    font-size: 1.8rem;
+}
+
+.avatar-v0 {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23FFF6EA'/%3E%3Cpath d='M12 64c0-12 9-19 20-19s20 7 20 19z' fill='%234BA3C3'/%3E%3Crect x='27' y='36' width='10' height='11' rx='4' fill='%23F4A58A'/%3E%3Cellipse cx='32' cy='27' rx='10' ry='12' fill='%23F9B39A'/%3E%3Cpath d='M21 24c0-9 6-13 12-13 7 0 11 5 10 13-3-4-7-5-11-5s-8 1-11 5z' fill='%23495C85'/%3E%3C/svg%3E");
+}
+
+.avatar-v1 {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23FFF6EA'/%3E%3Cpath d='M18 28c0-13 6-19 14-19s14 6 14 19v14H18z' fill='%23F25C66'/%3E%3Cpath d='M14 64c0-11 8-17 18-17s18 6 18 17z' fill='%23F6D9B8'/%3E%3Crect x='27' y='38' width='10' height='11' rx='4' fill='%23F4B796'/%3E%3Cellipse cx='32' cy='29' rx='10' ry='12' fill='%23FBC9AA'/%3E%3Cpath d='M21 26c2-9 7-11 11-11s9 3 11 11c-4-4-8-5-11-5s-7 1-11 5z' fill='%23F25C66'/%3E%3C/svg%3E");
+}
+
+.avatar-v2 {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23FFF6EA'/%3E%3Cpath d='M12 64c0-12 9-19 20-19s20 7 20 19z' fill='%234FCB8B'/%3E%3Crect x='27' y='36' width='10' height='11' rx='4' fill='%23E8963F'/%3E%3Cellipse cx='32' cy='27' rx='10' ry='12' fill='%23F6B054'/%3E%3Cpath d='M21 24c0-9 5-13 11-13s11 4 11 13c-3-3-7-4-11-4s-8 1-11 4z' fill='%236B4A2B'/%3E%3C/svg%3E");
 }
 
 .chat-item-info {
@@ -446,6 +645,160 @@ onMounted(async () => {
 
 .chat-hour {
     margin: 0.35rem 0.75rem 0;
+}
+
+.chat-bubble-line {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.chat-row.mine .chat-bubble-line {
+    flex-direction: row-reverse;
+}
+
+.chat-actions {
+    display: flex;
+    gap: 0.15rem;
+    opacity: 0.35;
+    transition: opacity 0.15s;
+}
+
+.chat-bubble-line:hover .chat-actions,
+.chat-actions:focus-within {
+    opacity: 1;
+}
+
+.chat-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.8rem;
+    height: 1.8rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--patudo-castanhoMid);
+}
+
+.chat-action:hover {
+    background: var(--patudo-bege);
+    color: var(--patudo-castanhoDark);
+}
+
+.chat-popup {
+    position: absolute;
+    top: 100%;
+    z-index: 5;
+    margin-top: 0.25rem;
+    border: 1px solid var(--bs-primary);
+    border-radius: 0.75rem;
+    background: var(--patudo-branco);
+    box-shadow: 0 4px 14px rgb(46 29 20 / 15%);
+}
+
+.chat-row.theirs .chat-popup {
+    left: 0;
+}
+
+.chat-row.mine .chat-popup {
+    right: 0;
+}
+
+.chat-picker {
+    display: flex;
+    gap: 0.15rem;
+    padding: 0.3rem 0.4rem;
+}
+
+.chat-emoji {
+    padding: 0.1rem 0.3rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    font-size: 1.3rem;
+    line-height: 1.4;
+}
+
+.chat-emoji:hover {
+    background: var(--patudo-bege);
+}
+
+.chat-menu {
+    display: flex;
+    flex-direction: column;
+    min-width: 8rem;
+    padding: 0.25rem;
+}
+
+.chat-menu button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: var(--patudo-castanhoDark);
+    text-align: left;
+}
+
+.chat-menu button:hover {
+    background: var(--patudo-bege);
+}
+
+.chat-reactions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.35rem;
+}
+
+.chat-chip {
+    padding: 0.05rem 0.55rem;
+    border: 1px solid var(--bs-primary);
+    border-radius: 999px;
+    background: transparent;
+    color: inherit;
+    font-size: 0.9rem;
+}
+
+.chat-chip.mine {
+    background: var(--patudo-bege);
+    font-weight: 700;
+}
+
+.chat-edit {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chat-edit-input {
+    flex: 1;
+    min-width: 12rem;
+    height: 2.6rem;
+}
+
+.chat-edit-save,
+.chat-edit-cancel {
+    padding: 0.35rem 0.8rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.chat-edit-save {
+    border: 0;
+    background: var(--bs-primary);
+    color: #fff;
+}
+
+.chat-edit-cancel {
+    border: 1px solid var(--bs-primary);
+    background: transparent;
+    color: inherit;
 }
 
 .chat-form {

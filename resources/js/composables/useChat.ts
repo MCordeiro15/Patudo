@@ -6,6 +6,10 @@ import { getTalkSession } from '@talkjs/core';
 import type { ConversationSnapshot, MessageSnapshot, TalkSession } from '@talkjs/core';
 import { computed, onBeforeUnmount, ref, shallowRef } from 'vue';
 
+// Reações disponíveis. Cada pessoa pode dar cada reação uma vez por mensagem.
+// Available reactions. Each person can give each reaction once per message.
+export const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '🙏'];
+
 export interface ChatPerson {
     id: string;
     name: string;
@@ -227,6 +231,7 @@ export function useChat() {
         }
 
         try {
+            error.value = null;
             const conversation = session.conversation(conversationIdFor(otherId));
             const contact = contacts.value.find((c) => c.id === otherId);
 
@@ -269,9 +274,89 @@ export function useChat() {
         }
 
         try {
+            error.value = null;
             await session.conversation(conversationIdFor(activeOtherId.value)).send(trimmed);
         } catch (e) {
             error.value = 'Não foi possível enviar a mensagem.';
+            console.error(e);
+        }
+    }
+
+    // Referência a uma mensagem da conversa aberta.
+    // Reference to a message in the open conversation.
+    function messageRef(messageId: string) {
+        if (!session || !activeOtherId.value) {
+            return null;
+        }
+
+        return session.conversation(conversationIdFor(activeOtherId.value)).message(messageId);
+    }
+
+    // Edita uma mensagem tua. Devolve true se correu bem.
+    // Edits one of your messages. Returns true on success.
+    async function editMessage(messageId: string, text: string): Promise<boolean> {
+        const trimmed = text.trim();
+        const message = messageRef(messageId);
+
+        if (!message || trimmed === '') {
+            return false;
+        }
+
+        try {
+            error.value = null;
+            await message.edit(trimmed);
+
+            return true;
+        } catch (e) {
+            error.value = 'Não foi possível editar a mensagem.';
+            console.error(e);
+
+            return false;
+        }
+    }
+
+    // Apaga uma mensagem tua. Devolve true se correu bem.
+    // Deletes one of your messages. Returns true on success.
+    async function deleteMessage(messageId: string): Promise<boolean> {
+        const message = messageRef(messageId);
+
+        if (!message) {
+            return false;
+        }
+
+        try {
+            error.value = null;
+            await message.delete();
+
+            return true;
+        } catch (e) {
+            error.value = 'Não foi possível apagar a mensagem.';
+            console.error(e);
+
+            return false;
+        }
+    }
+
+    // Dá ou retira a tua reação a uma mensagem (de qualquer pessoa da conversa).
+    // Adds or removes your reaction to a message (from anyone in the conversation).
+    async function toggleReaction(messageId: string, emoji: string, alreadyReacted: boolean): Promise<void> {
+        const message = messageRef(messageId);
+
+        if (!message) {
+            return;
+        }
+
+        try {
+            error.value = null;
+            const reaction = message.reactions(emoji);
+
+            if (alreadyReacted) {
+                await reaction.remove();
+            } else {
+                await reaction.add();
+            }
+        } catch (e) {
+            error.value = 'Não foi possível reagir à mensagem.';
             console.error(e);
         }
     }
@@ -297,5 +382,8 @@ export function useChat() {
         start,
         openConversation,
         sendMessage,
+        editMessage,
+        deleteMessage,
+        toggleReaction,
     };
 }
