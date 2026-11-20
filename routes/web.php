@@ -75,5 +75,10 @@ Route::inertia('/reservations', 'Owner/ReservationNotificationToOwner')
     ->middleware('auth')
     ->name('bookings.reservations');
 
-Route::inertia('/dev/modals', 'Modals/ModalTests');
+// Pagamento confirmado (dono)
+Route::inertia('/payment-confirmed', 'Payment/PaymentConfirmed')
+    ->middleware('auth')
+    ->name('payment.confirmed');
+
+Route::inertia('/dev/modals', 'Modals/ModalTests')->name('dev.modals');
 require __DIR__ . '/settings.php';
