@@ -12,7 +12,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 test('petsitter can view their own profile with its data', function () {
     $petsitter = Petsitter::factory()->create([
         'biography' => 'Cuido de cães há vários anos.',
-        'approval_status' => 'pending',
+        'approval_status' => 'approved',
     ]);
 
     $this->actingAs($petsitter->user)

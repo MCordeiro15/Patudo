@@ -1,502 +1,539 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
-import { Dog, Plus } from '@lucide/vue';
-import type { Animal } from '@/types';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import type { Animal, AnimalFormErrors } from '@/types';
+import InputError from '@/components/InputError.vue';
 
-const props = defineProps<{
-    show: boolean;
-    bookingId?: number | null;
-}>();
+const props = defineProps<{ show: boolean }>();
 
 const emit = defineEmits<{
     (e: 'close'): void;
-    (e: 'added', animalId: number): void;
+    (e: 'created', animal: Animal): void;
 }>();
 
-function getXsrf(): string {
-    const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
-    return match ? decodeURIComponent(match[1]) : '';
-}
+const name = ref('');
+const species = ref<'Cão' | 'Gato' | ''>('');
+const breed = ref('');
+const age = ref<string>('');
+const notes = ref('');
+const photoFile = ref<File | null>(null);
+const photoPreview = ref<string | null>(null);
+const photoInput = ref<HTMLInputElement | null>(null);
+const errors = ref<AnimalFormErrors>({});
+const generalError = ref('');
+const submitting = ref(false);
 
-function apiFetch(url: string, options: RequestInit = {}) {
-    return fetch(url, {
-        credentials: 'same-origin',
-        ...options,
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-XSRF-TOKEN': getXsrf(),
-            ...options.headers,
-        },
-    });
-}
-
-const animals = ref<Animal[]>([]);
-const existingAnimalIds = ref<number[]>([]);
-const loading = ref(false);
-const feedback = ref('');
-const searchQuery = ref('');
-
-const filteredAnimals = computed(() => {
-    if (!searchQuery.value) return animals.value;
-    const query = searchQuery.value.toLowerCase();
-    return animals.value.filter(
-        (a) =>
-            a.name.toLowerCase().includes(query) ||
-            a.species.toLowerCase().includes(query) ||
-            (a.breed && a.breed.toLowerCase().includes(query)),
-    );
-});
-
-const availableAnimals = computed(() =>
-    filteredAnimals.value.filter((a) => !existingAnimalIds.value.includes(a.id)),
+const isValid = computed(
+    () =>
+        name.value.trim().length > 0 &&
+        species.value !== '' &&
+        breed.value.trim().length > 0 &&
+        age.value !== '',
 );
 
-const loadAnimals = async () => {
-    loading.value = true;
-    feedback.value = '';
+const clearPreview = () => {
+    if (photoPreview.value) URL.revokeObjectURL(photoPreview.value);
+    photoPreview.value = null;
+};
+
+const resetForm = () => {
+    name.value = '';
+    species.value = '';
+    breed.value = '';
+    age.value = '';
+    notes.value = '';
+    photoFile.value = null;
+    if (photoInput.value) photoInput.value.value = '';
+    clearPreview();
+    errors.value = {};
+    generalError.value = '';
+};
+
+const close = () => {
+    if (submitting.value) return;
+    resetForm();
+    emit('close');
+};
+
+const handlePhotoChange = (event: Event) => {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/png'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+        generalError.value = 'Seleciona uma imagem JPG ou PNG até 5 MB.';
+        if (photoInput.value) photoInput.value.value = '';
+        return;
+    }
+
+    clearPreview();
+    photoFile.value = file;
+    photoPreview.value = URL.createObjectURL(file);
+    generalError.value = '';
+};
+
+const submit = async () => {
+    if (!isValid.value) return;
+
+    errors.value = {};
+    generalError.value = '';
+    submitting.value = true;
+
     try {
         await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
+        const xsrfToken = document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? '';
+
+        const body = new FormData();
+        body.append('name', name.value.trim());
+        body.append('species', species.value);
+        body.append('breed', breed.value.trim());
+        body.append('age', String(Number(age.value)));
+        body.append('size', 'medium');
+        if (notes.value.trim()) body.append('special_needs', notes.value.trim());
+        if (photoFile.value) body.append('photo', photoFile.value);
+
         const response = await fetch('/api/animals', {
+            method: 'POST',
             credentials: 'same-origin',
             headers: {
                 Accept: 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': decodeURIComponent(xsrfToken),
             },
+            body,
         });
+
+        const payload = await response.json().catch(() => ({}));
+
         if (response.ok) {
-            const data = await response.json();
-            animals.value = data.data ?? [];
+            emit('created', payload.data as Animal);
+            resetForm();
+            emit('close');
+        } else if (payload.errors) {
+            errors.value = payload.errors;
         } else {
-            feedback.value = 'Erro ao carregar os animais.';
+            generalError.value = payload.message ?? 'Não foi possível guardar o animal.';
         }
     } catch {
-        feedback.value = 'Erro de conexão. Tente novamente.';
+        generalError.value = 'Erro de conexão. Tente novamente.';
     } finally {
-        loading.value = false;
+        submitting.value = false;
     }
-};
-
-const loadExistingAnimals = async () => {
-    if (!props.bookingId) return;
-    try {
-        const res = await apiFetch(`/api/bookings/${props.bookingId}`);
-        if (res.ok) {
-            const data = (await res.json()).data;
-            existingAnimalIds.value = (data.animals ?? []).map((a: Animal) => a.id);
-        }
-    } catch {
-        // Ignorar erro ao carregar animais existentes
-    }
-};
-
-const addAnimal = async (animalId: number) => {
-    if (!props.bookingId) return;
-    loading.value = true;
-    feedback.value = '';
-    try {
-        const res = await apiFetch(`/api/bookings/${props.bookingId}`, {
-            method: 'PATCH',
-            body: JSON.stringify({ animal_ids: [animalId] }),
-        });
-        if (res.ok) {
-            existingAnimalIds.value.push(animalId);
-            feedback.value = 'Animal adicionado com sucesso!';
-            emit('added', animalId);
-            setTimeout(() => {
-                feedback.value = '';
-            }, 3000);
-        } else {
-            const err = await res.json().catch(() => ({}));
-            feedback.value = err.message ?? 'Não foi possível adicionar o animal.';
-        }
-    } catch {
-        feedback.value = 'Erro de conexão. Tente novamente.';
-    } finally {
-        loading.value = false;
-    }
-};
-
-const handleClose = () => {
-    searchQuery.value = '';
-    feedback.value = '';
-    emit('close');
 };
 
 watch(
     () => props.show,
-    (isOpen) => {
-        if (isOpen) {
-            void loadAnimals();
-            void loadExistingAnimals();
-        }
+    (open) => {
+        if (!open) resetForm();
     },
 );
 
-onMounted(() => {
-    if (props.show) {
-        void loadAnimals();
-        void loadExistingAnimals();
-    }
-});
+onBeforeUnmount(clearPreview);
 </script>
 
 <template>
-    <div
-        v-if="show"
-        class="patudo-modal-backdrop"
-        @click.self="handleClose"
-        @keydown.escape="handleClose"
-    >
-        <div class="patudo-modal-card" role="dialog" aria-modal="true">
-            <!-- Cabeçalho -->
-            <div class="patudo-modal-header">
-                <div class="patudo-header-left">
-                    <h2 class="patudo-modal-title">
-                        Adicionar Animal
-                    </h2>
+    <div v-if="show" class="reservation-add-pet-backdrop" @click.self="close" @keydown.escape="close">
+        <section
+            class="reservation-add-pet-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reservation-add-pet-title"
+        >
+            <h2 id="reservation-add-pet-title" class="modal-heading">Adicionar animal</h2>
+
+            <form @submit.prevent="submit" novalidate class="panel-box">
+                <div v-if="generalError" class="alert alert-danger py-1 small mb-2" role="alert">
+                    {{ generalError }}
                 </div>
-                <button
-                    type="button"
-                    class="patudo-close-btn"
-                    aria-label="Fechar"
-                    @click="handleClose"
-                >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                        <path d="M18 6L6 18M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
 
-            <!-- Mensagem de sucesso -->
-            <div v-if="feedback.includes('sucesso')" class="patudo-success-banner">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                    <path d="M20 6L9 17l-5-5" />
-                </svg>
-                {{ feedback }}
-            </div>
+                <div class="photo-row mb-2">
+                    <label for="reservation-pet-photo" class="photo-circle" title="Escolher fotografia">
+                        <div class="col-12">
+                            <div class="patudo-photo-box">
+                                <img
+                                    v-if="pet?.photos?.[0]"
+                                    :src="pet.photos[0]"
+                                    :alt="`Foto de ${pet?.name || 'animal'}`"
+                                    class="patudo-pet-photo"
+                                />
+                                <svg
+                                    v-else
+                                    viewBox="0 0 100 100"
+                                    class="patudo-dog-placeholder"
+                                    aria-hidden="true"
+                                >
+                                    <circle
+                                        cx="50"
+                                        cy="50"
+                                        r="46"
+                                        fill="#fbe2c4"
+                                        stroke="#231810"
+                                        stroke-width="1.2"
+                                    />
+                                    <path
+                                        d="M30 22 C20 22, 18 42, 26 48 C30 42, 34 32, 34 25 Z"
+                                        fill="#d9934c"
+                                        stroke="#231810"
+                                        stroke-width="1.5"
+                                    />
+                                    <path
+                                        d="M70 22 C80 22, 82 42, 74 48 C70 42, 66 32, 66 25 Z"
+                                        fill="#d9934c"
+                                        stroke="#231810"
+                                        stroke-width="1.5"
+                                    />
+                                    <path
+                                        d="M72 78 C84 74, 88 58, 82 52 C78 58, 76 66, 70 70 Z"
+                                        fill="#e5a967"
+                                        stroke="#231810"
+                                        stroke-width="1.5"
+                                    />
+                                    <path
+                                        d="M32 54 C28 68, 28 84, 34 90 L66 90 C72 84, 72 68, 68 54 Z"
+                                        fill="#e5a967"
+                                        stroke="#231810"
+                                        stroke-width="1.5"
+                                    />
+                                    <path
+                                        d="M41 58 C39 70, 41 84, 44 90 L56 90 C59 84, 61 70, 59 58 Z"
+                                        fill="#f7dec2"
+                                    />
+                                    <path
+                                        d="M36 66 L36 90 M43 72 L43 90 M64 66 L64 90 M57 72 L57 90"
+                                        stroke="#231810"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                    />
+                                    <path
+                                        d="M36 52 Q50 58 64 52"
+                                        fill="none"
+                                        stroke="#1d70b8"
+                                        stroke-width="4"
+                                        stroke-linecap="round"
+                                    />
+                                    <circle
+                                        cx="50"
+                                        cy="56"
+                                        r="2.5"
+                                        fill="#d1d5db"
+                                        stroke="#231810"
+                                        stroke-width="1"
+                                    />
+                                    <path
+                                        d="M32 32 C32 18, 68 18, 68 32 C68 46, 60 52, 50 52 C40 52, 32 46, 32 32 Z"
+                                        fill="#e5a967"
+                                        stroke="#231810"
+                                        stroke-width="1.5"
+                                    />
+                                    <ellipse
+                                        cx="50"
+                                        cy="42"
+                                        rx="10"
+                                        ry="7.5"
+                                        fill="#f7dec2"
+                                    />
+                                    <path
+                                        d="M39 32 Q42 29 45 32"
+                                        fill="none"
+                                        stroke="#231810"
+                                        stroke-width="1.6"
+                                        stroke-linecap="round"
+                                    />
+                                    <path
+                                        d="M55 32 Q58 29 61 32"
+                                        fill="none"
+                                        stroke="#231810"
+                                        stroke-width="1.6"
+                                        stroke-linecap="round"
+                                    />
+                                    <ellipse
+                                        cx="50"
+                                        cy="39"
+                                        rx="3.5"
+                                        ry="2.5"
+                                        fill="#231810"
+                                    />
+                                    <path
+                                        d="M47 45 C47 50, 53 50, 53 45 Z"
+                                        fill="#ef4444"
+                                        stroke="#231810"
+                                        stroke-width="1"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                    </label>
 
-            <!-- Mensagem de erro -->
-            <div v-if="feedback && !feedback.includes('sucesso')" class="patudo-error-banner">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M15 9l-6 6M9 9l6 6" />
-                </svg>
-                {{ feedback }}
-            </div>
+                    <label for="reservation-pet-photo" class="add-photo-btn">
+                        Adicionar foto <span class="fw-normal">(opcional)</span>
+                    </label>
 
-            <!-- Corpo -->
-            <div class="patudo-modal-body">
-                <!-- Pesquisa -->
-                <div class="mb-3">
                     <input
-                        type="text"
-                        class="patudo-search-input"
-                        placeholder="Pesquisar animal..."
-                        v-model="searchQuery"
+                        id="reservation-pet-photo"
+                        ref="photoInput"
+                        class="d-none"
+                        type="file"
+                        accept="image/jpeg,image/png"
+                        @change="handlePhotoChange"
                     />
                 </div>
+                <InputError :message="errors.photo?.[0]" />
 
-                <!-- Loading -->
-                <div v-if="loading && animals.length === 0" class="patudo-loading-state">
-                    <div class="patudo-spinner"></div>
-                    <p class="patudo-empty-text">A carregar animais...</p>
+                <div class="mb-2">
+                    <label for="reservation-pet-name" class="field-label">Nome *</label>
+                    <input
+                        id="reservation-pet-name"
+                        v-model="name"
+                        class="pet-control"
+                        :class="{ 'is-invalid': errors.name }"
+                        maxlength="255"
+                        required
+                    />
+                    <InputError :message="errors.name?.[0]" />
                 </div>
 
-                <!-- Sem animais -->
-                <div v-else-if="animals.length === 0" class="patudo-empty-state">
-                    <Dog :size="48" class="text-muted mb-2" />
-                    <p class="patudo-empty-text">Não tens animais registados.</p>
-                    <small class="text-muted">Vai ao teu perfil para adicionar.</small>
-                </div>
-
-                <!-- Sem resultados -->
-                <div v-else-if="availableAnimals.length === 0" class="patudo-empty-state">
-                    <p class="patudo-empty-text">
-                        {{ existingAnimalIds.length === animals.length
-                            ? 'Todos os animais já estão na reserva.'
-                            : 'Nenhum animal encontrado.' }}
-                    </p>
-                </div>
-
-                <!-- Lista de animais disponíveis -->
-                <div class="patudo-animal-list">
-                    <div
-                        v-for="animal in availableAnimals"
-                        :key="animal.id"
-                        class="patudo-animal-option"
-                        @click="addAnimal(animal.id)"
-                    >
-                        <div class="patudo-animal-avatar">
-                            <img
-                                v-if="animal.photo"
-                                :src="animal.photo"
-                                :alt="animal.name"
-                                class="w-100 h-100 object-fit-cover"
-                            />
-                            <Dog v-else :size="24" class="text-primary" />
+                <fieldset class="mb-2">
+                    <legend class="field-label">Espécie *</legend>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label
+                                class="species-option"
+                                :class="{ 'species-option--selected': species === 'Cão' }"
+                            >
+                                <span>Cão</span>
+                                <input v-model="species" type="radio" value="Cão" required />
+                            </label>
                         </div>
-                        <div class="patudo-animal-info">
-                            <p class="fw-semibold mb-0">{{ animal.name }}</p>
-                            <small class="text-muted">
-                                {{ animal.species }} {{ animal.breed ? '• ' + animal.breed : '' }}
-                            </small>
-                        </div>
-                        <div class="patudo-add-icon">
-                            <Plus :size="20" class="text-primary" />
+                        <div class="col-6">
+                            <label
+                                class="species-option"
+                                :class="{ 'species-option--selected': species === 'Gato' }"
+                            >
+                                <span>Gato</span>
+                                <input v-model="species" type="radio" value="Gato" required />
+                            </label>
                         </div>
                     </div>
-                </div>
-            </div>
+                    <InputError :message="errors.species?.[0]" />
+                </fieldset>
 
-            <!-- Rodapé -->
-            <div class="patudo-modal-footer">
-                <span class="patudo-footer-note">
-                    {{ availableAnimals.length }} animais disponíveis
-                </span>
-                <button
-                    type="button"
-                    class="btn-patudo-outline-pill"
-                    @click="handleClose"
-                >
-                    Fechar
-                </button>
-            </div>
-        </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-7">
+                        <label for="reservation-pet-breed" class="field-label">Raça</label>
+                        <input
+                            id="reservation-pet-breed"
+                            v-model="breed"
+                            class="pet-control"
+                            :class="{ 'is-invalid': errors.breed }"
+                            maxlength="255"
+                            required
+                        />
+                        <InputError :message="errors.breed?.[0]" />
+                    </div>
+                    <div class="col-5">
+                        <label for="reservation-pet-age" class="field-label">Idade (anos)</label>
+                        <input
+                            id="reservation-pet-age"
+                            v-model="age"
+                            type="number"
+                            min="0"
+                            max="99"
+                            class="pet-control"
+                            :class="{ 'is-invalid': errors.age }"
+                            required
+                        />
+                        <InputError :message="errors.age?.[0]" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="reservation-pet-notes" class="field-label">
+                        Notas para o cuidador <span class="fw-normal">(opcional)</span>
+                    </label>
+                    <textarea
+                        id="reservation-pet-notes"
+                        v-model="notes"
+                        rows="2"
+                        maxlength="1000"
+                        class="pet-control pet-textarea"
+                        :class="{ 'is-invalid': errors.special_needs }"
+                        placeholder="Alergias, medicação, hábitos..."
+                    />
+                    <InputError :message="errors.special_needs?.[0]" />
+                </div>
+
+                <footer class="d-flex justify-content-end gap-2">
+                    <button
+                        type="button"
+                        class="btn-cancel-pill"
+                        :disabled="submitting"
+                        @click="close"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        type="submit"
+                        class="btn-save-pill"
+                    >
+                        {{ submitting ? 'A guardar...' : 'Guardar animal' }}
+                    </button>
+                </footer>
+            </form>
+        </section>
     </div>
 </template>
 
 <style scoped>
-.patudo-modal-backdrop {
+.reservation-add-pet-backdrop {
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
     z-index: 10000000;
+    display: grid;
+    place-items: center;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.45);
 }
 
-.patudo-modal-card {
-    position: relative;
-    width: 100%;
-    max-width: 480px;
-    background-color: #fff8f1;
-    border: 1.5px solid #c4450c;
+.reservation-add-pet-card {
+    width: min(100%, 380px);
+    padding: 1.1rem 1rem;
+    background: #fffaf3;
+    border-radius: 22px;
+    box-shadow: 0 1rem 2.25rem rgba(0, 0, 0, 0.22);
+    color: #231209;
+}
+
+.modal-heading {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #231209;
+    margin-bottom: 0.7rem;
+}
+
+.panel-box {
+    background: #fed7aa;
+    border: 1.5px solid #c2410c;
     border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    max-height: 85vh;
-    display: flex;
-    flex-direction: column;
+    padding: 0.9rem;
 }
 
-/* Cabeçalho */
-.patudo-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.15rem 1.5rem;
-    border-bottom: 1.5px solid #c4450c;
-    flex-shrink: 0;
-}
-
-.patudo-header-left {
+.photo-row {
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
 
-.patudo-modal-title {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #231810;
-    margin: 0;
-}
-
-.patudo-close-btn {
-    background: transparent;
-    border: none;
-    color: #231810;
+.photo-circle {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
     cursor: pointer;
-    padding: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.15s ease;
+    display: grid;
+    place-items: center;
+    background: #f5d0a9;
 }
 
-.patudo-close-btn:hover {
-    opacity: 0.65;
-}
-
-/* Banners */
-.patudo-success-banner {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.55rem 1.5rem;
-    background-color: #dcfce7;
-    color: #166534;
-    font-size: 0.78rem;
-    font-weight: 600;
-    border-bottom: 1px solid #bbf7d0;
-}
-
-.patudo-error-banner {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.55rem 1.5rem;
-    background-color: #fee2e2;
-    color: #991b1b;
-    font-size: 0.78rem;
-    font-weight: 600;
-    border-bottom: 1px solid #fecaca;
-}
-
-/* Corpo */
-.patudo-modal-body {
-    padding: 1.15rem 1.5rem;
-    overflow-y: auto;
-    flex: 1;
-}
-
-/* Pesquisa */
-.patudo-search-input {
+.photo-circle img,
+.dog-illustration {
     width: 100%;
-    padding: 0.6rem 1rem;
-    border: 1.2px solid #d4a574;
-    border-radius: 9999px;
-    background-color: #ffffff;
-    color: #231810;
+    height: 100%;
+    object-fit: cover;
+}
+
+.add-photo-btn {
+    background: #ffffff;
+    color: var(--patudo-castanhoDark);
+    border: 1.5px solid #c2410c;
+    border-radius: 9px;
+    padding: 0.35rem 1rem;
     font-size: 0.85rem;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.field-label {
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #231209;
+    margin-bottom: 0.25rem;
+}
+
+.pet-control {
+    width: 100%;
+    background: #ffffff;
+    border: 1.5px solid #c2410c;
+    border-radius: 9px;
+    padding: 0.38rem 0.65rem;
+    font-size: 0.88rem;
+    color: #231209;
+}
+
+.pet-control:focus {
     outline: none;
-    transition: border-color 0.15s ease;
+    box-shadow: 0 0 0 2px rgba(194, 65, 12, 0.22);
 }
 
-.patudo-search-input:focus {
-    border-color: #c4450c;
+.pet-textarea {
+    resize: vertical;
+    min-height: 58px;
 }
 
-.patudo-search-input::placeholder {
-    color: #a8846a;
-}
-
-/* Loading & Empty */
-.patudo-loading-state,
-.patudo-empty-state {
+.species-option {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    padding: 2rem 0;
-    gap: 0.5rem;
+    width: 100%;
+    background: #ffffff;
+    border: 1.5px solid #c2410c;
+    border-radius: 9px;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #231209;
+    cursor: pointer;
 }
 
-.patudo-spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid #e5d5c5;
-    border-top-color: #c4450c;
-    border-radius: 50%;
-    animation: patudo-spin 0.6s linear infinite;
+.species-option--selected {
+    background: #e5e5e5;
 }
 
-@keyframes patudo-spin {
-    to { transform: rotate(360deg); }
-}
-
-.patudo-empty-text {
-    font-size: 0.85rem;
-    color: #6e5239;
-    font-weight: 600;
+.species-option input[type='radio'] {
+    accent-color: #18181b;
+    width: 15px;
+    height: 15px;
     margin: 0;
 }
 
-/* Lista de animais */
-.patudo-animal-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.patudo-animal-option {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    background-color: #ffffff;
-    border: 1.2px solid #e5d5c5;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.patudo-animal-option:hover {
-    border-color: #c4450c;
-    box-shadow: 0 2px 8px rgba(196, 69, 12, 0.1);
-}
-
-.patudo-animal-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background-color: #fffaf3;
-    flex-shrink: 0;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.patudo-animal-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.patudo-add-icon {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-/* Rodapé */
-.patudo-modal-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.85rem 1.5rem;
-    border-top: 1.5px solid #c4450c;
-    flex-shrink: 0;
-}
-
-.patudo-footer-note {
-    font-size: 0.72rem;
-    color: #6e5239;
-    font-weight: 600;
-}
-
-.btn-patudo-outline-pill {
-    background-color: #ffffff;
-    color: var(--patudo-terracota, #c4450c);
-    border: 1.3px solid var(--patudo-terracota, #c4450c);
-    border-radius: 9999px;
-    padding: 0.38rem 1.15rem;
-    font-size: 0.8rem;
+.btn-cancel-pill {
+    background: #ffffff;
+    color: var(--patudo-terracota);
+    border: 1.5px solid var(--patudo-terracota, #c2410c);
+    border-radius: 14px;
+    padding: 0.38rem 1.1rem;
+    font-size: 0.86rem;
     font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.15s ease;
 }
 
-.btn-patudo-outline-pill:hover {
-    background-color: #fdf2ea;
+.btn-save-pill {
+    background: #c2410c;
+    color: #ffffff;
+    border: 1.5px solid #c2410c;
+    border-radius: 14px;
+    padding: 0.38rem 1.15rem;
+    font-size: 0.86rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-save-pill:hover:not(:disabled) {
+    background: var(--patudo-laranjaVivo);
+    border-color: var(--patudo-laranjaVivo);
+}
+
+.btn-save-pill:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
 }
 </style>

@@ -105,6 +105,16 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
         );
     }
 
+    public function favouritePosts()
+    {
+        return $this->belongsToMany(
+            Post::class,
+            'post_favourites',
+            'user_id',
+            'post_id'
+        );
+    }
+
     public function createdTickets()
     {
         return $this->hasMany(SupportTicket::class, 'user_id');

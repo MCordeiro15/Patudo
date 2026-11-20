@@ -779,7 +779,7 @@ const saveAvailability = async () => {
                                             </button>
                                             <button
                                                 type="button"
-                                                class="btn btn-outline-secondary btn-sm rounded-pill"
+                                                class="btn btn-outline-danger btn-sm rounded-pill"
                                                 :disabled="saving"
                                                 @click="cancelEditing"
                                             >

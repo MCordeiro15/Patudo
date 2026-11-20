@@ -6,8 +6,10 @@ import logoPatudo from '@/../../assets/logoPatudo.svg';
 import type { Animal } from '@/types';
 import { useNotifications } from '@/composables/useNotifications';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
+import BookingList from '@/components/BookingList.vue';
 
-// O id da reserva vem do URL: /reservation-notification?booking=ID
+// /reservations          -> lista das reservas não pendentes (BookingList)
+// /reservations?booking=ID -> detalhe de uma reserva (abaixo)
 const bookingId = new URLSearchParams(window.location.search).get('booking');
 
 function getXsrf(): string {
@@ -202,8 +204,8 @@ onMounted(() => {
                 </div>
             </nav>
 
-            <!-- Botão de voltar -->
-            <div class="mt-4">
+            <!-- Botão de voltar (só no detalhe de uma reserva) -->
+            <div v-if="bookingId" class="mt-4">
                 <a
                     href="/reservations"
                     class="btn btn-outline-secondary rounded-pill d-inline-flex align-items-center gap-2"
@@ -213,7 +215,10 @@ onMounted(() => {
                 </a>
             </div>
 
-            <h1 class="text-center fw-bold display-5 mt-3 mb-4">Notificação de Reserva</h1>
+            <h1 class="text-center fw-bold display-5 mt-3 mb-4">{{ bookingId ? 'Notificação de Reserva' : 'As minhas reservas' }}</h1>
+
+            <!-- Sem ?booking no URL: lista das reservas não pendentes -->
+            <BookingList v-if="!bookingId" :pending="false" />
 
             <!-- Feedback -->
             <div v-if="feedback" class="alert py-2 small" :class="feedback.includes('sucesso') ? 'alert-success' : 'alert-danger'" role="alert">

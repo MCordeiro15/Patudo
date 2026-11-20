@@ -12,6 +12,7 @@ use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\SupportTicketsController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\PetsitterServiceController;
+use App\Http\Controllers\API\PostFavouriteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -72,11 +73,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/petsitters/{petsitter}/availability/{date}', [PetsitterAvailabilityController::class, 'destroy']);
     Route::post('/petsitters/{petsitter}/approve', [PetsitterController::class, 'approve']);
     Route::post('/petsitters/{petsitter}/reject', [PetsitterController::class, 'reject']);
+    // documento de identificação (disco privado): só o admin o pode abrir
+    Route::get('/petsitters/{petsitter}/identification-document', [PetsitterController::class, 'identificationDocument']);
     Route::apiResource('petsitters', PetsitterController::class);
 
     // Posts
     Route::get('/petsitters/{petsitter}/posts', [PostController::class, 'byPetsitter']);
     Route::apiResource('posts', PostController::class);
+
+    // Post Favourites
+    Route::get('/post-favourites', [PostFavouriteController::class, 'index']);
+    Route::post('/posts/{post}/favourite', [PostFavouriteController::class, 'store']);
+    Route::delete('/posts/{post}/favourite', [PostFavouriteController::class, 'destroy']);
 
     // Animals
     Route::apiResource('animals', AnimalController::class);

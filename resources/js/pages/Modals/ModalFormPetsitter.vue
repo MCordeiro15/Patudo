@@ -1,4 +1,4 @@
-<<script setup lang="ts">
+<script setup lang="ts">
 import { ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 
@@ -19,7 +19,6 @@ const service = ref('');
 const age = ref('');
 const location = ref('');
 const postcode = ref('');
-const availability = ref('');
 const sizes = ref<string[]>([]);
 const animalType = ref('');
 const price = ref('');
@@ -31,10 +30,11 @@ const errors = ref<FormErrors>({});
 const isLoading = ref(false);
 const generalError = ref('');
 
+// value = o que o back-end guarda (inglês), label = o que o utilizador vê (português)
 const sexOptions = [
-    { value: 'masculino', label: 'Masculino' },
-    { value: 'feminino', label: 'Feminino' },
-    { value: 'outro', label: 'Outro' },
+    { value: 'male', label: 'Masculino' },
+    { value: 'female', label: 'Feminino' },
+    { value: 'other', label: 'Outro' },
 ];
 
 const serviceOptions = [
@@ -43,16 +43,40 @@ const serviceOptions = [
 ];
 
 const sizeOptions = [
-    { value: 'pequeno', label: 'Porte Pequeno' },
-    { value: 'medio', label: 'Porte Médio' },
-    { value: 'grande', label: 'Porte Grande' },
+    { value: 'small', label: 'Porte Pequeno' },
+    { value: 'medium', label: 'Porte Médio' },
+    { value: 'large', label: 'Porte Grande' },
 ];
 
+// mesmos valores que o ModalEditPetsitterProfile usa
 const animalOptions = [
-    { value: 'cao', label: 'Cão' },
-    { value: 'gato', label: 'Gato' },
-    { value: 'ave', label: 'Ave' },
+    { value: 'dog', label: 'Cão' },
+    { value: 'cat', label: 'Gato' },
+    { value: 'other', label: 'Outro' },
 ];
+
+// nome do campo no back-end -> nome do campo neste formulário (para mostrar o erro no sítio certo)
+const errorFieldMap: Record<string, string> = {
+    service_location: 'location',
+    postal_code: 'postcode',
+    accepted_sizes: 'sizes',
+    accepted_animal_types: 'animal_type',
+    price_per_day: 'price_per_hour',
+    experience: 'about',
+    identification_documents: 'identity_document',
+};
+
+const mapBackendErrors = (backendErrors: FormErrors): FormErrors => {
+    const mapped: FormErrors = {};
+
+    for (const [key, messages] of Object.entries(backendErrors)) {
+        // accepted_sizes.0 -> accepted_sizes
+        const baseKey = key.split('.')[0];
+        mapped[errorFieldMap[baseKey] ?? baseKey] ??= messages;
+    }
+
+    return mapped;
+};
 
 const priceOptions = [
     { value: '5', label: '5 €' },
@@ -99,7 +123,6 @@ const resetForm = () => {
     age.value = '';
     location.value = '';
     postcode.value = '';
-    availability.value = '';
     sizes.value = [];
     animalType.value = '';
     price.value = '';
@@ -147,19 +170,19 @@ const submit = async () => {
             ?.split('=')[1];
 
         // multipart por causa do ficheiro (sem Content-Type: o browser define-o)
+        // nomes dos campos como o back-end os valida (PetsitterController@store)
         const body = new FormData();
         body.append('name', name.value.trim());
-        body.append('sex', sex.value);
+        if (sex.value) body.append('sex', sex.value);
         body.append('service', service.value);
         body.append('age', age.value);
-        body.append('location', location.value.trim());
-        body.append('postcode', postcode.value.trim());
-        body.append('availability', availability.value);
-        sizes.value.forEach((s) => body.append('sizes[]', s));
-        body.append('animal_type', animalType.value);
-        body.append('price_per_hour', price.value);
-        body.append('about', about.value.trim());
-        body.append('identity_document', documentFile.value as File);
+        body.append('service_location', location.value.trim());
+        body.append('postal_code', postcode.value.trim());
+        sizes.value.forEach((s) => body.append('accepted_sizes[]', s));
+        body.append('accepted_animal_types[]', animalType.value);
+        body.append('price_per_day', price.value);
+        body.append('experience', about.value.trim());
+        body.append('identification_documents', documentFile.value as File);
 
         const response = await fetch('/api/petsitters', {
             method: 'POST',
@@ -179,7 +202,7 @@ const submit = async () => {
             const errorData = await response.json().catch(() => ({}));
 
             if (errorData.errors) {
-                errors.value = errorData.errors;
+                errors.value = mapBackendErrors(errorData.errors);
             } else {
                 generalError.value =
                     errorData.message ?? 'Erro ao submeter candidatura.';
@@ -366,7 +389,8 @@ const submit = async () => {
                     </div>
 
                     <div class="row g-2 mb-3">
-                        <div class="col-12 col-md-4">
+                        <!-- 8 + 4 colunas, como as linhas de cima (Nome/Sexo e Serviço/Idade) -->
+                        <div class="col-12 col-md-8">
                             <label
                                 for="petsitter-location"
                                 class="form-label fw-bold small mb-1"
@@ -413,27 +437,6 @@ const submit = async () => {
                             />
 
                             <InputError :message="errors.postcode?.[0]" />
-                        </div>
-
-                        <div class="col-12 col-md-4">
-                            <label
-                                for="petsitter-availability"
-                                class="form-label fw-bold small mb-1"
-                            >
-                                Horário disponível *
-                            </label>
-
-                            <input
-                                id="petsitter-availability"
-                                v-model="availability"
-                                type="date"
-                                class="form-control patudo-field rounded-3"
-                                :class="{ 'is-invalid': errors.availability }"
-                                required
-                                aria-required="true"
-                            />
-
-                            <InputError :message="errors.availability?.[0]" />
                         </div>
                     </div>
 

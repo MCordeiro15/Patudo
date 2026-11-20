@@ -31,6 +31,17 @@ class BookingResource extends JsonResource
                 'name' => $this->service->type,
                 'price' => (float) $this->service->price,
             ] : null),
+            // nome e localidade de quem está na reserva, para as listas de Pedidos/Reservas
+            'owner' => $this->whenLoaded('user', fn () => $this->user ? [
+                'id' => $this->user->id,
+                'name' => $this->user->name,
+                'location' => $this->user->location,
+            ] : null),
+            'petsitter' => $this->whenLoaded('petsitter', fn () => $this->petsitter ? [
+                'id' => $this->petsitter->user_id,
+                'name' => $this->petsitter->user?->name,
+                'location' => $this->petsitter->service_location ?? $this->petsitter->city,
+            ] : null),
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'status' => $this->status,
@@ -39,6 +50,10 @@ class BookingResource extends JsonResource
             'animals' => AnimalResource::collection($this->whenLoaded('animals')),
             'review' => new ReviewResource($this->whenLoaded('review')),
             'created_at' => $this->created_at,
+            'message' => $this->message,
+            'zone' => $this->zone,
+            'entrance_hour' => $this->entrance_hour,
+            'exit_hour' => $this->exit_hour,
         ];
     }
 }
