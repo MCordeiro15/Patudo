@@ -39,15 +39,46 @@ Route::get('/profile-owner-view', fn () => Inertia::render('Petsitter/ProfileOwn
 
 Route::get('/profile', function () {
     $user = auth()->user();
-    if ($user->isPetsitter()) {
-        $petsitter = \App\Models\Petsitter::where('user_id', $user->id)->first();
-        if ($petsitter) {
-            return redirect()->route('petsitters.profile');
-        }
-    }
-    return Inertia::render('Owner/Profile');
-})->middleware('auth')->name('owner.profile');
-Route::inertia('/payment-confirmed', 'Payment/PaymentConfirmed')->middleware('auth')->name('payment.confirmed');
+    $petsitter = \App\Models\Petsitter::where('user_id', $user->id)->first();
 
-Route::inertia('/dev/modals', 'Modals/ModalTests');
+    // só vai para o perfil de petsitter depois de o admin aprovar
+    if ($petsitter && $petsitter->approval_status === 'approved') {
+        return redirect()->route('petsitters.profile');
+    }
+
+    return Inertia::render('Owner/Profile', [
+        // null (sem candidatura), 'pending' ou 'rejected' -> o perfil mostra o botão ou o estado
+        'petsitterApplicationStatus' => $petsitter?->approval_status,
+    ]);
+})->middleware('auth')->name('owner.profile');
+
+// Página de pedir reserva (dono). O petsitter vem no URL: /booking?petsitter=ID
+// Os dados são carregados pela página via API, que já valida tudo ao criar a reserva.
+Route::inertia('/booking', 'Owner/BookingPage')
+    ->middleware('auth')
+    ->name('bookings.create');
+
+// Página de reserva confirmada (dono). O id vem no URL: /booking-confirmed?booking=ID
+// Os dados são carregados pela página via /api/bookings/{id}, que já verifica permissões.
+Route::inertia('/booking-confirmed', 'Owner/BookingConfirmed')
+    ->middleware('auth')
+    ->name('bookings.confirmed');
+
+// Pedidos de reserva recebidos (petsitter): aceitar / recusar.
+// Os dados são carregados pela página via API, que já verifica permissões.
+Route::inertia('/orders', 'Petsitter/ReservationNotification')
+    ->middleware('auth')
+    ->name('bookings.orders');
+
+// Reservas feitas pelo utilizador (dono): estado, cancelar.
+Route::inertia('/reservations', 'Owner/ReservationNotificationToOwner')
+    ->middleware('auth')
+    ->name('bookings.reservations');
+
+// Pagamento confirmado (dono)
+Route::inertia('/payment-confirmed', 'Payment/PaymentConfirmed')
+    ->middleware('auth')
+    ->name('payment.confirmed');
+
+Route::inertia('/dev/modals', 'Modals/ModalTests')->name('dev.modals');
 require __DIR__ . '/settings.php';
