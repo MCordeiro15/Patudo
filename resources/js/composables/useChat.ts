@@ -209,7 +209,12 @@ export function useChat() {
             });
         });
 
-        return [...byOther.values()].sort((a, b) => {
+        // Só aparecem conversas com mensagens (e a que está aberta, mesmo vazia). Os contactos sem mensagens
+        // não aparecem: uma conversa nova começa no perfil do petsitter (/messages?with=ID).
+        // Only conversations with messages are shown (plus the open one, even if empty).
+        return [...byOther.values()]
+            .filter((item) => item.lastAt !== null || item.id === activeOtherId.value)
+            .sort((a, b) => {
             if (a.lastAt !== null && b.lastAt !== null) {
                 return b.lastAt - a.lastAt;
             }
@@ -266,6 +271,15 @@ export function useChat() {
         }
     }
 
+    // Pode abrir conversa com esta pessoa? Sim se for um contacto (dono -> petsitter) ou se já houver conversa.
+    // Can a conversation with this person be opened? Yes if they are a contact or a conversation already exists.
+    function canOpen(otherId: string): boolean {
+        return (
+            contacts.value.some((contact) => contact.id === otherId) ||
+            conversations.value.some((conversation) => otherIdFrom(conversation.id) === otherId)
+        );
+    }
+
     // ID da conversa aberta, para a caixa <t-chatbox>.
     // ID of the open conversation, for the <t-chatbox> box.
     const activeConversationId = computed<string | null>(() =>
@@ -293,5 +307,6 @@ export function useChat() {
         error,
         start,
         openConversation,
+        canOpen,
     };
 }

@@ -27,6 +27,7 @@ const {
     error,
     start,
     openConversation,
+    canOpen,
 } = useChat();
 
 function initial(name: string): string {
@@ -51,7 +52,8 @@ onMounted(async () => {
     // /messages?with=ID opens the conversation with that person straight away.
     const withId = new URLSearchParams(window.location.search).get('with');
 
-    if (withId && items.value.some((item) => item.id === withId)) {
+    // a lista só mostra conversas com mensagens, por isso verifica-se nos contactos/conversas
+    if (withId && canOpen(withId)) {
         await openConversation(withId);
     }
 });
