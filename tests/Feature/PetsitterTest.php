@@ -41,6 +41,35 @@ test('admin user sees all petsitters regardless of approval status', function ()
         ->assertJsonFragment(['user_id' => $pendingPetsitter->user_id]);
 });
 
+test('admin can filter petsitters by approval status', function () {
+    $admin = User::factory()->admin()->create();
+
+    Petsitter::factory()->approved()->create();
+    $pendingPetsitter = Petsitter::factory()->create(['approval_status' => 'pending']);
+
+    $this->actingAs($admin)->getJson('/api/petsitters?approval_status=pending')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonFragment(['user_id' => $pendingPetsitter->user_id]);
+});
+
+test('regular user cannot use the approval status filter', function () {
+    $user = User::factory()->create();
+
+    Petsitter::factory()->approved()->create();
+    Petsitter::factory()->create(['approval_status' => 'pending']);
+
+    $this->actingAs($user)->getJson('/api/petsitters?approval_status=pending')
+        ->assertOk()
+        ->assertJsonCount(1, 'data');
+});
+
+test('pending petsitters page is only accessible to admins', function () {
+    $this->get('/admin/petsitters/pending')->assertRedirect();
+    $this->actingAs(User::factory()->create())->get('/admin/petsitters/pending')->assertForbidden();
+    $this->actingAs(User::factory()->admin()->create())->get('/admin/petsitters/pending')->assertOk();
+});
+
 test('authenticated user can register as a petsitter', function () {
     $user = User::factory()->create();
 

@@ -81,6 +81,10 @@ Route::inertia('/reservations', 'Owner/ReservationNotificationToOwner')
     ->middleware('auth')
     ->name('bookings.reservations');
 
+Route::inertia('/admin/petsitters/pending', 'Admin/PendingPetsitters')
+    ->middleware(['auth', 'can:admin'])
+    ->name('admin.petsitters.pending');
+
 // Pagamento confirmado (dono)
 Route::inertia('/payment-confirmed', 'Payment/PaymentConfirmed')
     ->middleware('auth')
