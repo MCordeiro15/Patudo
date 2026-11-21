@@ -22,6 +22,8 @@ const props = withDefaults(defineProps<{
     serverErrors?: {
         star_rating?: string;
         comment?: string;
+        // erro geral do servidor (403, 409 ou de ligação)
+        general?: string;
     };
 }>(), {
     closeOnSubmit: true,
@@ -221,8 +223,9 @@ const handleSubmit = () => {
                                 {{ currentRatingLabel }}
                             </span>
                         </div>
-                        <p v-if="serverErrors?.star_rating" class="patudo-error-text mt-1 mb-0">
-                            {{ serverErrors.star_rating }}
+                        <!-- aviso local (sem estrelas) ou erro de validação do servidor -->
+                        <p v-if="errorMessage || serverErrors?.star_rating" class="patudo-error-text mt-1 mb-0">
+                            {{ errorMessage || serverErrors?.star_rating }}
                         </p>
                     </div>
 
@@ -288,6 +291,11 @@ const handleSubmit = () => {
                             <span class="patudo-char-counter">{{ comment.length }}/500</span>
                         </div>
                     </div>
+
+                    <!-- Erro geral do servidor (ex.: "Esta reserva já foi avaliada.") -->
+                    <p v-if="serverErrors?.general" class="patudo-error-text mb-2">
+                        {{ serverErrors.general }}
+                    </p>
 
                     <!-- Rodapé com linha divisória a toda a largura -->
                     <div class="patudo-modal-footer">

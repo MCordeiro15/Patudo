@@ -52,6 +52,7 @@ const selectedBooking = ref<BookingItem | null>(null);
 const reviewErrors = ref<{
     star_rating?: string;
     comment?: string;
+    general?: string;
 }>({});
 
 function getXsrf(): string {
@@ -218,7 +219,13 @@ const submitBookingReview = async (payload: ReviewPayload) => {
                 return;
             }
 
-            console.error('Laravel error:', data);
+            // 403 / 409: mostra a mensagem do servidor (ex.: "Esta reserva já foi avaliada.")
+            reviewErrors.value = {
+                general: data.message ?? 'Não foi possível enviar a avaliação.',
+            };
+
+            // se já estava avaliada, atualiza a lista para o botão "Avaliar" desaparecer
+            if (res.status === 409) await loadBookings();
             return;
         }
 
@@ -227,8 +234,8 @@ const submitBookingReview = async (payload: ReviewPayload) => {
 
         await loadBookings();
 
-    } catch (error) {
-        console.error('Error submitting review:', error);
+    } catch {
+        reviewErrors.value = { general: 'Erro de ligação. Tenta novamente.' };
     }
 };
 
