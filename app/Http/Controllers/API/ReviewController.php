@@ -37,7 +37,7 @@ class ReviewController extends Controller
 
         $data = $request->validate([
             'star_rating' => 'required|integer|between:1,5',
-            'comment' => 'nullable|string|max:2000',
+            'comment' => 'nullable|string|max:500',
         ]);
 
         // o petsitter_id vem da reserva, não do pedido
@@ -67,7 +67,7 @@ class ReviewController extends Controller
 
         $data = $request->validate([
             'star_rating' => 'sometimes|required|integer|between:1,5',
-            'comment' => 'nullable|string|max:2000',
+            'comment' => 'nullable|string|max:500',
         ]);
 
         $review->update($data);

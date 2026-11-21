@@ -15,10 +15,17 @@ export interface ReviewPayload {
     comment: string;
 }
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
     show: boolean;
     petsitter?: ReviewPetsitterInfo;
-}>();
+    closeOnSubmit?: boolean;
+    serverErrors?: {
+        star_rating?: string;
+        comment?: string;
+    };
+}>(), {
+    closeOnSubmit: true,
+});
 
 const emit = defineEmits<{
     (e: 'close'): void;
@@ -94,7 +101,10 @@ const handleSubmit = () => {
         comment: comment.value.trim(),
     });
     isLoading.value = false;
-    emit('close');
+
+    if (props.closeOnSubmit) {
+        emit('close');
+    }
 };
 </script>
 
@@ -211,8 +221,8 @@ const handleSubmit = () => {
                                 {{ currentRatingLabel }}
                             </span>
                         </div>
-                        <p v-if="errorMessage" class="patudo-error-text mt-1 mb-0">
-                            {{ errorMessage }}
+                        <p v-if="serverErrors?.star_rating" class="patudo-error-text mt-1 mb-0">
+                            {{ serverErrors.star_rating }}
                         </p>
                     </div>
 
@@ -271,6 +281,9 @@ const handleSubmit = () => {
                             class="patudo-textarea"
                             placeholder="A tua experiência com o serviço do Petsitter, por exemplo"
                         ></textarea>
+                        <p v-if="serverErrors?.comment" class="patudo-error-text mt-1 mb-0">
+                            {{ serverErrors.comment }}
+                        </p>
                         <div class="text-end">
                             <span class="patudo-char-counter">{{ comment.length }}/500</span>
                         </div>

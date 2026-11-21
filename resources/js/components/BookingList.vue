@@ -5,6 +5,9 @@
 import { usePage } from '@inertiajs/vue3';
 import { computed, onMounted, ref } from 'vue';
 import type { Animal } from '@/types';
+import ModalReviewPetsitter, {
+    type ReviewPayload
+} from '@/pages/Modals/ModalReviewPetsitter.vue';
 
 const props = defineProps<{
     pending: boolean;
@@ -23,6 +26,11 @@ type BookingItem = {
     end_date: string;
     status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'completed';
     total_price: number;
+    review: {
+        id: number;
+        star_rating: number;
+        comment: string | null;
+    } | null;
     animals: Animal[];
 };
 
@@ -39,6 +47,12 @@ const feedbackType = ref<'success' | 'danger'>('success');
 const currentPage = ref(1);
 const lastPage = ref(1);
 const updatingId = ref<number | null>(null);
+const showReviewModal = ref(false);
+const selectedBooking = ref<BookingItem | null>(null);
+const reviewErrors = ref<{
+    star_rating?: string;
+    comment?: string;
+}>({});
 
 function getXsrf(): string {
     const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
@@ -82,6 +96,7 @@ const speciesLabels: Record<string, string> = { dog: 'Cão', cat: 'Gato', other:
 const sizeLabels: Record<string, string> = { small: 'Pequeno', medium: 'Médio', large: 'Grande' };
 
 const isPetsitterOf = (b: BookingItem) => b.petsitter_id === currentUserId.value;
+const isOwnerOf = (b: BookingItem) => b.user_id === currentUserId.value;
 
 // Mostra sempre a outra pessoa da reserva
 const otherPerson = (b: BookingItem) => (isPetsitterOf(b) ? b.owner : b.petsitter);
@@ -168,6 +183,52 @@ const updateStatus = async (b: BookingItem, newStatus: NewStatus) => {
         feedback.value = 'Erro de conexão. Tente novamente.';
     } finally {
         updatingId.value = null;
+    }
+};
+
+const openReviewModal = (b: BookingItem) => {
+    reviewErrors.value = {};
+    selectedBooking.value = b;
+    showReviewModal.value = true;
+};
+
+const submitBookingReview = async (payload: ReviewPayload) => {
+    if (!selectedBooking.value) return;
+
+    try {
+        const res = await apiFetch(
+            `/api/bookings/${selectedBooking.value.id}/review`,
+            {
+                method: 'POST',
+                body: JSON.stringify({
+                    star_rating: payload.rating,
+                    comment: payload.comment || null,
+                }),
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            if (res.status === 422) {
+                reviewErrors.value = {
+                    star_rating: data.errors?.star_rating?.[0],
+                    comment: data.errors?.comment?.[0],
+                };
+                return;
+            }
+
+            console.error('Laravel error:', data);
+            return;
+        }
+
+        showReviewModal.value = false;
+        selectedBooking.value = null;
+
+        await loadBookings();
+
+    } catch (error) {
+        console.error('Error submitting review:', error);
     }
 };
 
@@ -286,6 +347,15 @@ onMounted(() => {
                                     Cancelar
                                 </button>
                             </template>
+                            <!-- Dono: avaliar uma reserva concluída sem review -->
+                            <button
+                                v-if="isOwnerOf(b) && b.status === 'completed' && !b.review"
+                                type="button"
+                                class="btn btn-outline-primary btn-sm rounded-pill px-3"
+                                @click="openReviewModal(b)"
+                            >
+                                Avaliar
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -302,6 +372,20 @@ onMounted(() => {
                 </button>
             </div>
         </template>
+
+        <ModalReviewPetsitter
+            :show="showReviewModal"
+            :close-on-submit="false"
+            :petsitter="{
+                id: selectedBooking?.petsitter_id,
+                name: selectedBooking?.petsitter?.name ?? 'Petsitter',
+                avatar_url: null,
+                service_summary: selectedBooking?.service?.name ?? 'Reserva'
+            }"
+            @submit="submitBookingReview"
+            @close="showReviewModal = false"
+            :server-errors="reviewErrors"
+        />
     </div>
 </template>
 
