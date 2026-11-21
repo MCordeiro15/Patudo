@@ -212,6 +212,7 @@ onMounted(async () => {
     padding: 1.25rem 1rem 1rem;
     border: 1px solid var(--bs-primary);
     border-radius: 1.75rem;
+    background-color: white;
 }
 
 .chat-title {
@@ -352,7 +353,7 @@ onMounted(async () => {
     border: 0;
 
     --t-color-brand-primary: var(--bs-primary);
-    --t-color-bg: var(--patudo-branco);
+    
     --t-color-border: var(--bs-primary);
     --t-radius-md: 0.75rem;
     --t-font-family: inherit;
@@ -438,6 +439,32 @@ onMounted(async () => {
     width: 2.6rem;
     height: 2.6rem;
     border-radius: 50%;
+}
+
+.chat-box :deep(.t-theme-message-action-menu) {
+    min-width: 180px;
+    padding: 0.35rem;
+    background: #fff;
+    border: 1px solid var(--patudo-terracota);
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
+}
+
+.chat-box :deep(.t-theme-message-action-menu .t-menu-item) {
+    color: var(--patudo-castanhoDark);
+    border-radius: 0.5rem;
+}
+
+.chat-box :deep(.t-theme-message-action-menu .t-menu-item-icon-box) {
+    color: var(--patudo-castanhoDark);
+    background: #fff;
+    border: 1px solid var(--patudo-terracota);
+    border-radius: 0.5rem;
+}
+
+.chat-box :deep(.t-theme-message-action-menu .t-menu-item:hover),
+.chat-box :deep(.t-theme-message-action-menu .t-menu-item:focus) {
+    background: var(--patudo-bege);
 }
 
 @media (max-width: 991px) {
