@@ -349,11 +349,13 @@ onMounted(async () => {
     width: 100%;
     min-height: 0;
     overflow: hidden;
+    background-color: white;
     /* o TalkJS põe uma moldura à volta da caixa; o mockup não tem */
     border: 0;
 
     --t-color-brand-primary: var(--bs-primary);
-    
+    --t-color-bg: var(--patudo-branco);
+    --t-color-text: var(--patudo-castanhoDark);
     --t-color-border: var(--bs-primary);
     --t-radius-md: 0.75rem;
     --t-font-family: inherit;
@@ -384,6 +386,7 @@ onMounted(async () => {
     border: 1px solid var(--patudo-terracota);
     border-radius: 0.5rem;
     font-size: 1rem;
+    
 }
 
 .chat-box :deep(.t-theme-message > .t-avatar-wrapper > .t-theme-avatar) {
@@ -411,6 +414,7 @@ onMounted(async () => {
 /* campo de escrever: sem linha por cima, caixa arredondada e botões redondos */
 .chat-box :deep(.t-theme-message-field .t-wrapper) {
     border-top: 0;
+    background-color: white;
 }
 
 .chat-box :deep(.t-theme-message-field .t-editor) {
@@ -465,6 +469,17 @@ onMounted(async () => {
 .chat-box :deep(.t-theme-message-action-menu .t-menu-item:hover),
 .chat-box :deep(.t-theme-message-action-menu .t-menu-item:focus) {
     background: var(--patudo-bege);
+}
+
+.chat-box :deep(.t-theme-message-action-menu .t-menu-item:hover .t-menu-item-icon-box),
+.chat-box :deep(.t-theme-message-action-menu .t-menu-item:focus .t-menu-item-icon-box) {
+    background: #fff;
+    border-color: var(--patudo-terracota);
+}
+
+.chat-box :deep(.t-theme-message-action-menu .t-menu-item:hover .t-menu-item-icon),
+.chat-box :deep(.t-theme-message-action-menu .t-menu-item:focus .t-menu-item-icon) {
+    color: var(--patudo-castanhoDark);
 }
 
 @media (max-width: 991px) {
