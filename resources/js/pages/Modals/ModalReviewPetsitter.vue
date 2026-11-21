@@ -15,10 +15,19 @@ export interface ReviewPayload {
     comment: string;
 }
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
     show: boolean;
     petsitter?: ReviewPetsitterInfo;
-}>();
+    closeOnSubmit?: boolean;
+    serverErrors?: {
+        star_rating?: string;
+        comment?: string;
+        // erro geral do servidor (403, 409 ou de ligação)
+        general?: string;
+    };
+}>(), {
+    closeOnSubmit: true,
+});
 
 const emit = defineEmits<{
     (e: 'close'): void;
@@ -94,7 +103,10 @@ const handleSubmit = () => {
         comment: comment.value.trim(),
     });
     isLoading.value = false;
-    emit('close');
+
+    if (props.closeOnSubmit) {
+        emit('close');
+    }
 };
 </script>
 
@@ -211,8 +223,9 @@ const handleSubmit = () => {
                                 {{ currentRatingLabel }}
                             </span>
                         </div>
-                        <p v-if="errorMessage" class="patudo-error-text mt-1 mb-0">
-                            {{ errorMessage }}
+                        <!-- aviso local (sem estrelas) ou erro de validação do servidor -->
+                        <p v-if="errorMessage || serverErrors?.star_rating" class="patudo-error-text mt-1 mb-0">
+                            {{ errorMessage || serverErrors?.star_rating }}
                         </p>
                     </div>
 
@@ -271,10 +284,18 @@ const handleSubmit = () => {
                             class="patudo-textarea"
                             placeholder="A tua experiência com o serviço do Petsitter, por exemplo"
                         ></textarea>
+                        <p v-if="serverErrors?.comment" class="patudo-error-text mt-1 mb-0">
+                            {{ serverErrors.comment }}
+                        </p>
                         <div class="text-end">
                             <span class="patudo-char-counter">{{ comment.length }}/500</span>
                         </div>
                     </div>
+
+                    <!-- Erro geral do servidor (ex.: "Esta reserva já foi avaliada.") -->
+                    <p v-if="serverErrors?.general" class="patudo-error-text mb-2">
+                        {{ serverErrors.general }}
+                    </p>
 
                     <!-- Rodapé com linha divisória a toda a largura -->
                     <div class="patudo-modal-footer">
