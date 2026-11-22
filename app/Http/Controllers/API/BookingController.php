@@ -11,11 +11,14 @@ use App\Http\Resources\BookingResource;
 use App\Models\Booking;
 use App\Models\Petsitter;
 use App\Models\PetsitterService;
+use App\Models\User;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class BookingController extends Controller
 {
@@ -85,7 +88,7 @@ class BookingController extends Controller
             'animal_ids' => 'required|array|min:1',
             // cada animal tem de existir E ser do utilizador autenticado
             'animal_ids.*' => ['integer', 'distinct', Rule::exists('animals', 'id')->where('user_id', $user->id)],
-            'message' => ['nullable', 'string', 'max:1000'],
+            'message' => ['nullable', 'string', 'max:500'],
             'zone' => ['nullable', 'string', 'max:255'],
             'entrance_hour' => ['nullable', 'date_format:H:i'],
             'exit_hour' => ['nullable', 'date_format:H:i'],
@@ -110,11 +113,31 @@ class BookingController extends Controller
         $petsitter = Petsitter::findOrFail($data['petsitter_id']);
         $service = PetsitterService::findOrFail($data['service_id']);
 
+        // o petsitter tem de trabalhar em todos os dias da semana do período
+        $missingDays = $this->unavailableWeekdays($petsitter, $data['start_date'], $data['end_date']);
+
+        if ($missingDays) {
+            throw ValidationException::withMessages([
+                'start_date' => 'O petsitter não está disponível à '.$this->joinWeekdays($missingDays).'.',
+            ]);
+        }
+
         // +1 porque os dois dias contam (1 a 3 dezembro = 3 dias)
         $days = (int) Carbon::parse($data['start_date'])->diffInDays(Carbon::parse($data['end_date'])) + 1;
+        $total = $service->price * $days;
 
-        // transaction: ou grava a reserva E os animais, ou não grava nada
-        $booking = DB::transaction(function () use ($data, $user, $petsitter, $service, $days) {
+        // transaction: ou paga E grava a reserva E os animais, ou não faz nada
+        $booking = DB::transaction(function () use ($data, $user, $petsitter, $service, $total) {
+            // pagamento fictício com o saldo: desconta só se chegar. É um único UPDATE, por isso
+            // dois pedidos ao mesmo tempo nunca deixam o saldo negativo.
+            $paid = User::whereKey($user->id)->where('credit', '>=', $total)->decrement('credit', $total);
+
+            if (! $paid) {
+                throw ValidationException::withMessages([
+                    'credit' => 'Saldo insuficiente para pagar esta reserva.',
+                ]);
+            }
+
             $booking = Booking::create([
                 'user_id' => $user->id,            // vem da sessão, não do pedido
                 'petsitter_id' => $petsitter->user_id,
@@ -122,7 +145,7 @@ class BookingController extends Controller
                 'start_date' => $data['start_date'],
                 'end_date' => $data['end_date'],
                 'status' => 'pending',             // sempre pending ao criar
-                'total_price' => $service->price * $days, // calculado no servidor, com o preço do serviço
+                'total_price' => $total, // calculado no servidor, com o preço do serviço
                 'message' => $data['message'] ?? null,
                 'zone' => $data['zone'] ?? null,
                 'entrance_hour' => $data['entrance_hour'] ?? null,
@@ -136,6 +159,51 @@ class BookingController extends Controller
         });
 
         return (new BookingResource($booking->load('animals', 'service')))->response()->setStatusCode(201);
+    }
+
+    /** Nomes dos dias da semana em português, pela chave guardada em availability_days. */
+    private const WEEKDAYS_PT = [
+        'monday' => 'segunda-feira',
+        'tuesday' => 'terça-feira',
+        'wednesday' => 'quarta-feira',
+        'thursday' => 'quinta-feira',
+        'friday' => 'sexta-feira',
+        'saturday' => 'sábado',
+        'sunday' => 'domingo',
+    ];
+
+    /**
+     * Dias da semana do período em que o petsitter não trabalha (vazio = disponível em todos).
+     * Basta ver os primeiros 7 dias: a partir daí os dias da semana repetem-se.
+     * Weekdays in the period the petsitter does not work (empty = available on all of them).
+     *
+     * @return list<string>
+     */
+    private function unavailableWeekdays(Petsitter $petsitter, string $start, string $end): array
+    {
+        $available = $petsitter->availability_days ?? [];
+        $first = Carbon::parse($start);
+        $last = $first->copy()->addDays(6)->min(Carbon::parse($end));
+        $missing = [];
+
+        foreach (CarbonPeriod::create($first, $last) as $day) {
+            $weekday = strtolower($day->englishDayOfWeek);
+
+            if (! in_array($weekday, $available, true) && ! in_array($weekday, $missing, true)) {
+                $missing[] = $weekday;
+            }
+        }
+
+        return $missing;
+    }
+
+    /** "segunda-feira", "segunda-feira e terça-feira", "segunda-feira, terça-feira e sábado" */
+    private function joinWeekdays(array $weekdays): string
+    {
+        $names = array_map(fn (string $day) => self::WEEKDAYS_PT[$day], $weekdays);
+        $last = array_pop($names);
+
+        return $names ? implode(', ', $names).' e '.$last : $last;
     }
 
     /**

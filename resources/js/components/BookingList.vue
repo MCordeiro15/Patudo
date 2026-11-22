@@ -139,12 +139,6 @@ const loadBookings = async (pageNumber = 1) => {
     }
 };
 
-const confirmMessages: Record<NewStatus, string> = {
-    approved: 'Aceitar este pedido de reserva?',
-    rejected: 'Recusar este pedido de reserva?',
-    cancelled: 'Cancelar esta reserva?',
-    completed: 'Marcar esta reserva como concluída?',
-};
 const successMessages: Record<NewStatus, string> = {
     approved: 'Pedido aceite.',
     rejected: 'Pedido recusado.',
@@ -153,8 +147,7 @@ const successMessages: Record<NewStatus, string> = {
 };
 
 const updateStatus = async (b: BookingItem, newStatus: NewStatus) => {
-    if (!confirm(confirmMessages[newStatus])) return;
-
+    // sem caixa de confirmação do browser: a ação acontece logo ao carregar no botão
     updatingId.value = b.id;
     feedback.value = '';
 
