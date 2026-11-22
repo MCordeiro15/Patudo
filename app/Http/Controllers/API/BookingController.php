@@ -45,7 +45,7 @@ class BookingController extends Controller
         $userId = $request->user()->id;
 
         return BookingResource::collection(
-            Booking::with('animals', 'service', 'user', 'petsitter.user')
+            Booking::with('animals', 'service', 'user', 'petsitter.user', 'review')
                 // o where com função agrupa o OR entre parênteses
                 ->where(fn ($q) => $q->where('user_id', $userId)->orWhere('petsitter_id', $userId))
                 ->when($request->has('pending'), fn ($q) => $request->boolean('pending')
