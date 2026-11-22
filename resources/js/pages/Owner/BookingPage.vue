@@ -35,12 +35,25 @@ const startDate = ref('');
 const endDate = ref('');
 const selectedAnimals = ref<number[]>([]);
 const notes = ref('');
+const selectedServiceId = ref<number | null>(null);
+const entranceHour = ref('');
+const exitHour = ref('');
+const zone = ref('');
 const feedback = ref('');
 const submitting = ref(false);
 
 // Dados carregados
 const animals = ref<Animal[]>([]);
 const loadError = ref('');
+const servicesError = ref('');
+
+type PetsitterServiceData = {
+    id: number;
+    type: 'pet-sitting' | 'passeio';
+    price: number;
+};
+
+const services = ref<PetsitterServiceData[]>([]);
 
 type PetsitterData = {
     id: number;
@@ -52,26 +65,71 @@ type PetsitterData = {
     avatar_url: string | null;
     average_rating: number | null;
     reviews_count: number;
+    availability_days: string[] | null;
 };
 
 const petsitter = ref<PetsitterData | null>(null);
 
 // Computed
 const displayName = computed(() => (petsitter.value ? (petsitter.value.user?.name ?? 'Petsitter') : 'Petsitter'));
+
 const displayLocation = computed(() => (petsitter.value ? (petsitter.value.service_location ?? petsitter.value.city ?? '--') : '--'));
-const displayPrice = computed(() => (petsitter.value ? (petsitter.value.price_per_day ?? 0) : 0));
+
+const selectedService = computed(() =>
+    services.value.find((service) => service.id === selectedServiceId.value) ?? null,
+);
+
+const selectedServicePrice = computed(() => selectedService.value?.price ?? 0);
+
+const selectedServiceLabel = computed(() => {
+    if (selectedService.value?.type === 'passeio') return 'Passeios';
+    if (selectedService.value?.type === 'pet-sitting') return 'Pet sitting';
+    return '—';
+});
+
+const selectedAnimalNames = computed(() => {
+    const names = animals.value
+        .filter((animal) => selectedAnimals.value.includes(animal.id))
+        .map((animal) => animal.name);
+
+    return names.length > 0 ? names.join(', ') : '—';
+});
+
+const availabilityText = computed(() => {
+    const dayLabels: Record<string, string> = {
+        monday: 'segunda-feira',
+        tuesday: 'terça-feira',
+        wednesday: 'quarta-feira',
+        thursday: 'quinta-feira',
+        friday: 'sexta-feira',
+        saturday: 'sábado',
+        sunday: 'domingo',
+    };
+
+    const days = (petsitter.value?.availability_days ?? [])
+        .map((day) => dayLabels[day])
+        .filter(Boolean);
+
+    return days.length > 0
+        ? `Disponibilidade do cuidador: ${days.join(', ')}.`
+        : 'O cuidador não indicou dias de disponibilidade.';
+});
+
 const numberOfDays = computed(() => {
     if (!startDate.value || !endDate.value) return 0;
+
     const start = new Date(startDate.value);
     const end = new Date(endDate.value);
+
     const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
     return diff > 0 ? diff : 0;
 });
 
-const totalPrice = computed(() => numberOfDays.value * displayPrice.value);
+const totalPrice = computed(() => numberOfDays.value * selectedServicePrice.value);
 
 const isFormValid = computed(() =>
-    Boolean(startDate.value && endDate.value && selectedAnimals.value.length > 0),
+    Boolean(selectedServiceId.value && startDate.value && endDate.value && selectedAnimals.value.length > 0),
 );
 
 // Data mínima para seleção (hoje)
@@ -80,15 +138,19 @@ const today = new Date().toISOString().split('T')[0];
 // Carregar dados
 const loadPetsitter = async () => {
     if (!petsitterId) return;
+
     const res = await apiFetch(`/api/petsitters/${petsitterId}`);
+
     if (res.ok) petsitter.value = (await res.json()).data;
     else feedback.value = 'Não foi possível carregar o petsitter.';
 };
 
 const loadAnimals = async () => {
     loadError.value = '';
+
     try {
         await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
+
         const response = await fetch('/api/animals', {
             credentials: 'same-origin',
             headers: {
@@ -96,6 +158,7 @@ const loadAnimals = async () => {
                 'X-Requested-With': 'XMLHttpRequest',
             },
         });
+
         if (response.ok) {
             const data = await response.json();
             animals.value = data.data ?? [];
@@ -107,9 +170,35 @@ const loadAnimals = async () => {
     }
 };
 
+const loadServices = async () => {
+    servicesError.value = '';
+
+    if (!petsitterId) return;
+
+    try {
+        const response = await fetch(`/api/petsitters/${petsitterId}/services`, {
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            services.value = data.data ?? [];
+        } else {
+            servicesError.value = 'Não foi possível carregar os serviços.';
+        }
+    } catch {
+        servicesError.value = 'Erro de conexão ao carregar os serviços.';
+    }
+};
+
 // Toggle seleção de animal
 const toggleAnimal = (id: number) => {
     const index = selectedAnimals.value.indexOf(id);
+
     if (index > -1) {
         selectedAnimals.value.splice(index, 1);
     } else {
@@ -122,6 +211,7 @@ const handleAnimalCreated = (animal: Animal) => {
     if (!animal?.id) return;
 
     const alreadyInList = animals.value.some((item) => item.id === animal.id);
+
     if (!alreadyInList) {
         animals.value.push(animal);
     }
@@ -136,19 +226,25 @@ const handleAnimalCreated = (animal: Animal) => {
 // Submeter reserva
 const submitBooking = async () => {
     if (!isFormValid.value || !petsitterId) return;
+
     submitting.value = true;
     feedback.value = '';
 
     try {
         await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
+
         const res = await apiFetch('/api/bookings', {
             method: 'POST',
             body: JSON.stringify({
                 petsitter_id: Number(petsitterId),
                 start_date: startDate.value,
                 end_date: endDate.value,
+                service_id: selectedServiceId.value,
                 animal_ids: selectedAnimals.value,
-                notes: notes.value.trim() || null,
+                message: notes.value.trim() || null,
+                zone: zone.value.trim() || null,
+                entrance_hour: entranceHour.value || null,
+                exit_hour: exitHour.value || null,
             }),
         });
 
@@ -158,8 +254,13 @@ const submitBooking = async () => {
             endDate.value = '';
             selectedAnimals.value = [];
             notes.value = '';
+            selectedServiceId.value = null;
+            entranceHour.value = '';
+            exitHour.value = '';
+            zone.value = '';
         } else {
             const err = await res.json().catch(() => ({}));
+
             if (err.errors) {
                 feedback.value = Object.values(err.errors).flat().join(' ');
             } else {
@@ -180,273 +281,351 @@ const showAddPetModal = ref(false);
 onMounted(() => {
     void loadPetsitter();
     void loadAnimals();
+    void loadServices();
 });
 </script>
 
 <template>
     <Head title="Nova Reserva" />
 
-    <div class="min-vh-100 d-flex flex-column position-relative overflow-hidden patudo-page">
-        <div class="patudo-glow patudo-glow-top"></div>
-        <div class="patudo-glow patudo-glow-bottom"></div>
+    <main class="booking-page min-vh-100 py-4">
+        <div class="container booking-container">
+            <nav class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4 booking-nav gap-3 gap-lg-4">
+                <a class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2 booking-brand" href="/">
+                    <img :src="logoPatudo" alt="Patudo" width="58" height="58" />
+                    <span>Patudo</span>
+                </a>
 
-        <main class="patudo-content flex-grow-1 py-4">
-            <div class="container">
-                <nav
-                    class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
-                >
-                    <a
-                        class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2"
-                        href="/"
-                    >
-                        <img
-                            :src="logoPatudo"
-                            alt="Patudo"
-                            width="70"
-                            height="70"
-                        />
-                        <span>Patudo</span>
-                    </a>
-
-                    <div class="nav nav-pills border rounded-pill p-1 mx-auto">
-                        <a class="nav-link rounded-pill px-4" href="/">Início</a>
-                        <a class="nav-link rounded-pill px-4" href="/orders">Pedidos</a>
-                        <a class="nav-link rounded-pill px-4" href="/favorites">Favoritos</a>
-                        <a class="nav-link active rounded-pill px-4" href="/reservations">Reservas</a>
-                    </div>
-
-                    <div class="d-flex align-items-center gap-3">
-                        <a href="/messages" class="text-dark">
-                            <MessageCircle :size="25" />
-                        </a>
-                        <button
-                            type="button"
-                            class="text-dark bg-transparent border-0 p-0 position-relative"
-                            @click="showNotifications = true"
-                        >
-                            <Bell :size="25" />
-                            <span
-                                v-if="unreadCount > 0"
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                style="font-size: 0.6rem;"
-                            >
-                                {{ unreadCount > 9 ? '9+' : unreadCount }}
-                            </span>
-                        </button>
-                        <button
-                            type="button"
-                            class="text-dark p-0 border-0 bg-transparent"
-                        >
-                            <UserRound :size="25" />
-                        </button>
-                        <Link
-                            href="/logout"
-                            method="post"
-                            as="button"
-                            class="btn btn-outline-danger rounded-pill d-flex align-items-center gap-2 px-3"
-                        >
-                            <LogOut :size="16" />
-                            <span>Sair</span>
-                        </Link>
-                    </div>
-                </nav>
-
-                <!-- Botão de voltar -->
-                <div class="mt-4">
-                    <a
-                        href="/profile-owner-view"
-                        class="btn btn-outline-secondary rounded-pill d-inline-flex align-items-center gap-2"
-                    >
-                        <ChevronLeft :size="16" />
-                        Voltar ao perfil
-                    </a>
+                <div class="booking-links nav nav-pills border rounded-pill p-1 mx-auto">
+                    <a class="nav-link rounded-pill px-3 px-lg-4" href="/">Início</a>
+                    <a class="nav-link rounded-pill px-3 px-lg-4" href="/orders">Pedidos</a>
+                    <a class="nav-link rounded-pill px-3 px-lg-4" href="/favorites">Favoritos</a>
+                    <a class="nav-link active rounded-pill px-3 px-lg-4" href="/reservations">Reservas</a>
                 </div>
 
-                <h1 class="text-center fw-bold display-5 mt-3 mb-4">Nova Reserva</h1>
+                <div class="booking-actions d-flex align-items-center gap-3">
+                    <a href="/messages" class="text-dark">
+                        <MessageCircle :size="25" />
+                    </a>
 
-                <!-- Feedback -->
-                <div
-                    v-if="feedback"
-                    class="alert py-2 small"
-                    :class="feedback.includes('sucesso') ? 'alert-success' : 'alert-danger'"
-                    role="alert"
-                >
-                    {{ feedback }}
+                    <button
+                        type="button"
+                        class="text-dark bg-transparent border-0 p-0 position-relative"
+                        @click="showNotifications = true"
+                    >
+                        <Bell :size="25" />
+                        <span
+                            v-if="unreadCount > 0"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge"
+                        >
+                            {{ unreadCount > 9 ? '9+' : unreadCount }}
+                        </span>
+                    </button>
+
+                    <button type="button" class="text-dark p-0 border-0 bg-transparent">
+                        <UserRound :size="25" />
+                    </button>
+
+                    <Link
+                        href="/logout"
+                        method="post"
+                        as="button"
+                        class="btn btn-outline-danger rounded-pill d-flex align-items-center gap-2 px-3"
+                    >
+                        <LogOut :size="16" />
+                        <span>Sair</span>
+                    </Link>
                 </div>
+            </nav>
 
-                <div class="row g-4">
-                    <!-- Coluna esquerda — Formulário -->
-                    <div class="col-12 col-lg-7">
-                        <section class="card bg-white border border-primary rounded-4 p-3 p-md-4 mb-4">
-                            <h2 class="h5 fw-semibold mb-3">Datas da reserva</h2>
+            <a href="/profile-owner-view" class="back-link d-inline-flex align-items-center gap-1 mt-5">
+                <ChevronLeft :size="24" />
+                Voltar ao perfil
+            </a>
 
-                            <div class="row g-3 mb-3">
-                                <div class="col-12 col-sm-6">
-                                    <label for="start-date" class="form-label small fw-semibold">Data de início</label>
-                                    <input
-                                        id="start-date"
-                                        type="date"
-                                        class="form-control"
-                                        :min="today"
-                                        v-model="startDate"
-                                    />
-                                </div>
-                                <div class="col-12 col-sm-6">
-                                    <label for="end-date" class="form-label small fw-semibold">Data de fim</label>
-                                    <input
-                                        id="end-date"
-                                        type="date"
-                                        class="form-control"
-                                        :min="startDate || today"
-                                        v-model="endDate"
-                                    />
-                                </div>
+            <h1 class="booking-title text-center mt-2">Pedir reserva</h1>
+
+            <div
+                v-if="feedback"
+                class="alert py-2 small booking-feedback"
+                :class="feedback.includes('sucesso') ? 'alert-success' : 'alert-danger'"
+                role="alert"
+            >
+                {{ feedback }}
+            </div>
+
+            <div class="row justify-content-center g-3 g-lg-4 booking-layout">
+                <div class="col-12 col-lg-7">
+                    <section class="booking-form-card">
+                        <div class="booking-section">
+                            <h2>1. Escolhe o serviço</h2>
+
+                            <div v-if="servicesError" class="alert alert-danger py-2 small mb-0" role="alert">
+                                {{ servicesError }}
                             </div>
 
-                            <div v-if="numberOfDays > 0" class="alert alert-info py-2 small d-flex align-items-center gap-2">
-                                <CalendarDays :size="16" />
-                                {{ numberOfDays }} {{ numberOfDays === 1 ? 'dia' : 'dias' }} de cuidado
+                            <div v-else-if="services.length === 0" class="booking-empty">
+                                Este cuidador ainda não tem serviços disponíveis.
                             </div>
-                        </section>
 
-                        <section class="card bg-white border border-primary rounded-4 p-3 p-md-4 mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h2 class="h5 fw-semibold mb-0">Animais</h2>
+                            <div v-else class="service-grid">
                                 <button
+                                    v-for="service in services"
+                                    :key="service.id"
                                     type="button"
-                                    class="btn btn-sm btn-outline-primary rounded-pill d-inline-flex align-items-center gap-1 px-3"
-                                    @click="showAddPetModal = true"
+                                    class="service-option text-start"
+                                    :class="{ selected: selectedServiceId === service.id }"
+                                    @click="selectedServiceId = service.id"
                                 >
-                                    <Plus :size="15" />
-                                    <span>Adicionar animal</span>
+                                    <strong>
+                                        {{ service.type === 'passeio' ? 'Passeios' : 'Pet sitting' }}
+                                    </strong>
+
+                                    <small>
+                                        € {{ service.price }} / {{ service.type === 'passeio' ? 'passeio' : 'noite' }}
+                                    </small>
+
+                                    <span
+                                        class="service-radio"
+                                        :class="{ selected: selectedServiceId === service.id }"
+                                    ></span>
                                 </button>
                             </div>
+                        </div>
 
-                            <div v-if="loadError" class="alert alert-danger py-2 small" role="alert">
+                        <div class="booking-section">
+                            <h2>2. Escolhe o animal</h2>
+
+                            <div v-if="loadError" class="alert alert-danger py-2 small mb-0" role="alert">
                                 {{ loadError }}
                             </div>
 
-                            <div v-else-if="animals.length === 0" class="text-center py-4 text-muted">
-                                <Dog :size="48" class="mb-2 opacity-50" />
+                            <div v-else-if="animals.length === 0" class="booking-empty text-center">
+                                <Dog :size="38" class="mb-1" />
                                 <p class="mb-2">Não tens animais registados.</p>
                                 <button
                                     type="button"
-                                    class="btn btn-sm btn-primary rounded-pill px-4"
+                                    class="add-pet-button"
                                     @click="showAddPetModal = true"
                                 >
                                     Adicionar o meu primeiro animal
                                 </button>
                             </div>
 
-                            <div v-else class="d-flex flex-column gap-2">
-                                <div
+                            <div v-else class="animal-grid">
+                                <button
                                     v-for="animal in animals"
                                     :key="animal.id"
-                                    class="animal-option p-3 rounded-3 border d-flex align-items-center gap-3"
+                                    type="button"
+                                    class="animal-option"
                                     :class="{ 'animal-selected': selectedAnimals.includes(animal.id) }"
                                     @click="toggleAnimal(animal.id)"
                                 >
-                                    <div class="animal-avatar d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 overflow-hidden">
+                                    <span class="animal-avatar d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden">
                                         <img
                                             v-if="animal.photo"
                                             :src="animal.photo"
                                             :alt="animal.name"
                                             class="w-100 h-100 object-fit-cover"
                                         />
-                                        <Dog v-else :size="24" class="text-primary" />
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <p class="fw-semibold mb-0">{{ animal.name }}</p>
-                                        <small class="text-muted">{{ animal.species }} {{ animal.breed ? '• ' + animal.breed : '' }}</small>
-                                    </div>
-                                    <div class="form-check form-check-reverse m-0">
-                                        <input
-                                            class="form-check-input"
-                                            type="checkbox"
-                                            :checked="selectedAnimals.includes(animal.id)"
-                                            @click.stop="toggleAnimal(animal.id)"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
+                                        <Dog v-else :size="24" />
+                                    </span>
 
-                        <section class="card bg-white border border-primary rounded-4 p-3 p-md-4 mb-4">
-                            <h2 class="h5 fw-semibold mb-3">Notas (opcional)</h2>
-                            <textarea
-                                class="form-control"
-                                rows="3"
-                                placeholder="Instruções especiais, alergias, rotinas..."
-                                v-model="notes"
-                            ></textarea>
-                        </section>
-                    </div>
+                                    <span class="text-start flex-grow-1">
+                                        <strong class="d-block">{{ animal.name }}</strong>
+                                        <small>
+                                            {{ animal.species }}{{ animal.breed ? ' · ' + animal.breed : '' }}
+                                        </small>
+                                    </span>
 
-                    <!-- Coluna direita — Resumo -->
-                    <div class="col-12 col-lg-5">
-                        <section class="card bg-white border border-primary rounded-4 p-3 p-md-4 mb-4 sticky-top" style="top: 1rem;">
-                            <h2 class="h5 fw-semibold mb-3">Resumo</h2>
-
-                            <div class="d-flex align-items-center gap-3 mb-3">
-                                <div class="petsitter-avatar d-flex align-items-center justify-content-center rounded-circle border border-primary flex-shrink-0 overflow-hidden">
-                                    <img
-                                        v-if="petsitter?.avatar_url"
-                                        :src="petsitter.avatar_url"
-                                        alt="Foto de perfil"
-                                        class="w-100 h-100 object-fit-cover"
-                                    />
-                                    <UserRound v-else :size="32" class="text-primary" />
-                                </div>
-                                <div>
-                                    <p class="fw-bold mb-0">{{ displayName }}</p>
-                                    <small class="text-muted">{{ displayLocation }}</small>
-                                </div>
-                            </div>
-
-                            <div class="border-bottom py-2">
-                                <div class="d-flex justify-content-between small">
-                                    <span class="text-muted">Preço por dia</span>
-                                    <span class="fw-semibold">€ {{ displayPrice }}</span>
-                                </div>
-                            </div>
-
-                            <div class="border-bottom py-2">
-                                <div class="d-flex justify-content-between small">
-                                    <span class="text-muted">Dias</span>
-                                    <span class="fw-semibold">{{ numberOfDays || 0 }}</span>
-                                </div>
-                            </div>
-
-                            <div class="border-bottom py-2">
-                                <div class="d-flex justify-content-between small">
-                                    <span class="text-muted">Animais</span>
-                                    <span class="fw-semibold">{{ selectedAnimals.length }}</span>
-                                </div>
-                            </div>
-
-                            <div class="py-2 d-flex justify-content-between">
-                                <span class="fw-bold">Total</span>
-                                <span class="fw-bold fs-5 text-primary">€ {{ totalPrice.toFixed(2) }}</span>
+                                    <span
+                                        class="animal-check"
+                                        :class="{ checked: selectedAnimals.includes(animal.id) }"
+                                    >
+                                        ✓
+                                    </span>
+                                </button>
                             </div>
 
                             <button
+                                v-if="!loadError && animals.length > 0"
                                 type="button"
-                                class="btn btn-primary w-100 rounded-pill mt-3 py-2"
-                                :disabled="!isFormValid || submitting"
-                                @click="submitBooking"
+                                class="add-pet-button d-inline-flex align-items-center gap-1 mt-2"
+                                @click="showAddPetModal = true"
                             >
-                                <span v-if="submitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
-                                {{ submitting ? 'A criar...' : 'Confirmar Reserva' }}
+                                <Plus :size="15" />
+                                Adicionar animal
                             </button>
+                        </div>
 
-                            <p class="text-muted small text-center mt-2 mb-0">
-                                A reserva será enviada para aprovação do petsitter.
+                        <div class="booking-section">
+                            <h2>3. Escolhe as datas e a hora</h2>
+
+                            <div class="row g-2">
+                                <div class="col-12 col-sm-6 col-lg-3">
+                                    <label for="start-date" class="form-label">Data de entrada</label>
+                                    <input
+                                        id="start-date"
+                                        v-model="startDate"
+                                        type="date"
+                                        class="form-control booking-input"
+                                        :min="today"
+                                    />
+                                </div>
+
+                                <div class="col-12 col-sm-6 col-lg-3">
+                                    <label for="end-date" class="form-label">Data de saída</label>
+                                    <input
+                                        id="end-date"
+                                        v-model="endDate"
+                                        type="date"
+                                        class="form-control booking-input"
+                                        :min="startDate || today"
+                                    />
+                                </div>
+
+                                <div class="col-12 col-sm-6 col-lg-3">
+                                    <label for="entrance-hour" class="form-label">Hora de entrada</label>
+                                    <input
+                                        id="entrance-hour"
+                                        v-model="entranceHour"
+                                        type="time"
+                                        class="form-control booking-input"
+                                    />
+                                </div>
+
+                                <div class="col-12 col-sm-6 col-lg-3">
+                                    <label for="exit-hour" class="form-label">Hora de saída</label>
+                                    <input
+                                        id="exit-hour"
+                                        v-model="exitHour"
+                                        type="time"
+                                        class="form-control booking-input"
+                                    />
+                                </div>
+                            </div>
+
+                            <p class="booking-help mb-0">
+                                <CalendarDays :size="14" />
+                                {{ availabilityText }}
                             </p>
-                        </section>
-                    </div>
+
+                            <p v-if="numberOfDays > 0" class="booking-help mb-0">
+                                {{ numberOfDays }}
+                                {{ numberOfDays === 1 ? 'dia de cuidado' : 'dias de cuidado' }}
+                            </p>
+                        </div>
+
+                        <div class="booking-section">
+                            <h2>4. Onde é o serviço?</h2>
+                            <label for="booking-zone" class="form-label">Zona</label>
+                            <input
+                                id="booking-zone"
+                                v-model="zone"
+                                type="text"
+                                maxlength="255"
+                                class="form-control booking-input"
+                                placeholder="Indica a zona"
+                            />
+                        </div>
+
+                        <div class="booking-section mb-0">
+                            <h2>5. Mensagem para o cuidador <span>(opcional)</span></h2>
+                            <textarea
+                                v-model="notes"
+                                class="form-control booking-input booking-notes"
+                                rows="4"
+                                maxlength="300"
+                                placeholder="Fala-lhe do teu animal, rotinas, horários de entrega..."
+                            />
+                            <div class="notes-count">{{ notes.length }}/300</div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="col-12 col-lg-4">
+                    <aside class="booking-summary sticky-lg-top">
+                        <h2>Resumo</h2>
+
+                        <div class="summary-profile d-flex align-items-center gap-2">
+                            <div class="petsitter-avatar d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden">
+                                <img
+                                    v-if="petsitter?.avatar_url"
+                                    :src="petsitter.avatar_url"
+                                    alt="Foto de perfil"
+                                    class="w-100 h-100 object-fit-cover"
+                                />
+                                <UserRound v-else :size="29" />
+                            </div>
+
+                            <div class="summary-details">
+                                <strong>{{ displayName }}</strong>
+                                <small class="summary-rating">
+                                    <span class="rating-star">★</span>
+                                    {{ petsitter?.average_rating ?? '—' }} ·
+                                    {{ petsitter?.reviews_count ?? 0 }} avaliações
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="summary-lines">
+                            <div>
+                                <span>Serviço</span>
+                                <strong>{{ selectedServiceLabel }}</strong>
+                            </div>
+
+                            <div>
+                                <span>Animais</span>
+                                <strong>{{ selectedAnimalNames }}</strong>
+                            </div>
+
+                            <div>
+                                <span>Entrada</span>
+                                <strong>{{ startDate || '—' }}</strong>
+                            </div>
+
+                            <div>
+                                <span>Saída</span>
+                                <strong>{{ endDate || '—' }}</strong>
+                            </div>
+
+                            <div>
+                                <span>Cálculo</span>
+                                <strong>
+                                    {{
+                                        numberOfDays
+                                            ? `${numberOfDays} noite${numberOfDays === 1 ? '' : 's'} × € ${selectedServicePrice}`
+                                            : '—'
+                                    }}
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="summary-total d-flex align-items-center justify-content-between">
+                            <strong>Total</strong>
+                            <span>€ {{ totalPrice.toFixed(2) }}</span>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="booking-submit w-100"
+                            @click="submitBooking"
+                        >
+                            <span
+                                v-if="submitting"
+                                class="spinner-border spinner-border-sm me-2"
+                                role="status"
+                            ></span>
+                            {{ submitting ? 'A criar...' : 'Confirmar Reserva' }}
+                        </button>
+
+                        <p class="summary-note">
+                            O pedido só fica confirmado quando o cuidador aceitar.
+                        </p>
+                    </aside>
                 </div>
             </div>
-        </main>
+        </div>
 
         <ModalNotifications
             :show="showNotifications"
@@ -459,46 +638,440 @@ onMounted(() => {
             @close="showAddPetModal = false"
             @created="handleAnimalCreated"
         />
-    </div>
+    </main>
 </template>
 
 <style scoped>
-.patudo-page {
-    background-color: #fffaf3;
+.booking-page {
+    background: #fffaf3;
+    color: #2e1d14;
 }
 
-.nav-pills .nav-link.active {
-    background-color: var(--patudo-terracota, #c2410c) !important;
-    color: #ffffff !important;
+.booking-container {
+    max-width: 1240px;
 }
 
-.nav-pills .nav-link:not(.active):hover {
-    color: var(--patudo-terracota, #c2410c) !important;
+.booking-nav {
+    min-height: 76px;
+    padding: .45rem 1.35rem;
+    background: #fff;
+    border: 1px solid #e4571c;
+    border-radius: 1.25rem;
 }
 
-.petsitter-avatar {
-    width: 56px;
-    height: 56px;
+.booking-brand {
+    color: #2e1d14;
+    font-size: 2rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.booking-brand img {
+    object-fit: contain;
+}
+
+.booking-links .nav-link {
+    color: #2e1d14;
+    font-weight: 500;
+}
+
+.booking-links .nav-link.active {
+    color: #fff !important;
+    background: var(--patudo-terracota, #c2410c) !important;
+}
+
+
+.notification-badge {
+    font-size: .6rem;
+}
+
+.back-link {
+    color: #2e1d14;
+    font-size: .95rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.booking-title {
+    margin: 3rem 0 3.25rem;
+    font-size: clamp(2.2rem, 4vw, 3.1rem);
+    font-weight: 800;
+}
+
+.booking-feedback {
+    max-width: 940px;
+    margin: -2rem auto 1.5rem;
+}
+
+.booking-layout {
+    max-width: 990px;
+    margin: 0 auto;
+}
+
+.booking-form-card {
+    padding: 1.15rem;
+    background: #fed7aa;
+    border: 1.5px solid #d64b16;
+    border-radius: 1.25rem;
+}
+
+.booking-section {
+    margin-bottom: 1.35rem;
+}
+
+.booking-section h2 {
+    margin: 0 0 .65rem;
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.booking-section h2 span {
+    font-weight: 400;
+}
+
+.service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: .55rem;
+}
+
+.service-option {
+    position: relative;
+    min-height: 68px;
+    padding: .65rem 2rem .65rem .75rem;
+    color: #2e1d14;
+    background: #fff;
+    border: 1.5px solid #d64b16;
+    border-radius: .75rem;
+    transition: box-shadow .15s, transform .15s;
+}
+
+.service-option:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(96, 45, 17, .12);
+}
+
+.service-option.selected {
+    box-shadow: inset 0 0 0 1px #c2410c;
+}
+
+.service-option strong,
+.service-option small {
+    display: block;
+}
+
+.service-option strong {
+    font-size: .84rem;
+}
+
+.service-option small {
+    margin-top: .2rem;
+    font-size: .72rem;
+    color: #725b4c;
+}
+
+.service-radio {
+    position: absolute;
+    top: .7rem;
+    right: .7rem;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid #c2410c;
+    border-radius: 50%;
+}
+
+.service-radio.selected::after {
+    display: block;
+    width: 8px;
+    height: 8px;
+    margin: 2.5px;
+    content: '';
+    background: #c2410c;
+    border-radius: 50%;
+}
+
+.add-pet-button {
+    padding: 0;
+    color: #24150e;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid currentColor;
+    font-size: .82rem;
+    font-weight: 700;
+}
+
+.animal-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .55rem;
 }
 
 .animal-option {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    width: 100%;
+    padding: .55rem .65rem;
+    color: #2e1d14;
+    background: #fff;
+    border: 1.5px solid #d64b16;
+    border-radius: .8rem;
     cursor: pointer;
-    transition: background-color 0.15s ease, border-color 0.15s ease;
-    background-color: #fff;
+    transition: transform .15s, box-shadow .15s;
 }
 
 .animal-option:hover {
-    background-color: rgba(var(--bs-primary-rgb), 0.05);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(96, 45, 17, .12);
 }
 
-.animal-selected {
-    background-color: rgba(var(--bs-primary-rgb), 0.08) !important;
-    border-color: var(--bs-primary) !important;
+.animal-option.animal-selected {
+    border-color: #c2410c;
+    box-shadow: inset 0 0 0 1px #c2410c;
 }
 
 .animal-avatar {
+    width: 38px;
+    height: 38px;
+    color: #c2410c;
+    background: #fff4e4;
+    border-radius: 50%;
+}
+
+.animal-option strong {
+    font-size: .86rem;
+}
+
+.animal-option small {
+    font-size: .72rem;
+}
+
+.animal-check {
+    display: grid;
+    place-items: center;
+    width: 19px;
+    height: 19px;
+    margin-left: auto;
+    color: transparent;
+    border: 1.5px solid #c2410c;
+    border-radius: .3rem;
+    font-size: .75rem;
+}
+
+.animal-check.checked {
+    color: #fff;
+    background: #c2410c;
+}
+
+.booking-empty {
+    padding: 1.25rem;
+    color: #725b4c;
+    background: rgba(255, 255, 255, .55);
+    border-radius: .8rem;
+}
+
+.form-label {
+    margin-bottom: .25rem;
+    font-size: .78rem;
+    font-weight: 700;
+}
+
+.form-label span {
+    font-weight: 400;
+}
+
+.booking-input {
+    min-height: 42px;
+    border: 1.5px solid #d64b16;
+    border-radius: .55rem;
+    background: #fffdf9;
+    font-size: .88rem;
+}
+
+.booking-input:focus {
+    border-color: #c2410c;
+    box-shadow: 0 0 0 .16rem rgba(194, 65, 12, .16);
+}
+
+.booking-help {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    margin-top: .55rem;
+    font-size: .76rem;
+}
+
+.booking-notes {
+    resize: vertical;
+}
+
+.notes-count {
+    margin-top: .2rem;
+    font-size: .7rem;
+    text-align: right;
+}
+
+.booking-summary {
+    top: 1rem;
+    padding: 1.25rem;
+    background: #fff;
+    border: 1.5px solid #d64b16;
+    border-radius: 1.1rem;
+}
+
+.booking-summary h2 {
+    margin: 0 0 .9rem;
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+.petsitter-avatar {
     width: 48px;
     height: 48px;
-    background-color: #fffaf3;
+    color: #c2410c;
+    border: 1px solid #2e1d14;
+    border-radius: 50%;
+}
+
+.summary-profile {
+    padding-bottom: .85rem;
+    border-bottom: 2px solid #d64b16;
+    align-items: center !important;
+}
+
+.summary-profile .petsitter-avatar {
+    margin-top: 0;
+}
+
+.summary-details {
+    padding-top: 0;
+}
+
+.summary-profile strong {
+    display: block;
+    font-size: .9rem;
+    line-height: 1.2;
+}
+
+.summary-profile small {
+    margin-top: .18rem;
+    font-size: .74rem;
+    line-height: 1.25;
+    color: #725b4c;
+}
+
+.summary-profile .summary-rating {
+    margin-top: .2rem;
+    color: #2e1b12;
+}
+
+.summary-profile .rating-star {
+    color: #f4b400;
+}
+
+.summary-lines {
+    padding: .65rem 0;
+    border-bottom: 2px solid #d64b16;
+}
+
+.summary-lines > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .18rem 0;
+    font-size: .78rem;
+}
+
+.summary-lines strong {
+    text-align: right;
+}
+
+.summary-total {
+    padding: .75rem 0;
+}
+
+.summary-total span {
+    font-size: 1.65rem;
+    font-weight: 800;
+}
+
+.booking-submit {
+    padding: .75rem 1rem;
+    color: #fff;
+    background: #c9450b;
+    border: 0;
+    border-radius: 999px;
+    font-size: .88rem;
+    font-weight: 800;
+}
+
+.booking-submit:hover:not(:disabled) {
+    background: #e75a13;
+}
+
+.booking-submit:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.summary-note {
+    max-width: 220px;
+    margin: .8rem auto 0;
+    color: #725b4c;
+    font-size: .72rem;
+    text-align: center;
+}
+
+@media (max-width: 991.98px) {
+    .booking-nav {
+        flex-wrap: wrap;
+    }
+
+    .booking-links {
+        order: 3;
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .booking-actions {
+        margin-left: auto;
+    }
+
+    .booking-title {
+        margin: 2.5rem 0;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .booking-nav {
+        padding: .55rem .75rem;
+    }
+
+    .booking-brand {
+        font-size: 1.55rem;
+    }
+
+    .booking-brand img {
+        width: 44px;
+        height: 44px;
+    }
+
+    .booking-actions {
+        gap: .7rem !important;
+    }
+
+    .booking-links .nav-link {
+        padding: .35rem .7rem !important;
+        font-size: .83rem;
+    }
+
+    .animal-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-form-card {
+        padding: .9rem;
+    }
 }
 </style>
+
