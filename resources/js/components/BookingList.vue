@@ -220,13 +220,15 @@ const loadBookings = async () => {
     loading.value = true;
     loadError.value = '';
     try {
-        // Todos os estados (o filtro por estado é feito aqui, nos botões de filtro).
+        // Pedidos: só os pendentes, filtrados na API (?pending=1).
+        // Reservas: todos os estados (o filtro por estado é feito aqui, nos botões de filtro).
         // A API pagina de 15 em 15, por isso lê todas as páginas.
+        const pendingParam = props.role === 'petsitter' ? '&pending=1' : '';
         const all: BookingItem[] = [];
         let pageNumber = 1;
         let lastPage = 1;
         do {
-            const res = await apiFetch(`/api/bookings?page=${pageNumber}`);
+            const res = await apiFetch(`/api/bookings?page=${pageNumber}${pendingParam}`);
             if (!res.ok) {
                 loadError.value = props.role === 'petsitter'
                     ? 'Não foi possível carregar os pedidos de reserva.'
@@ -240,7 +242,7 @@ const loadBookings = async () => {
         } while (pageNumber <= lastPage);
 
         // A API devolve as reservas onde és dono OU petsitter.
-        // Pedidos: os pendentes recebidos. Reservas: as tuas como dono + as recebidas já respondidas.
+        // Pedidos: os pendentes recebidos (o ?pending=1 também traz os teus pedidos como dono, por isso filtra-se aqui). Reservas: as tuas como dono + as recebidas já respondidas.
         bookings.value = props.role === 'petsitter'
             ? all.filter((b) => isPetsitterOf(b) && b.status === 'pending')
             : all.filter((b) => b.user_id === currentUserId.value || (isPetsitterOf(b) && b.status !== 'pending'));
