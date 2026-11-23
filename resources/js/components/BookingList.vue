@@ -1,14 +1,13 @@
 <script setup lang="ts">
 // Lista de reservas usada nas páginas Pedidos (petsitter) e Reservas (dono).
 // role="petsitter" -> pedidos pendentes recebidos (Ver ficha do animal, Recusar, Aceitar)
-// role="owner"     -> página Reservas: todas as reservas onde o user está, como dono OU como petsitter,
-//                     em todos os estados. Cada cartão mostra a outra pessoa e os botões do seu lado:
-//                     dono      -> Cancelar, Conversar, Avaliar, Ver detalhe
-//                     petsitter -> Recusar/Aceitar, Conversar, Concluir, Ver detalhe
-// Os cartões são os da Constança: o HTML e o CSS de cada role vieram das respetivas páginas.
+// role="owner"     -> página Reservas: SÓ as reservas em que o user autenticado é o dono,
+//                     da mais recente para a mais antiga, com filtro por estado e paginação.
+//                     Cada cartão mostra o petsitter, os animais, as datas, o preço total e o estado.
+//                     Estados da lista: carregamento, erro (com "Tentar novamente") e vazio.
 import { usePage } from '@inertiajs/vue3';
 import { ChevronRight, MapPin, UserRound } from '@lucide/vue';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import type { Animal } from '@/types';
 import ModalPetDetails, { type PetDetails } from '@/pages/Modals/ModalPetDetails.vue';
 import ModalReviewPetsitter, { type ReviewPayload } from '@/pages/Modals/ModalReviewPetsitter.vue';
@@ -25,6 +24,8 @@ type AnimalCard = Animal & {
     age?: number | string | null;
     size?: string | null;
 };
+
+type BookingStatus = 'pending' | 'approved' | 'rejected' | 'cancelled' | 'completed';
 
 type BookingItem = {
     id: number;
@@ -69,9 +70,15 @@ const currentUserId = computed(() => page.props.auth.user?.id ?? null);
 // ---------- Estado ----------
 const bookings = ref<BookingItem[]>([]);
 const loading = ref(false);
+const loadError = ref(''); // erro ao carregar a lista (estado de erro do dono)
 const processingId = ref<number | null>(null);
 const feedback = ref('');
 const feedbackType = ref<'success' | 'error'>('success');
+
+// Filtro por estado e paginação (dono)
+const PER_PAGE = 10;
+const statusFilter = ref<'all' | BookingStatus>('all');
+const currentPage = ref(1);
 
 // Ficha do animal (petsitter)
 const showPetDetails = ref(false);
@@ -99,6 +106,17 @@ function numberOfDays(b: BookingItem): number {
 function periodLabel(b: BookingItem): string {
     const days = numberOfDays(b);
     return `${days} ${days === 1 ? 'dia' : 'dias'}`;
+}
+
+// "12/03/2026" (UTC para a data não recuar um dia nos Açores)
+function formatDate(value: string): string {
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return value;
+    return d.toLocaleDateString('pt-PT', { timeZone: 'UTC' });
+}
+
+function datesLabel(b: BookingItem): string {
+    return `${formatDate(b.start_date)} – ${formatDate(b.end_date)}`;
 }
 
 // Cada página formatava o preço à sua maneira; mantém-se o formato de cada uma
@@ -132,14 +150,8 @@ function animalNames(b: BookingItem): string {
     return (b.animals ?? []).map((a) => a.name).join(', ') || '--';
 }
 
-// Página Reservas: em cada reserva, o user é o petsitter ou o dono
-const isPetsitterOf = (b: BookingItem) => b.petsitter_id === currentUserId.value;
-
-// Mostra sempre a outra pessoa da reserva
-const otherPerson = (b: BookingItem): Person | undefined => (isPetsitterOf(b) ? b.owner : b.petsitter);
-
-// Conversar abre o chat com a outra pessoa (ids de users)
-const chatWith = (b: BookingItem) => (isPetsitterOf(b) ? b.user_id : b.petsitter_id);
+// Conversar abre o chat com o petsitter (id de user)
+const chatWith = (b: BookingItem) => b.petsitter_id;
 
 const statusShort: Record<string, string> = {
     pending: 'Pendente',
@@ -149,9 +161,54 @@ const statusShort: Record<string, string> = {
     completed: 'Concluída',
 };
 
-// ---------- Lista ----------
+const statusFilters: { value: 'all' | BookingStatus; label: string }[] = [
+    { value: 'all', label: 'Todas' },
+    { value: 'pending', label: 'Pendentes' },
+    { value: 'approved', label: 'Aceites' },
+    { value: 'rejected', label: 'Rejeitadas' },
+    { value: 'cancelled', label: 'Canceladas' },
+    { value: 'completed', label: 'Concluídas' },
+];
+
+// ---------- Lista (dono): filtro, ordenação e paginação ----------
+// Mais recente primeiro (created_at; em empate, id mais alto primeiro)
+const sortedBookings = computed(() =>
+    [...bookings.value].sort((a, b) => {
+        const diff = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        return diff !== 0 && !Number.isNaN(diff) ? diff : b.id - a.id;
+    }),
+);
+
+const filteredBookings = computed(() =>
+    statusFilter.value === 'all'
+        ? sortedBookings.value
+        : sortedBookings.value.filter((b) => b.status === statusFilter.value),
+);
+
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredBookings.value.length / PER_PAGE)));
+
+const pagedBookings = computed(() => {
+    const start = (currentPage.value - 1) * PER_PAGE;
+    return filteredBookings.value.slice(start, start + PER_PAGE);
+});
+
+// Ao mudar de filtro volta à página 1; se a página atual deixar de existir, recua
+watch(statusFilter, () => {
+    currentPage.value = 1;
+});
+watch(totalPages, (n) => {
+    if (currentPage.value > n) currentPage.value = n;
+});
+
+function goToPage(n: number) {
+    currentPage.value = Math.min(Math.max(1, n), totalPages.value);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ---------- Carregar ----------
 const loadBookings = async () => {
     loading.value = true;
+    loadError.value = '';
     try {
         // Petsitter: só pendentes (?pending=1). Dono: todos os estados.
         // A API pagina de 15 em 15, por isso lê todas as páginas.
@@ -162,12 +219,11 @@ const loadBookings = async () => {
         do {
             const res = await apiFetch(`/api/bookings?${filter}page=${pageNumber}`);
             if (!res.ok) {
-                setFeedback(
-                    props.role === 'petsitter'
-                        ? 'Não foi possível carregar os pedidos de reserva.'
-                        : 'Não foi possível carregar as reservas.',
-                    'error',
-                );
+                const msg = props.role === 'petsitter'
+                    ? 'Não foi possível carregar os pedidos de reserva.'
+                    : 'Não foi possível carregar as reservas.';
+                if (props.role === 'petsitter') setFeedback(msg, 'error');
+                else loadError.value = msg;
                 return;
             }
             const json = await res.json();
@@ -177,12 +233,13 @@ const loadBookings = async () => {
         } while (pageNumber <= lastPage);
 
         // A API devolve as reservas onde és dono OU petsitter.
-        // Pedidos: só os pendentes recebidos. Reservas: todas.
+        // Pedidos: só os pendentes recebidos. Reservas: só as em que és o dono.
         bookings.value = props.role === 'petsitter'
             ? all.filter((b) => b.status === 'pending' && b.petsitter_id === currentUserId.value)
-            : all;
+            : all.filter((b) => b.user_id === currentUserId.value);
     } catch {
-        setFeedback('Erro de conexão. Tente novamente.', 'error');
+        if (props.role === 'petsitter') setFeedback('Erro de conexão. Tente novamente.', 'error');
+        else loadError.value = 'Erro de conexão. Tente novamente.';
     } finally {
         loading.value = false;
     }
@@ -436,51 +493,82 @@ onMounted(() => {
 
     <!-- ===================== Dono: as minhas reservas ===================== -->
     <template v-else>
-        <!-- Loading -->
+        <!-- Carregamento -->
         <div v-if="loading" class="text-center py-5">
             <div class="spinner-border text-secondary" role="status">
                 <span class="visually-hidden">A carregar...</span>
             </div>
         </div>
 
+        <!-- Erro -->
+        <div v-else-if="loadError" class="text-center py-5">
+            <p class="text-danger mb-3" role="alert">{{ loadError }}</p>
+            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" @click="loadBookings">
+                Tentar novamente
+            </button>
+        </div>
+
         <template v-else>
-            <div v-if="bookings.length === 0 && !feedback" class="text-center text-secondary py-5">
-                Ainda não tens reservas.
+            <!-- Filtro por estado -->
+            <div class="status-filters d-flex flex-wrap gap-2 mb-4" role="group" aria-label="Filtrar por estado">
+                <button
+                    v-for="f in statusFilters"
+                    :key="f.value"
+                    type="button"
+                    class="btn btn-sm rounded-pill filter-chip"
+                    :class="statusFilter === f.value ? 'active' : ''"
+                    :aria-pressed="statusFilter === f.value"
+                    @click="statusFilter = f.value"
+                >
+                    {{ f.label }}
+                </button>
+            </div>
+
+            <!-- Estado vazio -->
+            <div v-if="filteredBookings.length === 0" class="text-center text-secondary py-5">
+                {{ bookings.length === 0
+                ? 'Ainda não tens reservas.'
+                : 'Não tens reservas com este estado.' }}
             </div>
 
             <article
-                v-for="b in bookings"
+                v-for="b in pagedBookings"
                 :key="b.id"
                 class="booking-card bg-white mb-3"
             >
-                <!-- Avatar da outra pessoa (o petsitter, ou o dono se fores tu o petsitter) -->
+                <!-- Avatar do petsitter -->
                 <div class="booking-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden">
                     <img
-                        v-if="otherPerson(b)?.avatar_url"
-                        :src="otherPerson(b)!.avatar_url!"
+                        v-if="b.petsitter?.avatar_url"
+                        :src="b.petsitter.avatar_url"
                         alt="Foto de perfil"
                         class="w-100 h-100 object-fit-cover"
                     />
                     <UserRound v-else :size="56" class="text-secondary" />
                 </div>
 
-                <!-- Nome / local / animal -->
+                <!-- Petsitter / local / animais / datas -->
                 <div class="booking-info">
                     <div>
                         <h2 class="booking-name mb-0">
-                            {{ otherPerson(b)?.name ?? (isPetsitterOf(b) ? 'Proprietário' : 'Petsitter') }}
+                            {{ b.petsitter?.name ?? 'Petsitter' }}
                         </h2>
                         <small class="booking-location d-flex align-items-center gap-1">
                             <MapPin :size="17" />
-                            <!-- zona da reserva (onde é o serviço); reservas antigas sem zona: localidade da pessoa -->
-                            {{ b.zone || otherPerson(b)?.location || '--' }}
+                            <!-- zona da reserva (onde é o serviço); reservas antigas sem zona: localidade do petsitter -->
+                            {{ b.zone || b.petsitter?.location || '--' }}
                         </small>
                     </div>
 
-                    <p class="booking-animal mb-0">
-                        <strong>{{ (b.animals?.length ?? 0) > 1 ? 'Animais' : 'Animal' }}:</strong>
-                        {{ animalNames(b) }}
-                    </p>
+                    <div>
+                        <p class="booking-animal mb-1">
+                            <strong>{{ (b.animals?.length ?? 0) > 1 ? 'Animais' : 'Animal' }}:</strong>
+                            {{ animalNames(b) }}
+                        </p>
+                        <p class="booking-animal mb-0">
+                            <strong>Datas:</strong> {{ datesLabel(b) }}
+                        </p>
+                    </div>
                 </div>
 
                 <!-- Estado / serviço / preço / ações -->
@@ -497,57 +585,7 @@ onMounted(() => {
 
                     <p class="booking-price mb-0">Preço: {{ formatPrice(b.total_price) }}</p>
 
-                    <!-- Lado do petsitter: reservas que te fizeram -->
-                    <div v-if="isPetsitterOf(b)" class="booking-actions d-flex gap-2 mt-2 w-100">
-                        <!-- Pedido pendente: Recusar + Aceitar -->
-                        <template v-if="b.status === 'pending'">
-                            <button
-                                type="button"
-                                class="btn btn-outline-danger btn-sm rounded-pill flex-fill"
-                                :disabled="processingId === b.id"
-                                @click="updateStatus(b, 'rejected')"
-                            >
-                                Recusar
-                            </button>
-
-                            <button
-                                type="button"
-                                class="btn btn-conversar btn-sm rounded-pill flex-fill"
-                                :disabled="processingId === b.id"
-                                @click="updateStatus(b, 'approved')"
-                            >
-                                Aceitar
-                            </button>
-                        </template>
-
-                        <!-- Reserva aceite: Conversar + Concluir -->
-                        <template v-else-if="b.status === 'approved'">
-                            <a :href="`/messages?with=${chatWith(b)}`" class="btn btn-conversar btn-sm rounded-pill flex-fill">
-                                Conversar
-                            </a>
-
-                            <button
-                                type="button"
-                                class="btn btn-concluir btn-sm rounded-pill flex-fill"
-                                :disabled="processingId === b.id"
-                                @click="updateStatus(b, 'completed')"
-                            >
-                                Concluir
-                            </button>
-                        </template>
-
-                        <!-- Outros estados: ver detalhe -->
-                        <a
-                            v-else
-                            :href="`/reservations?booking=${b.id}`"
-                            class="btn btn-outline-secondary btn-sm rounded-pill flex-fill"
-                        >
-                            Ver detalhe
-                        </a>
-                    </div>
-
-                    <!-- Lado do dono: reservas que fizeste -->
-                    <div v-else class="booking-actions d-flex gap-2 mt-2 w-100">
+                    <div class="booking-actions d-flex gap-2 mt-2 w-100">
                         <!-- Reserva aceite: Conversar + Cancelar -->
                         <template v-if="b.status === 'approved'">
                             <a :href="`/messages?with=${chatWith(b)}`" class="btn btn-conversar btn-sm rounded-pill flex-fill">
@@ -604,6 +642,37 @@ onMounted(() => {
                     </div>
                 </div>
             </article>
+
+            <!-- Paginação -->
+            <nav v-if="totalPages > 1" aria-label="Paginação das reservas" class="mt-4">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                        <button type="button" class="page-link" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
+                            Anterior
+                        </button>
+                    </li>
+                    <li
+                        v-for="n in totalPages"
+                        :key="n"
+                        class="page-item"
+                        :class="{ active: n === currentPage }"
+                    >
+                        <button
+                            type="button"
+                            class="page-link"
+                            :aria-current="n === currentPage ? 'page' : undefined"
+                            @click="goToPage(n)"
+                        >
+                            {{ n }}
+                        </button>
+                    </li>
+                    <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                        <button type="button" class="page-link" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">
+                            Seguinte
+                        </button>
+                    </li>
+                </ul>
+            </nav>
         </template>
     </template>
 
@@ -836,7 +905,36 @@ onMounted(() => {
     color: #7a6657;
 }
 
-/* Os botões de cada par (ex.: Conversar + Concluir) ficam com a mesma largura,
+/* Filtro por estado */
+.filter-chip {
+    color: var(--patudo-terracota, #c2410c);
+    background-color: #ffffff;
+    border: 1px solid var(--patudo-terracota, #c2410c);
+    font-weight: 600;
+}
+
+.filter-chip:hover {
+    background-color: #fdeee4;
+    color: var(--patudo-terracota, #c2410c);
+}
+
+.filter-chip.active {
+    color: #ffffff;
+    background-color: var(--patudo-terracota, #c2410c);
+    border-color: var(--patudo-terracota, #c2410c);
+}
+
+/* Paginação com as cores do tema */
+.pagination {
+    --bs-pagination-color: var(--patudo-terracota, #c2410c);
+    --bs-pagination-hover-color: var(--patudo-terracota, #c2410c);
+    --bs-pagination-focus-color: var(--patudo-terracota, #c2410c);
+    --bs-pagination-active-bg: var(--patudo-terracota, #c2410c);
+    --bs-pagination-active-border-color: var(--patudo-terracota, #c2410c);
+    --bs-pagination-active-color: #ffffff;
+}
+
+/* Os botões de cada par (ex.: Conversar + Cancelar) ficam com a mesma largura,
    em vez de a largura depender do tamanho do texto (flex-fill) */
 .booking-actions .btn {
     /* !important porque o .flex-fill do Bootstrap também usa !important */
@@ -858,30 +956,6 @@ onMounted(() => {
     color: #ffffff;
     background-color: #3f5a42;
     border-color: #3f5a42;
-}
-
-/* Concluir: preenchido com a cor do tema, como os outros botões de ação */
-.btn-concluir {
-    color: #ffffff;
-    background-color: var(--patudo-terracota, #c2410c);
-    border: 1px solid var(--patudo-terracota, #c2410c);
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
-.btn-concluir:hover,
-.btn-concluir:focus,
-.btn-concluir:active {
-    color: #ffffff;
-    background-color: var(--patudo-laranjaVivo, #f97316);
-    border-color: var(--patudo-laranjaVivo, #f97316);
-}
-
-.btn-concluir:disabled {
-    color: #ffffff;
-    background-color: var(--patudo-terracota, #c2410c);
-    border-color: var(--patudo-terracota, #c2410c);
-    opacity: 0.65;
 }
 
 /* ================= Telemóvel ================= */
