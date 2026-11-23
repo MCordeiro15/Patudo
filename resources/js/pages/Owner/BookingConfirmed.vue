@@ -104,7 +104,7 @@ onMounted(() => {
 <template>
     <Head title="Reserva Confirmada" />
 
-    <main class="min-vh-100 py-4 patudo-page">
+    <main class="min-vh-100 py-4 patudo-page patudo-page-shell">
         <div class="container">
 
             <nav

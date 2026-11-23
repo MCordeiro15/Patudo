@@ -308,7 +308,7 @@ const displayPrice = computed(() =>
                 >
                     <button
                         type="button"
-                        class="btn btn-primary btn-sm position-absolute top-0 end-0 mt-3 me-3 px-4 report-btn"
+                        class="btn btn-primary btn-sm position-absolute top-0 end-0 mt-3 me-3 px-4"
                         @click="showReportModal = true"
                     >
                         Denunciar
@@ -522,12 +522,11 @@ const displayPrice = computed(() =>
 .about-card {
     min-height: 210px;
 }
+
 .info-card {
     min-height: 170px;
 }
-.report-btn {
-    border-radius: 6px;
-}
+
 .tags-row, .actions-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

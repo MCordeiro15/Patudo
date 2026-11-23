@@ -239,3 +239,41 @@ test('admin can update and delete another users animal', function () {
         'id' => $animal->id,
     ]);
 });
+
+test('animal can be created with a photo and an age', function () {
+    $user = User::factory()->create();
+    // PNG de 1x1 píxel (sem precisar da extensão GD para gerar imagens falsas)
+    $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
+    $photo = \Illuminate\Http\UploadedFile::fake()->createWithContent('rex.png', $png);
+
+    $response = $this->actingAs($user)->post('/api/animals', [
+        'name' => 'Rex',
+        'species' => 'Dog',
+        'breed' => 'Labrador',
+        'size' => 'medium',
+        'age' => 3,
+        'photo' => $photo,
+    ], ['Accept' => 'application/json']);
+
+    $response->assertCreated()
+        ->assertJsonPath('data.age', 3);
+
+    // a foto fica guardada como data URI, pronta a usar num <img>
+    expect($response->json('data.photo'))->toStartWith('data:image/png;base64,');
+});
+
+test('animal photo must be an image and the age must be valid', function () {
+    $user = User::factory()->create();
+    $pdf = \Illuminate\Http\UploadedFile::fake()->create('documento.pdf', 10, 'application/pdf');
+
+    $this->actingAs($user)->post('/api/animals', [
+        'name' => 'Rex',
+        'species' => 'Dog',
+        'breed' => 'Labrador',
+        'size' => 'medium',
+        'age' => 99,
+        'photo' => $pdf,
+    ], ['Accept' => 'application/json'])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['photo', 'age']);
+});

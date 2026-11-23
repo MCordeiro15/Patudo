@@ -4,6 +4,7 @@
  * Testes das rotas web das páginas de reserva: reserva confirmada, pedidos (petsitter) e reservas (dono).
  * Tests for the booking web pages routes: booking confirmed, orders (petsitter) and reservations (owner).
  */
+use App\Models\Animal;
 use App\Models\Booking;
 use App\Models\Petsitter;
 use App\Models\User;
@@ -113,5 +114,43 @@ test('a user outside the booking cannot load its data through the api', function
     // a página abre, mas a API que carrega a reserva recusa quem não faz parte dela
     $this->actingAs($stranger)
         ->getJson('/api/bookings/'.$booking->id)
+        ->assertForbidden();
+});
+
+test('booking api includes owner and petsitter avatars, also on show', function () {
+    $owner = User::factory()->create(['name' => 'Ana Dona']);
+    $petsitter = Petsitter::factory()->approved()->create(['profile_photo' => null]);
+    $booking = makeBookingForPages($owner, $petsitter);
+
+    // lista (páginas Pedidos/Reservas): avatar com as iniciais quando não há foto
+    $this->actingAs($owner)
+        ->getJson('/api/bookings')
+        ->assertOk()
+        ->assertJsonPath('data.0.owner.avatar_url', 'https://ui-avatars.com/api/?name=Ana+Dona&background=random')
+        ->assertJsonPath('data.0.petsitter.avatar_url', 'https://ui-avatars.com/api/?name='.urlencode($petsitter->user->name).'&background=random');
+
+    // detalhe (?booking=ID): o show também traz o dono e o petsitter
+    $this->actingAs($owner)
+        ->getJson('/api/bookings/'.$booking->id)
+        ->assertOk()
+        ->assertJsonPath('data.owner.name', 'Ana Dona')
+        ->assertJsonPath('data.petsitter.name', $petsitter->user->name);
+});
+
+test('petsitter can open the animal card of an animal in their booking, other petsitters cannot', function () {
+    $owner = User::factory()->create();
+    $animal = Animal::factory()->create(['user_id' => $owner->id]);
+    $petsitter = Petsitter::factory()->approved()->create();
+    $booking = makeBookingForPages($owner, $petsitter);
+    $booking->animals()->attach($animal->id);
+
+    $this->actingAs($petsitter->user)
+        ->getJson('/api/animals/'.$animal->id)
+        ->assertOk()
+        ->assertJsonPath('data.name', $animal->name);
+
+    $otherPetsitter = Petsitter::factory()->approved()->create();
+    $this->actingAs($otherPetsitter->user)
+        ->getJson('/api/animals/'.$animal->id)
         ->assertForbidden();
 });

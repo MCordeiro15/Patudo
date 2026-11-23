@@ -13,6 +13,7 @@ export type Animal = {
     sex: string | null;
     photo: string | null;
     weight: number | null;
+    age: number | null;
     created_at: string;
     updated_at: string;
 };
@@ -28,5 +29,6 @@ export type AnimalFormErrors = {
     sex?: string[];
     photo?: string[];
     weight?: string[];
+    age?: string[];
     [key: string]: string[] | undefined;
 };

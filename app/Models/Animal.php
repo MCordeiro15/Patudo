@@ -50,6 +50,7 @@ class Animal extends Model
         'sex',
         'photo',
         'weight',
+        'age',
     ];
 
     /**
@@ -58,6 +59,7 @@ class Animal extends Model
      */
     protected $casts = [
         'weight' => 'decimal:2',
+        'age' => 'integer',
     ];
 
     /**

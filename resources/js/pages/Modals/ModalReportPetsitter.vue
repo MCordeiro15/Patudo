@@ -119,14 +119,14 @@ const handleSubmit = () => {
                     <div class="patudo-modal-actions">
                         <button
                             type="button"
-                            class="btn-patudo-outline"
+                            class="btn btn-outline-primary"
                             @click="handleClose"
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            class="btn-patudo-solid"
+                            class="btn btn-primary"
                             :disabled="!selectedReason"
                         >
                             Enviar denúncia

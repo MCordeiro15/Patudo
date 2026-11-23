@@ -40,10 +40,10 @@ const confirm = () => {
                 class="modal-dialog modal-dialog-centered modal-sm"
                 role="document"
             >
-                <div class="modal-content rounded-4 border border-danger">
+                <div class="modal-content bg-white rounded-4 border border-primary">
                     <!-- Header -->
-                    <div class="modal-header border-bottom border-danger">
-                        <h5 class="modal-title fw-bold text-danger">
+                    <div class="modal-header border-bottom border-primary">
+                        <h5 class="modal-title fw-bold text-primary">
                             Remover Publicação
                         </h5>
                         <button
@@ -68,11 +68,11 @@ const confirm = () => {
 
                     <!-- Footer -->
                     <div
-                        class="modal-footer border-top border-danger d-flex gap-2"
+                        class="modal-footer border-top border-primary d-flex gap-2"
                     >
                         <button
                             type="button"
-                            class="btn btn-outline-secondary rounded-pill flex-fill"
+                            class="btn btn-outline-primary rounded-pill flex-fill"
                             @click="close"
                             :disabled="deleting"
                         >
@@ -80,7 +80,7 @@ const confirm = () => {
                         </button>
                         <button
                             type="button"
-                            class="btn btn-danger rounded-pill flex-fill"
+                            class="btn btn-outline-danger rounded-pill flex-fill"
                             @click="confirm"
                             :disabled="deleting"
                         >
