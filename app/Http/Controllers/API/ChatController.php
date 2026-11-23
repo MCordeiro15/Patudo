@@ -8,6 +8,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\UserAvatarController;
+use App\Models\Booking;
 use App\Models\Petsitter;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -43,17 +44,27 @@ class ChatController extends Controller
 
     /**
      * GET /api/chat/contacts
-     * Regra: um dono pode falar com qualquer petsitter aprovado. Um petsitter só responde a quem lhe escreve,
-     * por isso não tem lista de contactos (as conversas dele vêm do TalkJS).
-     * Rule: an owner can message any approved petsitter. A petsitter only replies to people who message them,
-     * so they have no contact list (their conversations come from TalkJS).
+     * Regra: um dono pode falar com qualquer petsitter aprovado. Um petsitter pode falar com os donos
+     * das reservas que lhe fizeram (botão "Conversar" nas Reservas); aos outros só responde se lhe escreverem
+     * (essas conversas vêm do TalkJS).
+     * Rule: an owner can message any approved petsitter. A petsitter can message the owners of the bookings
+     * made with them ("Conversar" button on Reservas); anyone else only if they write first (from TalkJS).
      */
     public function contacts(Request $request): JsonResponse
     {
         $user = $request->user();
 
         if ($user->isPetsitter()) {
-            return response()->json(['data' => []]);
+            // donos (ativos) das reservas deste petsitter; bookings.petsitter_id guarda o id do user
+            $owners = User::whereIn('id', Booking::where('petsitter_id', $user->id)->select('user_id'))
+                ->where('id', '!=', $user->id)
+                ->where('account_status', 'active')
+                ->get()
+                ->map(fn (User $owner) => $this->chatUser($owner, 'Dono'))
+                ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
+                ->values();
+
+            return response()->json(['data' => $owners]);
         }
 
         $contacts = Petsitter::with('user')

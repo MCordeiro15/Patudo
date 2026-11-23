@@ -67,7 +67,7 @@ test('contacts do not expose email or phone', function () {
     expect(array_keys($contact))->toBe(['id', 'name', 'role', 'photo_url']);
 });
 
-test('a petsitter has no contact list and only replies', function () {
+test('a petsitter without bookings has no contact list and only replies', function () {
     $user = User::factory()->petsitter()->create();
     Petsitter::factory()->approved()->create(['user_id' => $user->id]);
     Petsitter::factory()->approved()->create();
@@ -75,6 +75,41 @@ test('a petsitter has no contact list and only replies', function () {
     $this->actingAs($user)->getJson('/api/chat/contacts')
         ->assertOk()
         ->assertExactJson(['data' => []]);
+});
+
+test('a petsitter can message the owners of their bookings, and only them', function () {
+    $petsitter = Petsitter::factory()->approved()->create(['user_id' => User::factory()->petsitter()->create()->id]);
+    $owner = User::factory()->create(['name' => 'Ana Dona']);
+    $otherOwner = User::factory()->create();
+
+    // reserva com este petsitter (o dono aparece nos contactos, uma só vez)
+    foreach (['pending', 'approved'] as $status) {
+        \App\Models\Booking::create([
+            'user_id' => $owner->id,
+            'petsitter_id' => $petsitter->user_id,
+            'start_date' => now()->addDays(3)->toDateString(),
+            'end_date' => now()->addDays(5)->toDateString(),
+            'status' => $status,
+            'total_price' => 30,
+        ]);
+    }
+
+    // reserva de outro dono com outro petsitter: não aparece
+    \App\Models\Booking::create([
+        'user_id' => $otherOwner->id,
+        'petsitter_id' => Petsitter::factory()->approved()->create()->user_id,
+        'start_date' => now()->addDays(3)->toDateString(),
+        'end_date' => now()->addDays(5)->toDateString(),
+        'status' => 'approved',
+        'total_price' => 30,
+    ]);
+
+    $this->actingAs($petsitter->user)->getJson('/api/chat/contacts')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.id', (string) $owner->id)
+        ->assertJsonPath('data.0.name', 'Ana Dona')
+        ->assertJsonPath('data.0.role', 'Dono');
 });
 
 test('a petsitter session reports the Petsitter role', function () {
