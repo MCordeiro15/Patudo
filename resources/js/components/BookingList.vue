@@ -407,13 +407,13 @@ onMounted(() => {
 
     <template v-else>
         <!-- Filtro por estado (só nas Reservas; nos Pedidos estão todos pendentes) -->
-        <div v-if="role === 'owner'" class="status-filters d-flex flex-wrap gap-2 mb-4" role="group" aria-label="Filtrar por estado">
+        <div v-if="role === 'owner'" class="status-filters d-flex flex-wrap justify-content-center gap-2 mb-4 col-12 col-lg-8 mx-auto" role="group" aria-label="Filtrar por estado">
             <button
                 v-for="f in statusFilters"
                 :key="f.value"
                 type="button"
-                class="btn btn-sm rounded-pill filter-chip"
-                :class="statusFilter === f.value ? 'active' : ''"
+                class="btn col"
+                :class="statusFilter === f.value ? 'btn-primary' : 'btn-filter'"
                 :aria-pressed="statusFilter === f.value"
                 @click="statusFilter = f.value"
             >
@@ -944,23 +944,31 @@ onMounted(() => {
     color: #7a6657;
 }
 
-/* Filtro por estado */
-.filter-chip {
-    color: var(--patudo-terracota, #c2410c);
-    background-color: #ffffff;
-    border: 1px solid var(--patudo-terracota, #c2410c);
-    font-weight: 600;
+/* Filtro por estado: o ativo usa o .btn-primary do app.css; os outros o .btn-filter,
+   igual ao .btn-outline-primary mas sem hover */
+.btn-filter {
+    --bs-btn-bg: #ffffff;
+    --bs-btn-color: var(--patudo-terracota);
+    --bs-btn-border-color: var(--patudo-terracota);
+    --bs-btn-hover-bg: #ffffff;
+    --bs-btn-hover-border-color: var(--patudo-terracota);
+    --bs-btn-hover-color: var(--patudo-terracota);
+    --bs-btn-active-bg: #ffffff;
+    --bs-btn-active-border-color: var(--patudo-terracota);
+    --bs-btn-active-color: var(--patudo-terracota);
+    --bs-btn-padding-y: 0.6rem;
+    --bs-btn-padding-x: 1.6rem;
+    --bs-btn-font-size: 0.8rem;
+    --bs-btn-font-weight: 600;
+    border-radius: 25px;
+    line-height: normal;
 }
 
-.filter-chip:hover {
-    background-color: #fdeee4;
-    color: var(--patudo-terracota, #c2410c);
-}
-
-.filter-chip.active {
-    color: #ffffff;
-    background-color: var(--patudo-terracota, #c2410c);
-    border-color: var(--patudo-terracota, #c2410c);
+/* O .btn-primary do app.css não define a cor ao carregar, e ficava azul (Bootstrap) ao clicar */
+.status-filters .btn-primary {
+    --bs-btn-active-bg: var(--patudo-terracota);
+    --bs-btn-active-border-color: var(--patudo-terracota);
+    --bs-btn-active-color: #ffffff;
 }
 
 /* Paginação com as cores do tema */
