@@ -16,6 +16,8 @@
         "@laravel/passkeys": "^0.2.0",
         "@lucide/vue": "^1.17.0",
         "@popperjs/core": "^2.11.8",
+        "@talkjs/core": "^1.12.1",
+        "@talkjs/web-components": "^0.3.14",
         "@vueuse/core": "^12.8.2",
         "bootstrap": "^5.3.8",
         "class-variance-authority": "^0.7.1",

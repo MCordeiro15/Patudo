@@ -375,7 +375,15 @@ const displayPrice = computed(() =>
                                             Reservar
                                         </button>
                                         <button type="button" class="action-btn" @click="openReviewModal">Avaliar</button>
-                                        <button type="button" class="action-btn">Chat</button>
+                                        <!-- abre o chat com este petsitter -->
+                                        <Link
+                                            v-if="petsitterId"
+                                            :href="`/messages?with=${encodeURIComponent(petsitterId)}`"
+                                            class="action-btn text-decoration-none text-dark d-flex align-items-center justify-content-center"
+                                        >
+                                            Chat
+                                        </Link>
+                                        <button v-else type="button" class="action-btn" disabled>Chat</button>
                                     </div>
                                 </div>
                             </div>

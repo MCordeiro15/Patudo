@@ -29,6 +29,12 @@ Route::inertia('/favorites', 'Petsitter/Favorites')->middleware('auth')->name('f
 Route::get('/petsitters/profile', [PetsitterProfileController::class, 'showOwn'])
     ->middleware('auth')
     ->name('petsitters.profile');
+Route::inertia('/messages', 'Messages')->middleware('auth')->name('messages');
+// Foto de perfil de um utilizador como imagem (usada pelo chat, que precisa de um URL e não de base64)
+Route::get('/users/{user}/avatar', \App\Http\Controllers\UserAvatarController::class)
+    ->middleware('auth')
+    ->whereNumber('user')
+    ->name('users.avatar');
 Route::get('/petsitters/{petsitter}', [PetsitterProfileController::class, 'show'])
     ->middleware('auth')
     ->whereNumber('petsitter')

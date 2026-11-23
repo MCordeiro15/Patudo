@@ -40,4 +40,9 @@ return [
         ],
     ],
 
+    'talkjs' => [
+        'app_id' => env('TALKJS_APP_ID'),
+        'secret_key' => env('TALKJS_SECRET_KEY'),
+    ],
+
 ];

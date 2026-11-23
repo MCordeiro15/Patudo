@@ -13,6 +13,7 @@ use App\Http\Controllers\API\SupportTicketsController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\PetsitterServiceController;
 use App\Http\Controllers\API\PostFavouriteController;
+use App\Http\Controllers\API\ChatController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -123,4 +124,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/notifications/{notification}', [NotificationController::class, 'show']);
     Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
+
+    // Chat (TalkJS)
+    Route::get('/chat/session', [ChatController::class, 'session']);
+    Route::get('/chat/contacts', [ChatController::class, 'contacts']);
 });

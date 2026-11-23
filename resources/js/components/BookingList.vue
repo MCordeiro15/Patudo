@@ -978,6 +978,15 @@ onMounted(() => {
 .booking-actions .btn {
     /* !important porque o .flex-fill do Bootstrap também usa !important */
     flex: 1 1 0 !important;
+    /* todos com o tamanho do .btn-sm: as classes do app.css (.btn-outline-danger, .btn-outline-primary...)
+       têm padding próprio e ficavam mais altas que o Conversar */
+    --bs-btn-padding-y: 0.25rem;
+    --bs-btn-padding-x: 0.5rem;
+    line-height: 1.5;
+    /* texto centrado também nos links (<a>), como o Conversar */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Conversar / Avaliar: o .btn-success do Bootstrap ignora --bs-success, por isso usa-se a cor do tema */
@@ -995,14 +1004,6 @@ onMounted(() => {
     color: #ffffff;
     background-color: #3f5a42;
     border-color: #3f5a42;
-}
-
-/* Ver detalhe: contorno terracota do app.css (.btn-outline-primary), mas com o tamanho do .btn-sm
-   como os outros botões do cartão (o app.css tem padding próprio e ficava mais alto) */
-.booking-actions .btn-outline-primary {
-    --bs-btn-padding-y: 0.25rem;
-    --bs-btn-padding-x: 0.5rem;
-    line-height: 1.5;
 }
 
 /* Concluir: cor terracota do tema, com o mesmo tamanho do Conversar

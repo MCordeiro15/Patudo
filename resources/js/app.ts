@@ -35,6 +35,7 @@ void createInertiaApp({
             case name === 'Petsitter/ProfileOwnerView':
             case name === 'Petsitter/ReservationNotification':
             case name === 'Owner/ReservationNotificationToOwner':
+            case name === 'Messages':
             case name === 'Owner/BookingPage':
             case name === 'Payment/PaymentConfirmed':
             case name === 'Admin/PendingPetsitters':
