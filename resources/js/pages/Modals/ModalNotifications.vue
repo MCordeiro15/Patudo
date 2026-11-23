@@ -332,7 +332,7 @@ const timeAgo = (dateString: string) => {
                     </span>
                     <button
                         type="button"
-                        class="btn-patudo-outline-pill"
+                        class="btn btn-outline-primary"
                         @click="handleClose"
                     >
                         Fechar
@@ -734,22 +734,6 @@ const timeAgo = (dateString: string) => {
     font-size: 0.72rem;
     color: #6e5239;
     font-weight: 600;
-}
-
-.btn-patudo-outline-pill {
-    background-color: #ffffff;
-    color: var(--patudo-terracota, #c4450c);
-    border: 1.3px solid var(--patudo-terracota, #c4450c);
-    border-radius: 9999px;
-    padding: 0.38rem 1.15rem;
-    font-size: 0.8rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.btn-patudo-outline-pill:hover {
-    background-color: #fdf2ea;
 }
 
 .btn-patudo-solid-pill {

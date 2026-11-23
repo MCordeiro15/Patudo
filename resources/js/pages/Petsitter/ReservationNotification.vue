@@ -16,7 +16,7 @@ const { unreadCount } = useNotifications();
 <template>
     <Head title="Pedidos de reserva" />
 
-    <main class="min-vh-100 py-4 patudo-page">
+    <main class="min-vh-100 py-4 patudo-page patudo-page-shell">
         <div class="container">
             <!-- Navbar -->
             <nav class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4">

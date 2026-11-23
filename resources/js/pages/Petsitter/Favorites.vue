@@ -94,12 +94,7 @@ onMounted(() => {
 
 <template>
     <Head title="Petsitters Favoritos" />
-
-    <div class="min-vh-100 d-flex flex-column bg-light bg-opacity-25 position-relative overflow-hidden">
-        <div class="patudo-glow patudo-glow-top"></div>
-        <div class="patudo-glow patudo-glow-bottom"></div>
-
-        <main class="patudo-content d-flex flex-column flex-grow-1">
+        <main class="patudo-content patudo-page-shell flex-column flex-grow-1">
             <div class="container">
                 <!-- Navbar Superior com Logout -->
                 <nav
@@ -239,7 +234,6 @@ onMounted(() => {
                 @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
             />
         </main>
-    </div>
 </template>
 
 <style scoped>
@@ -260,12 +254,6 @@ onMounted(() => {
 .favorite-card {
     border-color: #e8c08f !important;
     border-radius: 1rem;
-}
-.profile-btn {
-    background-color: #c8470f;
-    border-color: #c8470f;
-    border-radius: 11px;
-    font-weight: 600;
 }
 
 h1, h2, p {

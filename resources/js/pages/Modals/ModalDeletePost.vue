@@ -72,7 +72,7 @@ const confirm = () => {
                     >
                         <button
                             type="button"
-                            class="btn btn-outline-secondary rounded-pill flex-fill"
+                            class="btn btn-outline-primary rounded-pill flex-fill"
                             @click="close"
                             :disabled="deleting"
                         >
@@ -80,7 +80,7 @@ const confirm = () => {
                         </button>
                         <button
                             type="button"
-                            class="btn btn-danger rounded-pill flex-fill"
+                            class="btn btn-outline-danger rounded-pill flex-fill"
                             @click="confirm"
                             :disabled="deleting"
                         >

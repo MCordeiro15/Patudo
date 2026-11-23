@@ -198,7 +198,7 @@ onMounted(() => {
 <template>
     <Head :title="bookingId ? 'Notificação de Reserva' : 'As minhas reservas'" />
 
-    <main class="min-vh-100 py-4 patudo-page">
+    <main class="min-vh-100 py-4 patudo-page patudo-page-shell">
         <div class="container">
 
             <!-- Navbar -->

@@ -624,7 +624,7 @@ const submit = async () => {
                     <div class="patudo-modal-actions">
                         <button
                             type="button"
-                            class="btn-patudo-outline"
+                            class="btn btn-outline-primary"
                             :disabled="isLoading"
                             @click="close"
                         >
@@ -632,7 +632,7 @@ const submit = async () => {
                         </button>
                         <button
                             type="submit"
-                            class="btn-patudo-solid"
+                            class="btn btn-primary"
                             :disabled="isLoading"
                         >
                             {{ isLoading ? 'A guardar...' : 'Guardar alterações' }}
@@ -882,43 +882,5 @@ const submit = async () => {
     margin-top: 1.15rem;
     padding-top: 0.75rem;
     border-top: 1px solid rgba(196, 69, 12, 0.15);
-}
-
-.btn-patudo-outline {
-    background-color: #ffffff;
-    color: var(--patudo-terracota);
-    border: 1px solid var(--patudo-terracota);
-    border-radius: 12px;
-    padding: 0.5rem 1.35rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.btn-patudo-outline:hover:not(:disabled) {
-    background-color: #fdf2ea;
-}
-
-.btn-patudo-solid {
-    background-color: #c4450c;
-    color: #ffffff;
-    border: 1px solid #c4450c;
-    border-radius: 12px;
-    padding: 0.5rem 1.35rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.btn-patudo-solid:hover:not(:disabled) {
-    background-color: var(--patudo-laranjaVivo);
-}
-
-.btn-patudo-outline:disabled,
-.btn-patudo-solid:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
 }
 </style>

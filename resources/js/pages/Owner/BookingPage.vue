@@ -608,7 +608,7 @@ onMounted(() => {
 
                         <button
                             type="button"
-                            class="booking-submit w-100"
+                            class="btn btn-primary w-100"
                             @click="submitBooking"
                         >
                             <span

@@ -3,11 +3,7 @@ import logoPatudo from '@/../../assets/logoPatudo.svg';
 </script>
 
 <template>
-    <div class="min-vh-100 d-flex flex-column bg-light bg-opacity-25 position-relative overflow-hidden">
-        <div class="patudo-glow patudo-glow-top"></div>
-        <div class="patudo-glow patudo-glow-bottom"></div>
-
-        <div class="patudo-content d-flex flex-column flex-grow-1">
+    <div class="patudo-content patudo-page-shell d-flex flex-column flex-grow-1">
             <header class="container py-4">
                 <!-- Navbar adaptativa: empilhada em mobile, em linha em desktop -->
                 <nav class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
@@ -74,5 +70,4 @@ import logoPatudo from '@/../../assets/logoPatudo.svg';
                 </div>
             </main>
         </div>
-    </div>
 </template>

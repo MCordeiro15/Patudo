@@ -79,7 +79,7 @@ onMounted(() => {
 <template>
     <Head title="Pagamento Confirmado" />
 
-    <main class="min-vh-100 py-4 patudo-page">
+    <main class="min-vh-100 py-4 patudo-page patudo-page-shell">
         <div class="container">
 
             <nav
