@@ -526,7 +526,7 @@ onMounted(() => {
 
                             <button
                                 type="button"
-                                class="btn btn-outline-secondary btn-sm rounded-pill flex-fill"
+                                class="btn btn-concluir btn-sm rounded-pill flex-fill"
                                 :disabled="processingId === b.id"
                                 @click="updateStatus(b, 'completed')"
                             >
@@ -834,11 +834,21 @@ onMounted(() => {
     color: #7a6657;
 }
 
+/* Os botões de cada par (ex.: Conversar + Concluir) ficam com a mesma largura,
+   em vez de a largura depender do tamanho do texto (flex-fill) */
+.booking-actions .btn {
+    /* !important porque o .flex-fill do Bootstrap também usa !important */
+    flex: 1 1 0 !important;
+}
+
 /* Conversar / Avaliar: o .btn-success do Bootstrap ignora --bs-success, por isso usa-se a cor do tema */
 .btn-conversar {
     color: #ffffff;
     background-color: var(--patudo-verde, #4f6f52);
     border: 1px solid var(--patudo-verde, #4f6f52);
+    /* mesmo tamanho de letra dos outros botões do cartão (Cancelar, Ver detalhe) */
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
 .btn-conversar:hover,
@@ -846,6 +856,30 @@ onMounted(() => {
     color: #ffffff;
     background-color: #3f5a42;
     border-color: #3f5a42;
+}
+
+/* Concluir: preenchido com a cor do tema, como os outros botões de ação */
+.btn-concluir {
+    color: #ffffff;
+    background-color: var(--patudo-terracota, #c2410c);
+    border: 1px solid var(--patudo-terracota, #c2410c);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.btn-concluir:hover,
+.btn-concluir:focus,
+.btn-concluir:active {
+    color: #ffffff;
+    background-color: var(--patudo-laranjaVivo, #f97316);
+    border-color: var(--patudo-laranjaVivo, #f97316);
+}
+
+.btn-concluir:disabled {
+    color: #ffffff;
+    background-color: var(--patudo-terracota, #c2410c);
+    border-color: var(--patudo-terracota, #c2410c);
+    opacity: 0.65;
 }
 
 /* ================= Telemóvel ================= */
