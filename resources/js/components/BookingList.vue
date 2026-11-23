@@ -120,7 +120,8 @@ function serviceLabel(b: BookingItem): string {
 
 // Cartão do petsitter: "Cão · Labrador · 3 anos · Grande"
 function animalLine(animal: AnimalCard): string {
-    const age = animal.age !== null && animal.age !== undefined && animal.age !== ''
+    // a idade vem da API (animals.age, em anos) ou é null
+    const age = animal.age != null
         ? `${animal.age} ${Number(animal.age) === 1 ? 'ano' : 'anos'}`
         : '';
     return [animal.species, animal.breed, age, animal.size].filter(Boolean).join(' · ');
@@ -244,6 +245,7 @@ const openAnimal = async (animal: AnimalCard) => {
             breed: a.breed,
             size: a.size,
             sex: a.sex ?? undefined,
+            age: a.age != null ? `${a.age} ${a.age === 1 ? 'ano' : 'anos'}` : undefined,
             weight: a.weight ? `${Number(a.weight)} kg` : undefined,
             care: a.special_needs ?? undefined,
             medication: a.medication ?? undefined,

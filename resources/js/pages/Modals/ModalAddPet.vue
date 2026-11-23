@@ -23,6 +23,7 @@ const aggression = ref('');
 const medication = ref('');
 const sex = ref('');
 const weight = ref('');
+const age = ref('');
 const photoFile = ref<File | null>(null);
 const photoPreview = ref<string | null>(null);
 const photoInput = ref<HTMLInputElement | null>(null);
@@ -103,6 +104,7 @@ const resetForm = () => {
     medication.value = '';
     sex.value = '';
     weight.value = '';
+    age.value = '';
 
     clearPhotoPreview();
     photoFile.value = null;
@@ -140,7 +142,7 @@ const submit = async () => {
             .find((row) => row.startsWith('XSRF-TOKEN='))
             ?.split('=')[1];
 
-        const body: Record<string, string | number | null> = {
+        const fields: Record<string, string | number | null> = {
             name: name.value.trim(),
             species: species.value.trim(),
             breed: breed.value.trim(),
@@ -150,18 +152,25 @@ const submit = async () => {
             medication: medication.value.trim() || null,
             sex: sex.value || null,
             weight: weight.value ? parseFloat(weight.value) : null,
+            age: age.value !== '' ? Number(age.value) : null,
         };
+
+        // FormData (e não JSON) para poder enviar a fotografia; os campos vazios não se enviam
+        const body = new FormData();
+        for (const [key, value] of Object.entries(fields)) {
+            if (value !== null && value !== '') body.append(key, String(value));
+        }
+        if (photoFile.value) body.append('photo', photoFile.value);
 
         const response = await fetch('/api/animals', {
             method: 'POST',
             credentials: 'same-origin',
             headers: {
-                'Content-Type': 'application/json',
                 Accept: 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-XSRF-TOKEN': xsrfToken ?? '',
+                'X-XSRF-TOKEN': decodeURIComponent(xsrfToken ?? ''),
             },
-            body: JSON.stringify(body),
+            body,
         });
 
         if (response.ok) {
@@ -399,13 +408,16 @@ const submit = async () => {
 
                                 <input
                                     id="animal-age"
+                                    v-model="age"
                                     type="number"
                                     min="0"
+                                    max="40"
                                     step="1"
                                     class="form-control patudo-field rounded-3"
                                     placeholder="Ex.: 3"
                                     autocomplete="off"
                                 />
+                                <InputError :message="errors.age?.[0]" />
                             </div>
                         </div>
 

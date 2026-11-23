@@ -54,6 +54,8 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'two_factor_confirmed_at' => 'datetime',
             'is_admin' => 'boolean',
             'is_petsitter' => 'boolean',
+            // saldo fictício (KAN-215). Não está no Fillable: só muda pelo pagamento de reservas.
+            'credit' => 'decimal:2',
         ];
     }
 

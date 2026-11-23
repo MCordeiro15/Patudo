@@ -8,8 +8,9 @@ import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 defineOptions({ layout: false });
 
-// O id do pagamento vem do URL: /payment-confirmed?payment=ID
-const paymentId = new URLSearchParams(window.location.search).get('payment');
+// O id da reserva paga vem do URL: /payment-confirmed?booking=ID
+// (o pagamento é fictício e fica na própria reserva, por isso lê-se a reserva)
+const bookingId = new URLSearchParams(window.location.search).get('booking');
 
 function getXsrf(): string {
     const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
@@ -42,32 +43,72 @@ type PaymentData = {
     reservation_end?: string;
 };
 
-// Mock até existir backend de pagamentos (/api/payments/{id})
-const mockPayment: PaymentData = {
-    id: 12345,
-    reservation_id: 1001,
+// Valores vazios até a reserva carregar (sem dados inventados)
+const emptyPayment: PaymentData = {
+    id: 0,
+    reservation_id: 0,
     amount: 0,
-    payment_method: 'Cartão de crédito',
-    created_at: new Date().toISOString(),
-    pet_name: 'Nome do Pet',
+    payment_method: '',
+    created_at: '',
+    pet_name: '',
     pet_photo: null,
-    reservation_start: new Date().toISOString(),
-    reservation_end: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+    reservation_start: '',
+    reservation_end: '',
 };
 
-const payment = ref<PaymentData>(mockPayment);
+// Horas de entrada/saída da reserva, para "Datas e horário"
+const entranceHour = ref<string | null>(null);
+const exitHour = ref<string | null>(null);
+const loadError = ref('');
+
+const payment = ref<PaymentData>(emptyPayment);
 const showNotifications = ref(false);
 const { unreadCount } = useNotifications();
 
 const formatDate = (iso?: string) => (iso ? new Date(iso).toLocaleDateString('pt-PT') : '--');
 
+// Datas da reserva vêm como "2026-11-23" (sem hora). new Date() lia-as em UTC e, nos Açores,
+// mostrava o dia anterior; por isso formata-se o texto diretamente.
+const formatDay = (day?: string) => {
+    const match = day?.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return match ? `${match[3]}/${match[2]}/${match[1]}` : formatDate(day);
+};
+
+// "23/11/2026 10:00"
+const withHour = (day?: string, hour?: string | null) => (hour ? `${formatDay(day)} ${hour.slice(0, 5)}` : formatDay(day));
+
+type BookingAnimal = { name: string; photo?: string | null };
+
+// Lê a reserva (GET /api/bookings/{id}: só o dono ou o petsitter a podem ver) e preenche os detalhes
 const loadPayment = async () => {
-    if (!paymentId) return;
+    if (!bookingId) {
+        loadError.value = 'Reserva não indicada.';
+        return;
+    }
     try {
-        const res = await apiFetch(`/api/payments/${paymentId}`);
-        if (res.ok) payment.value = (await res.json()).data;
+        const res = await apiFetch(`/api/bookings/${bookingId}`);
+        if (!res.ok) {
+            loadError.value = 'Não foi possível carregar a reserva.';
+            return;
+        }
+        const booking = (await res.json()).data;
+        const animals: BookingAnimal[] = booking.animals ?? [];
+
+        payment.value = {
+            id: booking.id,
+            reservation_id: booking.id,
+            amount: Number(booking.total_price ?? 0),
+            payment_method: 'Cartão de crédito',
+            created_at: booking.created_at,
+            pet_name: animals.map((a) => a.name).join(', '),
+            pet_photo: animals[0]?.photo ?? null,
+            reservation_start: booking.start_date,
+            reservation_end: booking.end_date,
+        };
+        entranceHour.value = booking.entrance_hour ?? null;
+        exitHour.value = booking.exit_hour ?? null;
     } catch {
-        // mantém o mock
+        loadError.value = 'Erro de ligação. Tenta novamente.';
     }
 };
 
@@ -147,6 +188,8 @@ onMounted(() => {
             </div>
 
             <p class="text-center fw-medium fs-5 mb-4">O pagamento foi aprovado com sucesso!</p>
+            <!-- só aparece se a reserva não carregar -->
+            <p v-if="loadError" class="text-center text-danger small mb-4">{{ loadError }}</p>
 
             <section class="details-card mx-auto">
                 <div class="px-4 pt-4 pb-3">
@@ -154,7 +197,7 @@ onMounted(() => {
 
                     <div class="detail-row">
                         <span>id da reserva:</span>
-                        <span class="value-pill"></span>
+                        <span class="value-pill">{{ payment.reservation_id ? `#${payment.reservation_id}` : '' }}</span>
                     </div>
                     <div class="detail-row">
                         <span>Valor pago:</span>
@@ -166,7 +209,7 @@ onMounted(() => {
                     </div>
                     <div class="detail-row">
                         <span>Forma de pagamento:</span>
-                        <span class="value-pill"></span>
+                        <span class="value-pill">{{ payment.payment_method }}</span>
                     </div>
                 </div>
 
@@ -182,13 +225,16 @@ onMounted(() => {
                     </div>
                     <div class="lh-sm">
                         <p class="mb-1 fw-medium">{{ payment.pet_name }}</p>
-                        <small class="fs-6">{{ formatDate(payment.reservation_start) }} - {{ formatDate(payment.reservation_end) }}</small>
+                        <small class="fs-6">
+                            {{ withHour(payment.reservation_start, entranceHour) }} - {{ withHour(payment.reservation_end, exitHour) }}
+                        </small>
                     </div>
                 </div>
             </section>
 
             <div class="text-center mt-5">
-                <a href="/orders" class="btn btn-primary rounded-pill px-5 py-2">Ir para meus pedidos</a>
+                <!-- as reservas do dono estão em /reservations (/orders é a página do petsitter) -->
+                <a href="/reservations" class="btn btn-primary rounded-pill px-5 py-2">Ir para meus pedidos</a>
             </div>
         </div>
 
@@ -247,6 +293,12 @@ onMounted(() => {
 
 .value-pill {
     display: inline-block;
+    /* o texto cabe dentro da pastilha, que tem altura fixa */
+    font-size: 0.8rem;
+    line-height: 1.1rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 999px;

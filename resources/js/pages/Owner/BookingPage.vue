@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { Bell, CalendarDays, LogOut, MessageCircle, UserRound, ChevronLeft, Dog, Plus } from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
@@ -7,6 +7,7 @@ import type { Animal } from '@/types';
 import { useNotifications } from '@/composables/useNotifications';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import ModalBookingPageAddPet from '@/pages/Modals/ModalBookingPageAddPet.vue';
+import ModalPayment from '@/pages/Modals/ModalPayment.vue';
 
 // O id do petsitter vem do URL: /booking?petsitter=ID
 const petsitterId = new URLSearchParams(window.location.search).get('petsitter');
@@ -41,6 +42,10 @@ const exitHour = ref('');
 const zone = ref('');
 const feedback = ref('');
 const submitting = ref(false);
+
+// Pagamento fictício: o saldo do utilizador (vem de /api/me) e o modal de pagamento
+const credit = ref<number | null>(null);
+const showPayment = ref(false);
 
 // Dados carregados
 const animals = ref<Animal[]>([]);
@@ -249,7 +254,10 @@ const submitBooking = async () => {
         });
 
         if (res.ok) {
-            feedback.value = 'Reserva criada com sucesso! Aguardando confirmação do petsitter.';
+            // reserva paga e criada: vai para a página "Pagamento Confirmado" com o id da nova reserva
+            const created = (await res.json()).data;
+            router.visit(`/payment-confirmed?booking=${created.id}`);
+            feedback.value = 'Pagamento feito e reserva criada com sucesso! Aguarda a confirmação do petsitter.';
             startDate.value = '';
             endDate.value = '';
             selectedAnimals.value = [];
@@ -278,10 +286,67 @@ const showNotifications = ref(false);
 const { unreadCount } = useNotifications();
 const showAddPetModal = ref(false);
 
+// Dias da semana das datas escolhidas em que o cuidador não trabalha (o servidor verifica o mesmo).
+// Bastam os primeiros 7 dias: a partir daí os dias da semana repetem-se.
+const weekdayKeys = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+const weekdayLabels: Record<string, string> = {
+    monday: 'segunda-feira',
+    tuesday: 'terça-feira',
+    wednesday: 'quarta-feira',
+    thursday: 'quinta-feira',
+    friday: 'sexta-feira',
+    saturday: 'sábado',
+    sunday: 'domingo',
+};
+
+const unavailableDays = computed(() => {
+    if (!petsitter.value || numberOfDays.value === 0) return [];
+    const available = petsitter.value.availability_days ?? [];
+    const missing: string[] = [];
+    const day = new Date(`${startDate.value}T00:00:00`);
+
+    for (let i = 0; i < Math.min(numberOfDays.value, 7); i++) {
+        const key = weekdayKeys[day.getDay()];
+        if (!available.includes(key) && !missing.includes(key)) missing.push(key);
+        day.setDate(day.getDate() + 1);
+    }
+
+    return missing.map((key) => weekdayLabels[key]);
+});
+
+const hasEnoughCredit = computed(() => credit.value === null || credit.value >= totalPrice.value);
+
+// Só deixa pagar com o formulário completo, dias disponíveis e saldo suficiente
+const canPay = computed(() => isFormValid.value && unavailableDays.value.length === 0 && hasEnoughCredit.value);
+
+const serviceLabelForPayment = computed(() => `Serviço de ${selectedServiceLabel.value} - Petsitter ${displayName.value}`);
+
+const formatEuros = (value: number) => `${value.toFixed(2).replace('.', ',')} €`;
+
+const loadCredit = async () => {
+    try {
+        const res = await apiFetch('/api/me');
+        if (res.ok) credit.value = Number((await res.json()).data?.credit ?? 0);
+    } catch {
+        // sem saldo carregado: o servidor continua a verificar ao pagar
+    }
+};
+
+// "Pagar" no modal: cria a reserva (o servidor desconta o saldo) e fecha o modal
+const payAndBook = async () => {
+    const total = totalPrice.value;
+    await submitBooking();
+    showPayment.value = false;
+    if (feedback.value.includes('sucesso') && credit.value !== null) {
+        credit.value = Math.max(0, credit.value - total);
+    }
+};
+
 onMounted(() => {
     void loadPetsitter();
     void loadAnimals();
     void loadServices();
+    void loadCredit();
 });
 </script>
 
@@ -338,7 +403,10 @@ onMounted(() => {
                 </div>
             </nav>
 
-            <a href="/profile-owner-view" class="back-link d-inline-flex align-items-center gap-1 mt-5">
+            <a
+                :href="petsitterId ? `/petsitters/${petsitterId}` : '/petsitters'"
+                class="back-link d-inline-flex align-items-center gap-1 mt-5"
+            >
                 <ChevronLeft :size="24" />
                 Voltar ao perfil
             </a>
@@ -382,7 +450,7 @@ onMounted(() => {
                                     </strong>
 
                                     <small>
-                                        € {{ service.price }} / {{ service.type === 'passeio' ? 'passeio' : 'noite' }}
+                                        € {{ service.price }} / {{ service.type === 'passeio' ? 'passeio' : 'dia' }}
                                     </small>
 
                                     <span
@@ -434,7 +502,9 @@ onMounted(() => {
                                     <span class="text-start flex-grow-1">
                                         <strong class="d-block">{{ animal.name }}</strong>
                                         <small>
-                                            {{ animal.species }}{{ animal.breed ? ' · ' + animal.breed : '' }}
+                                            {{ animal.species }}{{ animal.breed ? ' · ' + animal.breed : '' }}{{
+                                                animal.age != null ? ` · ${animal.age} ${animal.age === 1 ? 'ano' : 'anos'}` : ''
+                                            }}
                                         </small>
                                     </span>
 
@@ -510,6 +580,11 @@ onMounted(() => {
                                 {{ availabilityText }}
                             </p>
 
+                            <!-- datas com dias em que o cuidador não trabalha -->
+                            <p v-if="unavailableDays.length > 0" class="booking-help text-danger mb-0">
+                                O cuidador não está disponível à {{ unavailableDays.join(', ') }}. Escolhe outras datas.
+                            </p>
+
                             <p v-if="numberOfDays > 0" class="booking-help mb-0">
                                 {{ numberOfDays }}
                                 {{ numberOfDays === 1 ? 'dia de cuidado' : 'dias de cuidado' }}
@@ -535,10 +610,10 @@ onMounted(() => {
                                 v-model="notes"
                                 class="form-control booking-input booking-notes"
                                 rows="4"
-                                maxlength="300"
+                                maxlength="500"
                                 placeholder="Fala-lhe do teu animal, rotinas, horários de entrega..."
                             />
-                            <div class="notes-count">{{ notes.length }}/300</div>
+                            <div class="notes-count">{{ notes.length }}/500</div>
                         </div>
                     </section>
                 </div>
@@ -594,7 +669,7 @@ onMounted(() => {
                                 <strong>
                                     {{
                                         numberOfDays
-                                            ? `${numberOfDays} noite${numberOfDays === 1 ? '' : 's'} × € ${selectedServicePrice}`
+                                            ? `${numberOfDays} dia${numberOfDays === 1 ? '' : 's'} × € ${selectedServicePrice}`
                                             : '—'
                                     }}
                                 </strong>
@@ -606,17 +681,25 @@ onMounted(() => {
                             <span>€ {{ totalPrice.toFixed(2) }}</span>
                         </div>
 
+                        <!-- saldo fictício com que se paga a reserva -->
+                        <p v-if="credit !== null" class="summary-note mb-2">
+                            Saldo disponível: <strong>{{ formatEuros(credit) }}</strong>
+                        </p>
+                        <p v-if="!hasEnoughCredit" class="summary-note text-danger mb-2">
+                            Saldo insuficiente para esta reserva.
+                        </p>
+
                         <button
                             type="button"
                             class="btn btn-primary w-100"
-                            @click="submitBooking"
+                            @click="showPayment = true"
                         >
                             <span
                                 v-if="submitting"
                                 class="spinner-border spinner-border-sm me-2"
                                 role="status"
                             ></span>
-                            {{ submitting ? 'A criar...' : 'Confirmar Reserva' }}
+                            {{ submitting ? 'A pagar...' : 'Fazer Pagamento' }}
                         </button>
 
                         <p class="summary-note">
@@ -631,6 +714,16 @@ onMounted(() => {
             :show="showNotifications"
             @close="showNotifications = false"
             @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
+        />
+
+        <!-- Pagamento (fictício): o "Pagar" cria a reserva e o servidor desconta o saldo -->
+        <ModalPayment
+            :show="showPayment"
+            :service-label="serviceLabelForPayment"
+            :amount="totalPrice"
+            :processing="submitting"
+            @close="showPayment = false"
+            @paid="payAndBook"
         />
 
         <ModalBookingPageAddPet

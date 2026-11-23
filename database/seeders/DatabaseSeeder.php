@@ -131,5 +131,19 @@ class DatabaseSeeder extends Seeder
             // 6. Create bookings and reviews
             $this->call(BookingSeeder::class);
         }
+
+        // 7. Serviços da Sofia (petsitter 1), para haver alguém reservável depois do seed.
+        //    Só cria se ela ainda não tiver serviços (o export pode já os trazer).
+        $sofia = Petsitter::whereHas('user', fn ($q) => $q->where('email', 'sofia@patudo.test'))->first();
+        if ($sofia && ! $sofia->services()->exists()) {
+            $sofia->services()->createMany([
+                ['type' => 'pet-sitting', 'price' => 20],
+                ['type' => 'passeio', 'price' => 10],
+            ]);
+        }
+
+        // 8. Saldo fictício para testar reservas: quem ainda não tem saldo começa com 500 €
+        //    (os utilizadores criados pelo registo começam com 0 €)
+        User::where('credit', 0)->update(['credit' => 500]);
     }
 }
