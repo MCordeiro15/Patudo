@@ -238,10 +238,21 @@ class BookingController extends Controller
         // quem pode fazer esta mudança? (null se a mudança nem existe no mapa)
         $allowed = self::TRANSITIONS[$booking->status][$data['status']] ?? null;
 
-        if ($allowed !== $who) {
+        // 422: esta mudança de estado não existe (ex.: completed -> approved)
+        if ($allowed === null) {
             return response()->json([
                 'message' => "Não é possível passar de {$booking->status} para {$data['status']}.",
             ], 422);
+        }
+
+        // 403: a mudança existe, mas é do outro lado da reserva
+        // (ex.: o dono a aceitar a própria reserva; só o petsitter aceita, recusa e conclui)
+        if ($allowed !== $who) {
+            return response()->json([
+                'message' => $allowed === 'petsitter'
+                    ? 'Só o petsitter desta reserva pode fazer esta alteração.'
+                    : 'Só o dono desta reserva pode fazer esta alteração.',
+            ], 403);
         }
 
         $booking->update(['status' => $data['status']]);

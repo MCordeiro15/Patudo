@@ -1,10 +1,14 @@
 <script setup lang="ts">
-// Lista de reservas usada nas páginas Pedidos (petsitter) e Reservas (dono).
-// role="petsitter" -> pedidos pendentes recebidos (Ver ficha do animal, Recusar, Aceitar)
-// role="owner"     -> página Reservas: SÓ as reservas em que o user autenticado é o dono,
-//                     da mais recente para a mais antiga, com filtro por estado e paginação.
-//                     Cada cartão mostra o petsitter, os animais, as datas, o preço total e o estado.
-//                     Estados da lista: carregamento, erro (com "Tentar novamente") e vazio.
+// Lista de reservas usada nas páginas Pedidos (petsitter) e Reservas.
+// Nas duas: da mais recente para a mais antiga, com paginação.
+// Estados da lista: carregamento, erro (com "Tentar novamente") e vazio.
+// role="petsitter" -> página Pedidos: os pedidos PENDENTES em que o user é o petsitter (Recusar / Aceitar).
+//                     Depois de respondido, o pedido sai daqui e passa para as Reservas.
+// role="owner"     -> página Reservas, com filtro por estado:
+//                     - as reservas em que o user é o dono, em todos os estados;
+//                     - as reservas em que o user é o petsitter e que já não estão pendentes.
+//                     Cada cartão mostra a outra pessoa, os animais, as datas, o preço total e o estado,
+//                     e os botões do lado do user (dono: Cancelar/Conversar/Avaliar; petsitter: Conversar/Concluir).
 import { usePage } from '@inertiajs/vue3';
 import { ChevronRight, MapPin, UserRound } from '@lucide/vue';
 import { computed, onMounted, ref, watch } from 'vue';
@@ -70,12 +74,12 @@ const currentUserId = computed(() => page.props.auth.user?.id ?? null);
 // ---------- Estado ----------
 const bookings = ref<BookingItem[]>([]);
 const loading = ref(false);
-const loadError = ref(''); // erro ao carregar a lista (estado de erro do dono)
+const loadError = ref(''); // erro ao carregar a lista (mostra "Tentar novamente")
 const processingId = ref<number | null>(null);
 const feedback = ref('');
 const feedbackType = ref<'success' | 'error'>('success');
 
-// Filtro por estado e paginação (dono)
+// Filtro por estado e paginação (dono e petsitter)
 const PER_PAGE = 10;
 const statusFilter = ref<'all' | BookingStatus>('all');
 const currentPage = ref(1);
@@ -150,8 +154,14 @@ function animalNames(b: BookingItem): string {
     return (b.animals ?? []).map((a) => a.name).join(', ') || '--';
 }
 
-// Conversar abre o chat com o petsitter (id de user)
-const chatWith = (b: BookingItem) => b.petsitter_id;
+// Em cada reserva, o user é o petsitter ou o dono (bookings.petsitter_id é o id do user)
+const isPetsitterOf = (b: BookingItem) => b.petsitter_id === currentUserId.value;
+
+// O cartão das Reservas mostra a outra pessoa: o petsitter, ou o dono se fores tu o petsitter
+const otherPerson = (b: BookingItem): Person | undefined => (isPetsitterOf(b) ? b.owner : b.petsitter);
+
+// Conversar abre o chat com a outra pessoa da reserva (ids de users)
+const chatWith = (b: BookingItem) => (isPetsitterOf(b) ? b.user_id : b.petsitter_id);
 
 const statusShort: Record<string, string> = {
     pending: 'Pendente',
@@ -170,7 +180,7 @@ const statusFilters: { value: 'all' | BookingStatus; label: string }[] = [
     { value: 'completed', label: 'Concluídas' },
 ];
 
-// ---------- Lista (dono): filtro, ordenação e paginação ----------
+// ---------- Lista: filtro, ordenação e paginação ----------
 // Mais recente primeiro (created_at; em empate, id mais alto primeiro)
 const sortedBookings = computed(() =>
     [...bookings.value].sort((a, b) => {
@@ -210,20 +220,17 @@ const loadBookings = async () => {
     loading.value = true;
     loadError.value = '';
     try {
-        // Petsitter: só pendentes (?pending=1). Dono: todos os estados.
+        // Todos os estados (o filtro por estado é feito aqui, nos botões de filtro).
         // A API pagina de 15 em 15, por isso lê todas as páginas.
-        const filter = props.role === 'petsitter' ? 'pending=1&' : '';
         const all: BookingItem[] = [];
         let pageNumber = 1;
         let lastPage = 1;
         do {
-            const res = await apiFetch(`/api/bookings?${filter}page=${pageNumber}`);
+            const res = await apiFetch(`/api/bookings?page=${pageNumber}`);
             if (!res.ok) {
-                const msg = props.role === 'petsitter'
+                loadError.value = props.role === 'petsitter'
                     ? 'Não foi possível carregar os pedidos de reserva.'
                     : 'Não foi possível carregar as reservas.';
-                if (props.role === 'petsitter') setFeedback(msg, 'error');
-                else loadError.value = msg;
                 return;
             }
             const json = await res.json();
@@ -233,13 +240,12 @@ const loadBookings = async () => {
         } while (pageNumber <= lastPage);
 
         // A API devolve as reservas onde és dono OU petsitter.
-        // Pedidos: só os pendentes recebidos. Reservas: só as em que és o dono.
+        // Pedidos: os pendentes recebidos. Reservas: as tuas como dono + as recebidas já respondidas.
         bookings.value = props.role === 'petsitter'
-            ? all.filter((b) => b.status === 'pending' && b.petsitter_id === currentUserId.value)
-            : all.filter((b) => b.user_id === currentUserId.value);
+            ? all.filter((b) => isPetsitterOf(b) && b.status === 'pending')
+            : all.filter((b) => b.user_id === currentUserId.value || (isPetsitterOf(b) && b.status !== 'pending'));
     } catch {
-        if (props.role === 'petsitter') setFeedback('Erro de conexão. Tente novamente.', 'error');
-        else loadError.value = 'Erro de conexão. Tente novamente.';
+        loadError.value = 'Erro de conexão. Tente novamente.';
     } finally {
         loading.value = false;
     }
@@ -252,7 +258,8 @@ const successMessages: Record<string, string> = {
     completed: 'Reserva concluída.',
 };
 
-// Pedidos: aceitar / recusar (o pedido sai da lista). Reservas: o cartão muda de estado.
+// Sem recarregar a página: nos Pedidos o pedido respondido sai da lista (passa para as Reservas);
+// nas Reservas o cartão muda logo de estado
 const updateStatus = async (b: BookingItem, newStatus: 'approved' | 'rejected' | 'cancelled' | 'completed') => {
     processingId.value = b.id;
     feedback.value = '';
@@ -264,10 +271,11 @@ const updateStatus = async (b: BookingItem, newStatus: 'approved' | 'rejected' |
         if (res.ok) {
             if (props.role === 'petsitter') {
                 bookings.value = bookings.value.filter((item) => item.id !== b.id);
+                setFeedback(`${successMessages[newStatus]} Podes vê-la nas Reservas.`, 'success');
             } else {
                 b.status = newStatus;
+                setFeedback(successMessages[newStatus], 'success');
             }
-            setFeedback(successMessages[newStatus], 'success');
         } else {
             setFeedback(
                 newStatus === 'cancelled'
@@ -382,20 +390,62 @@ onMounted(() => {
         {{ feedback }}
     </div>
 
-    <!-- ===================== Petsitter: pedidos de reserva ===================== -->
-    <template v-if="role === 'petsitter'">
-        <div class="d-flex flex-column gap-4">
+    <!-- Carregamento -->
+    <div v-if="loading" class="text-center py-5">
+        <div class="spinner-border text-secondary" role="status">
+            <span class="visually-hidden">A carregar...</span>
+        </div>
+    </div>
+
+    <!-- Erro -->
+    <div v-else-if="loadError" class="text-center py-5">
+        <p class="text-danger mb-3" role="alert">{{ loadError }}</p>
+        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" @click="loadBookings">
+            Tentar novamente
+        </button>
+    </div>
+
+    <template v-else>
+        <!-- Filtro por estado (só nas Reservas; nos Pedidos estão todos pendentes) -->
+        <div v-if="role === 'owner'" class="status-filters d-flex flex-wrap gap-2 mb-4" role="group" aria-label="Filtrar por estado">
+            <button
+                v-for="f in statusFilters"
+                :key="f.value"
+                type="button"
+                class="btn btn-sm rounded-pill filter-chip"
+                :class="statusFilter === f.value ? 'active' : ''"
+                :aria-pressed="statusFilter === f.value"
+                @click="statusFilter = f.value"
+            >
+                {{ f.label }}
+            </button>
+        </div>
+
+        <!-- Estado vazio -->
+        <div v-if="filteredBookings.length === 0" class="text-center text-secondary py-5">
+            <template v-if="role === 'petsitter'">
+                Não tens pedidos de reserva pendentes.
+            </template>
+            <template v-else>
+                {{ bookings.length === 0
+                ? 'Ainda não tens reservas.'
+                : 'Não tens reservas com este estado.' }}
+            </template>
+        </div>
+
+        <!-- ===================== Petsitter: pedidos de reserva ===================== -->
+        <div v-if="role === 'petsitter'" class="d-flex flex-column gap-4">
             <article
-                v-for="booking in bookings"
+                v-for="booking in pagedBookings"
                 :key="booking.id"
                 class="card request-card rounded-4 p-4 px-md-5"
             >
                 <!--
                     Grelha com 3 colunas (avatar | dono e animal | serviço e preço) e 3 linhas
                     partilhadas, para que cada linha fique à mesma altura nas duas colunas:
-                    linha 1: nome / serviço e período
-                    linha 2: Animal / Preço
-                    linha 3: Ver ficha do animal / Recusar e Aceitar
+                    linha 1: nome / estado, serviço e período
+                    linha 2: Animal e datas / Preço
+                    linha 3: Ver ficha do animal / botões do estado
                     (no telemóvel passa tudo para uma só coluna, pela ordem em que está escrito)
                 -->
                 <div class="request-grid">
@@ -418,7 +468,7 @@ onMounted(() => {
                         </small>
                     </div>
 
-                    <!-- Animal -->
+                    <!-- Animal e datas -->
                     <div class="cell-animal">
                         <p
                             v-for="animal in booking.animals"
@@ -426,6 +476,9 @@ onMounted(() => {
                             class="mb-0 fs-5"
                         >
                             <strong>Animal:</strong> {{ animalLine(animal) }}
+                        </p>
+                        <p class="mb-0 fs-5">
+                            <strong>Datas:</strong> {{ datesLabel(booking) }}
                         </p>
                     </div>
 
@@ -435,7 +488,7 @@ onMounted(() => {
                             v-for="animal in booking.animals"
                             :key="animal.id"
                             href="#"
-                            class="btn btn-primary d-inline-flex align-items-center justify-content-between"
+                            class="btn btn-primary btn-ficha d-inline-flex align-items-center justify-content-between"
                             :class="{ disabled: loadingAnimalId === animal.id }"
                             @click.prevent="openAnimal(animal)"
                         >
@@ -444,8 +497,11 @@ onMounted(() => {
                         </a>
                     </div>
 
-                    <!-- Serviço e período -->
+                    <!-- Estado, serviço e período -->
                     <div class="cell-service text-center">
+                        <span class="status-pill d-block mb-2" :class="`status-${booking.status}`">
+                            {{ statusShort[booking.status] || booking.status }}
+                        </span>
                         <p class="fs-3 fw-medium mb-1">{{ serviceLabel(booking) }}</p>
                         <small><strong>Período:</strong> {{ periodLabel(booking) }}</small>
                     </div>
@@ -455,108 +511,61 @@ onMounted(() => {
                         <p class="fw-bold fs-4 mb-0">Preço: {{ formatPrice(booking.total_price) }}</p>
                     </div>
 
-                    <!-- Ações -->
+                    <!-- Ações (dependem do estado) -->
                     <div class="cell-actions d-flex gap-2">
-                        <button
-                            type="button"
-                            class="btn btn-outline-danger rounded-pill flex-fill py-2"
-                            :disabled="processingId === booking.id"
-                            @click="updateStatus(booking, 'rejected')"
-                        >
-                            Recusar
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-aceitar rounded-pill flex-fill py-2"
-                            :disabled="processingId === booking.id"
-                            @click="updateStatus(booking, 'approved')"
-                        >
-                            Aceitar
-                        </button>
+                        <!-- Pendente: Recusar + Aceitar -->
+                        <template v-if="booking.status === 'pending'">
+                            <button
+                                type="button"
+                                class="btn btn-outline-danger rounded-pill flex-fill py-2"
+                                :disabled="processingId === booking.id"
+                                @click="updateStatus(booking, 'rejected')"
+                            >
+                                Recusar
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-aceitar rounded-pill flex-fill py-2"
+                                :disabled="processingId === booking.id"
+                                @click="updateStatus(booking, 'approved')"
+                            >
+                                Aceitar
+                            </button>
+                        </template>
                     </div>
                 </div>
             </article>
         </div>
 
-        <!-- Estado vazio -->
-        <p v-if="!loading && bookings.length === 0 && !feedback" class="text-center text-secondary mt-4">
-            Não tens pedidos de reserva pendentes.
-        </p>
-
-        <!-- Spinner -->
-        <div v-if="loading" class="text-center py-4">
-            <div class="spinner-border text-secondary" role="status">
-                <span class="visually-hidden">A carregar...</span>
-            </div>
-        </div>
-    </template>
-
-    <!-- ===================== Dono: as minhas reservas ===================== -->
-    <template v-else>
-        <!-- Carregamento -->
-        <div v-if="loading" class="text-center py-5">
-            <div class="spinner-border text-secondary" role="status">
-                <span class="visually-hidden">A carregar...</span>
-            </div>
-        </div>
-
-        <!-- Erro -->
-        <div v-else-if="loadError" class="text-center py-5">
-            <p class="text-danger mb-3" role="alert">{{ loadError }}</p>
-            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" @click="loadBookings">
-                Tentar novamente
-            </button>
-        </div>
-
+        <!-- ===================== Reservas: como dono e como petsitter ===================== -->
         <template v-else>
-            <!-- Filtro por estado -->
-            <div class="status-filters d-flex flex-wrap gap-2 mb-4" role="group" aria-label="Filtrar por estado">
-                <button
-                    v-for="f in statusFilters"
-                    :key="f.value"
-                    type="button"
-                    class="btn btn-sm rounded-pill filter-chip"
-                    :class="statusFilter === f.value ? 'active' : ''"
-                    :aria-pressed="statusFilter === f.value"
-                    @click="statusFilter = f.value"
-                >
-                    {{ f.label }}
-                </button>
-            </div>
-
-            <!-- Estado vazio -->
-            <div v-if="filteredBookings.length === 0" class="text-center text-secondary py-5">
-                {{ bookings.length === 0
-                ? 'Ainda não tens reservas.'
-                : 'Não tens reservas com este estado.' }}
-            </div>
 
             <article
                 v-for="b in pagedBookings"
                 :key="b.id"
                 class="booking-card bg-white mb-3"
             >
-                <!-- Avatar do petsitter -->
+                <!-- Avatar da outra pessoa (o petsitter, ou o dono se fores tu o petsitter) -->
                 <div class="booking-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden">
                     <img
-                        v-if="b.petsitter?.avatar_url"
-                        :src="b.petsitter.avatar_url"
+                        v-if="otherPerson(b)?.avatar_url"
+                        :src="otherPerson(b)!.avatar_url!"
                         alt="Foto de perfil"
                         class="w-100 h-100 object-fit-cover"
                     />
                     <UserRound v-else :size="56" class="text-secondary" />
                 </div>
 
-                <!-- Petsitter / local / animais / datas -->
+                <!-- Outra pessoa / local / animais / datas -->
                 <div class="booking-info">
                     <div>
                         <h2 class="booking-name mb-0">
-                            {{ b.petsitter?.name ?? 'Petsitter' }}
+                            {{ otherPerson(b)?.name ?? (isPetsitterOf(b) ? 'Proprietário' : 'Petsitter') }}
                         </h2>
                         <small class="booking-location d-flex align-items-center gap-1">
                             <MapPin :size="17" />
-                            <!-- zona da reserva (onde é o serviço); reservas antigas sem zona: localidade do petsitter -->
-                            {{ b.zone || b.petsitter?.location || '--' }}
+                            <!-- zona da reserva (onde é o serviço); reservas antigas sem zona: localidade da outra pessoa -->
+                            {{ b.zone || otherPerson(b)?.location || '--' }}
                         </small>
                     </div>
 
@@ -585,7 +594,36 @@ onMounted(() => {
 
                     <p class="booking-price mb-0">Preço: {{ formatPrice(b.total_price) }}</p>
 
-                    <div class="booking-actions d-flex gap-2 mt-2 w-100">
+                    <!-- Lado do petsitter: reservas que te fizeram (já respondidas) -->
+                    <div v-if="isPetsitterOf(b)" class="booking-actions d-flex gap-2 mt-2 w-100">
+                        <!-- Aceite: Conversar + Concluir -->
+                        <template v-if="b.status === 'approved'">
+                            <a :href="`/messages?with=${chatWith(b)}`" class="btn btn-conversar btn-sm rounded-pill flex-fill">
+                                Conversar
+                            </a>
+
+                            <button
+                                type="button"
+                                class="btn btn-concluir btn-sm rounded-pill flex-fill"
+                                :disabled="processingId === b.id"
+                                @click="updateStatus(b, 'completed')"
+                            >
+                                Concluir
+                            </button>
+                        </template>
+
+                        <!-- Outros estados: ver detalhe -->
+                        <a
+                            v-else
+                            :href="`/reservations?booking=${b.id}`"
+                            class="btn btn-outline-primary btn-sm rounded-pill flex-fill"
+                        >
+                            Ver detalhe
+                        </a>
+                    </div>
+
+                    <!-- Lado do dono: reservas que fizeste -->
+                    <div v-else class="booking-actions d-flex gap-2 mt-2 w-100">
                         <!-- Reserva aceite: Conversar + Cancelar -->
                         <template v-if="b.status === 'approved'">
                             <a :href="`/messages?with=${chatWith(b)}`" class="btn btn-conversar btn-sm rounded-pill flex-fill">
@@ -625,7 +663,7 @@ onMounted(() => {
 
                             <a
                                 :href="`/reservations?booking=${b.id}`"
-                                class="btn btn-outline-secondary btn-sm rounded-pill flex-fill"
+                                class="btn btn-outline-primary btn-sm rounded-pill flex-fill"
                             >
                                 Ver detalhe
                             </a>
@@ -635,7 +673,7 @@ onMounted(() => {
                         <a
                             v-else
                             :href="`/reservations?booking=${b.id}`"
-                            class="btn btn-outline-secondary btn-sm rounded-pill flex-fill"
+                            class="btn btn-outline-primary btn-sm rounded-pill flex-fill"
                         >
                             Ver detalhe
                         </a>
@@ -643,8 +681,10 @@ onMounted(() => {
                 </div>
             </article>
 
-            <!-- Paginação -->
-            <nav v-if="totalPages > 1" aria-label="Paginação das reservas" class="mt-4">
+        </template>
+
+            <!-- Paginação (dono e petsitter) -->
+            <nav v-if="totalPages > 1" aria-label="Paginação" class="mt-4">
                 <ul class="pagination justify-content-center mb-0">
                     <li class="page-item" :class="{ disabled: currentPage === 1 }">
                         <button type="button" class="page-link" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
@@ -673,7 +713,6 @@ onMounted(() => {
                     </li>
                 </ul>
             </nav>
-        </template>
     </template>
 
     <ModalPetDetails :show="showPetDetails" :pet="selectedPet" @close="showPetDetails = false" />
@@ -756,8 +795,8 @@ onMounted(() => {
     background-color: #ffffff;
 }
 
-/* Ver ficha do animal */
-.btn-primary {
+/* Ver ficha do animal (classe própria, para o Concluir usar o .btn-primary normal do app.css) */
+.btn-ficha {
     /* ao clicar e enquanto a ficha carrega (disabled) o Bootstrap usava o azul por defeito */
     --bs-btn-active-bg: var(--patudo-laranjaVivo);
     --bs-btn-active-border-color: var(--patudo-laranjaVivo);
@@ -956,6 +995,39 @@ onMounted(() => {
     color: #ffffff;
     background-color: #3f5a42;
     border-color: #3f5a42;
+}
+
+/* Ver detalhe: contorno terracota do app.css (.btn-outline-primary), mas com o tamanho do .btn-sm
+   como os outros botões do cartão (o app.css tem padding próprio e ficava mais alto) */
+.booking-actions .btn-outline-primary {
+    --bs-btn-padding-y: 0.25rem;
+    --bs-btn-padding-x: 0.5rem;
+    line-height: 1.5;
+}
+
+/* Concluir: cor terracota do tema, com o mesmo tamanho do Conversar
+   (o .btn-primary do app.css tem padding próprio e ficava maior) */
+.btn-concluir {
+    color: #ffffff;
+    background-color: var(--patudo-terracota, #c2410c);
+    border: 1px solid var(--patudo-terracota, #c2410c);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.btn-concluir:hover,
+.btn-concluir:focus,
+.btn-concluir:active {
+    color: #ffffff;
+    background-color: var(--patudo-laranjaVivo, #f97316);
+    border-color: var(--patudo-laranjaVivo, #f97316);
+}
+
+.btn-concluir:disabled {
+    color: #ffffff;
+    background-color: var(--patudo-terracota, #c2410c);
+    border-color: var(--patudo-terracota, #c2410c);
+    opacity: 0.65;
 }
 
 /* ================= Telemóvel ================= */
