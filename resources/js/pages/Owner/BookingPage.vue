@@ -502,7 +502,9 @@ onMounted(() => {
                                     <span class="text-start flex-grow-1">
                                         <strong class="d-block">{{ animal.name }}</strong>
                                         <small>
-                                            {{ animal.species }}{{ animal.breed ? ' · ' + animal.breed : '' }}
+                                            {{ animal.species }}{{ animal.breed ? ' · ' + animal.breed : '' }}{{
+                                                animal.age != null ? ` · ${animal.age} ${animal.age === 1 ? 'ano' : 'anos'}` : ''
+                                            }}
                                         </small>
                                     </span>
 
@@ -690,7 +692,7 @@ onMounted(() => {
                         <button
                             type="button"
                             class="booking-submit w-100"
-                            :disabled="!canPay || submitting"
+
                             @click="showPayment = true"
                         >
                             <span

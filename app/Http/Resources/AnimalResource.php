@@ -37,6 +37,8 @@ class AnimalResource extends JsonResource
             'sex' => $this->sex,
             'photo' => $this->photo,
             'weight' => $this->weight,
+            // idade em anos (null se não foi indicada)
+            'age' => $this->age,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'user' => new UserResource($this->whenLoaded('user')),

@@ -13,6 +13,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Gate;
 
 class AnimalController extends Controller
@@ -52,9 +53,12 @@ class AnimalController extends Controller
             'aggression' => 'nullable|string|max:255',
             'medication' => 'nullable|string',
             'sex' => 'nullable|string|max:255',
-            'photo' => 'nullable|string|max:255',
+            'photo' => $this->photoRule($request),
             'weight' => 'nullable|numeric|min:0|max:999.99',
+            'age' => 'nullable|integer|min:0|max:40',
         ]);
+
+        $data = $this->withPhotoAsDataUri($request, $data);
 
         if ( ! $request->user()?->isAdmin() || empty($data['user_id'])) {
             $data['user_id'] = $request->user()->id;
@@ -94,9 +98,12 @@ class AnimalController extends Controller
             'aggression' => 'nullable|string|max:255',
             'medication' => 'nullable|string',
             'sex' => 'nullable|string|max:255',
-            'photo' => 'nullable|string|max:255',
+            'photo' => $this->photoRule($request),
             'weight' => 'nullable|numeric|min:0|max:999.99',
+            'age' => 'nullable|integer|min:0|max:40',
         ]);
+
+        $data = $this->withPhotoAsDataUri($request, $data);
 
         if ( ! $request->user()?->isAdmin()) {
             unset($data['user_id']);
@@ -118,5 +125,36 @@ class AnimalController extends Controller
         $animal->delete();
 
         return response()->noContent();
+    }
+
+    /**
+     * Regra da foto: um ficheiro de imagem (JPG/PNG/WEBP até 5 MB) ou, se não vier ficheiro, texto (a foto já guardada).
+     * Photo rule: an image file (JPG/PNG/WEBP up to 5 MB) or, when no file is sent, text (the photo already stored).
+     *
+     * @return array<int, string>
+     */
+    private function photoRule(Request $request): array
+    {
+        return $request->hasFile('photo')
+            ? ['nullable', 'image', 'mimes:jpeg,png,webp', 'max:5120']
+            : ['nullable', 'string'];
+    }
+
+    /**
+     * Converte a foto enviada em data URI (base64), como o avatar dos users, para o <img> a mostrar diretamente.
+     * Converts the uploaded photo to a data URI (base64), like the users' avatar, so an <img> can show it directly.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function withPhotoAsDataUri(Request $request, array $data): array
+    {
+        $file = $request->file('photo');
+
+        if ($file instanceof UploadedFile) {
+            $data['photo'] = 'data:'.$file->getMimeType().';base64,'.base64_encode($file->getContent());
+        }
+
+        return $data;
     }
 }
