@@ -9,6 +9,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class BookingResource extends JsonResource
 {
@@ -36,11 +37,20 @@ class BookingResource extends JsonResource
                 'id' => $this->user->id,
                 'name' => $this->user->name,
                 'location' => $this->user->location,
+                // foto do user, ou avatar com as iniciais (como no UserResource)
+                'avatar_url' => $this->user->avatar
+                    ?: $this->initialsAvatar($this->user->name),
             ] : null),
             'petsitter' => $this->whenLoaded('petsitter', fn () => $this->petsitter ? [
                 'id' => $this->petsitter->user_id,
                 'name' => $this->petsitter->user?->name,
                 'location' => $this->petsitter->service_location ?? $this->petsitter->city,
+                // foto do perfil de petsitter, ou avatar com as iniciais (como no PetsitterResource)
+                'avatar_url' => $this->petsitter->profile_photo
+                    ? (str_starts_with($this->petsitter->profile_photo, 'data:')
+                        ? $this->petsitter->profile_photo
+                        : Storage::disk('public')->url($this->petsitter->profile_photo))
+                    : $this->initialsAvatar($this->petsitter->user?->name),
             ] : null),
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
@@ -55,5 +65,14 @@ class BookingResource extends JsonResource
             'entrance_hour' => $this->entrance_hour,
             'exit_hour' => $this->exit_hour,
         ];
+    }
+
+    /**
+     * Avatar gerado com as iniciais do nome (o mesmo dos outros resources).
+     * Avatar generated from the name's initials (same as the other resources).
+     */
+    private function initialsAvatar(?string $name): string
+    {
+        return 'https://ui-avatars.com/api/?name=' . urlencode($name ?? 'U') . '&background=random';
     }
 }
