@@ -4,14 +4,10 @@
 import { Head, Link } from '@inertiajs/vue3';
 import {
     Bell,
-    CirclePlus,
-    Heart,
     MessageCircle,
-    PenLine,
-    Pencil,
     Save,
     Trash2,
-    UserRound,
+    UserRound, LogOut,
 } from '@lucide/vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import { computed, onMounted, ref } from 'vue';
@@ -470,12 +466,12 @@ const saveAvailability = async () => {
 
     <!-- Conteúdo principal da página. -->
     <!-- Main content area of the page. -->
-    <main class="min-vh-100 py-4 patudo-page">
+    <main class="min-vh-100 py-4 patudo-page patudo-page-shell">
         <div class="container">
             <!-- Barra de navegação com links principais. -->
             <!-- Navigation bar with main links. -->
             <nav
-                class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4 position-relative"
+                class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
             >
                 <a
                     class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2"
@@ -490,18 +486,15 @@ const saveAvailability = async () => {
                     <span>Patudo</span>
                 </a>
 
-                <div
-                    class="nav nav-pills border rounded-pill p-1 position-absolute start-50 translate-middle-x d-none d-lg-flex"
-                >
+                <div class="nav nav-pills border rounded-pill p-1 mx-auto">
                     <a class="nav-link text-dark rounded-pill px-4" href="/"
-                        >Início</a
+                    >Início</a
                     >
                     <a
                         class="nav-link text-dark rounded-pill px-4"
                         href="/orders"
+                    >Pedidos</a
                     >
-                        Pedidos
-                    </a>
                     <a
                         class="nav-link text-dark rounded-pill px-4"
                         href="/favorites"
@@ -516,13 +509,21 @@ const saveAvailability = async () => {
                     </a>
                 </div>
 
-                <div class="d-flex align-items-center gap-3 ms-auto">
-                    <a href="/messages" class="text-dark">
-                        <MessageCircle :size="25" />
-                    </a>
-                    <button type="button" class="text-dark bg-transparent border-0 p-0 position-relative" @click="showNotifications = true">
+                <div class="d-flex align-items-center gap-3">
+                    <a href="/messages" class="text-dark"
+                    ><MessageCircle :size="25"
+                    /></a>
+                    <button
+                        type="button"
+                        class="text-dark bg-transparent border-0 p-0 position-relative"
+                        @click="showNotifications = true"
+                    >
                         <Bell :size="25" />
-                        <span v-if="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                        <span
+                            v-if="unreadCount > 0"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style="font-size: 0.6rem"
+                        >
                             {{ unreadCount > 9 ? '9+' : unreadCount }}
                         </span>
                     </button>
@@ -533,244 +534,302 @@ const saveAvailability = async () => {
                     >
                         <UserRound :size="25" />
                     </button>
+                    <Link
+                        href="/logout"
+                        method="post"
+                        as="button"
+                        class="btn btn-outline-danger rounded-pill d-flex align-items-center gap-2 px-3"
+                    >
+                        <LogOut :size="16" />
+                        <span>Sair</span>
+                    </Link>
                 </div>
             </nav>
 
-            <div class="row justify-content-center mt-5 pt-4">
-                <div class="col-12">
-                    <h1 class="text-center fw-bold mb-4 pb-2">
-                        {{
-                            isOwnProfile
-                                ? 'O meu perfil'
-                                : 'Perfil do Petsitter'
-                        }}
-                    </h1>
+            <h1 class="text-center fw-bold display-5 mt-5 pt-4 mb-4">
+                {{ isOwnProfile ? 'O meu perfil' : 'Perfil do Petsitter' }}
+            </h1>
 
-                    <!-- No profile message -->
-                    <section
-                        v-if="!hasProfile"
-                        class="card border border-warning rounded-4 p-4 text-center"
+            <!-- No profile message -->
+            <section
+                v-if="!hasProfile"
+                class="card bg-white border border-primary rounded-4 p-4 text-center"
+            >
+                <p class="mb-0">Ainda não tem um perfil de petsitter.</p>
+            </section>
+
+            <template v-else>
+                <!-- Secção de informações principais do perfil: nome, localização, tags de serviço, experiência, rating e data de membro. -->
+                <!-- Main profile information section: name, location, service tags, experience, rating, and member since date. -->
+                <section
+                    class="card bg-white border border-primary rounded-4 p-3 p-md-4 mb-3 position-relative"
+                >
+                    <button
+                        v-if="canEdit"
+                        type="button"
+                        class="btn btn-primary btn-sm d-flex align-items-center gap-2 position-absolute top-0 end-0 mt-3 me-3 px-4"
+                        @click="showEditProfileModal = true"
                     >
-                        <p class="mb-0">
-                            Ainda não tem um perfil de petsitter.
-                        </p>
-                    </section>
-
-                    <template v-else>
-                        <!-- Secção de informações principais do perfil: nome, localização, tags de serviço, experiência, rating e data de membro. -->
-                        <!-- Main profile information section: name, location, service tags, experience, rating, and member since date. -->
-                        <section
-                            class="card border border-primary rounded-4 p-3 p-md-4 mb-3"
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
                         >
-                            <div class="row g-4 align-items-start">
-                                <div class="col-12 col-md-8">
-                                    <div class="d-flex gap-3">
-                                        <div
-                                            class="d-flex align-items-center justify-content-center rounded-circle bg-light flex-shrink-0 overflow-hidden"
-                                            style="width: 100px; height: 100px"
-                                        >
-                                            <img
-                                                v-if="displayAvatar"
-                                                :src="displayAvatar"
-                                                alt="Foto de perfil"
-                                                style="width: 100px; height: 100px; object-fit: cover"
-                                            />
-                                            <span v-else class="display-6">🐶</span>
-                                        </div>
+                            <path
+                                d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                            />
+                            <path
+                                d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"
+                            />
+                        </svg>
+                        Editar
+                    </button>
 
-                                        <div class="w-100">
-                                            <h2 class="h5 mb-0">
-                                                {{ displayName }}
-                                            </h2>
-                                            <p class="mb-0 text-muted small">
-                                                {{ displayLocation }}
-                                            </p>
-                                            <p
-                                                v-if="displayPhone"
-                                                class="mb-2 text-muted small"
-                                            >
-                                                {{ displayPhone }}
-                                            </p>
-
-                                            <div
-                                                class="d-flex flex-wrap gap-2 mb-2"
-                                            >
-                                                <span
-                                                    v-for="tag in serviceTags"
-                                                    :key="tag"
-                                                    class="badge rounded-pill text-bg-success px-3 py-2"
-                                                >
-                                                    {{ tag }}
-                                                </span>
-                                            </div>
-
-                                            <p class="mb-0 text-muted small">
-                                                {{ displayExperience }}
-                                            </p>
-                                        </div>
-                                    </div>
+                    <div class="row g-4 align-items-center">
+                        <div class="col-12 col-md-8">
+                            <div class="d-flex align-items-center gap-4">
+                                <div
+                                    class="profile-avatar d-flex align-items-center justify-content-center rounded-circle border border-primary flex-shrink-0 overflow-hidden"
+                                >
+                                    <img
+                                        v-if="displayAvatar"
+                                        :src="displayAvatar"
+                                        alt="Foto de perfil"
+                                        class="profile-avatar-img"
+                                    />
+                                    <UserRound
+                                        v-else
+                                        :size="64"
+                                        class="text-primary"
+                                    />
                                 </div>
 
-                                <div class="col-12 col-md-4">
-                                    <div
-                                        class="border-start ps-3 d-grid gap-1 text-muted small"
+                                <div>
+                                    <h2 class="h5 fw-bold mb-0">
+                                        {{ displayName }}
+                                    </h2>
+                                    <p class="text-muted small mb-0">
+                                        {{ displayLocation }}
+                                    </p>
+                                    <p
+                                        v-if="displayPhone"
+                                        class="text-muted small mb-0"
                                     >
-                                        <div>
-                                            Rating
-                                            <strong class="text-dark ms-1">
-                                                {{
-                                                    formatRating(displayRating)
-                                                }}
-                                            </strong>
-                                        </div>
-                                        <div>
-                                            Avaliações {{ displayReviewsCount }}
-                                        </div>
-                                        <div>
-                                            Membro desde {{ memberSinceLabel }}
-                                        </div>
+                                        {{ displayPhone }}
+                                    </p>
+
+                                    <div class="d-flex flex-wrap gap-3 my-2">
+                                        <span
+                                            v-for="tag in serviceTags"
+                                            :key="tag"
+                                            class="tag-pill rounded-pill py-1 small"
+                                        >
+                                            {{ tag }}
+                                        </span>
                                     </div>
+
+                                    <p class="text-muted small mb-0">
+                                        {{ displayExperience }}
+                                    </p>
                                 </div>
                             </div>
-                        </section>
+                        </div>
 
-                        <!-- Secção de biografia do petsitter com botão de editar perfil. -->
-                        <!-- Petsitter biography section with edit profile button. -->
+                        <div class="col-12 col-md-4">
+                            <div class="border-start border-secondary ps-4 py-2">
+                                <p class="fs-5 text-muted mb-1">
+                                    Rating {{ formatRating(displayRating) }}
+                                </p>
+                                <p class="text-muted mb-2">
+                                    Avaliações {{ displayReviewsCount }}
+                                </p>
+                                <p class="text-muted mb-0">
+                                    Membro desde:<br />
+                                    {{ memberSinceLabel }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Secção de biografia do petsitter. -->
+                <!-- Petsitter biography section. -->
+                <section
+                    class="card bg-white border border-primary rounded-4 p-3 px-md-4 mb-3 about-card"
+                >
+                    <h2 class="h5 fw-semibold mb-3">Sobre mim</h2>
+                    <p class="text-muted fs-5 mb-0 ps-md-2">
+                        {{ displayBiography }}
+                    </p>
+                </section>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-lg-6">
+                        <!-- Secção de serviços e preços do petsitter. -->
+                        <!-- Petsitter services and pricing section. -->
                         <section
-                            class="card border border-primary rounded-4 p-3 p-md-4 mb-3"
+                            class="card bg-white border border-primary rounded-4 p-3 px-md-4 h-100 info-card"
+                        >
+                            <h2 class="h5 fw-semibold mb-3">
+                                Serviços e preços
+                            </h2>
+                            <div class="price-row border-bottom pb-1 small text-muted">
+                                <span>Dog Sitting (diária)</span>
+                                <span>{{ formatPrice(displayPricePerDay) }}</span>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                        <!-- Secção de disponibilidade do petsitter com modo de visualização e edição. -->
+                        <!-- Petsitter availability section with view and edit modes. -->
+                        <section
+                            class="card bg-white border border-primary rounded-4 p-3 px-md-4 h-100 info-card"
                         >
                             <div
-                                class="d-flex align-items-center justify-content-between mb-2"
+                                class="d-flex align-items-center justify-content-between mb-3"
                             >
-                                <h3 class="h5 mb-0">Sobre mim</h3>
+                                <h2 class="h5 fw-semibold mb-0">
+                                    Disponibilidade
+                                </h2>
                                 <button
-                                    v-if="canEdit"
+                                    v-if="canEdit && !isEditing"
                                     type="button"
-                                    class="btn btn-outline-primary btn-sm rounded-pill"
-                                    @click="showEditProfileModal = true"
+                                    class="btn btn-primary d-flex align-items-center gap-1"
+                                    @click="startEditing"
                                 >
-                                    <Pencil :size="14" class="me-1" />
-                                    Editar perfil
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path
+                                            d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                                        />
+                                        <path
+                                            d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"
+                                        />
+                                    </svg>
+                                    Editar
                                 </button>
                             </div>
-                            <p class="mb-0 text-muted">
-                                {{ displayBiography }}
-                            </p>
-                        </section>
 
-                        <div class="row g-3 mb-3">
-                            <div class="col-12 col-lg-6">
-                                <!-- Secção de serviços e preços do petsitter. -->
-                                <!-- Petsitter services and pricing section. -->
-                                <section
-                                    class="card border border-primary rounded-4 p-3 p-md-4 h-100"
+                            <!-- View mode: quadrados com visto / cruz -->
+                            <div v-if="!isEditing" class="days-grid">
+                                <div
+                                    v-for="day in DAY_OPTIONS"
+                                    :key="day.value"
+                                    class="day-box"
+                                    :class="
+                                        currentAvailabilityDays.includes(
+                                            day.value,
+                                        )
+                                            ? 'day-on'
+                                            : 'day-off'
+                                    "
                                 >
-                                    <h3 class="h5 mb-3">Serviços e preços</h3>
-                                    <div
-                                        class="d-flex align-items-center justify-content-between"
+                                    <span>{{ day.label.slice(0, 3) }}</span>
+                                    <svg
+                                        v-if="
+                                            currentAvailabilityDays.includes(
+                                                day.value,
+                                            )
+                                        "
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
                                     >
-                                        <span>Dog Sitting (diário)</span>
-                                        <strong>{{
-                                            formatPrice(displayPricePerDay)
-                                        }}</strong>
-                                    </div>
-                                </section>
+                                        <path d="M3 12.5l6 6L21 6" />
+                                    </svg>
+                                    <svg
+                                        v-else
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="18"
+                                        height="18"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path d="M4 4l16 16M20 4L4 20" />
+                                    </svg>
+                                </div>
                             </div>
 
-                            <div class="col-12 col-lg-6">
-                                <!-- Secção de disponibilidade do petsitter com modo de visualização e edição. -->
-                                <!-- Petsitter availability section with view and edit modes. -->
-                                <section
-                                    class="card border border-primary rounded-4 p-3 p-md-4 h-100"
-                                >
-                                    <div
-                                        class="d-flex align-items-center justify-content-between mb-3"
+                            <!-- Edit mode: os mesmos quadrados, clicáveis -->
+                            <template v-else-if="canEdit">
+                                <div class="days-grid">
+                                    <button
+                                        v-for="day in DAY_OPTIONS"
+                                        :key="day.value"
+                                        type="button"
+                                        class="day-box day-btn"
+                                        :class="
+                                            editingDays.includes(day.value)
+                                                ? 'day-on'
+                                                : 'day-off'
+                                        "
+                                        @click="toggleDay(day.value)"
                                     >
-                                        <h3 class="h5 mb-0">Disponibilidade</h3>
-                                        <template v-if="canEdit && !isEditing">
-                                            <button
-                                                type="button"
-                                                class="btn btn-outline-secondary btn-sm rounded-pill"
-                                                @click="startEditing"
-                                            >
-                                                <Pencil
-                                                    :size="14"
-                                                    class="me-1"
-                                                />
-                                                Editar
-                                            </button>
-                                        </template>
-                                    </div>
-
-                                    <!-- View mode: show day labels -->
-                                    <template v-if="!isEditing">
-                                        <div
-                                            v-if="
-                                                currentAvailabilityDays.length >
-                                                0
-                                            "
-                                            class="d-flex flex-wrap gap-2"
+                                        <span>{{ day.label.slice(0, 3) }}</span>
+                                        <svg
+                                            v-if="editingDays.includes(day.value)"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="18"
+                                            height="18"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.5"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
                                         >
-                                            <span
-                                                v-for="day in DAY_OPTIONS"
-                                                :key="day.value"
-                                                class="badge rounded-pill px-3 py-2"
-                                                :class="
-                                                    currentAvailabilityDays.includes(
-                                                        day.value,
-                                                    )
-                                                        ? 'text-bg-success'
-                                                        : 'text-bg-light text-muted'
-                                                "
-                                            >
-                                                {{ day.label }}
-                                            </span>
-                                        </div>
-                                        <p v-else class="mb-0 text-muted small">
-                                            Nenhum dia selecionado.
-                                        </p>
-                                    </template>
-
-                                    <!-- Edit mode: checkboxes -->
-                                    <template v-else-if="canEdit">
-                                        <p class="text-muted small mb-3">
-                                            Selecione os dias em que está
-                                            disponível:
-                                        </p>
-                                        <div class="d-flex flex-column gap-2">
-                                            <label
-                                                v-for="day in DAY_OPTIONS"
-                                                :key="day.value"
-                                                class="form-check d-flex align-items-center"
-                                            >
-                                                <input
-                                                    class="form-check-input me-2"
-                                                    type="checkbox"
-                                                    :checked="
-                                                        editingDays.includes(
-                                                            day.value,
-                                                        )
-                                                    "
-                                                    @change="
-                                                        toggleDay(day.value)
-                                                    "
-                                                />
-                                                <span>{{ day.label }}</span>
-                                            </label>
-                                        </div>
+                                            <path d="M3 12.5l6 6L21 6" />
+                                        </svg>
+                                        <svg
+                                            v-else
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="18"
+                                            height="18"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.5"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <path d="M4 4l16 16M20 4L4 20" />
+                                        </svg>
+                                    </button>
+                                </div>
 
                                         <div class="d-flex gap-2 mt-3">
                                             <button
                                                 type="button"
-                                                class="btn btn-success btn-sm rounded-pill"
+                                                class="btn btn-aceitar btn-sm rounded-pill"
                                                 :disabled="saving"
                                                 @click="saveAvailability"
                                             >
-                                                <Save
-                                                    v-if="!saving"
-                                                    :size="14"
-                                                    class="me-1"
-                                                />
                                                 {{
                                                     saving
                                                         ? 'A guardar...'
@@ -787,127 +846,127 @@ const saveAvailability = async () => {
                                             </button>
                                         </div>
 
-                                        <div
-                                            v-if="saveError"
-                                            class="alert alert-danger mt-2 py-2 small"
-                                        >
-                                            {{ saveError }}
-                                        </div>
-                                        <div
-                                            v-if="saveSuccess"
-                                            class="alert alert-success mt-2 py-2 small"
-                                        >
-                                            Disponibilidade guardada com
-                                            sucesso!
-                                        </div>
-                                    </template>
-                                </section>
-                            </div>
-                        </div>
+                                <div
+                                    v-if="saveError"
+                                    class="alert alert-danger mt-2 py-2 small"
+                                >
+                                    {{ saveError }}
+                                </div>
+                            </template>
 
-                        <!-- Secção de publicações do petsitter com lista de posts e botão para criar novo. -->
-                        <!-- Petsitter posts section with post list and create new button. -->
-                        <section class="mt-5">
-                            <h2 class="text-center fw-bold my-5">
-                                Publicações
-                            </h2>
-
-                            <p v-if="postsLoading" class="text-center">
-                                A carregar publicações...
-                            </p>
                             <div
-                                v-else-if="postsError"
-                                class="alert alert-danger py-2 small text-center"
+                                v-if="saveSuccess"
+                                class="alert alert-success mt-2 py-2 small"
                             >
-                                {{ postsError }}
-                            </div>
-                            <p
-                                v-else-if="posts.length === 0 && !canPost"
-                                class="text-center text-muted"
-                            >
-                                Ainda não há publicações.
-                            </p>
-
-                            <div class="d-grid gap-3">
-                                <article
-                                    v-for="post in posts"
-                                    :key="post.id"
-                                    class="card border border-primary rounded-4 p-3"
-                                >
-                                    <div class="row g-3 align-items-stretch">
-                                        <div v-if="post.photos && post.photos.length > 0" class="col-12 col-md-3">
-                                            <img
-                                                :src="post.photos[0]"
-                                                alt="Imagem da publicação"
-                                                class="img-fluid rounded-4 h-100 object-fit-cover"
-                                            />
-                                        </div>
-
-                                        <div :class="post.photos && post.photos.length > 0 ? 'col-12 col-md-8' : 'col-12'">
-                                            <h3
-                                                v-if="post.title"
-                                                class="h4 mb-2"
-                                            >
-                                                {{ post.title }}
-                                            </h3>
-                                            <p class="text-muted mb-3">
-                                                {{ post.description }}
-                                            </p>
-                                            <small class="text-muted">{{
-                                                formatDateTime(post.created_at)
-                                            }}</small>
-                                        </div>
-
-                                        <div
-                                            class="col-12 col-md-1 d-flex justify-content-md-end gap-2"
-                                        >
-                                            <button
-                                                v-if="canEdit"
-                                                type="button"
-                                                class="btn btn-link text-dark p-0"
-                                                @click="editPost(post.id)"
-                                            >
-                                                <PenLine :size="18" />
-                                            </button>
-                                            <button
-                                                v-if="canEdit"
-                                                type="button"
-                                                class="btn btn-link text-dark p-0"
-                                                @click="deletePost(post.id)"
-                                            >
-                                                <Trash2 :size="18" />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                class="btn btn-link text-primary p-0"
-                                            >
-                                                <Heart :size="24" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </article>
-
-                                <article
-                                    v-if="canPost"
-                                    class="card border border-primary rounded-4 p-4 text-center d-flex align-items-center justify-content-center"
-                                    style="min-height: 170px; cursor: pointer"
-                                    @click="showNewPostModal = true"
-                                >
-                                    <CirclePlus
-                                        :size="56"
-                                        class="text-secondary mb-2"
-                                    />
-                                    <p class="mb-0">
-                                        Adicionar nova publicação
-                                    </p>
-                                </article>
+                                Disponibilidade guardada com sucesso!
                             </div>
                         </section>
-
-                        <div class="d-flex justify-content-end mt-3"></div>
-                    </template>
+                    </div>
                 </div>
-            </div>
+
+                <!-- Secção de publicações do petsitter com lista de posts e botão para criar novo. -->
+                <!-- Petsitter posts section with post list and create new button. -->
+                <h1 class="text-center fw-bold display-5 mt-5 mb-4">
+                    Publicações
+                </h1>
+
+                <p v-if="postsLoading" class="text-center">
+                    A carregar publicações...
+                </p>
+                <div
+                    v-else-if="postsError"
+                    class="alert alert-danger py-2 small text-center"
+                >
+                    {{ postsError }}
+                </div>
+                <p
+                    v-else-if="posts.length === 0 && !canPost"
+                    class="text-center text-muted"
+                >
+                    Ainda não há publicações.
+                </p>
+
+                <div class="row justify-content-center mb-4">
+                    <div class="col-12 col-lg-10">
+                        <div class="d-grid gap-3">
+                            <article
+                                v-for="post in posts"
+                                :key="post.id"
+                                class="post-card card bg-white border border-primary rounded-4 position-relative"
+                            >
+                                <div
+                                    v-if="post.photos && post.photos.length > 0"
+                                    class="post-img-wrap"
+                                >
+                                    <img
+                                        :src="post.photos[0]"
+                                        alt="Imagem da publicação"
+                                        class="post-img"
+                                    />
+                                </div>
+
+                                <div class="post-body">
+                                    <h3 v-if="post.title" class="post-title">
+                                        {{ post.title }}
+                                    </h3>
+                                    <p class="post-text text-muted">
+                                        {{ post.description }}
+                                    </p>
+                                    <small class="post-date">{{
+                                            formatDateTime(post.created_at)
+                                        }}</small>
+                                </div>
+
+                                <div class="post-actions">
+                                    <button
+                                        v-if="canEdit"
+                                        type="button"
+                                        class="btn btn-link text-dark p-0"
+                                        @click="editPost(post.id)"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="40"
+                                            height="40"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.25"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <path
+                                                d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                                            />
+                                            <path
+                                                d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"
+                                            />
+                                        </svg>
+                                    </button>
+                                    <button
+                                        v-if="canEdit"
+                                        type="button"
+                                        class="btn btn-link text-dark p-0"
+                                        @click="deletePost(post.id)"
+                                    >
+                                        <Trash2 :size="40" :stroke-width="1.25" />
+                                    </button>
+                                </div>
+
+                            </article>
+
+                            <article
+                                v-if="canPost"
+                                class="add-post-card card bg-white border border-primary rounded-4 p-4 text-center d-flex flex-column align-items-center justify-content-center gap-2"
+                                @click="showNewPostModal = true"
+                            >
+                                <div class="add-post-circle"></div>
+                                <span class="small">Adicionar nova publicação</span>
+                            </article>
+                        </div>
+                    </div>
+                </div>
+            </template>
         </div>
 
         <!-- Edit Profile Modal -->
@@ -951,3 +1010,231 @@ const saveAvailability = async () => {
         />
     </main>
 </template>
+
+<style scoped>
+.patudo-page {
+    background-color: #fffaf3;
+}
+
+.profile-avatar {
+    width: 140px;
+    height: 140px;
+}
+
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.tag-pill {
+    background-color: #587257;
+    color: #fff;
+    min-width: 120px;
+    text-align: center;
+}
+
+.about-card {
+    min-height: 170px;
+}
+
+.info-card {
+    min-height: 135px;
+}
+
+/* Linha do preço: o valor fica no fim da linha. */
+/* Price row: the value sits at the end of the row. */
+.price-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Quadrados dos dias da semana (Seg a Dom). */
+/* Weekday squares (Mon to Sun). */
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.4rem;
+}
+
+.day-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    width: 100%;
+    height: 72px;
+    padding: 0;
+    border: 0;
+    border-radius: 0.75rem;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.day-on {
+    background-color: #587257;
+}
+
+.day-off {
+    background-color: #c4491f;
+}
+
+.day-btn {
+    cursor: pointer;
+}
+
+.btn-aceitar {
+    color: #ffffff;
+    background-color: var(--patudo-verde, #4f6f52);
+    border: 1px solid var(--patudo-verde, #4f6f52);
+    --bs-btn-padding-y: 0.45rem;
+    --bs-btn-padding-x: 1.6rem;
+    --bs-btn-font-size: 0.8rem;
+    --bs-btn-font-weight: 600;
+    border-radius: 25px;
+    line-height: normal;
+}
+
+.btn-aceitar:hover,
+.btn-aceitar:focus {
+    color: #ffffff;
+    background-color: #3f5a42;
+    border-color: #3f5a42;
+}
+
+/* Cartão da publicação — medidas tiradas do mockup. */
+/* Post card — measurements taken from the mockup. */
+.post-card {
+    flex-direction: row;
+    gap: 14px;
+    padding: 10px 21px;
+}
+
+.post-img-wrap {
+    flex: 0 0 32%;
+    align-self: flex-start;
+    aspect-ratio: 1 / 1;
+}
+
+.post-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1rem;
+    background-color: #837877;
+}
+
+.post-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 140px 5px 0;
+}
+
+.post-body:first-child {
+    padding-left: 14px;
+}
+
+.post-title {
+    margin: 0 0 9px;
+    font-size: 1.9rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.post-text {
+    max-width: 422px;
+    margin: 0;
+    font-size: 1.13rem;
+    line-height: 1.31;
+}
+
+.post-date {
+    margin-top: auto;
+    font-size: 1.03rem;
+    line-height: 1.5;
+    word-spacing: 0.3em;
+    color: #2f1d13;
+}
+
+.post-actions {
+    position: absolute;
+    top: 13px;
+    right: 20px;
+    display: flex;
+    gap: 23px;
+}
+
+.post-heart {
+    position: absolute;
+    right: 19px;
+    bottom: 10px;
+    line-height: 1;
+}
+
+@media (max-width: 767.98px) {
+    .post-card {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .post-img-wrap {
+        flex-basis: auto;
+        width: 100%;
+        aspect-ratio: 16 / 10;
+    }
+
+    .post-body {
+        padding: 8px 8px 40px;
+    }
+
+    .post-actions {
+        top: 18px;
+        right: 18px;
+        padding: 2px 8px;
+        border-radius: 0.75rem;
+        background-color: rgba(255, 255, 255, 0.9);
+    }
+}
+
+.add-post-card {
+    min-height: 320px;
+    cursor: pointer;
+}
+
+/* Círculo cor de pêssego com o sinal + (mockup). */
+/* Peach circle with the + sign (mockup). */
+.add-post-circle {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background-color: #f8d8a9;
+}
+
+.add-post-circle::before,
+.add-post-circle::after {
+    content: '';
+    position: absolute;
+    background-color: #fff;
+}
+
+.add-post-circle::before {
+    top: 50%;
+    left: 13%;
+    right: 13%;
+    height: 1px;
+}
+
+.add-post-circle::after {
+    left: 50%;
+    top: 13%;
+    bottom: 13%;
+    width: 1px;
+}
+</style>

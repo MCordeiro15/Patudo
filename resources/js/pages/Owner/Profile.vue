@@ -218,7 +218,7 @@ onMounted(() => {
 
     <!-- Conteúdo principal da página. -->
     <!-- Main content area of the page. -->
-    <main class="min-vh-100 py-4 patudo-page">
+    <main class="min-vh-100 py-4 patudo-page patudo-page-shell">
         <div class="container">
 
             <nav

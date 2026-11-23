@@ -214,7 +214,8 @@ class BookingController extends Controller
     {
         Gate::authorize('view', $booking);
 
-        return new BookingResource($booking->load('animals', 'service', 'review'));
+        // user e petsitter.user: nome, localidade e foto de cada um (detalhe da reserva e Pagamento Confirmado)
+        return new BookingResource($booking->load('animals', 'service', 'review', 'user', 'petsitter.user'));
     }
 
     // PATCH /api/bookings/{booking}/status

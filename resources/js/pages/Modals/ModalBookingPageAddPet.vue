@@ -363,7 +363,7 @@ onBeforeUnmount(clearPreview);
                 <footer class="d-flex justify-content-end gap-2">
                     <button
                         type="button"
-                        class="btn-cancel-pill"
+                        class="btn btn-outline-primary"
                         :disabled="submitting"
                         @click="close"
                     >
@@ -371,7 +371,7 @@ onBeforeUnmount(clearPreview);
                     </button>
                     <button
                         type="submit"
-                        class="btn-save-pill"
+                        class="btn btn-primary"
                     >
                         {{ submitting ? 'A guardar...' : 'Guardar animal' }}
                     </button>
@@ -503,37 +503,5 @@ onBeforeUnmount(clearPreview);
     width: 15px;
     height: 15px;
     margin: 0;
-}
-
-.btn-cancel-pill {
-    background: #ffffff;
-    color: var(--patudo-terracota);
-    border: 1.5px solid var(--patudo-terracota, #c2410c);
-    border-radius: 14px;
-    padding: 0.38rem 1.1rem;
-    font-size: 0.86rem;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.btn-save-pill {
-    background: #c2410c;
-    color: #ffffff;
-    border: 1.5px solid #c2410c;
-    border-radius: 14px;
-    padding: 0.38rem 1.15rem;
-    font-size: 0.86rem;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.btn-save-pill:hover:not(:disabled) {
-    background: var(--patudo-laranjaVivo);
-    border-color: var(--patudo-laranjaVivo);
-}
-
-.btn-save-pill:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
 }
 </style>

@@ -524,7 +524,7 @@ const submit = async () => {
                         <div class="d-flex align-items-center gap-2">
                             <button
                                 type="button"
-                                class="btn btn-outline-primary rounded-pill px-4 fw-semibold bg-white"
+                                class="btn btn-outline-primary rounded-pill flex-fill"
                                 :disabled="isLoading"
                                 @click="close"
                             >

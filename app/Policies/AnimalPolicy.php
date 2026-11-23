@@ -24,7 +24,11 @@ class AnimalPolicy
      */
     public function view(User $user, Animal $animal): bool
     {
-        return $user->isAdmin() || $user->id === $animal->user_id;
+        // o petsitter também pode ver a ficha de um animal que esteja numa reserva sua
+        // (bookings.petsitter_id guarda o id do user do petsitter)
+        return $user->isAdmin()
+            || $user->id === $animal->user_id
+            || $animal->bookings()->where('bookings.petsitter_id', $user->id)->exists();
     }
 
     /**

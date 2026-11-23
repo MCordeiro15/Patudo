@@ -101,8 +101,8 @@ const confirm = () => {
             <p v-if="error" class="field-error">{{ error }}</p>
 
             <div class="actions">
-                <button type="button" class="btn-cancel" :disabled="processing" @click="close">Cancelar</button>
-                <button type="button" class="btn-confirm" :disabled="processing" @click="confirm">
+                <button type="button" class="btn btn-outline-primary" :disabled="processing" @click="close">Cancelar</button>
+                <button type="button" class="btn btn-outline-danger" :disabled="processing" @click="confirm">
                     {{ processing ? 'A recusar...' : 'Recusar verificação' }}
                 </button>
             </div>
@@ -256,17 +256,5 @@ h3 {
 
 .actions button:disabled {
     opacity: 0.6;
-}
-
-.btn-cancel {
-    background-color: #fff;
-    border: 1.5px solid #c2410c;
-    color: #c2410c;
-}
-
-.btn-confirm {
-    background-color: #c2410c;
-    border: 1.5px solid #c2410c;
-    color: #fff;
 }
 </style>

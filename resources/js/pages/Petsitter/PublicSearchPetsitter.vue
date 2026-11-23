@@ -217,13 +217,7 @@ onMounted(() => {
 
 <template>
     <Head title="Procurar Petsitter" />
-
-    <div class="min-vh-100 d-flex flex-column bg-light bg-opacity-25 position-relative overflow-hidden">
-        <div class="patudo-glow patudo-glow-top"></div>
-        <div class="patudo-glow patudo-glow-bottom"></div>
-
-        <!-- Para utilizador logado -->
-        <main v-if="auth.user" class="patudo-content d-flex flex-column flex-grow-1 py-4">
+        <main v-if="auth.user" class="patudo-content patudo-page-shell flex-column flex-grow-1 py-4">
             <div class="container">
                 <nav
                     class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
@@ -433,7 +427,7 @@ onMounted(() => {
         </main>
 
         <!-- Para visitante não logado -->
-        <main v-else class="patudo-content d-flex flex-column flex-grow-1 py-4">
+        <main v-else class="patudo-content patudo-page-shell flex-column flex-grow-1 py-4">
             <div class="container">
                 <div class="d-flex align-items-center justify-content-between">
                     <a
@@ -581,7 +575,6 @@ onMounted(() => {
                 </div>
             </div>
         </main>
-    </div>
 
     <ModalNotifications
         :show="showNotifications"

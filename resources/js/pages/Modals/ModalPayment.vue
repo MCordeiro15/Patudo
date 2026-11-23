@@ -133,10 +133,10 @@ const pay = () => {
                 </div>
 
                 <div class="d-flex justify-content-end gap-2 mt-4">
-                    <button type="button" class="btn btn-sm btn-light border rounded-pill px-3" :disabled="processing" @click="close">
+                    <button type="button" class="btn btn-outline-primary btn-light border rounded-pill px-3" :disabled="processing" @click="close">
                         Cancelar
                     </button>
-                    <button type="submit" class="btn btn-sm btn-pay rounded-pill px-4" :disabled="processing">
+                    <button type="submit" class="btn btn-primary btn-pay rounded-pill px-4" :disabled="processing">
                         {{ processing ? 'A pagar...' : 'Pagar' }}
                     </button>
                 </div>

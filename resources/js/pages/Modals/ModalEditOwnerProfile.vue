@@ -250,7 +250,7 @@ const handleDeleteAccount = () => {
                 >
                     <button
                         type="button"
-                        class="btn-patudo-danger"
+                        class="btn btn-outline-danger d-inline-flex align-items-center gap-2"
                         @click="handleDeleteAccount"
                     >
                         <svg
@@ -276,14 +276,14 @@ const handleDeleteAccount = () => {
                     <div class="d-flex align-items-center gap-2">
                         <button
                             type="button"
-                            class="btn-patudo-outline-sm"
+                            class="btn btn-outline-primary"
                             @click="handleClose"
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            class="btn-patudo-solid-sm"
+                            class="btn btn-primary"
                             :disabled="isLoading"
                         >
                             {{
@@ -428,61 +428,5 @@ const handleDeleteAccount = () => {
 .patudo-bordered-textarea:focus {
     border-color: #c4450c;
     box-shadow: 0 0 0 2px rgba(196, 69, 12, 0.18);
-}
-
-.btn-patudo-danger {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    background-color: #ea2b1f;
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    padding: 0.45rem 1.1rem;
-    font-size: 0.84rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.btn-patudo-danger:hover {
-    background-color: #c81e14;
-}
-
-.btn-patudo-outline-sm {
-    background-color: #ffffff;
-    color: var(--patudo-terracota);
-    border: 1px solid var(--patudo-terracota);
-    border-radius: 8px;
-    padding: 0.45rem 1rem;
-    font-size: 0.84rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.btn-patudo-outline-sm:hover {
-    background-color: #fdf2ea;
-}
-
-.btn-patudo-solid-sm {
-    background-color: #c4450c;
-    color: #ffffff;
-    border: 1px solid #c4450c;
-    border-radius: 8px;
-    padding: 0.45rem 1.15rem;
-    font-size: 0.84rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.btn-patudo-solid-sm:hover:not(:disabled) {
-    background-color: var(--patudo-laranjaVivo);
-}
-
-.btn-patudo-solid-sm:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
 }
 </style>

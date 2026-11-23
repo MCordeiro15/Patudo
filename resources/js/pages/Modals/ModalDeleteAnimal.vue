@@ -43,7 +43,7 @@ const confirm = () => {
                     <div class="modal-content rounded-4 border border-danger">
                         <!-- Header -->
                         <div class="modal-header border-bottom border-danger">
-                            <h5 class="modal-title fw-bold text-danger">
+                            <h5 class="modal-title fw-bold texto-danger">
                                 Remover Animal
                             </h5>
                             <button
@@ -72,7 +72,7 @@ const confirm = () => {
                         >
                             <button
                                 type="button"
-                                class="btn btn-outline-secondary rounded-pill flex-fill"
+                                class="btn btn-outline-primary rounded-pill flex-fill"
                                 @click="close"
                                 :disabled="deleting"
                             >
@@ -80,7 +80,7 @@ const confirm = () => {
                             </button>
                             <button
                                 type="button"
-                                class="btn btn-danger rounded-pill flex-fill"
+                                class="btn btn-outline-danger rounded-pill flex-fill"
                                 @click="confirm"
                                 :disabled="deleting"
                             >
@@ -103,5 +103,9 @@ const confirm = () => {
     justify-content: center;
     padding: 1rem;
     z-index: 10000000;
+}
+
+.texto-danger {
+    color: #9E3D3D;
 }
 </style>
