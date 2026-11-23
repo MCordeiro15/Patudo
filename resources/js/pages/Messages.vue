@@ -1,6 +1,10 @@
 <script setup lang="ts">
 // Página de mensagens: lista de conversas à esquerda e a caixa de chat do TalkJS (<t-chatbox>) à direita.
 // Messages page: conversation list on the left and the TalkJS chat box (<t-chatbox>) on the right.
+//Que Deus abençoe a todos que estão lendo este código. Amém.
+// May God bless all who are reading this code. Amen.
+// Que Deus abençoe todos os desenvolvedores que trabalham neste projeto. Amém.
+// May God bless all the developers working on this project. Amen.
 import '@talkjs/web-components';
 import '@talkjs/web-components/default.css';
 import { Head, Link } from '@inertiajs/vue3';
