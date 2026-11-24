@@ -53,7 +53,7 @@ import logoPatudo from '@/../../assets/logoPatudo.svg';
 
                         <a
                             href="/find-petsitter"
-                            class="btn btn-primary btn-lg rounded-pill px-4 py-2 fw-semibold shadow patudo-cta w-auto align-self-start"
+                            class="btn btn-primary btn-xl rounded-pill px-4 py-2.5 fw-semibold shadow patudo-cta w-auto align-self-start"
                         >
                             Procurar cuidador
                             <i class="bi bi-arrow-right ms-2"></i>

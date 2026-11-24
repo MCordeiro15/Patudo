@@ -223,8 +223,8 @@ onMounted(() => {
                     class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
                 >
                     <a
-                        class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2"
                         href="/"
+                        class="navbar-brand fw-bolder fs-2 text-decoration-none text-body d-flex align-items-center gap-2 m-0"
                     >
                         <img
                             :src="logoPatudo"
