@@ -72,8 +72,8 @@ onMounted(async () => {
 <template>
     <Head title="Mensagens" />
 
-    <main class="min-vh-100 py-4 patudo-page">
-        <div class="container">
+    <main class="min-vh-100 py-4 patudo-page-shell">
+        <div class="container ">
             <!-- Barra de navegação, igual à das outras páginas. -->
             <!-- Navigation bar, same as the other pages. -->
             <nav class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4">
@@ -90,8 +90,8 @@ onMounted(async () => {
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-primary">
-                        <MessageCircle :size="25" fill="currentColor" />
+                    <a href="/messages" class="text-dark bg-transparent border-0 p-0 position-relative">
+                        <MessageCircle :size="25" fill="none" />
                     </a>
                     <button
                         type="button"
@@ -447,6 +447,12 @@ onMounted(async () => {
     width: 2.6rem;
     height: 2.6rem;
     border-radius: 50%;
+}
+
+.chat-box :deep(.t-theme-message-field .t-record-button) {
+    --t-color-brand-primary: var(--patudo-terracota);
+    --t-color-brand-primary-hover: var(--patudo-laranjaVivo);
+    --t-color-text-inverse: #ffffff;
 }
 
 .chat-box :deep(.t-theme-message-action-menu) {
