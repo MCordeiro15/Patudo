@@ -132,7 +132,7 @@ class ExportDatabase extends Command
             'petsitter_id' => $r->petsitter_id,
             'star_rating' => $r->star_rating ?? $r->rating ?? 5,
             'comment' => $r->comment ?? null,
-            'visible' => $r->visible ?? true,
+            'status' => $r->status ?? 'published',
         ])->toArray();
 
         // Export animal_bookings
@@ -271,7 +271,8 @@ class ExportDatabase extends Command
         $content .= "        foreach (\$reviews as \$reviewData) {\n";
         $content .= "            \$reviewCreateData = \$reviewData;\n";
         $content .= "            unset(\$reviewCreateData['id']);\n";
-        $content .= "            Review::create(\$reviewCreateData);\n";
+        // forceCreate: o status não está no $fillable do Review
+        $content .= "            Review::forceCreate(\$reviewCreateData);\n";
         $content .= "        }\n\n";
 
         // Animal Bookings (delete all first, then recreate)
