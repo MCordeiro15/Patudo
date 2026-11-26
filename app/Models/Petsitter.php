@@ -41,6 +41,11 @@ class Petsitter extends Model
 
     public $incrementing = false;
 
+    /** Limites do preço por dia, em euros (candidatura e editar perfil). / Price-per-day limits, in euros. */
+    public const MIN_PRICE_PER_DAY = 5;
+
+    public const MAX_PRICE_PER_DAY = 200;
+
     /* `approval_status` is not in `$fillable`.
      Only an administrator should be able to change it, and it should not be possible to submit it via a form.
      `average_rating` is calculated automatically by `refreshAverageRating()`. */
