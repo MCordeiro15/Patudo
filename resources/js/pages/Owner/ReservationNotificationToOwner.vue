@@ -110,7 +110,7 @@ function formatDay(day: string): string {
 }
 
 // Quem abre o detalhe pode ser o dono ou o petsitter da reserva (bookings.petsitter_id é o id do user)
-const page = usePage<{ auth: { user: { id: number } | null } }>();
+const page = usePage<{ auth: { user: { id: number; is_petsitter?: boolean } | null } }>();
 const viewerIsPetsitter = computed(() => !!booking.value && booking.value.petsitter_id === page.props.auth.user?.id);
 
 // O cartão do detalhe mostra a outra pessoa: o petsitter para o dono, o dono para o petsitter.
@@ -252,9 +252,10 @@ onMounted(() => {
                 </div>
             </nav>
 
-            <!-- Topo da lista: botão "Pedir reserva" -->
+            <!-- Topo da lista: botão "Pedir reserva" (o petsitter não pode reservar, por isso não o vê) -->
             <div v-if="!bookingId" class="d-flex justify-content-end mt-4">
                 <a
+                    v-if="!page.props.auth.user?.is_petsitter"
                     href="/"
                     class="btn btn-primary rounded-pill d-inline-flex align-items-center gap-2 px-3"
                 >

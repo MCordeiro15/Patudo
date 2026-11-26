@@ -8,6 +8,7 @@ namespace App\Policies;
 
 use App\Models\Booking;
 use App\Models\User;
+use Illuminate\Auth\Access\Response;
 
 class BookingPolicy
 {
@@ -36,9 +37,12 @@ class BookingPolicy
      * Permite verificar se o utilizador pode criar novos registos.
      * Determines if the user can create new records.
      */
-    public function create(User $user): bool
+    public function create(User $user): Response
     {
-        return true;
+        // O petsitter (aprovado) não pode fazer reservas; só os donos reservam.
+        return $user->isPetsitter()
+            ? Response::deny('Um petsitter não pode fazer reservas.')
+            : Response::allow();
     }
 
     // Só o dono ou o petsitter da reserva. Que mudanças cada um pode fazer
