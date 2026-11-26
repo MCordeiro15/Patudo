@@ -37,7 +37,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 2127,
+       'constructedObjectId' => 2146,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -70,7 +70,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 2121,
+       'constructedObjectId' => 2140,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -90,7 +90,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:07.000000',
+       'date' => '2026-11-26 10:56:15.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -98,7 +98,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1625,
+       'constructedObjectId' => 1632,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -118,7 +118,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -133,7 +133,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 2128,
+       'constructedObjectId' => 2147,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -166,7 +166,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 2107,
+       'constructedObjectId' => 2126,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -186,7 +186,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:07.000000',
+       'date' => '2026-11-26 10:56:15.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -194,7 +194,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 2106,
+       'constructedObjectId' => 2125,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -214,7 +214,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -229,7 +229,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1648,
+       'constructedObjectId' => 1667,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -262,7 +262,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1646,
+       'constructedObjectId' => 1665,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -282,7 +282,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:07.000000',
+       'date' => '2026-11-26 10:56:15.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -290,7 +290,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1666,
+       'constructedObjectId' => 1687,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -310,7 +310,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -325,7 +325,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1658,
+       'constructedObjectId' => 1678,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -358,7 +358,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1659,
+       'constructedObjectId' => 1680,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -378,7 +378,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:07.000000',
+       'date' => '2026-11-26 10:56:16.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -386,7 +386,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1657,
+       'constructedObjectId' => 1677,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -406,7 +406,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -421,7 +421,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1656,
+       'constructedObjectId' => 1676,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -454,7 +454,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1651,
+       'constructedObjectId' => 1675,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -474,7 +474,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:07.000000',
+       'date' => '2026-11-26 10:56:16.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -482,7 +482,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1652,
+       'constructedObjectId' => 1670,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -502,7 +502,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -517,7 +517,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1653,
+       'constructedObjectId' => 1671,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -550,7 +550,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1655,
+       'constructedObjectId' => 1672,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -570,7 +570,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:16.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -578,7 +578,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 2105,
+       'constructedObjectId' => 1674,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -598,7 +598,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -613,7 +613,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1654,
+       'constructedObjectId' => 2124,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -646,7 +646,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1661,
+       'constructedObjectId' => 1673,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -666,7 +666,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:16.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -674,7 +674,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1667,
+       'constructedObjectId' => 1666,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -694,7 +694,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -709,7 +709,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1668,
+       'constructedObjectId' => 1688,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -742,7 +742,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1669,
+       'constructedObjectId' => 1689,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -762,7 +762,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:16.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -770,7 +770,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1670,
+       'constructedObjectId' => 1690,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -790,7 +790,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -805,7 +805,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1671,
+       'constructedObjectId' => 1691,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -838,7 +838,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1672,
+       'constructedObjectId' => 1692,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -858,7 +858,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -866,7 +866,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1673,
+       'constructedObjectId' => 1693,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -886,7 +886,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:58:05.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -901,7 +901,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1674,
+       'constructedObjectId' => 1694,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -934,7 +934,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1675,
+       'constructedObjectId' => 1695,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -954,7 +954,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -962,7 +962,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1676,
+       'constructedObjectId' => 1696,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -982,7 +982,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -997,7 +997,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1677,
+       'constructedObjectId' => 1697,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1030,7 +1030,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1678,
+       'constructedObjectId' => 1698,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1050,7 +1050,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1058,7 +1058,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1679,
+       'constructedObjectId' => 1699,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1078,7 +1078,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1093,7 +1093,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1680,
+       'constructedObjectId' => 1700,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1126,7 +1126,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1681,
+       'constructedObjectId' => 1701,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1146,7 +1146,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1154,7 +1154,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1682,
+       'constructedObjectId' => 1702,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1174,7 +1174,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1195,7 +1195,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1683,
+       'constructedObjectId' => 1703,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1215,7 +1215,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1223,7 +1223,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1684,
+       'constructedObjectId' => 1704,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1243,7 +1243,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1264,7 +1264,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1685,
+       'constructedObjectId' => 1705,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1284,7 +1284,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1292,7 +1292,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1686,
+       'constructedObjectId' => 1706,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1312,7 +1312,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1320,7 +1320,7 @@ class ExportedDataSeeder extends Seeder
   14 => 
   array (
     'id' => 15,
-    'name' => 'mrg',
+    'name' => 'Marco Filipe João',
     'email' => 'marco@gmail.com',
     'password' => '$2y$12$2lZFfyUvV1VpFsjsmcETBup.jQpBjoNkuq6A9mUTrWYo95db3TAL2',
     'email_verified_at' => NULL,
@@ -1333,7 +1333,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1687,
+       'constructedObjectId' => 1707,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1353,7 +1353,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1361,7 +1361,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1688,
+       'constructedObjectId' => 1708,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1381,7 +1381,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 12:57:46.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1403,7 +1403,7 @@ class ExportedDataSeeder extends Seeder
             );
         }
 
-        // Export Petsitters (7 petsitters)
+        // Export Petsitters (8 petsitters)
         $petsitters = array (
   0 => 
   array (
@@ -1446,7 +1446,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 2125,
+       'constructedObjectId' => 2144,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1466,7 +1466,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:07.000000',
+       'date' => '2026-11-26 10:56:15.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1474,7 +1474,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1699,
+       'constructedObjectId' => 1720,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1494,7 +1494,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1537,7 +1537,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1698,
+       'constructedObjectId' => 1719,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1557,7 +1557,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:07.000000',
+       'date' => '2026-11-26 10:56:15.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1565,7 +1565,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1697,
+       'constructedObjectId' => 1718,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1585,7 +1585,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1631,7 +1631,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1696,
+       'constructedObjectId' => 1717,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1651,7 +1651,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:07.000000',
+       'date' => '2026-11-26 10:56:15.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1659,7 +1659,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1695,
+       'constructedObjectId' => 1716,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1679,7 +1679,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1725,7 +1725,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1693,
+       'constructedObjectId' => 1715,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1745,7 +1745,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:07.000000',
+       'date' => '2026-11-26 10:56:16.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1753,7 +1753,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1694,
+       'constructedObjectId' => 1713,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1773,7 +1773,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1819,7 +1819,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1692,
+       'constructedObjectId' => 1714,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1839,7 +1839,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:07.000000',
+       'date' => '2026-11-26 10:56:16.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1847,7 +1847,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1690,
+       'constructedObjectId' => 1712,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1867,7 +1867,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1884,7 +1884,7 @@ class ExportedDataSeeder extends Seeder
     'postal_code' => NULL,
     'age' => 26,
     'price_per_day' => 10,
-    'average_rating' => 1,
+    'average_rating' => 5,
     'accepted_sizes' => 
     array (
       0 => 'small',
@@ -1913,7 +1913,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1691,
+       'constructedObjectId' => 1710,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1933,7 +1933,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:16.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1941,7 +1941,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1708,
+       'constructedObjectId' => 1711,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -1961,7 +1961,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -1978,7 +1978,7 @@ class ExportedDataSeeder extends Seeder
     'postal_code' => NULL,
     'age' => 25,
     'price_per_day' => 20,
-    'average_rating' => NULL,
+    'average_rating' => 4,
     'accepted_sizes' => 
     array (
       0 => 'small',
@@ -2005,7 +2005,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1709,
+       'constructedObjectId' => 1730,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -2025,7 +2025,7 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:16.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -2033,7 +2033,7 @@ class ExportedDataSeeder extends Seeder
     \Carbon\CarbonImmutable::__set_state(array(
        'endOfTime' => false,
        'startOfTime' => false,
-       'constructedObjectId' => 1710,
+       'constructedObjectId' => 1731,
        'clock' => NULL,
        'localMonthsOverflow' => NULL,
        'localYearsOverflow' => NULL,
@@ -2053,7 +2053,97 @@ class ExportedDataSeeder extends Seeder
       ),
        'dumpLocale' => NULL,
        'dumpDateProperties' => NULL,
-       'date' => '2026-11-26 13:45:08.000000',
+       'date' => '2026-11-26 10:56:17.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+  ),
+  7 => 
+  array (
+    'id' => NULL,
+    'user_id' => 15,
+    'biography' => NULL,
+    'short_bio' => NULL,
+    'experience' => 'sou grande, alto e enorme',
+    'service_location' => 'PDL',
+    'city' => NULL,
+    'postal_code' => '9747-432',
+    'age' => 23,
+    'price_per_day' => 10,
+    'average_rating' => NULL,
+    'accepted_sizes' => 
+    array (
+      0 => 'medium',
+      1 => 'large',
+    ),
+    'sex' => 'male',
+    'accepted_animal_types' => 
+    array (
+      0 => 'dog',
+    ),
+    'identification_documents' => 'identification-documents/15/kzxKbZvI6EGw3tnM5ncezYFGT2vO5JXQQJmdKXFj.jpg',
+    'approval_status' => 'approved',
+    'availability_days' => 
+    array (
+      0 => 'monday',
+      1 => 'tuesday',
+      2 => 'thursday',
+      3 => 'wednesday',
+    ),
+    'profile_photo' => NULL,
+    'created_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 1732,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-26 12:55:04.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+    'updated_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 1733,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-26 12:58:55.000000',
        'timezone_type' => 3,
        'timezone' => 'UTC',
     )),
@@ -2085,7 +2175,7 @@ class ExportedDataSeeder extends Seeder
             }
         }
 
-        // Export Animals (14 animals)
+        // Export Animals (15 animals)
         Animal::query()->delete();
         $animals = array (
   0 => 
@@ -2275,13 +2365,27 @@ class ExportedDataSeeder extends Seeder
     'user_id' => 9,
     'name' => 'Thor',
     'species' => 'Cão',
-    'breed' => 'Cão de Fila',
+    'breed' => 'Cão de File',
     'size' => 'large',
     'sex' => 'macho',
     'weight' => '15.00',
     'photo' => 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAfwBiQMBIgACEQEDEQH/xAAcAAACAgMBAQAAAAAAAAAAAAADBAIFAQYHAAj/xABHEAACAQMCBAQDBgQEBQMDAwUBAgMABBESIQUTMUEGIlFhMnGBBxQjQpGhUrHB0RVi4fAWJDNTVEOS8ReTomOC4iVEVXKU/8QAGgEAAwEBAQEAAAAAAAAAAAAAAQIDAAQFBv/EACYRAAICAgICAgMBAQEBAAAAAAABAhEhMQMSBEEiURMyYQVxgRT/2gAMAwEAAhEDEQA/ANalu2lURsAMUs0nmwKFKxABU+aswCRznTXOlRrDKdbAGr6NFECJnbFay0k0cwOBgGru1vUl0rKO3ak5IvYBloI2UatyK80EcqYGNu1Rl5Z80Umw7VlFUrrRyG9KjT2ahC74eGhYBfN7VUxQ/dXzMMD3raYXkJ82+aFxKxWVBkDNPHladM1MoIryNpigXIq3tdDgafLSLWIifUoGabiaONPPkN7U82no0S+gZeRg9RSd+sbWrkx6sA4NLWzrLuznPtT/ACg0LaXBGOlc9dZIds51cFWmKkYNWXDLs2bbZNRvrXTeOSOmaAAdQHevTtSWTJFxLxKa7lUqcAGm/vxVgHzj2qrWzYBWjJGetWvD+G89gJTt6muaSigDUF1bFiNGaeltZRDzLRiBjpQ7bhjW0+I1V1buTVw8D24VIup33qF5tDJWiq4VHJIWF5F5h0bFY4hcz2l5biPJ1HGasbcXKs7XAUDPb0on3e3upR5gzLuKLyxmvojFPzDynbEh70xJFIjKUbB70Oe1iWVWzhvaps6cz4jtSMLQbdotTnJFCkkXSMJvQLi6dRhCNIokF1HJGNaAGskYibk6gO9Mi5MbiL23oTlOUZFAz6UqJSjhi4znvTfwBZKW67596jOyldx5jWCzSaWQgDvXpI+VJ52zneiEzHEqIVJ60KCUq7Z+EbA0O4Ytdqqb5FSznyYGmi9BCeZgWByPSpxkMuCdxUOaFQx6eo6ihR5jj8pyT60PRhpXI61IMCc4peMBWGXOT2ptnygCgD3NAwOQzSMCCAor2s43GcUWDdWBbJoDtyGPM6UaAFhlGor0zUZwqk6cg1XTySvOgh6Z603JcKh0SEAgd6JqGUUFAZWxt0oLyfhnlLgD96VW4jlLDXuKg90yISi6iD2rBLNFWWDDqCCNxQAbS1HLjiwx7ihW144ALR9fWjcxnOoxgema1VkFEXlEcbSyg4HSkHv2uMKkTAfxCrG4nIiOtFKY6CqfiHF4Y7Zo7aPTIB1xSK3o0jCRvzGa4ZQo6UPUZrlRqOBVRz7iQK8reXNHluywAiGGpnAi3ktGkcXXkIOBimOYZFdZVwCOoqhtpGSfWr6mO2KvbeVniIKZPSpTjQvsUitI4hiI5YnvU/uh/wC2lef8KTU5we1G+8N6ULZqOeM2l8nPyq64aqyR5aqJLlJ2XsQN6eguhGMA4967pK1QyyO3tohOUO9DtplgP4u4o0MykeZgSa9PbBlznrU03pmISShZMxA6aYjE8q6l2GKQZzGMEbCnI7wRxAq2+KzWMB2MWtwYhl85FYmvWZdQby9qgtzbyRf/AKjUIRAL5+hpaXswjLxB+fvnTVhHonQEmlbi1jALZGMUlHPIhIwSgqvVNYNVFlLiBwY2+lWFmJGGp2wD71ryXcLybE575o8vFW0FYzkChLjbwHY1x9EAWRCNuuKqFKnzd6g1xLJ5nJIPalbhyhBFW44NRozwW9vdlMI7bdq2HhaTzMMbKVyDWl2knnLSLq22q44dxG8tpEYSZC9F9aTkhejRNrtLwxlhKjeQkZx1p2LjUMxCvG4xtkiq69eTiFhHLwyRQ5A1KaqrK3vTdcu/dkAGQQOtc/WlbKt0P8UuLx+ai6zGTlSKe4KCYY5ChR16571KLiFrHA0UZEjrt5hQhKXOpm0j0FG8A2N3TI0gd204PrSouTJLpQgj1pJi1ySuTsDUuH26xo5djnPWhRh2WDlyMwOx670NuYPNG2wosDLJqAbIoxwkJVYzWZmLtNLGgkBGT2ooik4ig2AZTmlNWlxzB8hRElaGYGJ9BxWaAWkNtPHD13G2KPKhkRC5wwpcXjzKMnDD0716NHeJmfNL2DR5VCuGJGzdaxI2ZSw+Eb0s+oFgCcaqZQDuQRimTwEDNdRhSB1qEF0hG+c/tRuXBI40DJ71C9tpjCwRVBxtWxRgU99DERg5fsM0VLwsgZsjPaqs8LdQr3JBxvmjRSLLIFjcYBxp71qpWgWWlvcuPMFNELi4bXKNI/hNAeDnYWNymBuBULhZTGqx+XGxakvBkS1qhOk9DRblBe2mr8wGxpWGOKTI54JHWsFTH5YpPLn1ooIrENL6ZAcDrirG20RkHR5Se9ZjgiUa3bzNUwfMNIyBRbwYPIytggAAV55o3Glc7DagXDkRkRrgnrSUMcmpVLNkn0pfRvY4Zl5R1DzD8o6mqLiNhJeFntlKnG4NXi2+JtU2dZ6HtTypCCFaQFj6UybQWr2alZ2zRQabsrjPSs2sLffXWNQ642q6veFO0n4QGgnuaHb8NltySHALA1m/ZFxaZQhkhuSNI1A71bW9wqwli+GPalI+GEkySuOp39aquJTPFchYwdAo13EljJYyztPIRjcVjnSf5qrjd6gGhXzDY1n73J70eiBaNMjODlT5qIzsYz5jn1rEAWOTB3otwMDYbV3exvVkLG/mjcLI2VFXH+Ir3krW5YpFbVQjI+cZOaWUExLaNuFxDMulWy1S0gJ1rXeGLLr1uWAA6mruB1eMkt0qTj1GWSBnET5I29aO3EYjEBk5z0FVN/PkFVxSMc7R++adcaeQ2kbTFiaPIOaFcj7tEwXfUKQtLiTl+U09Z3KzZWcAqPWh1aZfElRRlgDnO5o1vIgJz3qHGokS6/A2TGcilrSKWQ5AOn1qt2iHapUWaSmNXVRnPSlZSpbMnxelMOpFvhfiFVTtlyZD5vStE03Q+LpfLhdh1FP2UiXMmdWkDb5VUJoXG2fWn7DQVYLsTWkgxbbLuKK6hlSayk1AHYButbNw++jvdMVzEUnI222H1rWfDtwljMHuEZwT09K2acx3UDTcMYFj29K5Z7plUJX6JDNyoI0V+7ZpuytpHgAmZR8qDZcMaRQ/ENnB2Jo8MNxFc41ryGOnGNxSP6DRIWyQsShbI/epsTLbnIC+hrE0ipccs5GBuT0quv7vTJp1gx9lFLVugMYZGjKPG23tRPvb5w0m2KQiuNSFYiSO2alATqIYZJpqMlZPn8yQyNuq1YWluJHEmQ6Y70gsQjfTLgqewp2zkihTSDt7mg9WGhhI3eSQKAB2oy3TBVSTAIO9AN1DGdzjNGmksWAYYJ+dLtADHluSYiMHrQeZFExIQu59TQJ7lFQLAMknrSJ4jJFOQVUisk6NZYxTv5sYQ+lFa41uqFtTftSccpuBnlgE1MK0Ry4yPYUGjDtxBHJGQXySv6UkthBZKsyglutDnupQgFvAxyfiqQ59uUdm1sexopGqwsV4iyFzqBbbpU1aSLI16gTneoTwLdgOhGV6qPWoNb3MpBLaQBgDNCkmEMzQuCCmlz2FYisnMZ1yADOwBpeWKSIqzqNvejR6JssSwrGok8Uh8qHAHTJokCuDh8lh3HesALGmksWPXajRNJLGWXbHbFFRbZiSumdMqHJO2KM0kdtHr0DNLRMzHJXYd6nNGs5Hnx7Glb9mszNdRTqDk59KgLRG/wCZDYPSsmMRbFAx9aisgjG/Q9qTuwKT9iXELq8jlXkPle9FhvXEQ+9Lk/xCiXHJPlU4J339arruR7MAyqXU9MU19hXY1e2BfTNC+VP5aqeI2c6+dosqw6irCLiULQ7N8XQVG5mnS20K2rPTO9BNoWVNFPaWckcZIQYPWofdz71bJz1j8wB23FA5jf8AYFMptkupzmCQSy5waZuCypnsdqHZkocsmxo93JGXCb4YV6F5Hi11E4mH3iPWcqTg1ezcL4dLZm4kcIydBnGaqbqx5Gh0J0mgS3DMShOVx0NbeibeQk9+eWIkGFB61iOWRl2JAquZj61ZWOGQUzWBuP6FAWeYoxPWsEFZQD60WWFku9Y6LvXm/EYuO1MZosLdsR0J5sZC0K2lbGCay583SlrJX0St2JYxsNQc9+1WKutmBG67VWLIsTBifpS95dtOR5jig42TUurLO9vYFaPlnuc1TzMJJmYDbNTjjyB7+te5LO2B1FFKhJTcmEhdCcEVZ2NuXkAjIzVU8UkONS/X0rYOHBLS25pOpmH6UJSwNx7L7g1vyrsGUK4I+GrW2t1hmkkZDGurbT0rUXvnRhJC5BrYRcyS8KLlydI3xXLKLvJ1WqwPX85kC6GZ4gdytHjkSaBVUHOa1LhFxdW1/sWe2kGdxsK2iC4Qz+XTqI7Uso9cAuw1wUU6JQNTDFV0nD4JmZCRqHvVkgiuB+IBzh096BLDh23w4H7Uv/ANFVa2k1rcaHBKdcii63MhcL5fSmo+eXUkaQehNCaQxSMCoK560bsCwBlbUdZbGKHGdYO+w6ipSSiR+WFGPWlwoWfAOxHSmNeQxXuST869GdRxqNeDgkJQSNE+B0NY3sMcx76zRYEWcBmGT2pYhpPIMY9fSm7ciEoq+Yj1rPRiN1I1u40llGKYguZHQ/inYUW+dhCsjRKVJwBivWskYJAjGWH70vZUYUiv5Y2K83Izk5pw3AmYSBzil3WE3ZjaLS3eiyWiRKHD7Y+GjhoJnmva5eE7nrTg4naBU5jqZGHw1T/e35mnlkj5USGC3llZmxqxnftStYyZMtWhil8wlZQd8ZrLLpeOGNS+rqR6VXJehX0ZyB3pn/ElRGVHGs9DSu0H+mLxvu8+UDUe1uyoxupoFrciWRhKNQ65pxfu87jYjHTFa2jDYdWbEQ8uNxWACAcDvVfieK4OlsJVjbuRsxBB70P2AD1sWwe1LXPw7KSSadbGcA5z3o8cMM8fmkxSyyZxsqZQq6GkU7VmcpcMdQ1RkYApq7tMAqkgf0zQIdPwtgYpNaJ1RXwcNtFZuZrhY9NfQ01exRw26iNtTHoaV4vepdyi1dsOnwtnY1G3YctYpZBkHY09N5Gwz0k7Qx5c0n9/HtWeLTI0ZwfmKo+aP4apCFoldFbC1pOqLGSTjpTq2sAUmVNwcjJqHDrS1gkN2SB/lJoHGLw5YRYw3TFdG3SBtCvELwMrRqQcdKozknvTTAaMkkueuaXchenWrRVIUMLRtAdzsaLbuYwQvak+a5AGvY9qftbSdYRO6nQelMNG7BzCVhr3x3qFsxz0OKau5BycYxSdu2OvrWC1UiwEeE1Y6b0EyKDuRTUbBo6RdRnB9ayHkxeZiTvQqJKDrOKGc0xJjdg346hunvTbYjvDoGc/pVbAzB/L1q0sWWecB8Z6Clk8CovoLWGa11yoM4r0Ij5BiVdT5wAKMvDbwxArG5XsR0p+1tYuCFbm4IkeQfAeufauNzX/AKWSEeFeHriU674cu3J+tbZHb8PtQtrbyLoIwUJ3oclwZIEyulT0Bpe4it7OF7iOI/ecdetSlJy2yypEOL/8osccFoHjY4JHUUG2s1jmAIdHIyAaespjPDC8rg6jk+1Wdy42k0K57H0rd3pmpFVdWkqTo8bOXA7U3aoJDrkG4GN6ZEvOAxjVXjKHmKNjSB1HrWbDgqr+5dJdgBGNhiq6GVbkmJgc5qwvbOSWcjfR60sIVt8YHmzuabCQmRTlpDIQ714SwFzpOortU723jGt9RLHoKp7YlbhhIjKD3p45AWtsq3EjFA23tTItlLZJyR2pS3kkgXEBwCd9qe5zcvUukN3oO7CmQFuhYZ8ozvWbiTlOFji2z8dEikEkbAgF8Z60GWR3h/DxqBwRQptmaG1uZZgsLxqygbGmIYOVIrAZ3qv4U0rTrHp6ndj2qzmkjtnILeY9jSSWaRkgkltE7tKV/E7Us8ckqGV0OU/KKDe3E1uRIj7EbUCG9uJFz0zWimYLzLcLsrKx9RvRFgthb41FWbcnvRA0MygFAGXvQZbdP+q0ukelbZhO5txEAyZ0nvS0KJF5pDlz8K5p15uajLDvtttQY4ktYDNL5532Ge1UTM2EsJZFZ2Me1OyX6wxnCgN3qrgu2Ixpxv0qc7q0gLDI9qRxt5CmOPdtMqkHGafsGfSRIcjrmqaBl5pUdMdKet5+W5TOdulbCCtFqpHUfD3oV8/3S31xHO++O1QhdgBqG1TvAojIVNWoYwTUrtgB2PE47uRUC5I/MOhrF/HyjzIgdLfF6CkLOCWOUKkZSNd8+tNXPEhDZuzKDpzlTTdexqTVM1G4n1XbFpN804JgHXL/AL1QPcrd3LFTp3qeiUuCHPsK6+n2Q7VhF3flOUWRst6VVcyX/tU7awmWPztvRvujfw0nZLAuzTpHaS50KzaO29NXICIMHO3WldXKmKDDH1FN3MfMiAjyTirvBkVZy7YzQ5oyhwaajh5TAynFZmiNw3l2Ud6ezC8J5ZDsoIx0qxS5c2ixsSAelJFCyFe4rMRDoil9welEyeR0xiSMjGSaFJZ8h/OpGfamrbAI33BGK2bj9zw+74JbMoVbogagB0oWVas1fAWHb0quIZ2PberUQu64TfFJXTBDheveijT0KTBkGagrjTv1qchLjHehaSrDAyaYkHjkiXSQpDDqfWmYiiOsg7Gj8N8N8T4iVe3tm5b9C21bTb+AL/kMJmjVsbKTvSNoKg2G4d4mMcCpIAIwu2R1p61iTiF1HcTphM5VvSqSexltITZ3kQWRV2bHWk7fi8yotsmrKHGPWuV8a9FbrZtd9DdC/AtwXhO1W8VlptdFx8TDGDVFw/ipSaOKVsOR9BWwPKZYAwYO+Nt6g01hlPQvDaJbRkY2HQUSMlyVI7dqFDKzfhyKw9TTEq/d4TyTnPc0Uhf+EAY7WMvIcFjUIcyzE5AU7ivMGKgSoCawzwqMxZ1DtQGQYsFX484PelpkSRS6FTjrULoxuFcOcEYIr0LRQxEAhmPrW0axKaLVEX05c9Kr5IvMNeCf5Vco7JmRtLFd/KNjUgtnNHzyjBz+WipUBKxFOG3A0NHgq3p2pW/R7W5EfZhnrV/JfcpIwkYAA3rXuJsbu5EiZBHrTRbvIGj1gyQMz3Go6jsBThjtgDIhYZOcUkgGF1hhv6VbcNsZJ9mwEB7jrRk0si0NcNEawc8g47e9KXSFImu7gf8AUfyKewq7eJIYguRgDpVPOsdwrLJN0bYUvH7Keha8YTCONcdNhS1xJyFSIEBv5U+v3SGQHJdwMUhei3ldkU5PrRj9CsxzWKec7eoNZgnbUSysy9AKgwSCIIrAg/tU1vfKhjUADY+9PS2YekaSOMNaxISeu1RN250LLACQPSvC/wBOCigmoPcSzvzAqrj4qR1thoJDFBchgcJ86Wm4cYmOmbyVg3aMhymGB2I70MXBdtyNPpQV+jYQdEijcOjaydjTSPGZ8MANsVCEQcsvq6dqCsyuxfbOdhRatZMW4ZDsG3FGdOauQwUgd6qgG2dQWPoKGb8M/JZWBNScaNofuL7khIxhvUjtVJxJfv5ZUuFiVtiD3p+5iFrZtMWBB9a1i84lDrCj61TiT9C27yZi8LuWLpOCp6b01PYG0kERIYgetKwSGXToJUdjmjFW1EyMTnvVG3eWLJJaG7WKPTpc4PbemOUv/dpO0SMNqZ8j3pvXb/xfvSNZFaOX27yLNrB3q+trhSgYnzj4hVcLWR8FR+gq5i4cpRMNhyOldcpJiK2L3aLcIDH17ipLGI7MgLlj60ZbB45cZPuKLJGdGA2M0t/RkY4Zw+3uLVE//uZWxv2pgeAr8XjjJaNBq1AVc+B+Dh+NQyXwPJB1ZA2rvltw+0SLyQqQw6kdadNjUfLUtuLO4MMoYMv8QxUWGtxmuwfa/wCH7WKzh4hbxKjBwrYHXNcoli04HeiUWS18LcHuOJXM6QAkRx5O2dzWr8Ys5rTiMsUy4INd7+xexWPw9cXjLmSecjJ9FwKoftl8NwwmHikEaec6XGMYrL7E2ziyxksMda2TwrwSe54hBcSwnkqcjy5BFJR2Ek7BYUZmzsAOtdg4TPDwDwvaWTIjXar+IxHQntRm6CoOwfDoby4tFVIVtUXbLHCnen14XGcCa8Bf0RaqbniUjopDEFunrQJeLx2EP4jFpG6n0qFo6aZeXfh+yvbbl3Fycj4WZRlTWtv4I4fDcNLHxVmz1HIHl/ekj4oSScxB/rq60w/EVEZY5AI70QdUxiLwrw8Lh+JMSu+sQf61awcCAtwLC7ilONhJ5DWsQ8SkEhCNlTRfvsgVgXbUdwAelTlG2N1RdzWdzaKPvism3YZB+tL3M1s1n5nRQPzFsYqh4nxrirWD2kVyxiZfh6Vy+6urpmaKWeQhTjGqtHisSbjFG6cY8brExg4dHzNI0mVz/IVU2Xi28BcNcFWY4H4eratXp2zsHk/EZtI+VW6RSEjKTeDoHDeOTSwPK8cN1AnxmIHWP/29asjfwz20c8C+SRcj3rQ4S1uweF3R16NntWxcPuY5pogcKt2pyoOySL1x89jUnFbRWUGkP2nEuQ5BGsFtxVyYUuIw0TcqRt8E1SrAtpOHfLEUeeSR5BKknQfm7VGUbdolH+lqtq4PLumB27UtLwyVmPKKmIdDVenFFeJk1fid3z1p6C40wLFiQk984FK1JDbLRYLZLZDMVJHTpUku0Q6Ux7AUnKmIgWI6bAUCMcnDscse1bqB4H5rvWeWU39aC1iWQ6FGTSklzC0pwzK59adt5JVwQ2V9a1VoBXNaTgtiLOBuaUitdRYMSo71bQXUn3l43YYNKXyuk2lWABprZuqqyquEKOVGfbPepxwh7dg7aHHQdjTpgE4AnIyOhFR4lGLe1GhgfemUvQKwVUM0kYZXUkA9adguEEpOPIV3GaBaapUySMd6UaLTctpY6TTUmwJjf3nBY6cLnY0vzdStKrjNSyUQhRq2qNlFFJ/1FKZ6impGYSK6a4RVjO4+KjNpSIvncVm3hhSYiBXbO2AKYjtYiJIZkkXVvlhilk1Y1kLDjA1aGYZ6Z9asReW1y45QUsvtVLBwDFysxkIiBo109rwy4Ywy5DDtSSUW/ibslsh4h4ys8X3dBgjritLlMmTnr71sFxiQtINyd6rJog7ZArq4qiqJylbHbG5WQIibBav4OVPDhPi71qKHSPKcNVjY3bwuFbNJyQvKCmvZcrZkuVBNF/w8+h/ShC5kjj15FD/xeb1/ao9ZGwNS8MFnFkxbDvijWVlZ3MDSjqg2PvVtawXMiSRXyHQx2NIX3A5I0MVgzJqG46ZpFL0w9fo127dkmYgFgO4FAgaO5lVCQMnFdDbhNtwrhCO0YmYoNZxvWh8WswrtPDEURzt2xV4yQJ8Mox7HafAPCILHhOmZA5Y6gSM1t4niGFDDHSuaeFfG8MPCIbX7pdPNHFjITOT86Xj8R8ZvLmSa3WREVv8ApvtRfI0Uhx99GwfaxdQjwxIudT6gQB864YCXfJrqfE+NNxaP7pxCEKcb5rQLvh4iuJFiyd9gBRjydhnxOKO1/Zk8H/B1ksJGoatY/wA2az9pVul34VuY2wW20bZ3qk+y2/EfAjaSRurxyNlmGxzv1q28X8RM3BLqKweMXSrlC4yM0fyLRNQezlX3+x8OgQYVrtQNY/h27V5eNHjDjA6DJxWk3PC+LXfHUhuAXupTuUGfnXTuD+HF4VaqkgLSY87e9NX2UToWh1gK8pwFGATWq+KeKQxu0CzAAjzbZJrZvEF3FDFpDFcHatCvLZLu5e7IZiu5RRnNBRyFywR4Lazz3hkjhk0HdS+21bx90li4fzJAGz5VPvWscAvLiYTS3EcYSJC4LFgTj8gwDv8APA2O9WNn4is7pnikWaMHoXGBmi8mi6QxZrphHMGWJ2waecxtMrBdS6cEE96VyrxhYd2J3NGg5cCgzNjLdztSN0UWVQU2nMSRsAZXYHpXMeMxNDxGVWGMn9a6q0izkujqEAxj6VzvxWiC8DLkE/vW4p2xOaFIoF6itgsGZIuYTnTvk96oouWHBm1YwfhxT0U5aMjOlB1NVksCcLS2XNzOsqrylGt98dlpnglqX4lZRMVIRjIwz69f5VS8OulWdJZRiJD0zu3tW1eHYoGWfiBxqchFA/L64qb+MSk52W99IzOwQDBO3tVXcz8tcMwweozT3MDuMNVJxiPTKdJ3qfGrdHPdsYtgqTxsoBUHJzWxXN0txp5JQADtWml8W4fUc4xgU7wqXRbiWRsnsuaM4WrGRsqGTUQclMb0vOSXVlOAOgpUcUcQtEq7scipR3OkxvJH5QcketTqg4YPiEh1xuqbHqaZW+k5kRBxGvVfWsty7iYsoxG3RfSo/dchl/MOlZoDRZGSKdw0a4ZdzilbyZ3SQBMHsTTNmVS3d2TzBd6r2vllbLjDDptSUzPAuk0qaVfem7grcwAAUveAhEn0sFbptisRS8yM6DobsPWmcfZPJPSba106f2qVneWwSbm25cuvk9jVhZ8B4pxGANCFOf4jSPGOCX/DImkmVAo6lTTpDJNZIabaCwWfWObIfhHak5BtzNWBn0qrhjk1GVyQvbJqxgtr29TRbp5O5NP1ofjhLkdRR0vwJHY23DEnZUeeXdnIr3je8t2tgFhAwMlwN6R4cz8J4VbwXhjDAbYrHGo5uIcLYxJqB67b1N9u3U6ZQSga091G1pyw+oHuv5aXtOFW1zl9RlI6A+tJrHHbZCTFJD8QYdKHLxS4tVZIypU9GFL1eonJJV+yDcVsGtSHOhQ22kHpVWbfSupSKA97JMzGZiSNxk0XnK0IxkGrRUkskHV4EHQh9SdKZhQs2pv0pl0j5QzgZo8IhTB2xTuRrCBneLSyEY6UPlN/AaO8gODG21Y+8f56nk3Zm0SX3FuJXojsrOXlg5BIwB+tbVY8JuJT/wA9JCjY/L/eqs+OOHh9AKQsdsYovDb17y+lm5uY1TalUFR0JZ2W9zbs3/LKBIOmaJwXwvaRJJccTijlIP4aMMhfpWon7QltLiWCS21FCQGBFbJwDjz8VtEmzhHAJX0orjcctFZcikuqNzteHWSQKI7aIDHZRVTxzg0MNtLc2x0EDJUdDTTXrRw6kbpRGuedw8s6czP5fWnxLYke0Xg0y8tYDa8yeLDEfEBWnXri3vI4baLmyyMMbZJrqF5DDNbjEWxxkelUvEOG2PDLxOMLFre0ieQR9mIFRVdqOp/q2N2UMtpw1Vki5BK5Y9MGqa+vrSBZFljllVxg6QcVrd/9p8zObi5DcsdEUftinLHxlZcXstbqyKcj8QYq64ldnN+R6JW/GrGGQfdrKOFiMayMt+tTuOJSHzMxZD2rXL+LU/Mt11Id0Y7ZHrRYJHlhUS5B7EHpR0GrB8fltr2FoyuHPQ+lU/CeGT/dpm06lDHenr6Biy53/wAwq04NPyHMbDMT9VJ2zilnJpYHgk9lcFtoYdXJ1+XSSPX1pG6aBgoihEbH96tOK2k8F0/IBKYyu3aqWZikitjfPm96EXYssE7F59fLk1Ko22O4qwntTLESrs8eMYLbikRNmXXp0r65o9ndL94ZTgxnrg96aa9ghKgQZraHCsw9RmqW+aK8hkAXEkYzv6VslzFIdWgAqOme9arxJvutwSw2dcE+lCNbQ0v6ViWWqB5AQOmPnQrJBJcoj7qTuKc4dCZrhoA3kYbHPQ1Y8M8Lz3Nyzs5W3jwWkH8qp2S2ScdNCd1ZJNeC2tkGpzhWXtW5WccdhaJaRqOWo6+p9aHBa2NnIWijzIRp1t1FYaTS3TI96jJ9tAbs8z6ZSwOAB0qquLrnXbljjA2qwupkMDZXDAVSmPADjvTwXsWhhrhRGy4HTrU+HRF9Pm0gmlEQsCCKsbYcqEbb+1NLCBIuIOHoZ1cPqAFPXNtrUBMHSNsVTQ3y6tEKYJXfJpi1v5o1KIM+ua5nGd2NxyQ9axeQADO+5rZ7LhUR4a102gtgnfqKpuHKHt3JG/WjRwZQkyOB/CGOKfHsq8mIYg0culgoIIzWuzwmxJlkdZF1bYO9bHcqE4ZPpOAB6Vpry+XzMSvvRROdWbB/xFa3kai6tQFjXCgetUmqZ5DNGoVdWwodnCsyyAnAG6isZeLynOmj1SVAejrXhK7kh4fDz4wSV6g1XeM7j/EJLXhvKIWV8uc9q0q24ldnQI55AAMYBp6xs+IcQupb8zOY7Ybsx39cChFBTwJ+JbD7neR2kQwoGTTdhckKsETFQo7UmbpuJX8vn1PpIBJotjbywpJNINgcA1pvNH0H+NHjSb9sdvZ7mSWJ5H5gU7KR0q24bxy5hV/vCqVIwApqqTzIGI3xWGvVjjZNGWIpU3do9afh8M0l0QHjywX1rLOqhJ0HUDqK1W1uTpzKur0GOlbDE/3gup6EdPWrXhvgp7i2L6gNZyue1PGR4n+140eNxnH2aFcfjv5EP0FMQqzwaVG49a6twLws/C4mSWKKUNnLad69eeDLJ5A6wlSxywB7VS7Pn3Gzk0kUu2rf51OOFzGST+9dXufB9kLhSkQCgd6t+HeEuFfd2WW3Vy3fFA3RnElbSMazXtS/x12e28AcHhdzLEGDMSNQpr/gbgH/AIqf+2tQvRnzrxJJprl23IrqlsBwLwnznclzGMk9elaS0Yefyp8RGB6mtt8Y2/E+IcHgt7S0YYA1jNMl2dIeXwtnMZ5ZpJHlLHLMTXXPs5ilHhuGQ7tneufp4Y45MOX9wfSe5xXUuA2h4PwuKBGJKoAyn1xVOfCSE4cuy8W8CxMsg6japwcWwRaqwV8ZFUNol3xG4IdDEi7/ADrD2hW8d2YgqMA1wc0qjg9PxoKUsmyx3JlGjYud6S4vIF0RzjUp3K/xLjcVU200ygnX+IvT3FWKWo4gqyyMRcJuu/eocTfI6OjlSgnZxO/fhZ4jcR8hzw9jgLk6kOetS4dbcJs5hJDdT3Cqx0wsML9al4msJYOJyRhQOZI2r39qqUuPuZKx6dPcEb16SZ5jWTdprqSVU1YG3Ufyo/DpEZGSXt0IFajb8W5kegkhgRgmrrh/EkicPGwIbqH9falkh4sspreVtQ05I9DmoQq2sLJsM5Jo4vllJRArAbhkH7Glrm6lTYKADSZeB00sltcXGUTlt5VGNx1qlvora5LF0KkdNHeq+4vbgMdI8o6Ug3GZbZSXEbfStGDQJTTH5bbSAACo6bigxqYDkBdQ7rQLfxSk7iOaMKx26bVaa4pozJHDp9W3xTttLJNJMY4ZItyjJKpz+Vwegqj8QQJdIwQKSDgE96bjufuzS6Tj0x2qrubhXuCRgnOSCaEVmx27RV8PguYroKrEAYzXU7OCOHgEaoqqCM/M1z6dmLRLFgNK4A9t66Jbq54MwYAaU6H1FLyf0MV8TXJCJJcEYYnbFTuLN1QYI+tPnh5JSSNcjAOoe9SuoQ6KGOMd6l2pkeuTXpZF0GNk39cUhL1AxtWw3vDLqG258kZEefjI2NUUmlpMdq6I6AkSRV5fvU25wUBEbfocUKR+XGdP0ovC+OS2kmZ1EiDsRVYwUtsnyusEYmGsIchs7sKYaNrZxIspIY9KbPHeF3jcuWyZAerpT9l4am4uhk4Y4aAHYmjLhb0SjP7Lbhnnt9zuRTBtZHIKkhajbWMto/JnI1KMHTVva2czw61UlR3zXN0bdI7Oyqyl43+BwiUE9q0BZUkk074rpHiC0muuFSxwRNJIey9a5vLZ3FjLm6tZ48d2Taqw421ZPkcbyxkLLEUaHOO9PxIlzH5jhx1pM3qBEQIdx2p1ZY1iGpQrfzpZRHi0xi3K28bNtt0q8g4hHD4TmjilxPcElgO2a1yaRGaJCmEPU1K4MUShIgcYxSxjQXErbVZLS9WVSSud62c3Bey8pyuc1r56b1ccwQ2MSqMkjJoci0z1/wDHjfM/pGf8Sgg2uGIyNsDNXMHBr28hSWO3GiRdQc+lUPC+M29hNIbu0WZX23GSKurnxpOqrDw2N44tOnJHQVNtHp8vP5K5pLjVr0O2nhuC1UcyVnmb8orbbW7igs0hWBwUXAOKz4bs7abhcNyDzJXXLOepNXawoFxpGKrCHs+e8vyeXkbjP0yns77lRsJ9T53BIpuBbi8jEkelV7ZpwwR6T5B09KJwza3AHrVUjhZWTX8MSsl15XXqa9b8asIxtOv61XeL4lfg944Xzb4Ncp4HwPifEmk0TMAo7tQaDZ3D/FbSXGmQH3r3+JW38dU3hbh6x8EijnXMqjBPXJpr7kf4B+lan9msV4b4A4ZG3Mnh1spyrH1p7iNqkFu+hcaBsa2O1cPbK+eorX/EMrR8MmYDcg4qvHgnyOyh4JxF7x3UBSqkjYU9xnh5mtS6+UjuK17wTqjY685LE9K3S7Gu3Oehpef9QcCKzw9BJDa5bc4O5pHis9osjrd3Mdux+HWwGTV9wxT9yIxvXNftUtJWiR5R5QfSuN8SnSO/i5Xx5RZ2nFOH/eCrXUTHps1X9ndQyQHk+b/MvSvnGeJorgIds+ldv8CJKnAreEMNIyc/Onh40eKV2PyeU+aLjVGo/aTayCVrm3QiPvjsa0vw3wniHiTiQsbNVchdckjdI17kn+lfQlxZxSyaZo1dSN1IBBpW14bZcEFxLwvh0Fu02SxRcas/0rt5eJRXZHj+L5EuSS45LJxnjPhu44QwBfmITgN8qUhkCtnSu/rXR73hVzd3DySfiSsepGwpSXwQkqkvEWz1I2ya5+x634Gls1WHiJSMqSqAjGxxkUaXiEfL8qFgDufSvcR8O2XDbpIc3Lzy9I1OdCjuatLXgsHBeMWh43C8doULu8wLI+2wGNs75pW0hfxSKeKy4jfH/lreV1PVlQ4Aqp4nJBY3It5FWQqMsY2DaT6HFbxxbxXi2ks/DiH7ssXLBaPcfKueGxZ7gs6nkodUxByeu9NC2xJRpCc86zgHkKjA9Vq+4fdTDlQNJhG3bPalb17eV0WFU/GALqv5AOg+fSgW8UpuTK+oJ2GaMkhIqi4ud1cgjqRmqhFL3Y1bgb5xVpqLr59IHrRbe0ijDP3J7nbFLoYlw63W741DEQAFUEe29blczNa2jxkgrsjH9q0jw/dCTxNK2rEfL07Ctnus6nik+FyM1OSuQ8Xgt+CyLLZfdww5mPJqPWqziKz28ojnjKPq8uBkGs2Ec/Kjmg1c3maSF9MVtjiG5jUXcOSu4ON1NFwTJ8i9oqfE8o/4ejSSUa2x5QK0JolVck7+tbJ4llklugmPKuwAqnmsptAJglx3JQ06wZiNtAk8uid9C9c1ZtwawWPWJyR1pWK0nllAggZvpV5wzhR53/8AU4mEOPhB+L2oSTbwQldlLZWNtcIzrJjzEL+tbRw2a84Rwzk2eeY7bHHSnjw2N7fmcPtViVTgDHSl3l+63S/eJizL0QDqarCf45WxVxOaGrSWWSXNyTrI3p5uLPZIYArEkHGKAh1za9BXbpUmlimnWFlzgE5x19qjGVNtHTKFxSC8K4o8MRnuEAz+XrU5uM2d4TFcWytnsV61UX3EYlAjEOo9PTFN8LeCKF5Ch5rdA4O1dMJ1xYOXki/yUU914bk4rxB/8CtgFQeYucAH+9An8AccizPdNHhdzhq3HwjqRrid5WRA2p98Ck+N8dufEFzJFaTcqzi2Y5xzP9Km3ZZJxNNmjjMqj/tDHzNLvl3+VP8AFbqKd15cQjSMYwvekQ2lc1NYL+rA6GZwEVn/AMqjOa2668NX1xYW91a250MmdHQ0PwVDGk8tzJoK/Coaum2d/FyFRcdOgFaatFPF8qfjz7QOQDw9xHVp+5PqJ9K2LgXgTiF02ucCFB61us0uudFUAZb0rYraMxRjTv8A1pFGzv5P9nm61FJMouC2UnCrT7rcEAR/Cw7im1vIScaxQPEt5bwhhK+GC+uK5nP4y5N6tsIF0sca2kq8YUsHjcvK5ycpbOrmaPBw69KFw24QxlQckNXMOHeJpr7ij2blYlx5CCSD9aPd8eu7a2mks7hWliOGXTRol+RHQbiKOeOWORBIrHcCl7Tg1mhLRRGM98bVonhfxnxDiIcMYlkB2U5FbdbeI0ClL0cl8dex+tBrIY8kWVnFeMva8eseEcLlUFmzMMZ8tbZp9z+tcPW6P/G03ELlmCPLiJ/YV0n/AIjsv/IH/uoPA8U2XnBuIsOH8oyFpF6g1Di3Fre3sXa4UE42U1XeDkeSyNxKfM571TfaIZeWqRDfvirwVq2c/JLOB3wtJHOhmAADknAra2CiDPatH8IwtBZWuvbWoz862TiPF4bJRDJkEjqaTyFgfgZe8ORVtx0yelaZ9qUUcvD9JIyN6ai8VPFpijhEu3xBqoPHHEH4nwt3KcvHaufjqWjpkmjkt5aie/jEQ83WuqeGpZF4fbxBcEEAmuYW2v8AxSEg4Gd66f4fVhbod/iqnJtCxeGbrboJLlQewyflRbkBzjA26UG0bTFNITucKPliorKGJp/Im3Lqb/N4EuJz+wkVrEo2AqPErmHhnDp7qVdSxrnSOpPYCjh0iiaWZwkaDUzHoAK5r4v8ZWfF1az4ffrAinTl02f3BqKVndOSiLXfGbu+t5+XYpreQOZgvnVfT6VVcbh4reqsl1LcXwY7AOAifSlJbp04eIm4taw6QV0xoWZvQ56VrNzxDic0h03ZkHTIOP2p1FHLLkdmwG3KBf8AEbyGyh06Wit2zI3zoF4sV2FSNltrJB+EDjU4/wBaoEkZDrlkRpP83Ssc+O6kZyShHQZyBRbE7dhpjEhJbRGM9F2pW44gBgRbKPekpSpJySx96Gw046UErFcqHV4hJzFwwYA1dXBIsQQ2NXpWtQIXkVRvvV1eXZis1TAO2kEUJYdDQdq2Z8NiR+LM6k7da3qWN5blzIGIWMH61oHht5P8TXTqwR5sV0uyY3DhzkaxoAx6Us8MeGhzgOstIukLpYMD9KfvL0o6knGofF7+lK8LR4knuWwI9wrH270lJK0zyROcuo1Kw2BoRDIs2cTDUY0JHRxVPxm+vYYSjxlEBxq0DB+tMW9w0cWTsp337UzbcSWY8l0Ru+lh2+tNQtFf4aNs9s0k94sUy58hIFGE/Epg7WFnJeHO3kIH61fWUvD4m1R2VurN1IQZqza9VlxE2lvfFZqjQpbNe4NbeJJFb71bQWkb/laTLdfarD/BbX70bi9l1yDoqbAUWa7cn4tWe4NLvNkaRkH0rOmzRVaHNNjH0jBzsSTmpRzQwODHEgyPSqO4lKEk9RS68SyvnyD71g/9Lye7RH1cmMjO2UBxWDxEOPgB9wuMVTPOLlMJgsPQ0KJ5A+jQw9STig2Oky1kvnUEI6gN1BFeF4ChjMSMnQ6QAD9KQuiiRqNSZ670FLiMvodgAehHTNC8GcT13w7h8oJMLw+6H+lVV7wObl5spBMP4TsatOakU3JnAIbuDS10/JOqFvJ7A4H9KydugNYNg4Ha2VrYQpOqibT5gTvmrvh6xNKTEcgb4B6Vo9vfRzR8m9jMidM6sMvyIq28JaeH39woneSKUDQsh8y/3+dNKSqmSfG1k26H8S+iUfxVtybDHpWoRXEXMRox03zWw2xn0pJq1KR8Pelg8gkjmP2scVFpfmAn4lBrkN7dTSyiURnAO3pXTftOtbm/8QuxiGlVAUZrRBaXDvJHJHpVe2avCUUJO5JKhW34pc29uJwNJDbEVOPxFIVkGSOYMMfWnJ1iThaq8akg771U6bI/+mRTJpk3Ci74TKosual2kUqtsuoZoo8WStqiu5A6r0261r8cFjK6qpYMT603PwSFFOmRv1oOvYOjeUe4vxyK8eMReTSfSvffYf8AzD+grX5YRFK4DfDUcD1/enxRrd7PqCO1dI1ETooXsDVFxNxPxBo543ZSNjjartLJI31I7An3ov3ZDuevrXFLyrSSQ6hTsRtLMi1URpgINqFxTkSNG841EbECrpFIGCdqC9mjknG5puTyFKFIMI9ZWUE8Ftass2jKkbACqPjSm4sZQLaTcbHG1bw1iunrQ5OHLLGyE4BHpXPDlcfRWc+xw5uFXUPErfMTgM221dQ4PPBb2cUcsEokH+XYmrkcDhLo8mHeP4WIpoWIz2pp+RJtCutITW40y430HfH9KNFLG07J0XAIJ60Y2APTFRks7pojGLlgh28qgGm/MpZkU4uRccesTnX2kcS4lxsrw3hDKtnGfxCHwzn+1c/PhTj2Aq2kpBONjsK7pw/w5BYBwg1Mx1Fj1NY/wKRZS8UpXPVTTQ54LaJ8k5SdnE5/DPEbGFXvBGoA2wTkVV30DxR4DLg90713HxJwMXFgwOA6jYhc5rj3E+HPEXw48p2WmjydmNtGtDbIr1NXduIdLZ6jp6UsMMRnp61ck1RkEnoambeXTr0nesiQQvmJsn+IisvdSuoDOSR0oNv0FV7Bx6kcHB233olxdSXJXWRt0ArE8wlVfLhh1OetQgTmSqp6Z3rf038Rs/hCIxSNM3wk4reoZEVDOjgLG2lST8RIycDHbvWs8CsxPBrupmhtY9JdlQkuAR5ABvkjO/ath+9xXXLjFsYbeJdMUYc4VPTrUpZdl0/SGZeJLNbGIFmCrhRjAH0qpEkuRqbDEEf2oqlBIwgUnUpA1bYoUCkJzDljqxvWiqM2FN4Ra/ijts/9KRtblxcK2vODscdaXvpDGkgRjg56UjZ3MgwC5YdQcU6Qt4N8um/5dLqEHWNmGdqHbcTZlySAOhBO9LcLunmtjFINipFUnMMUjqCCOh9qA1mzXN+Yirhup32zimF4gsoV4yPfT/bNanHcs66GYMO2e1N2ssgBXRnP+beg1gKZsN1JG0QnRgCR07GqG8mCy6xjfqorxne3fGGCnfff9qxNMkbDMZAbuRtSrAzpqx/hZidSS2PUaQaNKIlDvGdlAOP99KrbKQkEIThui0NrgxyOjKy43zjb61P2UrA/aXqvrPMJC/EMHpVZxl9GXjChV3GTnNKC6WRyunzBviTb9s0vxXmSQuYW1aRlt+lMlkV6LCO/hMMckzAb41R9R+u1RmkCSBorjWpGemx+maoOH3CTW0inMZB6qc5+lRkulgtmSbd1Pl7ahTpLsTbdZNkimbTqWQBO/rVlZXWVUq51r5kfoaofDiWt7auSzLOR5QRtn609bskUphulbOrY/wDzSTzgaDwb94c4tFxCZYJWAnO235q6PAoWNQOwr5xZ5LDjA+7y6XD6kYEeWu4+CvEC8f4SskmEu4vJPH79j8jRgqJ8q+hDj/hleJ8Re6aYLkYxVWPAVvzDJzCzHrvWycWBW9bDHcUnqcdHf9alKaUngn2Rr8/2cWbhssTqPSkT9lNkXGSd624SSA/9RqmJXz/1GoflQLi9o1GP7KrJSGBORRv/AKaRjOmZv1raWllG+o/rXknm/iNb8qN8TT//AKWW5SQSNksc5Ipb/wCkdn/HW+feZh+Y1771N/Eab8yN8PoCFyQQf1qRbBxUGGTsawuSKhQApfPSsh8daDq0ipDLHtQMTMrH0rHNYelRcaelRTJyW61jE9b57VkmXOdqyoymRjNYVn6HArUE8Xk7CvZkrJJFRWUk4dSN6wAgO3XFExjHmz8qG2OmetRLBRtn51g2YvdIgbfJ671xXidu91c3GlDq1HzAV2G8kbkSEnYLtXMLjMd0xPVm2wavxFImg8Rt5kRhMoGn9ap0ikkYCONmJ2AVSc10/inD4bqAuyYb1qjh+9cOVGtWOEk1hcAgNjGcfWumMsCyiaUyMrYZWBydiKyqs3wgt8hW33fHJ7dGhkiiZWh5Ssc5VdWpse5PU1mLxRJM8jxwwo5uBcYIOnUq4UY9AO3rT26E6morDIxAEbb57enWrSwtUtyzz4LgY0rVkl3LdRmJy6ZBUgR4GCcn9TRBYroJXSAOu1Ld7HUaCw3jyGNFhIXsS3T6VaQ3JiGhG1Ej4ff3qigkRHySSB0UU/bTsW0x6VYjOr+9FoZF3En3iNjzNIT4m7mhcSY8hOXsMg4qbwTLbRMpOkjc+pNBmjfBHxlevzpVkJVXkmpdAY5xkUhbIZHBjJQdx1FM36B1wGKOO9e4ajNgMcZ7Y6090JRsHCXAdQS2+3Sqjii7z6TjDk71Z2ERjcEnA9dWKq+IXC/eL5POdJJGpsn50jY6VIBYTPzBqJAH1q1Y5jUqxOO4PWtQ4ddTRSlTq0g5A+dbPDOjQHzED+HNB7GjofjcSWmdQVl6lhn+tAu4pMI0jKQMdDvWLByVdDp0nsaNK0eA0wUHoN8GllY0aoDJILIsFyud85pW1vndJecSSg+L1+tWHEo/+XdNOpHXIw2a0+C8ltefC2oAsdh2qcfkh5fEsLPieuaUoMecYb0p+6u5tbK4R1cZJG2PetWgvWCcpIyNT5L6s0eYPK0YVvK3UZzmqOOSSlZYaltLhwDqEm+c71U3kxmldFcKM5Bx8Xt7VZRRK3D55JUBDHCL10+9U8Nti8WOQkDPpjNbjpuxZ3Rs3hGKR7hUDsurphq2bi/C5YLeSZmdifzdf1pDgUcUMseBkjBBC1svFZXkQjZkIwd9v0qfLJ9sFeNYNM4pGii3dg5frjbFXXh3jt1wHiCTwZVZFAZc9qXuYGa3XmLpx08tLRqskYSTBdDs+rrTrMQS3R2ixvJOI26XLzLIG6MtHIOfWtG8McaksmjguFIt3OC2dh74reQwYal3X1rkkmnkhOHVmCD6CshR3oi6cZqekYzgUolABg9BU9Jx8OKKBgHyj6V4SL0NFBoD07V7PtRy64xioZX3o4NQqEwPSsBMH4hj2ppFDfFUjEmNhWAJ6Fc9elQCtr0qetNGNhsDsa8sNAwLS5+IVgjJo7J5hmpaBpNEwCOMsev0qRhdthtjrRY9KjJqZYEHTsayYRVUlzuRgVMRk7nBomwTevYGnKisYEYgd871lYyVxjFSRNs9CaIFIOScmiYqOOnkWbqTgsMZrmVyFdpNW++Vro/i2dobQNkbggVzG4kVpFDDD+nzq/GsFI6PS3n4GhiNhjA7VUySsSVU423r3Eg0eWX61VPdKucvnuaukZsS4idch1tnHTA6VjhaxczYEOx2FRuMSPlW6dTVhZ8uMoy4yw3Jp/QB+OFiDIxyg6L61KN8W75x6GsRzALjTrPQAUGcPoUKR6mkCHhtRIQNlzuB60ZLAxyK4OMnKj1FAsCVhdmJ1fDVhc3aNKAFPwjAHYCs2EsIJ5ZVWJUyFJ296QvWlto9ZBy2xHoaMlxyywB0s2Cp7GqriF3JLKRI2onv60UgMUtblLu4Ky9Sf0q5FsYVDZVkPtmqC2iktrgTjBz2q7W6keLzKMenpWewrCGorkRKw0DAPWtcvcy307R6g5GVz3FWssyCI41EE9fSqy3Us0skpUruFwd6RjbKq1zJM5JCNjudvlTazO8RIYjDAMvY/SoWgVBOAfhby5qAlKzsseMk9xTbF0i/hdkKxGN1bAxnvRruZUkjBkOcDY+tIu5kQc1tLBcZ6UGaXyIshJbOMY3P1pVkLwWPG71NECAdtyOq/Wtb4jGZZHZfO4UZYmrbiKwtCraXGwDAb0mbVkkbCpobBUkdTSKojt9tilvbCNC6I7E/CVr1krAsxAILbDuKs1jSG0YF/PjdNRx86XsExJllIGknJOcU2WJoYv7hbLhMSRksZG3GNP8AKkbCIXNwshVhnsd6zxO4F3NFEYtSrtt5frVxwqLlqmF0gdRTQSihZuy5sQlrNH55Btv5gAau7tkd43UBE7ajtmqqXSbqAcsgnAypG9N8TSXUow5jUb5fIqM0nIrB0gF/crPCAmkgN5u+KrI25M2qTffIU9P0qxWMiFwUKkb4OcUnLC7DWxUq22euKrFUqFll2Py3yPahkAIzvpGK6B4S4qvEOHcgsebbYRh6jsf51zSMxvCYZAyxDpgZJPyrZ/A0yxcQVAGBfKsGGMjtXPyLFhnmJ0ABR3qe2PiqK6QTkV7bG1ROcLnutD1ZbpisqNI9qidW/cVjBVIxWcihgeUD1r3LHrWCYBUDOqixvGqY1ZJ9aC6IpyWAPp61AlcjPrRFDtLGnxNU0kiO/Wl3QEEADehnTGQp6nsKGTWMs8P8RJ7bVkkGM4oSPFpzvWVmU9xj5UaNZHfFeUt0qZx8anIrLMmNqHU1mBj8xFEVvTGKEmkuSdqKTthcH3pqDZh9JU5xntUQ2kDJqWT6DNYMchlGcBcde1ABrPj59HDIJcZCzDNcr4zcPb3gWMZ67/OumfaPOrcOgtWOC7FwB/l/+a5ZLdJcXG+PKMfWr8TKr9Qcrm5tVWRxrXr86oruJjJjIAYirG8P3d5D0ByPrVdFOLmbSeorpTwBkltNnFEhURuisdupyajPOY2AHcUnzDJID6ZNMmKy0S5/EeROqnGfamowWlyDkMOlU9rKBHKmMljT/DLgLKrNvpOQtBjIuYkMhaJl0jaiLaYkVznYYHvUVkMsOAdJbzN9amoZGMc5ORuvvSXkYU4gTHkEHT2x2oNvyzsV+eVolw6NldWsN27qaJysxqEVwD1zRsFA7hfIpVQF6DHeixyJ8IbGodM0uYzI/KIK4/MBRntyE0kgkdD6UTGZ0KQMT8PtVOHC2kzAd+oq2dz9zdN8g1XWYQRzxyZYHcCplPRTQhhKSHJB60fhw53E01MdCnf0ryCKJGeWMgMSB8s1CxkFvquI2Uyk+RWHxCmbtOhPaTL3ircsHlYYnYDalWfVEGbAYDttisys9y0cbFVlXzHf+VRmGqZI2Vxg9QcD60IqkGTtk5mEsYALAADOe9HJRLdpRISVIHLAyKCAOYIwwlyc9MkCj38ZaFY01acEnHWkksjRYglq0hklaVlAPY4/So3skybxyNjGM7b02qoCqICV679Afaq3ius3kSREeXcZ7mrLCJsBPI8F3HIcsT0DZrarKWRFiM4KaznOKpJ7QXdzbuJdRPxKPyn2q9GWaC3Y9F8ufagnaBRdcLkM3EEVmQ4O+RkVdcVjAYgcrSRvjYVUeGUDXg5o0lVI261d3LKHdSAuvuy7VCf7YKx0a/ChkDR62G/UnY0PiIZLdY4WXOcaEO+f5CrR7LlZmihTI82sNmqbi7yvdLzSMkDocEU8XbM8IDLGEtlQ6llDZ05yT+lS4Pfiz4jbygsGDjPX1pNpNN4dMojiA2dutBYhJ1lSVnJcHznGKDWKMmfQMRV4klHR1BrB27GkeC3PP4LaSg6sxgZp1SzrheorkIPZEyENncIaKMlQVqGCEy2Nj0qYkITOwFYBgerbH0qeketKc3LHJzvU+ev8VC0C0FYDykjO2/zrzR9Mj3FTIzGMV5yDjJw1EAMLvWeWAS7DfGKL5Qu5z714MmjB33ooLBADGwOO21RSJnYg7ZpgAndNtPQetR5mNRf1rNGpAmLxqYgox6+tZh2JEmCMbYoxMcowDn61iNYyGI2YGgaiD50DH8qyFw+5OKk/bUNj0rBYFCSNumaJiWIlOCzHP7VhdDbNJjHahhDywysCQeleRcsScA0AnPvHc6Px8Ra/w4Iwp+o3/pXLp4xZX8kjyaomYaBW9+LbpZ+IcUYaRi4Cawc7ADatSvYIn8x0asfFIck/SumCpFawKyMLsM/VSCw+VUsCaL4cvIUnG9XFgrxiNGXyt5Tn0ArFzYiKRZgN87CrwYrQO6gDRhsHWNqC9qIIXY41YwBmrCVk5LAHzDGd6r7kvM22/Ye9OkBittpVX1bsdhVhGgiRWwBgZNQhthFHqlGqbPlHoKgqyCM68nV09j6Uasxb2xadMoTqUZqwNzE7KJPMh9OoNVFlcm2CsqZb4d/SiSyfiE6CHPYVNxyMmWAt01s67he+OtDlcy7IxGKLZmd8qBoLfoRU3h5ZJ1AsOuKyYWhWCAhlJBGnvnpTx2GolTj1pUSOVbIyKKxHJOSAD0P96Ipgvqt5NUYKn07VRW+gXcoTJPtV9HGY7KRySpwapOFj8aUBMnsx9ak2rLZpFXxkupjjOyjO3frSlqrMy7jSD3pvjIaW+O+SB0qEOlIcMOhwpx1NOsRJP9w1nqS4I3JJ2PWrQIzXKYAb2BAoXDEMkhU4GfpVhMiWURYBWlPQntWbCkViTE8SJZmG/oDgfSmJ7mOGSSTzBQuQobO/pVdDKZLuWZDiNR5iaS4jPzZgq/Cd8e9bqmwOVINb3dxPM8vMwR0XNPWHDri7n5gViXB7dKX4TbMpcuoGMda3nhlxY2duSWBkwcYPcf8AzRboEVYnw3gX3eBZJAAwbfPWh3aKblGQgkeYexoMXiJLp5AQQNwKBPdxytpQEMvp3oILL7wq5M8sshGoA4OOtXEM4lR1Zlzq3QfzFUnh5hbux/8ATdTqz2oMN0UuSdWpATtUmrbKJ4NkP3eSOUPdGMjYAkgfStZ4mUeXEY2UZL9Sf1piPiBlJjGXXOfMv+lJXdxCpk3YM3VQMUYqmZu0Ud+7gc0MTqOy4zRLgareFtDFCN8nBzSSl5C6uoCsdh6U0jBiI31lcdhg/KmlsWJ3PwOqyeF7Q9MLtvV8uVJGw961T7On5fhmGIq/kYqNXWtkm8zBl2zXGyUtskyNrYMwxQn5g8uNXpTKIvLyAdXc1hmy5boAcZoegULLCPzAK3oDWPua/wCzRyV5ugrv1omk+g/WlpfQKPJcx69BTYDqKwXDMGA+VDkkQ/EuD3xUgSS7AYC9AKbsAl5mLZGPasCRQQMHasQgzLqycmsy6Y2jLdD1ojHkkbVk7DtUJWLtuuPb1qUrsQFUDFYKt11AkdMUGwESpHmIxjstMiJXiDJtnrvSoL+Zu+KmrKU8hOvbIJxRi0gE5AScBt1GMUMu5QxhMjPWiQly76k2GxqcJDIWz0OAo61qTCDULGukg7V4tsWA2x0FGYpIAGbDDtivAgxAZA360aNRw/xG+h+IpL5Zmum6DAwPWqB4w6BiWKgfl2zWxePlWPj11asSpabWu2xBHWteWNpSUBZgvXA7V08eirYrxHiLWmgQxKF6Vm04it4y6hpbpVXdSCSQxMejYU5rMcM1hKGddj3xV1SwKekvSsxiO6avMfU1ZxgBUlAyeoJGwrXZjqlLZ6mrDh9wcYckhenpTPIqlbNhtVFxOHlAwo2AqNxaoHUZ2zn60lFxSGH439sAUf8AxGzkaNfvCE9Tnb6UuR8Df3by7AFcb79ahOFESnfUO432qrveIpGziM9feq48SmY6mc5PcbVurZrSNgXiUaxhUYhl7Y3zTVvfNcoFkAVlG+2K1ZVmkbUSQp75q54YAqMCWPzNbpRu1lvGrSAFRsTio3+F0Rgjc+b2oqSLFbg4z756UhG5llJbcHoaVjIY4tcLb2RhjcBj+XHT696ruFRyN8KnUxyPeoXUUsly8eslVHlB7CrbwyY44ZZpFBESt5feud4RdZNX45lOKSwxkkg43HSoCDlAKQGfrjTtXr6QT8TuLl9Wl3601bMrNrEJK9izV0J0kc3sdiJhtTI7qikbADFIS38uRpZXLEhc71DiVzzW0Kh3GAM5waVj/wCWXUd3PfO4obM3Q3dXMdtAsKqDI3mIHrVYukuXkOSetZYsXHUux64zWeWAW19aZJIXMmHk4hLghDsPQU7ZTTTRjVvgH96RhtCyEhT86espkgI0DWUPQjrQm7WB1gPBaLboXkwdW4Apae/h1ExNgg0LiN5Jc5ljGhM4YCq367HtSxjeWBvJtvC+NA3CoGA2GR61YPcmz4g7qimOUhhq6b1o0QdHWRQQw36VcTcRZ7GMOw1xttnsKzjnAU/s2C0uDb3D6yhjY9AaHxAGO4SaJcJ3B32rU7W+kjvE1E6dfQGt5u7d7i0t5EOkOMDzAmtVOg3aKCO2Z7qaSEF41XVsQKZtrF5NZGEYjILHqKFcxf4cVK5QOMFjvmtg4Nbrd2YJl0sRgkDakk6dlIqzfPs41DgK482hyDk1tsQUqGfYg1qn2erLFw25tpVYlJ99+owK22RozqUjB9K5bVtkJ7MSSMchV/TpQlDnyuclutT5pA0KNuxofOSNNUnxe9BimTkE+XOOle5k3oKmAkkOpXCsf2FCxH/3B+tAwy7iEqGC575HWhnUhLhlCsNgKlcvrQZAKrsDSrK7xAK3mxkGs3QrJjUFyWIY9NJokbARO8mWAqCII00iTUR1OKlHKWUxlho9aCNZC4miK6S5Vu5xtRFbSgZSCOqkComKOMCJ9znOaypwAhU6AMaxRumYNG8AgkyQW75pZEiXdyBq6exqWbZSVKtj+I96Gyj8wGF6ZFZujByxRH0SEkjv2r0bNpXRsB1Oe9Zyrwbrt3A60MMIgEKac7hc/vRzdmCvMQ3bpuaW5szMAVGOwpsRxyJ2LddOOtCCEBgdRQ/lPUVjHJvtkspVn4fxBdtRMbkdNtxWtxTNGivEDjR5t+tdS+0Xh63nhi4iUAcgiVNW5HbFclt5yV0ELoA0lM108UrRVaKC4gMl2zadKO9PXEktu6xlg2Rg6un+8UP77GsrRuoyrnytQ7y5EsyoAGU75H9aq7bCqorroRiQ8tsjO4HSoxuykAHaiXaBX8nwmgVaOiLwyUh1Nk4zXkwGGRkdxU9PM3iHTrtUY35cmcb9KBveTMwj1fhagPRqnaxCZsFgB6mhMxYknrWY3KMCAGI9aZGvJfWvwFdQIA2wKYtVZXOo5BPftSVpdhowYwPdR2qw1I2FZgBjb1oS0OgstxpfSvUYAB703HNAlkxmAj229zVWLZ2m8z4VRnJ6Gi3soIEbpknByp6GoTKwwCh/6M83Ldg3Q533p+0K2Flekr5WUAAepqtu7qQQpDjB1eXPUj2NRu7hpIUQbKxJbtU2rZRuolTO7R/gBw3djVjaxIsQcnJA8m9V9qhub4AKSxbv61v/AADwJxPiujUDbW/WSVlzgegHrVOSXXBBM0uG2ubm6WC0hM1zKcKqjp9a262+zm5gjt7jiDAySvgovRds11DgPhfhvAiI7NQZPzO3U/M034qIteFyS8skRASPj0qD5WZbOB3vB3a+litwE0isRcEjRyk82pmIAx61ecVvOGfepJlv0A6aSN6FbSWNvCb64mDDqCO5qvd0VcVYrcQR2URaQEKBpTPdsVS2MZFyzny6l2FD4lxSbi120suUiBGmJTsP9aOpW4jjIbSygggdlpqaWSd2yEyctV8mQOvvUOD8Du+L8RS0tY2yzYz/AAimYXNxOhj82dtxtXX/AALwJbO0+9uFE0q9T2FJLl6KgSSZa8P8HcFXgsFndWcVwqIBqdd9XfeuU/ap4Vj4HxeKXh8fLsriPKgfldeoruqPy1XmggdtJ61r/jvhK+IeASRIMTxNzYS3XI6j6jNR4+SpC2fOJOt9RGPXFbf4fuGNlhJT5B0bqK1q1jQXckMuUcsVXPY56Gtj4aEt0EIZMue53zXZJhgjF9IZJhrI0Y2GK2Dh7w2tgjIoLL5lOcaq166QqynTkBsL7VbOrGy0yMw1DcY2zSyiUTZvfgficN3f3SNIDqhVgq9cg4I/Q1uekZ1x7iuLfZ/emw8SWrSHlpLJyiSdhnbf64rtxEgDMgQLnA2xvXHNU6F5N2BVPLuzDHYCpParIuGJJBxj0qIiZmHnAU9c7CvGMqSScBcDXnbNITArGy60yChwB7Ub7tF/EtTJDlzE2QyYwvb3oX3Yf+YK1fRicofR5c6T0I7V6AmRhGELN1OTgUaMq7HcjG+3Q0MmB2ZWLEdBkbE0Hu0KejV15hAG+2jNBKkrpyoPfy9KNGoZ2M0g32GNjXo1dJlAyUBwcb5BrNew0B0xyvgSH3IHWioVRRHvqIxU2jVpJeUmOX1IoMmtnUyKCMdCcGs00BmZpo1BjfIO29AMrBiMllPQ+lZIOoynyRocdOp9qMrAeZk8p79M0klJsJ6J8j8MfiAY1fzr0zfCereh61Ixxg82HOsHO/TFRkGFYlirHov9qfNAB2hzNlX09QckE/IUZZ5CGUwMSD1ahtGnLIMmMjrgZo9nhbYrglc4yx61lejCt/C13bTxExhJIymkDJB96+frqB7DiU9u50nJJ27ivogolvnQyoepONWquN/aBwrk+JprmPyxTfiAk9z1q3C6lQ8TnfEWD3khztn0oEicsq2oMOux3FO8aaFrkCMHWB5jnaq5ds13rQrY2+u4UKDrIGc96WQ6XBIzg7isI7I2pSR8jTsixTxq/wAEnTYdT70LoL+WRq2htbvIZhE2Njq61Vzx8qZ0znB2PrWCukHVnI7etTEkbDTKo9jjeslTA8ga9UnUqfao04ge0naB9hlT1q7t2EmSCemwxmteUFmAFbAZFjRAqkHA6UHoeBbRaJLN22DAYxSsEBkwXC6R19RXuY0Kg9SRkjHUUS4Z4YJAACGXINQkdEUVN24lvAFfZW6Y6VL7vPfTC2toWeQqBgUvw4GWQswwRkn3rt3gHgMPD+E218YPx7iPLuw6k9AKnyT6CzlgrvAXgKHgyR3t8vPvHGoNjAj9hXQIiscZiXXpxkqNs16RJEVlYFPzawe3ypWBZQ2lSrNksc7EiuSfI3IjYzFLzNSABdO+43Jpa9L3dvcxToCrRMhUDfpTLHUQy5I7kb7VlygUcxgDnK+v1pWzHyzxVGi4hcRSHLI5B2qAm1xLGWOlO2OtW/j2AQeLeJKi6YzMSta+M4yNgK9aFSimB7Mgk5I2puxm5RbO7EYG+w9aVBAAFMW8Zkf8PBx1zRloMTbfBXDfv/E47eNTuQzYGwArvVvYQQQRxxnyKuK519kVkoS7utKuyhYwSdt+tdHkd11NHpC/wjtXn8krY8n6DBYdSEodiSRnvUJILVSwiwrv8RY9fl6UDnCRg8ZDEHf1FRmRzp5gGnGVBHQZqd/SFOJfa14aHBuOJxK13tb050AfA46j69aqeBvBeOouyDjYKxwc12jxl4ci8S8GksYpQZgNcOeqsNx/auEcNZ7G9NrdDlTQy6TjYgg7iuvjn2h/UNB0zZuIW0SsFUH1GSDUopJVt3QD8uBmrCWIXYWZFOB1BOc0CRDAT5cHqARsapFpopplVw2GZJ45yFZ4pA3XYD++1d5kdJrRZZWZS6jGD0z3ri4Ci4BAIMoIGBtXW+GgycNtmRwylFxnfIxvXHy/tZuVVEeNqkCJpLuo675rKKnM1O6gEZ09jS8KTIuYh+GxwAG/pXuQ6qSZD5vNgjYVJt+kRQ4rQZaSIkLjDaT/ACqHKg/7xpVkJkQIVVRnHqTWeZJ6D9qPb+BGXkkVFCLywG2CmoySBUbAAZRvnt715FySA3sADilJJpDcEYYhRp06dz8zQlKtkxqTP4bp5WGDy8bY7k0V9UhV1dlJHlGOvsaEXWElASjqoGB6/OvCFpmDq5yy/D/WiFDEKyoQpIDFfMdxj50N3Es6EjOg/F6igLJmXyORjqQDv+vaiTM4tg0e+dgpG3zo+jUSnEbgx7Bcgg1CKWN7geYlNPmwOpoWWUfGXwMnI6f3rCaI5cuynO6qRgH0ApLkwpj4KafKGwBk464qEqjTIYzlceUHdqgzjljUChG5OP2PtWEkhU9Wy++c5JppNGs9bBVdWkdlXTj1z86LJHGH1Rbg5UjPQdjSzGaRjlMIDtg7/Wsc9ow+E3I3HYCl70AOwt8ec50nYDoRXOvtVgiMlrIoOeWcLW5JM07uqIxIxltOBWqeP7iGS4hRgNSRaQPU96pwSbnopDLOGzsWlfUd9RqMalnC7nPp1q04xYGO4blKTq3NK2iPDOutBuNiRXqJ4ErJK4ijgjREVZHfo2MEH0rpNh9mUV34UtbxZpIuIumtw26Pk9PbatD4Ygn45bwyAaVcZHXevpq1hEdqrnCaFBCZ2xXLzzkqSG0cGu/s745CpmWATxj+DOa1LiXC7u0lYTW7xnPQrivqiUPAxAbYqCQrevpVfNY2tyiJc2sMqHOFaNT+uamuacf6B52fLWl1OCDn0NGjjWQadOlq+k5fCfAHkAm4LauD10x7frVNxL7PvDV1va2jWjr+ZGwP0qn/ANKrKNSODmPkOpB3qxtbjnyLC6/Cu5FbL4w8Ff4LLG0UrS28q+Vj2Poa1S2jmF4AgJ07HAxtVY8ilG0Ol9G0R26PbpKzYCDzaeoqm4pqd0hjfCN3BJq2QyALoXSD1ydjRbOxVpy3JyNIJU9KR/ZVfRS8LszJxBY16CIkn1rv3AW18A4azMSBbxlO2DpFch5ccd2VtzgHo/ofSuu8GR4+EWsIIKxIiJ7DHeubmeUmJyUkOT4MGDu5ORnp1qQj0F1Bz7D+lCmErTlIzGds4Hb615FkZlMkZLr8S4JyPX3rn7Jy0QMxJHMWxbsyAHo5wD60CW0UMAGxvqxnJpkfhajC2c+dkzt7D50s7SJMypCxjYajg/72oNJejWcS+1e3WPxBJIp+NtW/fbrWoL5rZthgbfWuofbJw0abfiGlcPHoLHsQen71zThSLK7q3Ug6Qa9PglfGhntCS/FT9nEWkwhwMAn3pWVVJHL2IXLfP2prh7aWZySckAZqknasMVTO0fZapThE50+V3BwB2A7VuNtcwsSUy6/D0xvVL4Btkg8J2BwFkkXmEjc7+tbIkpbMWkDQdsKP3rzJJt2CTyASMMzkbh8kMvb2NQhYpEcknA04z09qI7OBGLcxj1DDqO9eA/Bw6KXz5VTYfU0lWwPBKDUHaVG0FfRR3rl/2reGokuhx63TSJDouww6Pjyt+m36V0+E6x+JnSvZaU45ZpxnhV5YyR55qFdzspHQ/wAjVYTcTJ0cj8J32mB0mUuUXAB7+4pjirrq15dMYyh61r/CGl4XxZ7W+w8qOUHMO23ati4g/NUAx4U/AepH1rrj+xd5QlOmtkMEpZAQ2D2NdJ8G3TNwO3Z42ympQcbDBrmClyVii3AO4xgjeuw+FHit+B26FipOrOD3Nc/OsoM8wHoOaEZsop1bE5H60ScvrCkoxX4lznNTMLSuigsFG/XpWJ41bUQwGCMYHSou6IgY/KC5UMD2x0r2q3/7dMStHHs2+3VF6fpSfO/y/wD40cAsYEJ5uqNi4BwQD196i0I+8dSgwdgcGlEubmIiYOXP5sqAM+lenmkZGDTKxY5IK9z8qXutUIxlOUzsWJkdB8ODgduveiF9OOU2kHK5HXFLWjNjlkFcLjfppr0btJJmNMljt6Ae4p4yUkGxmJo4wqFGKqN8neoSTvcszx6VjUklcbewFBa40ksfMe+PhNIyzfdmaUsFikGND/Cd/UdKDlVBRYrrJaSby5+W9EDhn5vVc4Xy560ieKxZ0IdCsNIZCOuKxLdFJVYbw7q+k7jPfHai6WQtNDbzagVUgkZLBsnURUJAuCVDahsc4649qWbVJbmZZVWIbam2J96yjSsVEZOFOQfUevzpLYg1G88mkoTjuDg5HcijsDqYKxLAasDv7UGym2bUVZwQFz1xvmh/f1Z2ByNK7aexPQU9pLIQ8k7hVxpC4x5T3+Vcu+0uaYTo5I5o3wu21dGjlWSIQphHDEuzA/7zXPvtPgFvHBMAzqU0Fz2Io8UrmqH490aNf3SugD/9TucbVrcssmvzMRg9jVreR60Q5JXG2PSqmZNE5UZKg7Zr0ommWPhycRcbt5ZDsGyc96+kEuVmto5oYypZVOkb6vcCvmaJfu13byKQQxB37E19IeE5Fn4Hw83C6XSFTzc4yMVy+SraoV4RYNOsYbIYsMFlcb59BvROXHcRao1IUHVt3HvWISJZNk14OoZIzipTCKK45sbFdiPI2w27ioJOsioAl5IGchmLxjA9MfLvRJ1Rl5nLOOwONz60rr5ci45QjPmLMobIxUxciWQRypgdVJUVCOVTYbEPEdgnFuCtbSoeZjKsPyHsa44LdIpnjKlXB0vnrkV3YScxisgjAJwvf6VyTx/AY/FSyW6+S4hVwB6gkGunhw6saEs0V2pcqG26laesS3O0Bihx8siqtpeSqlvMWyFB7U5Y3ZVNMwxpBK11PRdbA3qyJeMsLYJJOK67ZZisLcQE6liUsGOewztXJOFR/euNwOAxjZgCD7kbV2iCPTKsUcIVpFzrPUY64z0ri8jMheZ4Qst2zShHlUs+BqU/D/rTetkYsQz8vpvS89tIlyG5Qc9cDGTv1x2pqRNbmOJ0ZnAGBvj+1RhebIAnkJLq2lCuZGKjr7VJ7v4DG0mZCPIcfLeozxReaIlyVyNuma9bclVEJjy+RpJGaDk06syKPx5wyPivhq8g0kywjmIMdcdcVwDhrC34nGZfhV9/evpye0/5hkuD2OUTuCMZxXz74+4QeB+IpI1jKxEl4yRswzXb40s9BloqOK4W+k8gGd8DpivWGG5oC5AXPvRbsSXFkLjIOo+Yn27UPhMhRpwE1FkwK6X+g15O8+BLlbzwtbMZgWhHLKhcEEVsK7ZC5yw2IOK5f9knEGe24haKwMiycwKdtjsa6KZJiVCdVHbvXncnxkxHsNINZ0pIdQO2MdcdN6IIiqo7SMW/MuPi/wBKVildJjIYtHQayNsmm5FCrnU+UJXCkfF2NJFXsAZYkh534hK6ckZ6HtmhJ587/EPoNqWDSHIJ0qvUnHfr9alkxLIgkEo0ZQY3H+ho3eEE5b9qFjFZeIbXiUa5S6QBtK7al2P67fpS898ksKnUunT1Wtx8dcMuOI+HZcwANb/iRl+px1H6VzrhDq9tLC3mbqARuK6+GfaKvaKReKCcOmX71kkeXtiut+FircIj8p3YkEb4rkJgEbrJGD13BNdW8JO0vBolifS41EjoAPnQ8lexm/hRsEzTxRKAYxtuxbbH9KXiLyaZQv4RO5IJBrCwRMQCzEn/ANVsk6vaizvcMTHHHIUxnRlRnB69a59km8hAkSyyKMAfmJB3rOm3/ii/91SEB0PJpCj82G6fSktVv/4//wCH+lL1kAcSWS2bDKGfGk5UE0rMysiiKJmmUs3LUkE57nNOQLoEnOLCXqxON9/alpYzhSRln7A5J/fYUzWAYE4Cgn5csicyRcJHqBYHHod6kb6GO4S3mldZgucKwxgepOKybe0S6zJMQ7gatQwyn0GBmhXfDOH3CAC2jAIyGOSz79d96SPxoKodu0R2jLsfu8gBXG5DfWq1kkM0iKXMRXI8wO/THtird7MxwxvcF5RnKRIMD07dAKhG3MJ1okSFVJVEPT+fambfs3ailHC5IwTKVkYZ0pjfJPxavlTVssSzpLOA0m+n/L26DrtTc3MJuZopXSEAJEjDOr1bNAWCPRGXeVS3fYnHripSck11D3ZmQyExtlfu6eUjv/vfr1rOZFlEiIpUkAYIJP0+VZa35esw65FbpuNj7D+tTVWnXIjLcsYEa7Ffr2NNbYvYhHkzScyMLqYfEQfkQO1NzaViCNFCgDDp27ilorb8TLEqVzqQdFHufWo6gB+EjpFknO51+2T0rKUqdo1tjS8gygOxaR2IGSMZHpvvWqfaba/e+AySLGC0D6gq+h61tQ+7xRFY0USPuUZtRB6bH+1V3EXW9juLZ4yzyIUOADj0JqkJqLSZo4ZwXhqqpfnDUCp2z06VW3gR+JuFBCl8bn3qzmtZbe9mgDEFSQQfXNVN9qS6fUc+Y16MN2VmsGb1SrAZwUOCK+h/BPLuPBVgrFh+ACz/ACJ2+VfOsqO8JuSCRqwSe9d38AS6/B/D13DAkbfPOKj5LqNiSNtkkSJl0qo14AyaDdMFkU7GNxupJGaWknjknQCIgFcddxjv65oN3KTKqGQMNJYqQSRgf79q8yfJNoWxldUimPQwjbqMjHTbeiQXMsTPJbDVpwpISq2G8N1OdAUOcYBOBk9Nz7ZpqN5XiPMUjzZEbZXH96WLlKQEshyys5eYYbVrULuR71oXj1IU4/wl0DENHL122DLW620zSlQV03DbaB0Fab9pen73wWXmLJvKmUAxnY4269K6OGVzHh+xqNxEqsw05bV5Qfy0FpVxqfIHSnuJxusz81t2XUBjBzVMpLsAzeVcjJ716MHcS8sM2Xwdpbi9oiY5ZcM59hvXX2kaJ435nmx5ceh+Vcm8CBJuPQkhFXDDA9Mdq6cskBmMIkyVHm2yAfnXHzupE+V6GJUDRM8blWbIkCk5xt/vrXrdJUCqpC5GMkdBjago5VJVcYzuDghRRDNrAZtPQjpjB7n5VBUSsk3x4GWJ6v6e1FEEa/i6jgbKo7dvnUHw8RcPnBBwOu9Qd5I4DM65JwqqBuB6/PpTKomtk3U85TqJwM5z0HzrU/tD8OHxHwE/d41e6tmLwsMAnbdR7GtsaRXQ8wMrqR5cda8Qjxo8GWwvXpt8qeEqfZGPl2ym06reUFkbbSdsH1rPDZTb3ikHG5HStt+1LgS8M40t3bqFjvQ0g09mB3/n+9a392ZkR8hTtv3r0FJSVlEjYPA1+LDxGku/LMnKkwcDDbfzxXc7diRggMwHofoK+drXMN4VR2XmKHDe4rufh/iJ4rwy3vYcqWjCSj+Fh1/lXJ5CqXY00XUrAgxqU1dwTjf+9Qil5cLGTYbBV0j12pRLqOR25sLLpwF1Z1HHejsDHGV5RZ8alYggHfr1qF3okHaKMpFLN5g2xHdvSgJZCNiqM6hmXSztnR++9HMjmVvP5lAHtooct0kKvys7bHy7fSmxsKYxeWEE1wkc7vInJxIurZs7fSuJ3VlFwzj15w/py5WCOR5ih3H7Guu/e+Zy5C2WBAXDdfX51oP2i2qjiUXE0J1SHlStnoR0/an4uROVDQZqt7O1rc6Y1yu2H7/vXT/B8urw9GskpjTU2VXIJ/SuTcUmM8sAHUvggnOcd66P4MvOVwrSCSobVjGd8VTyHUbHeYs3SSKNEDQRSKcbEvkZFDiuJI7ZFjOHDfiE7qf0qJYXEDLqYP1LYKg7dKiqMdQPmhx29fT3rlbt4JbG3uEkZ02YFs4AKjPb50Lk3P8A3G/9xqAXEZg0GJI1yCwAyT0HzpfQf4z/APdFZ9n6MHilk5UY1pzGyWXOdqxDfqziHSX82S2MBfbaoRSASaooyoLgalT64FNPBKFUhAAR5ih3B9/epJzasBKImcSyy6sRZC4UHSAfXvQY0DhGaNWAXJkzgfpnOabh5oiB5hw2TlO496UEcryNrQLFjZlb3qklpgG4py0REWkBj5gdyP8AfpSZtlJDsXLAkeYHAPqT2rMcRWUM7FQGJIQbg9P0o0xVEwzSlzqJ1DSvp9aCbkvkE8IZQyKqayRnOsftWZmViqFdUoUqskiHb9q8xSKSGSKXUR1TOonf9qHczoJSNmUkrht8GmtJNmIrpYKZTGGTOzoTq+n9aIrBBIWmKJjzH4RQIy0mHVyUKhS4xn5e1ECJPDpLrlOok65ycD0oJ4CeWaKVEhQqJCCDgfEPr3qck0ZgaO30GRW8vJK5IHXp3oEdoHRmkLRrg5CvnJx/vpQlmiSMsuYSo2IG361u0kY9cSSTLlYyhyQshOTn2OaJCGdDKZVZjt8P7kUd4HZtTLqWQecBs/UUVI0X4vNvpx0Bx6/rRjGV2zUcQ+0SAWXHrjlJhjIQD0wDvWn8STLROuxI3+ddH+1e0U8UjlRSVZN8bbjNaLfoGtodGcJivQ4HaLSyhOZWWwSIqcFc4+vWu2/ZrHO3gyyeGTHnkDArknOeh7Vxoz5t5DqBIj6V2r7LoifBltIAcEsc4JHU5qfPmNCTqi+Vd5DIFwMbdyO/yqclujPqSGIEHfTjXoI6770QTAFtMolCkDYAEAb/ACNAUSTMswjAGsAIpz9TXDaqkiYaS1t4PIjOQBkhwDqz/KvSwlYlI0I7NhBpJ1Z9O9ejbXzFmVowPKvM2z3J3oBu1jkTlu4U9GOWAHv6Cj2UXQdHpHdNSsmjJ3bv22rWPG9ksthYTruEuyOnYof6itmmuOfFouJlO/fJI74x8vWte8WXCz8FzGwCRSpgr8J6j9aWGOVBg/kalxGFrrl8opkxebJx8+ta7Ch5jowDNnerriB0oxZTlk2J69O1UPD4meQtqOrG2a9GF0dM1k23wIg/xVQhYAo3nJxp/WukSxxXNtH99X4JdSsp2ON+o61zzwbBzeI8svhBGdx6+lb8BmRA2VGnTv2NcfkOpWR5Fkbu7i3aMBIWZmbJOcgD5daXhklWZAmllK6iXBAVf6UFZESc6dnDEagw3GMdM5G9ORTRRxx8xjrbyyMDgFc/vUVK8ywSZ5yNhzGZc7qW6f3rzpM0SxCVivXK43ydz+lEnQRSxYWURk5jYkeb/WorBO4YxnT5tiXXCjGemd6dJWEBFK+6oGIU7hj1oqyKQNckcbKCxDNpUj5VmRim0U5lcDooBHzyetCeS0tLrn3G6ofzkAFsd/b2oKNaDRpP2s26S8CtZzpLrKQmCNs+3uRXO7FUdTC4OC2x7iuo+PYorjwdNcRTF4UkRy2xBOcdu+9cgEhtTzG1YycCu/g/WmUjosLjh7xEupBaFsjPdTXRPs8u3lNzGER4U0nCkDU/174rmkXEmmk2wSQBv6V1z7NYIrTw/DK6qks7s6Oy7HfA3pPJdRC3g3HlxSPG00bIMkk9cn3xuRQ5lZ7h0YalXDF8gKD/AGqUeCWktbkhseYHtvQr6K5lXTHOsUvdyNm9e+1creME6wFhZubKhMSMVGApyCP974oTSoihtILfmzHjG/8AvqKWjsxHJFru9g2GXG5x6VYXLoytzR5lbGkZz9a3psFAmtIZl1gJK6ZAVGxvn2xVRx7gi3vBrqBoNMjJrjJGNMg3H8u9W1vb21wckMMKRs2ckdhUiQuxLaWH5sn5UItOpo1UcKvrTM5uCoXKg6fQ1u3ge6FhdQmUsA40FsbYPce9VfiKFkvpbML5Y5GK528vX+tYeZ1sI106WXZWH867q7RTLrJ05gvN5fNw6jfJ7UVLgW5jDgCI4A26tnriqrgXEn4jZq124MoGh1Pcj1q1LMrl8q756DJX61xpNOmRcWHkZzbu4zIwzjUp3+YpXl3v/wCh+39q8DI7agpEqnOmM7EUxqu/8/7U9sGRVHMCtoQtIY9RUEbEflH1365NehZWTkXBMbkZ7k6vU4plFWOOWQyGSRsjIUDf5daTKLFbRS3CGORwcJ3Zc9TUJdsUIHjIMugFiqrjOorn6V7/AJdjzZuYjKuAyDIPsBQeZPq0Jas1uASWHQL89sH2qbPKx0/dZWiwPJ6Cj2VZNYSXTbzRRysCykkORu2e/wC4oAd2k0ylsg7s3fFTZkVshgWHl1noM9qzeG5lw8cBMUYA1Lhgw74/qaEratBJSBLZ48Mihm851DJP9KVlld5JCWVy76iEX4R2UURVSUo7pGZFGQeukA1Iya+WLc6CRhyFHT+maEsoNAQyWyrC0kTN8RGct16bdcUV3zIJkWNmfy7j96m1smmOVmMKpq0Noy2fUf770NhCyExquoyeYnA1MdtgOmaLVKjMOpM4BILjPxDYfLNCjaCWcxrpkXJwRtpPpUrV5Fd1yNMgwAu4Y+mflS0cfnUcuQRgsSI19dt/l9KNtgHJ7wRItuV5oUFgw6qT2o3OwoOWKBcjqTuKXa2gTJDZbmYDBcHHpU1ARjhpdbfEMDY7dfXtT3JvJsmh/asi8m0kSUyFdUbnGwPXGe9c2j0tamPGTueldb+0uIz+Ho3UKGEqvt2yDmuRWg5aOwydyGz2NdXjKsIsncSvmjGkHOkY/eu4fZnLp8DWEbodDIwXR8QJZvNXGb2IxwpJHuGGGFdl+zqYw+EeGhyqpyyxJ9ctW8qahFX9iy0bHyk0rspTOFGPi23z6n5UNVELNiXUpOoLkeU9xXrhhLAskpQRqBsCO+9etobcEJFlhjUzZOwzsB71wLk7OkhNAL5z+Dy5GdgcA56DPpRfuAm0CV8g9QBU5csp5eiSRdwmjqM9D32rCXccsPlUgAZ0ON17Y3/tQcY3bNQAQhJSxmXLP5QGGdj0z/s1X+K4HfglxqhRUXGCRpIOfT1qzDRl1CIuOoZjnfFVXiW5DcCudLNvpyM7E5puKaclQ0V8kc/4qwa0ClgZozpU57DvSChQgBUE6dsUe+XJRnGSdxv0qEMkaY1DbGc77mvR0jq9m4fZsh5ksgTU2NGlh2Nbs0f3jXG4AAxkrsRjqcmta8CArw2WUIeZL3Ga2O2na4TeFQGJB6gMff26VycjuVM5pv5C0Ag0gRlAyDrqLMxzuc9MGpcmCZ5I95Dq3AHm9P7UEo0VwGJ1IqjW+fJq6Yz/AEpuWWWVVBg0rgBtt9IG2/eoRV7ECTKptwgYvyvhBO2r3HpRYJUQqggiIzgbEYzQnjcxxaZAFbfLLk+2w6b0Es00KuiaWjfO+wI9vrTttMFjbaDIcYkToXGCBWZSJIwGtkY6goDAnP67UvCZnl1RaY4wdOSpXUfap3N4qhYZdQlZttAyDW3kJr/2lyzf8JX4kjEcKiMIQ2zHUMj09K5FBaLLYMswCvqGx611T7TJnPh0QyNgSSoG+Q3rnkkghjTWhPMAwcV28P6lIIqrDhyvfQ21t+JKzaMD3rsqBOEWNpZrFNKIQscbIpOAB1x03rnfgCzEnjq3aFSwhheX0wemf3rs0drG4WWKIpGR59WxJA7f/BqXkL8joLpYYpJxUTWCR8iFFbAUk6GA75J2J9qxClxgrbxkI22pySACeuc0cIvNHPRJGkGwHlZh/pRbaB7ZIVjmdkV3LGQdV7AgbbdM1BxsSTF3ndLVI2lO0nxYJx2wTjb61LQ8DuyaHjLbKx60WUkI/k0jfDKmCCfrQppkfCzJoAGCMYDDtQklHYLyAaQE6QwSbI2A6HvnJ64r0jOFKF/Kv8Z2A7nf2qTs80qx24CBmGrSMeWjRwR69bOxHQLrHT32qUI9ncWGjmfjKXHH7tgv8I07nGwpSN2aFdW+nO3zqz+0GzktONyTKpEFxGrgk5wR1/pWvWV1y4jIysykZG/Q/OvUh+pVbN28FzpJdTws+k8sFiOqkZ/vW2vJGERAJAAeq/1rlXgC7eXxBJHIp0yRMwUHrjeunkxX8QAOheUSXAwAR9K5OXHI6J8mws19EbiJYTodzggrv7j0xRvvEv8A48f6Gqy3mfljWiLIdwGXUV9tqZ++H/tzf/8AN/8AyqMZtiBvxQsaBlb+IjuPSiRm4SQySxZbBUGU5VB2/rS0dy2qIBHBTIZh0x6f7xTV1KxWTlku6b8tAMj50yfZWgA4NFtHqiyxJwWx9T26+1REaX1w3KkXT11H9waJw+V2eUzhQnwv5dIHvt0IoYWRbohXVoipCu2+e/1pXTSwH0KzxLbkTl3tjIrAOhAwQeuCCKcitGexbnuDKxyJhnLDIxketZtbgSSKZlXlgnGrffO4+W5qSXCG5dtTpGDgBVyfQ7frTx6regWj0lkRPGXfVGIxqP5iPnQGl+7kBWQAZKg9fejpOCpYLpwV06xknb9KJb8oholQgqcrnHlz1x9e1M0mviZOhEPLMsgVnaXpqxkaew9t6LAsqSLGjK7qMsMA/pR9EccnNUYLbZAwSQaxy52tzKJSOWoBIz1+nr0pVD37DghzZGmCTRF2ZcYPf/4qUZgSUbgMuV0sN/XbFGmhkaIxo6jShMarnbuRn9aWsHJkWR1YMvm1aBgr+uf5UIp9urC8DKxyK0eAysdwwG7Dv1rF4Xt4kRtLHQcqTp0/tudv3rCxqG50DF1I1KCucj19uhoVwXeIx3DESIcHGThc53/QZp3SiwFdx23iv+CXSICcQHMhHcDYCuIldLPpDaSds13CUNMJEVVIPn8q5A2xnr0rht2xS4vIW1ZhmZevuar4c7k0PHVApCzxMjDBB1Cus+A1WTwlZIxPLRGJC7EnUdt65TCrTrr7jdfcV1bwHO//AAvbQJnAmIORkKNWc/MVTy0qthejYZrPmQ85oWi0/iMuvcqPX5/rRLeIICsTFS6aiobJUYwB226mvJJC64lK8wtsQM/UjO9HtQY2YppOPiYkkZ+Xrv8AtXCurlaAqBXPPhgVEjeQba8g6j9AaSe0aR+YUCu35mYnFWJnQNJEJDqCZO22PT2+lYW4ijYFzjfoOp9qWUYt5F9iMMb/AHzTazFnAwV0AfTOcfU4qm8ayXEfCzFNhdcoQaZNYXvgNjf5VtEsMEozMiM6nylB0Pvjr1PWtM+0G4ctaxMdQwWYA9DsM4qvDBKSHSyabcxfjHzNpK4BJoJuFeVYxnSi40ig3Nx59IbzDcZ7ilrcu1wCVJkY5ONhiu9lr+jrHgyKT/DQFVtGcE7bjHTethkRY5caHfYM5LE5zvj2qk8IJy+EnTqLhipzjSfar2GZ+WXkjaTJJxG+MH3Hp2rz+RXIhNZsWjWeGaEw2fPDlhI+cAZPXGf6URpI4llVZ8RgdlOQcdc9sHtT9nLFFDpmUIrLhiSSATuKVaWCS5SFW5YKHBQ6QuDuQP8AStVJJMTDBcxY9DSKNj5Srdff61PWCQAqsWyAc4yPn/Wp3NlFO5HMkbPQINicb5x09aXSAoEAYSxHPm6EnsPnU6nF5YaDy6oscvQzjco29BiiVpcu7ad9h6/2rF5Z65mYSaUA1aDsce/t9Kw72tpbsZWIRWLMynOkAftmhTlKmarNJ+068kvL2ztNCRlFMsoBycnYZ+W/61qF6y4ihBP4a4DItPcXvH4lez3MnxMxI9h2FDlKzrBHFGOcVCYHc+terFdIZKx0bZ9mtkljDfX5bN1cOqLscaRvjPrmt7lkESg3rYdyCoz0XsMVVcGgtrO1tLLlajbrjO+ffcfOmriWOUxoEJdDylztqxXnPlu2iUt2Nc82zPJcsG1gHVgDTk5AI9ulDlRgVaSXltrONXmDL/v9awrcwGflS5lbTIRQZy/PXlW0siDCyMjAacdOvXtR2YdnSbmhzDhPiBAIOP5EUjcRzRxoomDEjyI5BKbnuBTE1vPcNb5ExXVknV0GMb/WjvDGIJ4ZEQEEeZTgrjvmi4KSoOBSJdEMZWV3K+bZRkk74+lEskl1PzFVT8RVhj1wM/oazoZFZXGlWwEVRj5b/pQpzKA7pIFkY6f/APYY/epRj0oxrP2mDm8Fhw6kxPuAc6cjufpWhcLZZYooG2kPcnbFdH8bs0/h24VD5QVOM9D9Nq5nw1xG4Y50nbavR8eSlxjpl94dhS18W2Iif8NtSuwGCoI6V0uZIkaOKGJY42Y6Bnb5Vy3gV06+JLGRlCLzd/rXTmJlLGJNk2GD3/Sufy90gTDQ2w5Opl0DoXzjQPSi6Lf/AMxP1NKS8TiglhSeUpJIcIrfnP8AvNNfeV/hf9DUo9EqB1TK1bfTKgjlZUU9jgtnpnbfv8qwTOZ1toXGpWAVQ5BI+eCc03DZpDHHEsryKmF1udvmNXX+dXUVvaW0v31naacR6Vdm2APZV6D+dGEL9UJFXgr762ubNIZmRA7tgRhz5fbpvmoWeH5zxaTGBnJGk/L6dKOZnlmlGHcliMuAwHT/AHj50BpryWULblo7dc6nx5cem/8ASi0k7QWqAC1kRcLcKWxnBOyr3379egoQhWIuT5X0gLpG/wD+72qxlfkJo1CQr5VG+epx/Klp0BDctSQg1N5Meb0Pr0pZrqhaIRypmDTImAM7DAf5+lHjHMGvGSfNoxj54IpR70SiGKG2UMCVLlAM/wBq9KglwwDMxA1h26expVPJhkRhp8A81CgBbseuw9xTFossZTQ+WxhcbADOw96TtsQHlyA80+bVjbpt8vp+tC/5uFHmkCwDpqdx519T3p3JRVgLxlaBmcKQSQPiAAA/X5UIRRNbmYSMCDkaY+3zrX+IXzxWaR28hkeTDuXbA+S+1GteIrLNKtwrZ5eBJnIxkjGKz54pjJofuFkt9oJOUCfiXfHrsff0qZ5kRfEkmW+LI659B/eqoXbSiSNG6nCyMPL02z2FGt5rjRIzHIcaCGOcH+lJ3qVvRrRm4hTmHSjCMHZs5yD1GNu9cN8ROtv4qvcArE8z+Uj1Ndpg1SyYndY52BAVVymRv8yce1cd8UQrNxu8lAIdpidR7DPaujxMyY8BNX+7pzm8qHt6Ct+8AX8pimhjUtFIBKFXqrd/oa0T7tI1u6Fcp1ya2n7KbYpxS6aVi0SQaQvb6108/wCmRvR0aOOYQMJFWEqwcBj09t+29SWZo4ghO2vLumBlvn3oNpe6rwNy0ij04VcDSVxgj2zTV3HIZo8uBGo+FTqI/wBMV5Tji47EoFPNHGiqrRrCD/08+aRh3J7Cp2riYrqyqICeb19M+9Z8zxsVEOnSTh8DHp0/r6UJzqhDRozv0V8bfJe/6+tDo77S2bqPRuSpKuAc9fQdcmubfaBdRjirrE+UiXDH3O5H71vjvy7MyYmaQnOhSNXuPQ4z61yzxjG48RXlvLr2k1HPb0rt8aPyv6KLBSOpLaky7Nuuewo8cDyTQhiSdQxnsKhagmV87hRtV1aRCa5SY4WNBkg+ldPJgpBWdJ4VaC2sItDlWIBYath6mnYJRGphALHTq15A6dsDtjpXrIQy8PgcswJjXUOgO3amYEhEA06xqUliOw2wNR9K4XfYizDXDNFq5emNkJ5rISFx69DvXpYwUt5ljtlCb4+Hb2O+Pl3rMbRI0MkiMUQMTpA1DPp1zQnFu7LKYZ1XBIRT69Ns9P3pv6bB55kYs8JVWHmUgaSP5fyocLxqX0rKyt/1GbI69xUGWGJ0dIX1H+JRnHzpW74rFaTadEsshGQoyFU9MFvXPpSuPd0BoZmcaFjjR5FI0F3UAYqo8WzST2i21lCxaRebc9VUY2xuepP8qh4ju+J2Ngstvo/6hLIhA0dNz36d859q0y64jPJEZuLMxz0Ujb9a6uLhin2bClbKOaVmlfXkjfdelXvgu2S441ZyXHnSNuYVbbOKr+Ga55xJDbxuokCjW2Ez2Gfetv8ADls1vxSeVY5EdV/6YGWibO4P9PlVOflSVDrCs3S4jgjuXvLcGMtsjJk4J7Y6D51FJ4OdAjwhmADKHQ5DetCnR5G1FTkx583c+v8ApUIbiNXWNwH3MbNpJIPfG3t1rzq+RJsHFMzXLlw8bqMqCcDfpVlE5O0rRySDzI3XUPQYpWO+gjmjBHMOG1EgHR2A9qMl1nLr8Q364Gr09KySj7MiCXYVwSFRgTnY4FGtYAr63kyu+lXI1E+5oVvcFLhZG0vkYOnGAfqc9aHdzEu8q4SRdyWfJPsB0oy6xy2aixhfIeJ9PLYEE4w+rPb22oDBeVhQAg1K4zjTsMfzzQGuefCsoIwdyScEeookU8EkOh9MsI3Ox3ONt+9FuL0a7FpeFm84RewwMmpbdxmTJzgbED1rkNkoGAR5G8xBPSu1wSxDSq83DByfNsRjpXFyyRzYXPKyRk+ldniV0aQxY8tIZYriPDBGDEfKulPl2WWWJ0DqWUnLnGBgken9q5vbAGIrjbsDXQ+HXvL4TbG4IVJIwpLjrgdB6/Kk8tRStmmsWPQMxhxE6KofSoIGSe1Mcu49F/8AuGqqC4zoMifhkZjVl209vejc20/8SP8ARv71zwqUdiXQa3t55Z3QGEa01ktITpx3xjpQVEsOqOMSyqAS+Y86v82Ow+tTgtHjjnljkDa1XEbdIwPX505iPlIIH8rkllPmCnuSSegrRhUbWwZQPhtxqiWPlyBn8i+UAMB1OB0A/vWLw8oDmMjQkkcuFGLnfAPyqN68SxxCKFgNYBOgIB7D+dLvLcNKsjgqf+nqAOAKSfLKONmbst44QYCZHdAUALIfMd+nypRpSLglQuhTgNuFZu/TvQbq7kS3jHMUQNsMEZPbPy7UTh8kIiRXRQunTqA3/UDNUfJcqRkrFfu87yyLzEVWYndclR126fvinlt/w0aJyVcZVjk5+RGwqIiaUBYimNLeUKCpHvUIUu7WOQpHFqLHKwkAHbqQcAH5UyikGid1a/cJ2Mk2ETBEkxJyPbelPvdlNKUuY7h5B8MjAFW+mf5imU58jqs4eUkZlZmXYdRkf2que1a8nggUhZXZtLhCy+vXtt/OllCv0D1Y7FYWt1qdrdGRE8zy+ZU9AB2+lLJb8PvznmSjzHBaPKt6464H1q5uo4Bw8W5lKR4Goqcase/pSDSJFGBzwAcKurIwPf1rSiks5E95BfcGj1OlwsaliQzbN8sDrRnhF0VCzKFAyxKkY9zQkIl05mLSSkv522YVN5JYl5WoDmjGlT7/AMqlj6wMkkZ5ZgjlZXbEeQnmwW965JxKAG5ZnGS77ErXUbt+VbykDU4Gjc9G9j+tc54zIZZtaH3rt8dVorCqKpFZQUO6Z7VuHgi1ituG3Tu55005AQYyAACP51qSn8TJ29M962DwxOWEvl6MG1k4A+fypvKv8boD0dBtUaW1wI4mIPQqf2Pr8qjNbBJQ7M8cbNnQWyG29O/fr61XRNJcWvKlOQraiugHV6ddqtLWFFYk5XTt5pDsfTTjOa4YZVASYnDliYGRVDYXMTgB/fbcHtXl4bzCg5rtL/lJO4P9KbujbK2YFLunxb4C++OtTtrtXIS4iSNCANgV37f7NFLPVmbBNZsrRxHQoA0lSwH++tcs8URNccdv5g2RrwG+VdZ4ndW1nYO2YyVXIKn4f8uK5bcRNK4GNgSWOetdPjcUYSbQYop7e0dVLgrhj5gRucVZRRF2j0B8vsoB2yaZSJGZOWAyt0zt8xRra2d+K2tvCMJ8Tkj4cVXlliy0fijeLJTb2wbVvCANDemKejmeV8M4ZNsb42PYD/fSk58TR8nX5Ebc9sYptEb7rGYVC6mJXfc1wxi7ObteD08rQuZE3bAUDHRQcVIzrMcNI8cagbg4IPfp160Cfl/eAs8mGRN8Hp7bbZocghWwBId4wNflG7e1H2Ynfu8piTEmhmzr6Ej0pSUvy2uYpFZFyNbbaTn/AHtRBdiRzFBbnzAEM4xp9BWbi4aLTIQGK7uMdR2/370jauzZZUXdnNfaJ7h9QRAoT4VJLHqPlirXh/BoeH20yR5YSu0jo2/+xjb9aysCrAWYhZZWLJqYnQNuuPnRxcvIUXVnlAnO4Dn0qinSoCdArO0tLZo9Fpas+cnlwICMEkduo3OaCrRuzXBRhNOAJCMEtj+Ij03okE8ksrgw6FXOFJ2b3J/oKZnuIlg5YRIkY50ouNqykmtjJ4PQty7fUiy4YgDSuW+VFEUSyrLcSaJNWFUDJXI742zSiTxxxhmLKAThVbovrTUJW6iYIpVsht9mIHr6Gmi00Ldnp4UtxiKKLBbI1LsCe/0qMQD4V3RsLpYrHjJ9Qew9sUoZn0MBlSp6nc5J3zUopNEMp1g46kD1pVTeQWFlhm2KlUPVFAxqGaZezSPlZQSSAa23+FvQUo0syxxqG/CXJI659MelFFz5myylgMNjP1H8qbpG7D2xQxNHBJarHBpWQ/8AplfN/p+tI+WMNhQB2GoAA+u1OTFDZrISEaTJXCjzt6Y9PnQp41gtgqqoaTdnRQK04dgKheGVWE8kbkxCM6gTuNq5DeEM0hBwqHO3Sur301utlcpl1kVfK7dMd965JxEywRzZTd+lX8Pj6JlFhFzazqYI9RyAM49a3bw7JFxjhLQ3KK/3aTyZ/LqHY9QflXMuHvLHYo5yCnUVv3g6VUnKQuFeZA65/iXcVfnjccB2bVJDDHInKt3kdQFYKMaQKLm6/wD8fP8A+1v7VKJpMSqFYOV1F9QwCe2e+9L/AHyb/vf/AJmuKl6B0TCRy8wPCZHJHRhkgjtj1+VMwRAwOiFRjt/XHWqqJ5HLJFPLo6YEenSfl1zVvb3MPmW5gQzoPMzR41e+r1pYZWcCsrrpJcOraMqy45a4yPWoJK6O6rIzICGYNg/oTTUk68xJV0xKzBmVvTuDimOJcPRY2ltIk1a8lScahnscUI8a7XFi/wDBeRBMkWX1EbkaASST0Gf/AJqVtDky4UcpT/02U6hn+XzqLr93Q6yAV/IYwc47eud+vtXpLuWNI7pCSuOnMUY9sk7nPrtTVQaYQF9JWF/whkK3Rc9hUsXCqBNLiTWAugjB7k5xkVC2ui9xjAjSZcOFPlB9R/pQ2KJzMb6duZn1/wBmkTNlErmZ1ClCZihDEkhRvUCZYmDQyT6V2YJgnB9O5okpgkddmdQew6fP671C3eJL0Mp1KiYUZ3Y+uemK00m7B7ASRSrIkjuVzkDYMSRS/EbO5urqFryWa4jYBpYoiVx1wTsdx6U41vctJBJHIH1DU6uMgKSNqzPK0LRvAeY+SMKf2Hpt/OioxWwsVuuFyho2tpFjWNQRHINBz6tjGNu1EJS4cRTORPD3XYGjSKGhR0B5hY7SMdQ9MnvSBws2oqQjxkBj7UJ1eANfQrx+5jtIoonYiXY6c5wvt61o85bnuJGKjJ2IPfeugPFb3Tm3lkjeaJNQkVctFkfyrnXimw4rwmQi5VpYJW0xXSkHUcdx2+tdnBJaKppKhJmdlO+UG6mrvwJameGaeQRPAq6XSRScNq6YyO3rmg+DuC3HFoJYp2MUcMoMsh/hwc49+lbrwmKBF5FtZG3sVyYQwCmU93bO+/vTc0/i4oF/Rc2scc1qjxwpAiKRpYHSBnrq1Z+m1SE8VuHitomeEKG0kjAz3G5P1r0sqwR8ltEhJ8xQAA+gFI3fEWB0W1nIJe79gPTJ7Vy/kjBU9mUh6WTWFLHCEbSS7j+9AWWWONzHq3zjG+cVHn87lrIrMVUjLsSPUkD0pa9uXV0SSZUj7uzaVH6dqnKXsV0yr49doiC2EpkeYCRlx8I9M1rYfL68ZOMhR2pviltNHxCZ5ZleSRvIqHZYx0pOaeOOMRxqdZ6sa7+KCjHBVYQ1ZXEWhpDjmLsoUdBVtwVDNdyTaXJRQgIXp+lUFtbcwsIypI9O9bN4XkeC3uE3L6sZJxnFS8hJRGbXXJd27RpDJGYihXr3Oe3ypyGdBaockqxwXxuMY7UC3ladTpVdRXIwQTg+tZEkRUJcBdQ8hVG8q/L1NQtoi1QF1huXIt3dg+5OQTn0zjY46+1SuQq2YXUCM9AQNvQetTZJWgQx4tLbc4zhmGeh9BQJNaPpdYpHzldDBhjHz60rdAIGwikHMR5VmJ3J2RB/Ws3IYGMLcXJOcFVXAOKlGksshWLlnOG8/mBP0NQks7uTeV0jVhkEHJ0/LsdqV4VJDW6MNOxnjjjXTqGW0L1HqT0HzosyHUGjJBA/MaCoki0wr5yhwGk+I/TsKM05VSY41ZhtpLYqfbORGYeIJcMWChsZztse/egrDggvdAyJvuRup7e2KObm2lRWZV1Yww1BsfUUrxC4iDHlRojYGXc7IOmTVG0lkPoCEdWjIIkAGoJpIUn1z3o8TzNJqyX0YbpkHtsR3odjK8cDxTq3NLllAAOV9R6j+9Ox6WQKMLghtQQZx860VRq0hfaGZ5FcursAyEkfyosMsLSAMRpGB0wT/pRGsczEtiSByGyD+YduxA/3mgSRhpVlxgFG2wSAc9RWzHQHGnQztFI8hOuIFmXLZPtgdhSsJkZFJVY9bahuCW7YwKcgnKWSK5jlYAiRgMZPbH0xvWAYXZWD6VRdgQT88HFM2mFqj0iJPBbB0IaM6kONwai6s0pmyXBAV11ZHzonMtdIj5g04wEwd/cY60JohBOrqWEUnXJ2z8qe8WhGqNd8QXCW5likAHLAyT1IPQe/etMtob2S6Ti1ysiWsd2sehk+Loc49N66jLw4XcEouIgcgr5hnb5g5qJ4RZQ20UUEE3LUj8ITNj6ZNWhyVHBSOjmviSA8O8P3cyjDG4WNDntk5/lV9wSzkQWoWeCaVUWSOSJ86kPttV/xXw9ZcXs5ILuOREaXmNobHmHQ9KYt4Le2uBMj819IUIp2AG2kZ9Km/JbjXsykkP2spS30HOruMjvWeavof/tmovEr4VgCc6sasbUTRaf+LH/7j/el+Swhaf2MxK0iqhkRGBA0MNz9e/1qEqo8lxFHL/0upJzv6VCG0ljlRgwYI2oOWBU59xU5bUqdEcIXSxOP4lI374z3pVlZBlidtOr6g7glG322GaKeJwyZjLagOiFvTofelyzw2s/3VxK0bnDkbIPT3xUuGLHJB96ms7eWcKN+RhsH2Papxck6sCdFhJxBb5o2Clyv5tBUrj3P86FGgjQyM4dSpI7uf1oN1LCoijkCNrlCBIjvvvuM7DHrR4LW3mvCLS61sq6HgZdJB6ggn+m1Vfa6sZNsWZmM0YcEAHOqMdvl0/egTwKjtOk/NDdUBww9Bin3RLduWyDGonbfDdyN96UkZmgld1XCsojCKRkkgEnO+1RkqYVL0LQyMu7hw+sdj67belYkMkd0JI1KKX+BhnOdskdqtEGgqLkfikeRV6D/AFoTxFpFZiQCWJIxg46EjFHpgD+jEN3O+l0GldLZPqB0pVkZ5Y2a5CqDkgqd/wBKKQsgATps3XB/WjyyRIqMoAOcN/mop28moWcyga2AdfynXsKBNLGZuQ4PLUjPlIGk+n1xTQ5RXUAscmQFHVQN/wB9qxGUZFZot9yS2xFbAHglJbiztXiSM4kbd17569PTpVfFbS2SvaXhW5tZQFjgKl3VB+aRjsf9as5bh3hVkYsD0zsR17Ht70ss5eEebVj856tVHJIDMW0FvZW6W9qoihU50g5z7EmgtiSR0bMhwC0jHAJO+FHsP5VIcydiEUjDeaQjYfTvR4/x5+QsYMgPmKYK4x1NK5NsKwLWyMElacHlDyhydLau2Kyba7l0fdJ2ULjViPUT8yaZcxmXksBKijoOmcdqasJY7fh0j25A0/hHfoSNz88Vko2Nhi7wBZOa3MORgZfofeqXjE5ieOC3UNcON8b7e3pV9boJFZEfMQ+Enqa13hljdR+IIWu25jPNzFA/Ko/33qnGo32YePLyaDdcUkHF2t2c83BLE7kY969dyzIUnnLFJToWTOAT6UzPwO5fxbeTcsuZS7R8sghF1Hcnoo271a33DecOH2QEd8sN5E0kcWcOCfMuflvmuxzVFKwG4LaPbRSSMhDFNSgnIYfOti4ShuZ7mSHyxo2nT0Gcf3r0fCPutxcQ2tykloj/AIYPXSTnT9Ogpy3hhsoJHgd8u2cdB8jXHzTsHJL0NzCS3gQrqy2zFRnH9KxFFFM0UudedwDnB9/lR4rp3gVVwgOBqI6k+lE+M5yFbpk/mPtSKnonbJLFDzlE+vboAdh6UnPBouWaNsf5h2NHWYyKAq7tsPf+1CcqsmkZDAYMZO+aHJTQuXklFKiXcWw2B1FVoVwjXBDRycuMkK5cDcUtqkW65UxKhj230/pVprVY9GA2Y8jod/akhLsnYbwJ8UtQiPNGhU6gSxJI6dgNycdqBcR3k3IMbEomzBxgjuDVlAUdVMoYrnqQTj1phnRYNMDHTsMkZJPzq3WMkCymhgTLrqRVIGgrvk532G9QvLM2v/LOdMUuwlAycenz3q35MEbxs5AKvhiAP2PaoXMtxO4CKvJd9xjc496m+NNZ2MsCkVhDyRFCrMMELKAcgeh/SvM/JiI06GRvID1K980y/D7b7394huWjkHmYpjHTG/ehSwXHmkEhcMCNSHUB+oouOLQGgETGRgpZmK7q4OQQex9KCWxbuIWd0VQrqD1/2aYsbacapZyoQDSgUfCO9YAMMTAIXXIxtv70tNLItuxW0kSNMTBlA2zKpG57f/FNFUGE1Rqujqz9e/TrQI5bli7LBrUNshAOn6UygDAIIV5w64+L/Sso/GxstWDtmjWU8nllB5tIONPvQtLYZpZDIoBKDHeoX0M4vo4UiZ+YuEZSWVfXpUo7aOGQQTJIGPxDqPnU3GViu/Y1ADcKScoyDdUAI+dPRlJSkqSAOBjzb4xS0LWy6uTjQRhnbv60VLgYaDTgEFS8f5R610QikEWkjkuJGRWZZCNTADY0tY2qpdNHd6mdDqOn8uentVzy3+JXAJUZbtQFeOxOUIH8Xl1A5659aWXErsD2DWBw/IWVXZwQ+RjBoH+ETf8Aeh/9hr00ic5dm0t0bQelT1xf+af0NZUw9v4ZN7ylCFCshOyqck1ma4lS2j88bguUxGdwR2IrN4lvHxIkkFVbyrjOcdx60V7rmFubFCqli51eZs+46Z9qXOV2FFQhkUfihkLnOhSQMDrT9vKhXmeUKuwGfiNIrHqxKC5YDCEeXGewXsKLJCmMTyRMoAJ82GQ1lV/EyAieMSPLoK65AcEDc+3f96atZXIYuYgx6GQYwMbfKlXVAjKLdhHEQVLy51D22p8Oot1le1cqTu4XJAHQEDpTRi9sZAOZ92QRSSCaXGFJyRUoJIWi8uNer45D5U9/WkkaSaeZoYmVNIJxk536Anp70WfmNDpt25T6c5wPWlTm3aN7J3JkfiMIgZpBsWYA+Y/Ws3AAZlyxKpqXptvuBtSkSXMMTXBmDF8qXZNyPpThUXEBl5jFQAo07ZbvRy017A3TAmJkQPrwzsdCDtj3qJtpp5icaAN8AaiB677UxPEweJEUEhTjJx+lEtmVRowS7k+U7b+9D8a9msjy4YFwThnySxGST/QV7kB2kYpqRFwFPQn+tCXXJHLPIQzLsdG4Azj+1A4bcPLcyWzrlcn8QvgEfKqUligZGbqF0RJ5PJHsQsZwCfTHcUuI+ZrVDgDdiB8OfWj8QmeSRUUERpjlsD+1eFtNb2iztIojkf16n5d6RrNGexaKN5R93R8IMGR8dvQUzc3QB5ECqq6NXoWHzoMPM5EhtiuIWAYN+bP9abSBLmIC4i5MhwH27de9NF2sDbEvukiYkDdM4A/b9qmymO1exQgBzr16cjUP/n9qfmgihOIA6pGM4O+aAmXiOWZkOMnTjAodKMmRjXFrEJZCjLlQQQA/09ayhBmaZoQNIwOXsVHf51GWJpG0SYIOFAPTPr+lTdViVEyShU41b4aj9UFOhK4ht5eHPZ8iYRyjDhfjk+ZxVdZ2kVk07tDOSwBVCBhCBjOcVsE+oSQmMBtSjKt1zUBGsco845i77mg3J+w9yukEc0CSIRGGHlUfm9flWQs1vDGZIGYsNkQgkeg+dP6PvLqkaoseTlVHQ0pPZw20imzaXKrpbVJkM3qKVpJNgbtBraOWQrJpSJy41F1+EelYvo1t5o3P4mhMDSx8hPtmhT2TmKJVd1aL4SPzZqEYkVDGGYspIHMO5oJ0hezonzMuZX5hDgKigbZ9aLLDCJEBnAfctGw/3g1K3d40Uzr5VbCyMPXofevPHC1+0suA+nBLdCPQU21RtFc8osZZ9TRGIDbIyxHpn1+VF+/xXNsg4ckh0kasKdj6HIFNtbQtLLzTqic7Aj+VYiWK4ZTGhUod4/UDv70K669hVE3eLyRnUCjZyDsD9OtY4hdNFbry1Tz7cyRiAn0659qylk5VmtHGrcZA8yr8qxGET8GceVujM2/uSPSjcjdiPMUwJGDqVemvffvR5JGa3dYpPIvxcoE6vbb+VRu7K2MGvmB8d1I/XNDtIYreKKZXXTKcAFumNt96y3kZZ9gI7iMXZ5ZJLjSYypU/p2NTknGptbCOLGQurJ29KPNDDFIseWXOwb0HpmmhZwyyRyxldOgjQy/yNBQbewPQvNdG6tYpoJQCf+p5PTv9ayji2/GJ87L5RjUDQ9CwRnQqKinYlt8j50JShUu8mewwPKKMp02voI1pic8yTKuDr8rbFvTNeiuUnPLiVg5J8mFBzUntpuTHLpVtZwNAycepoIlFuTmAnPxMRv8AQ1u1V6BVhZxHaZU3IDsMLFGBjPp60O1kZm/Ht44ExtgklvfOalbclA33WEaSCX7tv1yT2qH3RgnMgRTGDqYK2rHpT3TsVr2Ru2ER5YhBHUOzbN7AVhLgKRoXYDoT3/tUHlZHUMmXJ+HoBUAowgkwm+6jcn+1R/K27M9D7Shj2P8AkO4A+VYuMSwx6QMHfpnSPSgXl3KiFliJiI646fOoxXCyRRtpyjfEFzsRT23aBphjBEmhtbMf4iMZqWYP+0f1NBuWmmjaaMOVQbBhsPSlPvt9/koOdehnRCCSC9vHmlZ8KdJZRsrY2Ge1FeWJrZ44UKgb6cHPzpqEJFdSWyxpySPhI9ga8w0iFR0JIOfSlapUxb9HoQYZd49ScsZJ9fWgqlq98qltMp2VM4Bpkxg2s0hZsqTjfalHQQwrdxeWZ9ieoGTvgU8VhILJ3l08/wCHGqwZbAcknFFgcRKrwSslwPKGHQmgxaZXw6IdXU43O1PQxxtajVGpC4wKeN27YE2QVgkKfeIEd8YchOWT7n3rCm15qxxTMwDZ87AFfl7VmUkzyKTkZFJ3NlFz4HBYEtgjO1Ip/ILdjjvbtIlu7YSRsAgDfPTrRriBoLOGGAhVXzyHOCQO1JcNijee6EiBxCQYw24U+1N3kzGZV22HXvVE8dvZr0JWuZLyO5Yq76sEF9oxnpinLy1LzzrOW/ElGnB33/pXkjX7xEemrcgdM5FPLIWlJIXIY42rRygtKxf7tBBFPbdB8OV9B6e1Kx29ql2buGJVd10ghe3696fktIrviBtJQRCLYSsFOC59z6VRcG0ySuHRSMZIx1rSdNIOmWN68O2Ydci7gMTse1QmmZ1UTRKG0AAHO3qQO1BliWSSUNny4xv0rMw0Rl1JB0Dv1zUe7yLY3kRxLJGM7EgNvms299iXk3jAEkeYocA4zil7e4kNxbLkeZcE4yanxoGS55etlRcYAPr1qybUbGTyNXOsXJijXzZB0sM5Ht60Mga+XHIBJvqXGdsUn97nhijgEhZBlQW64+dZB03/AJdtxSck3GmLKiUtvIYsw3RTUwADDOdu3pQ2nNsvLAJk7l8daz1EgIzg1CIBgdQ1Z65qE5tyqJmvQe1lVGOSSwAz71AaNeDGwB/MnWgiTlcVCKq6WABBFPcSd4gFRiFLA4+lXWYUw0E0kWvLhdkeQHDqAD7daRADMVKcxxswA6nuafuCP8Mt3KqTsNxVZZ6p7t1d20hdgDRm9R+wIytxyZ1gKkxKMD1X+9FVlmvVBfCr8PufSp28EbyEuuSDjenLaxgfWSuDkjY0nSbFexO7kN0GgcHCkAAdu/SiT2DNAGQAEDVqLdBTcUEaKxAydY3PepqnLNyys3kUlRVOlO2PVlJcxTaURctncYP8qJaWYtxLzXZW/Kit5mP9KfsZm0ykAAxnK+1CncNdbonXHTrQlCshpGbKykOudGdZWG2o7ClrpefKFeQI+x1GPf5e4q8dFUwxqMKyZIFVEkCoxILHz4wTQ54KMFRmqPS2wSJWkCEY+NF7VgcJRYs25c53CscY+VZlXTI0QJ0BhgZo1rM4Qsd8SFd/SlhUpNNaDH2KcNa4igkgvY5WiZjpEwBx/pRIXhS4OCyEJ5fNkfSleKSNFxWKPOtCdg++nPpTrWsRMikHCjUMHGDVEr0IxCYTqToQyws3nk1ZCf6UVHSNpIIxkjoT6U5yUl0EjDAhSV21D3od6oiluQv/AKOAhO5ApfxpO2MjF/cPDFFbQknbGEHWhPCCAqPMshIAVPNg/OmeHXbvbYkjjY7+YruKPbytCjNDhCxKkr1OPencE9hr0Yh4aeWUwE66mkYIST61mwt0sRIBcLK43KIv8j6UrdrnkyEsWyDkmm7WOMwXD8tQ6OoDd6OO1GYqGZJXd1SINv8ADkgfPtS5iYSR/dmVlf8AMw3FZvVW4VxKMhSCADjodqLHM5ngwdPTpSNKqM9AZpMStCF1Ar5gehHrXoJlMLNZxeVSPMelR4scRySaQTnOMbUW0PLV41xpaMMRjvU6bk0K8oVXnTXCRzSll1b74Apz/h609V/99LTHF4uPan9Zowgk3YidH//Z',
     'special_needs' => NULL,
     'aggression' => 'media',
+    'medication' => NULL,
+  ),
+  14 => 
+  array (
+    'user_id' => 10,
+    'name' => 'Kika',
+    'species' => 'Cão',
+    'breed' => 'Labrador',
+    'size' => 'medium',
+    'sex' => NULL,
+    'weight' => NULL,
+    'photo' => NULL,
+    'special_needs' => 'Varicela',
+    'aggression' => NULL,
     'medication' => NULL,
   ),
 );
@@ -2321,7 +2425,7 @@ class ExportedDataSeeder extends Seeder
             Post::create($postCreateData);
         }
 
-        // Export Bookings (19 bookings)
+        // Export Bookings (10 bookings)
         Booking::query()->delete();
 
         // Export Petsitter Services (3 services)
@@ -2344,9 +2448,9 @@ class ExportedDataSeeder extends Seeder
   2 => 
   array (
     'id' => 3,
-    'petsitter_id' => 7,
+    'petsitter_id' => 15,
     'type' => 'pet-sitting',
-    'price' => 25.0,
+    'price' => 10.0,
   ),
 );
         foreach ($services as $sData) {
@@ -2489,140 +2593,14 @@ class ExportedDataSeeder extends Seeder
     'petsitter_id' => 1,
     'user_id' => 9,
     'service_id' => 2,
-    'start_date' => '2026-11-27',
+    'start_date' => '2026-11-26',
     'end_date' => '2026-11-27',
     'status' => 'cancelled',
-    'total_price' => 10,
-    'message' => 'ter cuidado',
-    'zone' => 'Ribeira Grande',
-    'entrance_hour' => '11:00',
-    'exit_hour' => '13:00',
-  ),
-  10 => 
-  array (
-    'petsitter_id' => 1,
-    'user_id' => 9,
-    'service_id' => 2,
-    'start_date' => '2026-11-30',
-    'end_date' => '2026-11-30',
-    'status' => 'cancelled',
-    'total_price' => 10,
-    'message' => 'ter cuidado',
-    'zone' => 'Ribeira Grande',
-    'entrance_hour' => '12:00',
-    'exit_hour' => '13:00',
-  ),
-  11 => 
-  array (
-    'petsitter_id' => 7,
-    'user_id' => 9,
-    'service_id' => 3,
-    'start_date' => '2026-11-27',
-    'end_date' => '2026-11-27',
-    'status' => 'approved',
-    'total_price' => 25,
-    'message' => 'ter cuidado',
-    'zone' => 'Ribeira Grande',
-    'entrance_hour' => '11:00',
-    'exit_hour' => '12:30',
-  ),
-  12 => 
-  array (
-    'petsitter_id' => 7,
-    'user_id' => 9,
-    'service_id' => 3,
-    'start_date' => '2026-12-01',
-    'end_date' => '2026-12-01',
-    'status' => 'approved',
-    'total_price' => 25,
-    'message' => 'ter atenção e cuidado',
-    'zone' => 'Ribeira Grande',
-    'entrance_hour' => '11:00',
-    'exit_hour' => '12:00',
-  ),
-  13 => 
-  array (
-    'petsitter_id' => 7,
-    'user_id' => 14,
-    'service_id' => 3,
-    'start_date' => '2026-11-27',
-    'end_date' => '2026-11-27',
-    'status' => 'approved',
-    'total_price' => 25,
-    'message' => 'adwdasdw',
-    'zone' => 'asdw',
-    'entrance_hour' => '15:50',
-    'exit_hour' => '16:54',
-  ),
-  14 => 
-  array (
-    'petsitter_id' => 1,
-    'user_id' => 14,
-    'service_id' => 1,
-    'start_date' => '2026-11-26',
-    'end_date' => '2026-11-27',
-    'status' => 'approved',
-    'total_price' => 40,
-    'message' => 'dwdsdwd',
-    'zone' => 'ssss',
-    'entrance_hour' => '12:55',
-    'exit_hour' => '13:55',
-  ),
-  15 => 
-  array (
-    'petsitter_id' => 1,
-    'user_id' => 14,
-    'service_id' => 1,
-    'start_date' => '2026-11-26',
-    'end_date' => '2026-11-27',
-    'status' => 'approved',
-    'total_price' => 40,
-    'message' => 'sadwd',
-    'zone' => 'sdwads',
-    'entrance_hour' => '12:55',
-    'exit_hour' => '13:55',
-  ),
-  16 => 
-  array (
-    'petsitter_id' => 1,
-    'user_id' => 14,
-    'service_id' => 1,
-    'start_date' => '2026-11-26',
-    'end_date' => '2026-11-28',
-    'status' => 'pending',
-    'total_price' => 60,
-    'message' => 'rgrgrggrg',
-    'zone' => 'rg',
-    'entrance_hour' => '19:44',
-    'exit_hour' => '20:44',
-  ),
-  17 => 
-  array (
-    'petsitter_id' => 7,
-    'user_id' => 9,
-    'service_id' => 3,
-    'start_date' => '2026-12-04',
-    'end_date' => '2026-12-04',
-    'status' => 'approved',
-    'total_price' => 25,
-    'message' => 'a',
-    'zone' => 'RIbeira Grande',
-    'entrance_hour' => '12:00',
-    'exit_hour' => '13:00',
-  ),
-  18 => 
-  array (
-    'petsitter_id' => 7,
-    'user_id' => 9,
-    'service_id' => 3,
-    'start_date' => '2026-12-11',
-    'end_date' => '2026-12-11',
-    'status' => 'approved',
-    'total_price' => 25,
-    'message' => 'ter cuidado',
-    'zone' => 'Ribeira Grande',
-    'entrance_hour' => '12:00',
-    'exit_hour' => '13:00',
+    'total_price' => 20,
+    'message' => NULL,
+    'zone' => 'pdl',
+    'entrance_hour' => NULL,
+    'exit_hour' => '14:00',
   ),
 );
         // só usa as colunas que existem na tabela (evita erro se uma migration ainda não estiver no branch)
@@ -2661,7 +2639,7 @@ class ExportedDataSeeder extends Seeder
     'booking_id' => 3,
     'petsitter_id' => 3,
     'star_rating' => 4,
-    'comment' => 'Correu tudo bem, enviou fotos todos os dias.',
+    'comment' => 'Profissional e carinhoso. Voltarei a contratar!',
     'visible' => true,
   ),
   3 => 
@@ -2669,7 +2647,7 @@ class ExportedDataSeeder extends Seeder
     'booking_id' => 4,
     'petsitter_id' => 4,
     'star_rating' => 5,
-    'comment' => 'Super simpática e pontual. Voltarei a reservar.',
+    'comment' => 'Ótima experiência! O petsitter foi pontual e muito cuidado.',
     'visible' => true,
   ),
   4 => 
@@ -2684,16 +2662,16 @@ class ExportedDataSeeder extends Seeder
   array (
     'booking_id' => 6,
     'petsitter_id' => 6,
-    'star_rating' => 1,
-    'comment' => 'Péssimo, não apareceu à hora combinada e não respondeu às mensagens.',
+    'star_rating' => 5,
+    'comment' => 'Excelente serviço! O meu animal foi muito bem cuidado. Recomendo!',
     'visible' => true,
   ),
   6 => 
   array (
     'booking_id' => 7,
     'petsitter_id' => 7,
-    'star_rating' => 2,
-    'comment' => 'Comentário ofensivo de teste para moderação.',
+    'star_rating' => 4,
+    'comment' => 'Muito atencioso e responsável. O meu cão adorou!',
     'visible' => true,
   ),
 );
@@ -2703,37 +2681,57 @@ class ExportedDataSeeder extends Seeder
             Review::create($reviewCreateData);
         }
 
-        // Export Animal Bookings (6 animal bookings)
+        // Export Animal Bookings (10 animal bookings)
         AnimalBooking::query()->delete();
         $animalBookings = array (
   0 => 
   array (
-    'booking_id' => 14,
-    'animal_id' => 18,
+    'booking_id' => 1,
+    'animal_id' => 8,
   ),
   1 => 
   array (
-    'booking_id' => 15,
-    'animal_id' => 18,
+    'booking_id' => 2,
+    'animal_id' => 9,
   ),
   2 => 
   array (
-    'booking_id' => 16,
-    'animal_id' => 18,
+    'booking_id' => 3,
+    'animal_id' => 10,
   ),
   3 => 
   array (
-    'booking_id' => 17,
-    'animal_id' => 18,
+    'booking_id' => 4,
+    'animal_id' => 8,
   ),
   4 => 
   array (
-    'booking_id' => 18,
-    'animal_id' => 21,
+    'booking_id' => 5,
+    'animal_id' => 9,
   ),
   5 => 
   array (
-    'booking_id' => 19,
+    'booking_id' => 6,
+    'animal_id' => 10,
+  ),
+  6 => 
+  array (
+    'booking_id' => 7,
+    'animal_id' => 8,
+  ),
+  7 => 
+  array (
+    'booking_id' => 8,
+    'animal_id' => 20,
+  ),
+  8 => 
+  array (
+    'booking_id' => 9,
+    'animal_id' => 20,
+  ),
+  9 => 
+  array (
+    'booking_id' => 10,
     'animal_id' => 21,
   ),
 );
