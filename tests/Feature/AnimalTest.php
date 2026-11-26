@@ -266,7 +266,7 @@ test('user cannot delete another users animal', function () {
     ]);
 });
 
-test('admin can update and delete another users animal', function () {
+test('admin cannot update another users animal but can delete it', function () {
     $admin = User::factory()->admin()->create();
     $user = User::factory()->create();
     $animal = Animal::create([
@@ -279,7 +279,9 @@ test('admin can update and delete another users animal', function () {
 
     $this->actingAs($admin)->putJson("/api/animals/{$animal->id}", [
         'name' => 'AdminUpdated',
-    ])->assertOk();
+    ])->assertForbidden();
+
+    expect($animal->fresh()->name)->toBe('Thor');
 
     $this->actingAs($admin)->deleteJson("/api/animals/{$animal->id}")->assertNoContent();
 
@@ -308,6 +310,36 @@ test('animal can be created with a photo and an age', function () {
 
     // a foto fica guardada como data URI, pronta a usar num <img>
     expect($response->json('data.photo'))->toStartWith('data:image/png;base64,');
+});
+
+test('owner can update an animals photo and age', function () {
+    $user = User::factory()->create();
+    $animal = Animal::create([
+        'user_id' => $user->id,
+        'name' => 'Rex',
+        'species' => 'Dog',
+        'breed' => 'Labrador',
+        'size' => 'medium',
+    ]);
+    $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
+    $photo = \Illuminate\Http\UploadedFile::fake()->createWithContent('rex.png', $png);
+
+    $response = $this->actingAs($user)->post("/api/animals/{$animal->id}", [
+        '_method' => 'PUT',
+        'name' => 'Rex',
+        'species' => 'Dog',
+        'breed' => 'Labrador',
+        'size' => 'medium',
+        'age' => 4,
+        'photo' => $photo,
+    ], ['Accept' => 'application/json']);
+
+    $response->assertOk()->assertJsonPath('data.age', 4);
+    expect($response->json('data.photo'))->toStartWith('data:image/png;base64,');
+    $this->assertDatabaseHas('animals', [
+        'id' => $animal->id,
+        'age' => 4,
+    ]);
 });
 
 test('animal photo must be an image and the age must be valid', function () {

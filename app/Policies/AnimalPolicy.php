@@ -44,7 +44,7 @@ class AnimalPolicy
      */
     public function update(User $user, Animal $animal): bool
     {
-        return $user->isAdmin() || $user->id === $animal->user_id;
+        return $user->id === $animal->user_id;
     }
 
     /**

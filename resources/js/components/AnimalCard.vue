@@ -1,7 +1,7 @@
 <!-- Componente que exibe um card com informações resumidas de um animal de estimação. -->
 <!-- Component that displays a card with summarized pet information. -->
 <script setup lang="ts">
-import { Trash2 } from '@lucide/vue';
+import { Pencil, Trash2 } from '@lucide/vue';
 import type { Animal } from '@/types';
 
 // Props recebidas do componente pai.
@@ -11,6 +11,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
+    edit: [id: number];
     delete: [id: number];
 }>();
 
@@ -35,10 +36,16 @@ const sizeBadgeClass = (size: string) =>
     <div class="card border border-primary rounded-4 p-3 h-100">
         <div class="d-flex align-items-start gap-3">
             <div
-                class="d-flex align-items-center justify-content-center rounded-circle bg-light flex-shrink-0"
+                class="d-flex align-items-center justify-content-center rounded-circle bg-light flex-shrink-0 overflow-hidden"
                 style="width: 56px; height: 56px"
             >
-                <span class="fs-4">🐾</span>
+                <img
+                    v-if="animal.photo"
+                    :src="animal.photo"
+                    :alt="animal.name"
+                    class="w-100 h-100 object-fit-cover"
+                />
+                <span v-else class="fs-4">🐾</span>
             </div>
 
             <div class="w-100">
@@ -64,14 +71,24 @@ const sizeBadgeClass = (size: string) =>
                     {{ animal.special_needs }}
                 </p>
 
-                <button
-                    type="button"
-                    class="btn btn-sm btn-outline-danger rounded-pill mt-2 d-flex align-items-center gap-1"
-                    @click="emit('delete', props.animal.id)"
-                >
-                    <Trash2 :size="14" />
-                    Remover
-                </button>
+                <div class="d-flex gap-2 mt-2">
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-primary rounded-pill d-flex align-items-center gap-1"
+                        @click="emit('edit', props.animal.id)"
+                    >
+                        <Pencil :size="14" />
+                        Editar
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-danger rounded-pill d-flex align-items-center gap-1"
+                        @click="emit('delete', props.animal.id)"
+                    >
+                        <Trash2 :size="14" />
+                        Remover
+                    </button>
+                </div>
             </div>
         </div>
     </div>

@@ -1,16 +1,17 @@
 
 <script setup lang="ts">
-import { ref, onBeforeUnmount } from 'vue';
-import type { AnimalFormErrors } from '@/types';
+import { ref, onBeforeUnmount, watch } from 'vue';
+import type { Animal, AnimalFormErrors } from '@/types';
 import InputError from '@/components/InputError.vue';
 
 const emit = defineEmits<{
     (e: 'close'): void;
-    (e: 'saved'): void;
+    (e: 'saved', animal?: Animal): void;
 }>();
 
 const props = defineProps<{
     show: boolean;
+    animal?: Animal | null;
 }>();
 
 
@@ -53,10 +54,10 @@ const sexOptions = [
 ];
 
 const clearPhotoPreview = () => {
-    if (photoPreview.value) {
+    if (photoPreview.value?.startsWith('blob:')) {
         URL.revokeObjectURL(photoPreview.value);
-        photoPreview.value = null;
     }
+    photoPreview.value = null;
 };
 
 const handleNameInput = (event: Event) => {
@@ -131,6 +132,31 @@ const resetForm = () => {
     generalError.value = '';
 };
 
+const fillForm = (animal?: Animal | null) => {
+    resetForm();
+
+    if (!animal) return;
+
+    name.value = animal.name;
+    species.value = animal.species;
+    breed.value = animal.breed;
+    size.value = animal.size;
+    specialNeeds.value = animal.special_needs ?? '';
+    aggression.value = animal.aggression ?? '';
+    medication.value = animal.medication ?? '';
+    sex.value = animal.sex ?? '';
+    weight.value = animal.weight !== null ? String(animal.weight) : '';
+    age.value = animal.age !== null ? String(animal.age) : '';
+    photoPreview.value = animal.photo;
+};
+
+watch(
+    () => [props.show, props.animal] as const,
+    ([show, animal]) => {
+        if (show) fillForm(animal);
+    },
+);
+
 const close = () => {
     resetForm();
     emit('close');
@@ -169,26 +195,35 @@ const submit = async () => {
             age: age.value !== '' ? Number(age.value) : null,
         };
 
-        // FormData (e não JSON) para poder enviar a fotografia; os campos vazios não se enviam
+        // FormData (e não JSON) para poder enviar a fotografia.
         const body = new FormData();
         for (const [key, value] of Object.entries(fields)) {
-            if (value !== null && value !== '') body.append(key, String(value));
+            body.append(key, value === null ? '' : String(value));
         }
-        if (photoFile.value) body.append('photo', photoFile.value);
+        if (photoFile.value) {
+            body.append('photo', photoFile.value);
+        } else if (props.animal) {
+            body.append('photo', photoPreview.value ?? '');
+        }
+        if (props.animal) body.append('_method', 'PUT');
 
-        const response = await fetch('/api/animals', {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: {
-                Accept: 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-XSRF-TOKEN': decodeURIComponent(xsrfToken ?? ''),
+        const response = await fetch(
+            props.animal ? `/api/animals/${props.animal.id}` : '/api/animals',
+            {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-XSRF-TOKEN': decodeURIComponent(xsrfToken ?? ''),
+                },
+                body,
             },
-            body,
-        });
+        );
 
         if (response.ok) {
-            emit('saved');
+            const result = await response.json();
+            emit('saved', result.data);
             close();
         } else {
             const errorData = await response.json().catch(() => ({}));
@@ -225,7 +260,7 @@ const submit = async () => {
             >
                 <div class="d-flex justify-content-between align-items-center flex-shrink-0 px-4 py-3 border-bottom border-primary">
                     <h2 id="modal-add-animal-title" class="h5 fw-bold mb-0">
-                        Adicionar animal
+                        {{ animal ? 'Editar animal' : 'Adicionar animal' }}
                     </h2>
 
                     <button
@@ -552,7 +587,7 @@ const submit = async () => {
                                 class="btn btn-primary rounded-pill px-4 fw-semibold"
                                 :disabled="isLoading"
                             >
-                                {{ isLoading ? 'A guardar...' : 'Guardar animal' }}
+                                {{ isLoading ? 'A guardar...' : animal ? 'Guardar alterações' : 'Guardar animal' }}
                             </button>
                         </div>
                     </div>

@@ -19,6 +19,7 @@ const animals = ref<Animal[]>([]);
 const isLoading = ref(false);
 const loadError = ref('');
 const showAddModal = ref(false);
+const showEditAnimalModal = ref(false);
 const showDeleteModal = ref(false);
 const showNotifications = ref(false);
 
@@ -37,6 +38,7 @@ const handlePetsitterApplicationSaved = () => {
 const { unreadCount } = useNotifications();
 const deletingAnimal = ref<{ id: number; name: string } | null>(null);
 const deletingAnimalLoading = ref(false);
+const editingAnimal = ref<Animal | null>(null);
 
 // Propriedade computada que retorna o nome de exibição do utilizador.
 // Computed property that returns the user's display name.
@@ -159,9 +161,23 @@ const fetchAnimals = async () => {
     }
 };
 
-const handleAnimalSaved = () => {
-    // Refresh the list after a new animal is saved
-    void fetchAnimals();
+const handleAnimalSaved = (animal?: Animal) => {
+    if (!animal) {
+        void fetchAnimals();
+        return;
+    }
+
+    const index = animals.value.findIndex((item) => item.id === animal.id);
+    if (index === -1) {
+        animals.value.push(animal);
+    } else {
+        animals.value[index] = animal;
+    }
+};
+
+const openEditAnimalModal = (animalId: number) => {
+    editingAnimal.value = animals.value.find((animal) => animal.id === animalId) ?? null;
+    if (editingAnimal.value) showEditAnimalModal.value = true;
 };
 
 const openDeleteModal = (animalId: number) => {
@@ -432,7 +448,11 @@ onMounted(() => {
                         :key="animal.id"
                         class="col-12 col-md-6 col-lg-4"
                     >
-                        <AnimalCard :animal="animal" @delete="openDeleteModal" />
+                        <AnimalCard
+                            :animal="animal"
+                            @edit="openEditAnimalModal"
+                            @delete="openDeleteModal"
+                        />
                     </div>
 
                     <div class="col-12 col-md-6 col-lg-4">
@@ -452,6 +472,13 @@ onMounted(() => {
         <ModalAddPet
             :show="showAddModal"
             @close="showAddModal = false"
+            @saved="handleAnimalSaved"
+        />
+
+        <ModalAddPet
+            :show="showEditAnimalModal"
+            :animal="editingAnimal"
+            @close="showEditAnimalModal = false; editingAnimal = null"
             @saved="handleAnimalSaved"
         />
 
