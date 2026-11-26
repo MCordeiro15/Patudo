@@ -95,8 +95,18 @@ class ChatController extends Controller
             'name' => $user->name,
             'role' => $role ?? ($user->isPetsitter() ? 'Petsitter' : 'Dono'),
             // URL da foto de perfil (null se não tiver), para o TalkJS e para a lista de conversas
-            'photo_url' => UserAvatarController::urlFor($user),
+            'photo_url' => $this->chatPhotoUrl($user),
         ];
+    }
+
+    private function chatPhotoUrl(User $user): ?string
+    {
+        // No perfil público do petsitter, só a foto do perfil conta como foto; não usar avatar genérico do user.
+        if ($user->isPetsitter() && ! $user->petsitter?->profile_photo) {
+            return 'https://ui-avatars.com/api/?name='.urlencode($user->name ?? 'P').'&background=random';
+        }
+
+        return UserAvatarController::urlFor($user);
     }
 
     /**

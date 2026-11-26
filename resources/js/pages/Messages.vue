@@ -12,6 +12,7 @@ import { Bell, LogOut, MessageCircle, UserRound } from '@lucide/vue';
 import { onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import { useChat } from '@/composables/useChat';
+import { useInitials } from '@/composables/useInitials';
 import { useNotifications } from '@/composables/useNotifications';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
@@ -33,21 +34,26 @@ const {
     openConversation,
     canOpen,
 } = useChat();
+const { getInitials } = useInitials();
 
-function initial(name: string): string {
-    return name.trim().charAt(0).toUpperCase();
-}
+const avatarColors = [
+    { background: '#ffed5b', foreground: '#111827' },
+    { background: '#62df7e', foreground: '#111827' },
+    { background: '#50b9a5', foreground: '#111827' },
+    { background: '#d1df50', foreground: '#111827' },
+    { background: '#a52352', foreground: '#ffffff' },
+];
 
-// Um de três avatares ilustrados, conforme o id da pessoa (sempre o mesmo para a mesma pessoa).
-// One of three illustrated avatars, chosen by the person's id (always the same for the same person).
-function avatarClass(id: string): string {
-    return `avatar-v${Number(id) % 3}`;
-}
+function avatarStyle(id: string, photoUrl?: string | null): Record<string, string> {
+    if (photoUrl) {
+        return { backgroundImage: `url("${photoUrl}")` };
+    }
 
-// Foto de perfil por cima do avatar ilustrado, quando o utilizador tem foto.
-// Profile photo over the illustrated avatar, when the user has one.
-function photoStyle(photoUrl?: string | null): Record<string, string> | undefined {
-    return photoUrl ? { backgroundImage: `url("${photoUrl}")` } : undefined;
+    const numericId = Number(id);
+    const colorIndex = Number.isFinite(numericId) ? Math.abs(numericId) % avatarColors.length : 0;
+    const color = avatarColors[colorIndex] ?? avatarColors[0]!;
+
+    return { backgroundColor: color.background, color: color.foreground };
 }
 
 function timeLabel(timestamp: number): string {
@@ -141,7 +147,10 @@ onMounted(async () => {
                             :class="{ active: item.id === activeOtherId }"
                             @click="openConversation(item.id)"
                         >
-                            <span :class="['chat-avatar', avatarClass(item.id)]" :style="photoStyle(item.photo_url)">{{ initial(item.name) }}</span>
+                            <span
+                                :class="['chat-avatar', { 'chat-avatar-with-photo': item.photo_url }]"
+                                :style="avatarStyle(item.id, item.photo_url)"
+                            >{{ item.photo_url ? '' : getInitials(item.name) }}</span>
                             <span class="chat-item-info">
                                 <strong>{{ item.name }} • {{ item.role }}</strong>
                                 <span class="chat-preview">{{ item.lastText || 'Sem mensagens' }}</span>
@@ -160,7 +169,10 @@ onMounted(async () => {
 
                     <template v-else>
                         <div class="chat-header">
-                            <span :class="['chat-avatar', 'chat-avatar-lg', avatarClass(activePerson.id)]" :style="photoStyle(activePerson.photo_url)">{{ initial(activePerson.name) }}</span>
+                            <span
+                                :class="['chat-avatar', 'chat-avatar-lg', { 'chat-avatar-with-photo': activePerson.photo_url }]"
+                                :style="avatarStyle(activePerson.id, activePerson.photo_url)"
+                            >{{ activePerson.photo_url ? '' : getInitials(activePerson.name) }}</span>
                             <div>
                                 <strong class="chat-header-name">{{ activePerson.name }} • {{ activePerson.role }}</strong>
                                 <span class="chat-status">
@@ -256,30 +268,24 @@ onMounted(async () => {
     justify-content: center;
     width: 3.4rem;
     height: 3.4rem;
-    border: 1px solid var(--patudo-castanhoDark);
     border-radius: 50%;
     background-color: var(--patudo-branco);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    font-size: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
 }
 
 .chat-avatar-lg {
     width: 5.5rem;
     height: 5.5rem;
+    font-size: 1.8rem;
 }
 
-.avatar-v0 {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23FFF6EA'/%3E%3Cpath d='M12 64c0-12 9-19 20-19s20 7 20 19z' fill='%234BA3C3'/%3E%3Crect x='27' y='36' width='10' height='11' rx='4' fill='%23F4A58A'/%3E%3Cellipse cx='32' cy='27' rx='10' ry='12' fill='%23F9B39A'/%3E%3Cpath d='M21 24c0-9 6-13 12-13 7 0 11 5 10 13-3-4-7-5-11-5s-8 1-11 5z' fill='%23495C85'/%3E%3C/svg%3E");
-}
-
-.avatar-v1 {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23FFF6EA'/%3E%3Cpath d='M18 28c0-13 6-19 14-19s14 6 14 19v14H18z' fill='%23F25C66'/%3E%3Cpath d='M14 64c0-11 8-17 18-17s18 6 18 17z' fill='%23F6D9B8'/%3E%3Crect x='27' y='38' width='10' height='11' rx='4' fill='%23F4B796'/%3E%3Cellipse cx='32' cy='29' rx='10' ry='12' fill='%23FBC9AA'/%3E%3Cpath d='M21 26c2-9 7-11 11-11s9 3 11 11c-4-4-8-5-11-5s-7 1-11 5z' fill='%23F25C66'/%3E%3C/svg%3E");
-}
-
-.avatar-v2 {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23FFF6EA'/%3E%3Cpath d='M12 64c0-12 9-19 20-19s20 7 20 19z' fill='%234FCB8B'/%3E%3Crect x='27' y='36' width='10' height='11' rx='4' fill='%23E8963F'/%3E%3Cellipse cx='32' cy='27' rx='10' ry='12' fill='%23F6B054'/%3E%3Cpath d='M21 24c0-9 5-13 11-13s11 4 11 13c-3-3-7-4-11-4s-8 1-11 4z' fill='%236B4A2B'/%3E%3C/svg%3E");
+.chat-avatar-with-photo {
+    border: 1px solid var(--patudo-castanhoDark);
+    font-size: 0;
 }
 
 .chat-item-info {

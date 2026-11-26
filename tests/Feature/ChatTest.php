@@ -4,6 +4,7 @@
  * Ficheiro PHP: ChatTest.php
  * PHP file: ChatTest.php
  */
+use App\Models\Booking;
 use App\Models\Petsitter;
 use App\Models\User;
 
@@ -84,7 +85,7 @@ test('a petsitter can message the owners of their bookings, and only them', func
 
     // reserva com este petsitter (o dono aparece nos contactos, uma só vez)
     foreach (['pending', 'approved'] as $status) {
-        \App\Models\Booking::create([
+        Booking::create([
             'user_id' => $owner->id,
             'petsitter_id' => $petsitter->user_id,
             'start_date' => now()->addDays(3)->toDateString(),
@@ -95,7 +96,7 @@ test('a petsitter can message the owners of their bookings, and only them', func
     }
 
     // reserva de outro dono com outro petsitter: não aparece
-    \App\Models\Booking::create([
+    Booking::create([
         'user_id' => $otherOwner->id,
         'petsitter_id' => Petsitter::factory()->approved()->create()->user_id,
         'start_date' => now()->addDays(3)->toDateString(),
@@ -122,19 +123,30 @@ test('a petsitter session reports the Petsitter role', function () {
 // PNG de 1x1 píxel em base64, como as fotos ficam guardadas na base de dados
 const CHAT_TEST_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
 
-test('contacts and session include the photo url, or null without a photo', function () {
+test('contacts and session use the same avatar as petsitter search', function () {
     $owner = User::factory()->create(['avatar' => CHAT_TEST_PNG]);
     $withPhoto = Petsitter::factory()->approved()->create(['profile_photo' => CHAT_TEST_PNG]);
-    $withoutPhoto = Petsitter::factory()->approved()->create(['profile_photo' => null]);
+    $petsitterWithoutProfilePhoto = User::factory()->petsitter()->create(['avatar' => CHAT_TEST_PNG]);
+    $withoutPhoto = Petsitter::factory()->approved()->create([
+        'user_id' => $petsitterWithoutProfilePhoto->id,
+        'profile_photo' => null,
+    ]);
+
+    $searchAvatars = collect($this->getJson('/api/petsitters/public')->assertOk()->json('data'))
+        ->keyBy('user_id');
 
     $contacts = collect($this->actingAs($owner)->getJson('/api/chat/contacts')->assertOk()->json('data'))
         ->keyBy('id');
 
     expect($contacts[(string) $withPhoto->user_id]['photo_url'])->toContain('/users/'.$withPhoto->user_id.'/avatar')
-        ->and($contacts[(string) $withoutPhoto->user_id]['photo_url'])->toBeNull();
+        ->and($contacts[(string) $withoutPhoto->user_id]['photo_url'])
+        ->toBe($searchAvatars[$withoutPhoto->user_id]['avatar_url']);
 
     $this->actingAs($owner)->getJson('/api/chat/session')
         ->assertJsonPath('user.photo_url', fn ($url) => str_contains($url, '/users/'.$owner->id.'/avatar'));
+
+    $this->actingAs($petsitterWithoutProfilePhoto->fresh())->getJson('/api/chat/session')
+        ->assertJsonPath('user.photo_url', $searchAvatars[$withoutPhoto->user_id]['avatar_url']);
 });
 
 test('the avatar route returns the stored photo as an image', function () {
