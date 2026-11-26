@@ -44,7 +44,6 @@ function apiFetch(url: string, options: RequestInit = {}) {
 
 // Itens da sidebar sem página ainda: ficam em mock (sem ligação).
 const menu = [
-    { label: 'Painel' },
     { label: 'Utilizadores' },
     { label: 'Verificações', active: true },
     { label: 'Reservas' },
@@ -97,11 +96,40 @@ const subtitle = computed(() => {
 
 const daysAgo = (iso?: string) => {
     if (!iso) return '';
-    const days = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86400000));
+    let date: Date;
+    if (iso.includes('T')) {
+        date = new Date(iso);
+    } else if (iso.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)) {
+        date = new Date(iso.replace(' ', 'T') + 'Z');
+    } else if (iso.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        date = new Date(iso + 'T00:00:00Z');
+    } else {
+        date = new Date(iso);
+    }
+    if (isNaN(date.getTime())) return '';
+    const days = Math.max(0, Math.floor((Date.now() - date.getTime()) / 86400000));
     return days === 0 ? 'Pedido hoje' : `Pedido há ${days} ${days === 1 ? 'dia' : 'dias'}`;
 };
 
-const formatDate = (iso?: string) => (iso ? new Date(iso).toLocaleDateString('pt-PT') : '');
+function parseDate(iso?: string): Date | null {
+    if (!iso) return null;
+    let date: Date;
+    if (iso.includes('T')) {
+        date = new Date(iso);
+    } else if (iso.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)) {
+        date = new Date(iso.replace(' ', 'T') + 'Z');
+    } else if (iso.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        date = new Date(iso + 'T00:00:00Z');
+    } else {
+        date = new Date(iso);
+    }
+    return isNaN(date.getTime()) ? null : date;
+}
+
+const formatDate = (iso?: string) => {
+    const date = parseDate(iso);
+    return date ? date.toLocaleDateString('pt-PT') : '';
+};
 
 const load = async () => {
     loading.value = true;
@@ -243,7 +271,7 @@ onMounted(() => {
                 </div>
                 <div class="admin-user">
                     <span>Administrador</span>
-                    <div class="avatar avatar-md"></div>
+                    <span class="admin-avatar"></span>
                 </div>
             </header>
 
@@ -283,8 +311,8 @@ onMounted(() => {
                             :class="{ selected: c.user_id === selectedId }"
                             @click="select(c)"
                         >
-                            <img v-if="c.avatar_url" :src="c.avatar_url" alt="" class="avatar avatar-sm" />
-                            <div v-else class="avatar avatar-sm"></div>
+                            <img v-if="c.avatar_url" :src="c.avatar_url" alt="" class="person-avatar" />
+                            <span v-else class="person-avatar"></span>
                             <div class="list-text">
                                 <strong>{{ c.user?.name ?? 'Cuidador' }}</strong>
                                 <small>{{ daysAgo(c.created_at) }} · Cuidador</small>
@@ -302,8 +330,8 @@ onMounted(() => {
                 <section class="detail">
                     <template v-if="selected">
                         <div class="detail-head">
-                            <img v-if="selected.avatar_url" :src="selected.avatar_url" alt="" class="avatar avatar-lg" />
-                            <div v-else class="avatar avatar-lg"></div>
+                            <img v-if="selected.avatar_url" :src="selected.avatar_url" alt="" class="person-avatar-lg" />
+                            <span v-else class="person-avatar-lg"></span>
                             <div class="detail-title">
                                 <h2>{{ selected.user?.name ?? 'Cuidador' }}</h2>
                                 <small>
@@ -503,28 +531,39 @@ h1 {
     font-weight: 700;
 }
 
-.avatar {
+.admin-avatar,
+.person-avatar {
     border-radius: 50%;
-    background-color: #fed7aa;
-    border: 1.5px solid #2e1d14;
-    object-fit: cover;
+    background-color: var(--patudo-bege);
+    border: 1px solid var(--patudo-terracota);
     flex-shrink: 0;
 }
 
-.avatar-sm {
-    width: 34px;
-    height: 34px;
+.admin-avatar {
+    width: 38px;
+    height: 38px;
 }
 
-.avatar-md {
-    width: 32px;
-    height: 32px;
-    border-color: #c2410c;
+.person-avatar {
+    width: 38px;
+    height: 38px;
+    object-fit: cover;
 }
 
-.avatar-lg {
-    width: 58px;
-    height: 58px;
+.person-avatar-lg {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--patudo-terracota);
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--patudo-terracota);
+    background-color: var(--patudo-bege);
 }
 
 .toolbar {

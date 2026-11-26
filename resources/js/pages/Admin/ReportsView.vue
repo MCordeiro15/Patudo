@@ -5,7 +5,7 @@
 <template>
     <main class="patudo-page-shell">
         <div class="patudo-content container py-4">
-            <h1>Título da Página</h1>
+            <h1>Denúncias</h1>
         </div>
     </main>
 </template>

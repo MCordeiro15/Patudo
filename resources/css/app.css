@@ -124,13 +124,18 @@ button, input, select, textarea, .btn, .form-control, .table {
 .patudo-page-shell {
     min-height: 100vh;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     position: relative;
-    overflow: hidden;
     background-color: rgba(var(--bs-light-rgb), 0.25);
     background-image:
         radial-gradient(circle at 0% 0%, rgba(194, 65, 12, 0.12) 0%, transparent 32%),
         radial-gradient(circle at 100% 100%, rgba(249, 115, 22, 0.25) 0%, transparent 35%);
+}
+
+.patudo-page-shell .patudo-content {
+    flex: 1;
+    overflow-y: auto;
+    min-width: 0;
 }
 
 .patudo-page-shell > * {
@@ -141,7 +146,9 @@ button, input, select, textarea, .btn, .form-control, .table {
 .patudo-navbar {
     width: 200px;
     min-width: 200px;
-    min-height: 100vh;
+    height: 100vh;
+    position: sticky;
+    top: 0;
     background-color: #ffffff;
     border-right: 1px solid var(--patudo-laranjaVivo);
     display: flex;

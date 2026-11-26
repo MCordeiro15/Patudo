@@ -1,13 +1,34 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 
-type BookingStatus = 'Aceite' | 'Pendente' | 'Concluída' | 'Cancelada';
+type BookingStatus = 'pending' | 'approved' | 'rejected' | 'completed' | 'cancelled';
 type FilterTab = 'Todas' | 'Pendentes' | 'Aceites' | 'Concluídas' | 'Canceladas';
 
+interface ApiBooking {
+    id: number;
+    user_id: number;
+    petsitter_id: number;
+    service_id: number;
+    service: { id: number; name: string; price: number } | null;
+    owner: { id: number; name: string; location?: string | null; avatar_url?: string | null } | null;
+    petsitter: { id: number; name: string; location?: string | null; avatar_url?: string | null } | null;
+    start_date: string;
+    end_date: string;
+    status: BookingStatus;
+    total_price: number;
+    animals: { id: number; name: string; species: string; breed?: string | null; age?: number | null; photo?: string | null }[];
+    review: { id: number; rating: number; comment: string; created_at: string } | null;
+    created_at: string;
+    message?: string | null;
+    zone?: string | null;
+    entrance_hour?: string | null;
+    exit_hour?: string | null;
+}
+
 interface AdminBooking {
-    id: string;
+    id: number;
     ownerName: string;
     petName: string;
     sitterName: string;
@@ -16,6 +37,8 @@ interface AdminBooking {
     period: string;
     total: number;
     status: BookingStatus;
+    ownerAvatar?: string | null;
+    sitterAvatar?: string | null;
 }
 
 interface AdminNavItem {
@@ -25,22 +48,70 @@ interface AdminNavItem {
     active?: boolean;
 }
 
+function getXsrf(): string {
+    const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : '';
+}
+
+function apiFetch(url: string, options: RequestInit = {}) {
+    return fetch(url, {
+        credentials: 'same-origin',
+        ...options,
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-XSRF-TOKEN': getXsrf(),
+            ...options.headers,
+        },
+    });
+}
+
+function parseDate(iso?: string): Date | null {
+    if (!iso) return null;
+    let date: Date;
+    if (iso.includes('T')) {
+        date = new Date(iso);
+    } else if (iso.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)) {
+        date = new Date(iso.replace(' ', 'T') + 'Z');
+    } else if (iso.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        date = new Date(iso + 'T00:00:00Z');
+    } else {
+        date = new Date(iso);
+    }
+    return isNaN(date.getTime()) ? null : date;
+}
+
+const pendingVerifications = ref(0);
+
+const loadPendingVerifications = async () => {
+    try {
+        const res = await apiFetch('/api/petsitters?approval_status=pending');
+        if (res.ok) {
+            const data = await res.json();
+            pendingVerifications.value = (data.data ?? data).length;
+        }
+    } catch {
+        pendingVerifications.value = 0;
+    }
+};
+
 const searchQuery = ref('');
 const selectedFilter = ref<FilterTab>('Todas');
 const currentPage = ref(1);
 const pageSize = 8;
+const totalItems = ref(0);
+const loading = ref(false);
 
-const navItems: AdminNavItem[] = [
-    { label: 'Painel', href: '#' },
-    { label: 'Utilizadores', href: '#' },
-    { label: 'Verificações', href: '/admin/petsitters/pending', badge: 5 },
+const navItems = computed<AdminNavItem[]>(() => [
+    { label: 'Utilizadores', href: '/admin/users' },
+    { label: 'Verificações', href: '/admin/petsitters/pending', badge: pendingVerifications.value },
     { label: 'Reservas', href: '/admin/bookings', active: true },
-    { label: 'Avaliações', href: '#' },
-    { label: 'Denúncias', href: '#', badge: 3 },
-    { label: 'Suporte', href: '#', badge: 2 },
-    { label: 'Relatórios', href: '#' },
-    { label: 'Definições', href: '#' },
-];
+    { label: 'Avaliações', href: '/admin/reviews' },
+    { label: 'Denúncias', href: '/admin/reports', badge: 3 },
+    { label: 'Suporte', href: '/admin/support', badge: 2 },
+    { label: 'Definições', href: '/admin/settings' },
+]);
 
 const filterTabs: FilterTab[] = [
     'Todas',
@@ -50,48 +121,73 @@ const filterTabs: FilterTab[] = [
     'Canceladas',
 ];
 
-// Substituir por dados vindos da API / props do Inertia
-const bookings = ref<AdminBooking[]>([
-    { id: '#1048', ownerName: 'Nome do dono', petName: 'Animal: Nome', sitterName: 'Nome do cuidador', location: 'Localização', service: 'Diária', period: '12/11 – 15/11', total: 60, status: 'Aceite' },
-    { id: '#1047', ownerName: 'Nome do dono', petName: 'Animal: Nome', sitterName: 'Nome do cuidador', location: 'Localização', service: 'Visita', period: '14/11', total: 12, status: 'Pendente' },
-    { id: '#1046', ownerName: 'Nome do dono', petName: 'Animal: Nome', sitterName: 'Nome do cuidador', location: 'Localização', service: 'Passeio', period: '02/11 – 03/11', total: 20, status: 'Concluída' },
-    { id: '#1045', ownerName: 'Nome do dono', petName: 'Animal: Nome', sitterName: 'Nome do cuidador', location: 'Localização', service: 'Diária', period: '18/11 – 20/11', total: 40, status: 'Aceite' },
-    { id: '#1044', ownerName: 'Nome do dono', petName: 'Animal: Nome', sitterName: 'Nome do cuidador', location: 'Localização', service: 'Passeio', period: '10/11', total: 10, status: 'Cancelada' },
-    { id: '#1043', ownerName: 'Nome do dono', petName: 'Animal: Nome', sitterName: 'Nome do cuidador', location: 'Localização', service: 'Diária', period: '28/10 – 31/10', total: 60, status: 'Concluída' },
-    { id: '#1042', ownerName: 'Nome do dono', petName: 'Animal: Nome', sitterName: 'Nome do cuidador', location: 'Localização', service: 'Visita', period: '20/11', total: 12, status: 'Pendente' },
-    { id: '#1041', ownerName: 'Nome do dono', petName: 'Animal: Nome', sitterName: 'Nome do cuidador', location: 'Localização', service: 'Passeio', period: '16/11', total: 20, status: 'Aceite' },
-]);
+const bookings = ref<AdminBooking[]>([]);
 
-const filteredBookings = computed(() => {
-    const q = searchQuery.value.trim().toLowerCase();
+const mapApiToAdmin = (api: ApiBooking): AdminBooking => {
+    const start = parseDate(api.start_date);
+    const end = parseDate(api.end_date);
+    const period = start && end
+        ? `${start.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' })} – ${end.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' })}`
+        : '—';
+    const petNames = api.animals.map(a => a.name).join(', ') || '—';
 
-    return bookings.value.filter((item) => {
-        const matchesStatus =
-            selectedFilter.value === 'Todas' ||
-            (selectedFilter.value === 'Pendentes' && item.status === 'Pendente') ||
-            (selectedFilter.value === 'Aceites' && item.status === 'Aceite') ||
-            (selectedFilter.value === 'Concluídas' && item.status === 'Concluída') ||
-            (selectedFilter.value === 'Canceladas' && item.status === 'Cancelada');
+    return {
+        id: api.id,
+        ownerName: api.owner?.name ?? '—',
+        petName: petNames,
+        sitterName: api.petsitter?.name ?? '—',
+        location: api.petsitter?.location ?? api.owner?.location ?? '—',
+        service: api.service?.name ?? '—',
+        period,
+        total: api.total_price,
+        status: api.status,
+        ownerAvatar: api.owner?.avatar_url ?? null,
+        sitterAvatar: api.petsitter?.avatar_url ?? null,
+    };
+};
 
-        const matchesSearch =
-            !q ||
-            item.id.toLowerCase().includes(q) ||
-            item.ownerName.toLowerCase().includes(q) ||
-            item.sitterName.toLowerCase().includes(q) ||
-            item.petName.toLowerCase().includes(q) ||
-            item.location.toLowerCase().includes(q);
+const loadBookings = async () => {
+    loading.value = true;
+    try {
+        const params = new URLSearchParams();
+        params.set('page', String(currentPage.value));
+        params.set('per_page', String(pageSize));
 
-        return matchesStatus && matchesSearch;
-    });
-});
+        if (selectedFilter.value === 'Pendentes') {
+            params.set('pending', '1');
+        } else if (selectedFilter.value !== 'Todas') {
+            params.set('pending', '0');
+        }
 
-const totalPages = computed(() =>
-    Math.max(1, Math.ceil(filteredBookings.value.length / pageSize))
-);
+        const res = await apiFetch(`/api/bookings?${params.toString()}`);
+        const text = await res.text();
+        console.log('[BookingsView] API response:', res.status, text);
 
-const paginatedBookings = computed(() => {
-    const start = (currentPage.value - 1) * pageSize;
-    return filteredBookings.value.slice(start, start + pageSize);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = JSON.parse(text);
+        const items = data.data ?? data;
+
+        bookings.value = items.map(mapApiToAdmin);
+        totalItems.value = data.total ?? data.meta?.total ?? items.length;
+    } catch (e) {
+        console.error('[BookingsView] loadBookings error:', e);
+        bookings.value = [];
+        totalItems.value = 0;
+    } finally {
+        loading.value = false;
+    }
+};
+
+const totalPages = computed(() => Math.max(1, Math.ceil(totalItems.value / pageSize)));
+
+watch([currentPage, selectedFilter], () => {
+    void loadBookings();
+}, { deep: true });
+
+onMounted(() => {
+    void loadPendingVerifications();
+    void loadBookings();
 });
 
 function setFilter(tab: FilterTab) {
@@ -99,10 +195,8 @@ function setFilter(tab: FilterTab) {
     currentPage.value = 1;
 }
 
-function viewBooking(id: string) {
-    const numericId = id.replace('#', '');
-    // router.visit(`/admin/bookings/${numericId}`);
-    console.log('Abrir reserva:', id, numericId);
+function viewBooking(id: number) {
+    router.visit(`/admin/bookings/${id}`);
 }
 
 function logout() {
@@ -111,15 +205,42 @@ function logout() {
 
 function statusBadgeClass(status: BookingStatus) {
     switch (status) {
-        case 'Aceite':
-        case 'Concluída':
+        case 'approved':
+        case 'completed':
             return 'status-pill--success';
-        case 'Pendente':
+        case 'pending':
             return 'status-pill--pending';
-        case 'Cancelada':
+        case 'rejected':
+        case 'cancelled':
             return 'status-pill--cancelled';
     }
 }
+
+const statusLabels: Record<BookingStatus, string> = {
+    pending: 'Pendente',
+    approved: 'Aceite',
+    rejected: 'Recusada',
+    completed: 'Concluída',
+    cancelled: 'Cancelada',
+};
+
+const filteredBookings = computed(() => {
+    const q = searchQuery.value.trim().toLowerCase();
+
+    return bookings.value.filter((item) => {
+        const matchesSearch =
+            !q ||
+            String(item.id).includes(q) ||
+            item.ownerName.toLowerCase().includes(q) ||
+            item.sitterName.toLowerCase().includes(q) ||
+            item.petName.toLowerCase().includes(q) ||
+            item.location.toLowerCase().includes(q);
+
+        return matchesSearch;
+    });
+});
+
+const paginatedBookings = computed(() => filteredBookings.value);
 </script>
 
 <template>
@@ -151,7 +272,7 @@ function statusBadgeClass(status: BookingStatus) {
                     :class="{ active: item.active }"
                 >
                     <span>{{ item.label }}</span>
-                    <span v-if="item.badge" class="navbar-badge">{{ item.badge }}</span>
+                    <span v-if="item.badge !== undefined && item.badge !== null" class="navbar-badge">{{ item.badge }}</span>
                 </a>
             </nav>
 
@@ -170,7 +291,6 @@ function statusBadgeClass(status: BookingStatus) {
             <header class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
                 <div>
                     <h1 class="fw-bold mb-1">Reservas</h1>
-                    <p class="text-secondary mb-0">486 reservas este mês</p>
                 </div>
 
                 <div class="d-flex align-items-center gap-2">
@@ -227,10 +347,11 @@ function statusBadgeClass(status: BookingStatus) {
                         </thead>
                         <tbody>
                         <tr v-for="booking in paginatedBookings" :key="booking.id" class="booking-row">
-                            <td class="fw-bold">{{ booking.id }}</td>
+                            <td class="fw-bold">#{{ booking.id }}</td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
-                                    <span class="person-avatar"></span>
+                                    <img v-if="booking.ownerAvatar" :src="booking.ownerAvatar" :alt="booking.ownerName" class="person-avatar" />
+                                    <span v-else class="person-avatar"></span>
                                     <div>
                                         <div class="fw-semibold">{{ booking.ownerName }}</div>
                                         <small class="text-secondary">{{ booking.petName }}</small>
@@ -239,7 +360,8 @@ function statusBadgeClass(status: BookingStatus) {
                             </td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
-                                    <span class="person-avatar"></span>
+                                    <img v-if="booking.sitterAvatar" :src="booking.sitterAvatar" :alt="booking.sitterName" class="person-avatar" />
+                                    <span v-else class="person-avatar"></span>
                                     <div>
                                         <div class="fw-semibold">{{ booking.sitterName }}</div>
                                         <small class="text-secondary">{{ booking.location }}</small>
@@ -252,7 +374,7 @@ function statusBadgeClass(status: BookingStatus) {
                             <td>
                                 <span class="status-pill" :class="statusBadgeClass(booking.status)">
                                     <svg
-                                        v-if="booking.status === 'Aceite' || booking.status === 'Concluída'"
+                                        v-if="booking.status === 'approved' || booking.status === 'completed'"
                                         width="13"
                                         height="13"
                                         viewBox="0 0 24 24"
@@ -265,7 +387,7 @@ function statusBadgeClass(status: BookingStatus) {
                                         <polyline points="20 6 9 17 4 12" />
                                     </svg>
                                     <svg
-                                        v-else-if="booking.status === 'Pendente'"
+                                        v-else-if="booking.status === 'pending'"
                                         width="13"
                                         height="13"
                                         viewBox="0 0 24 24"
@@ -292,13 +414,13 @@ function statusBadgeClass(status: BookingStatus) {
                                         <line x1="18" y1="6" x2="6" y2="18" />
                                         <line x1="6" y1="6" x2="18" y2="18" />
                                     </svg>
-                                    {{ booking.status }}
+                                    {{ statusLabels[booking.status] }}
                                 </span>
                             </td>
                             <td class="text-end">
                                 <button
                                     type="button"
-                                    class="btn btn-outline-secondary"
+                                    class="btn btn-outline-primary"
                                     @click="viewBooking(booking.id)"
                                 >
                                     Ver
@@ -317,7 +439,7 @@ function statusBadgeClass(status: BookingStatus) {
 
             <footer class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
                 <small class="text-secondary">
-                    A mostrar {{ paginatedBookings.length }} de {{ filteredBookings.length }}
+                    A mostrar {{ paginatedBookings.length }} de {{ totalItems }} resultados
                 </small>
 
                 <div class="d-flex align-items-center gap-1">
@@ -354,9 +476,6 @@ function statusBadgeClass(status: BookingStatus) {
 </template>
 
 <style scoped>
-.patudo-admin-shell {
-    flex-direction: row;
-}
 
 .brand-icon,
 .brand-text {
