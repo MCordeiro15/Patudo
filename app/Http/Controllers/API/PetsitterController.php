@@ -67,7 +67,7 @@ class PetsitterController extends Controller
 
         $data = $request->validate([
             'user_id' => 'sometimes|exists:users,id|unique:petsitters,user_id',
-            'name' => 'sometimes|string|max:255',
+            'name' => ['sometimes', 'string', 'max:255', 'regex:/^[\p{L} ]+$/u'],
             'biography' => 'nullable|string',
             'experience' => 'required|string|max:500',
             'service_location' => 'required|string|max:255',
@@ -147,7 +147,7 @@ class PetsitterController extends Controller
         Gate::authorize('update', $petsitter);
 
         $data = $request->validate([
-            'name' => 'sometimes|string|max:255',
+            'name' => ['sometimes', 'string', 'max:255', 'regex:/^[\p{L} ]+$/u'],
             'phone' => 'sometimes|nullable|string|max:20',
             'biography' => 'sometimes|nullable|string',
             'experience' => 'sometimes|string',

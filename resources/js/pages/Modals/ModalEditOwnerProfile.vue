@@ -21,6 +21,7 @@ const emit = defineEmits<{
 }>();
 
 const name = ref('');
+const sanitizeName = (value: string) => value.replace(/[^\p{L} ]/gu, '');
 const location = ref('');
 const phone = ref('');
 const about = ref('');
@@ -33,7 +34,7 @@ watch(
     () => props.show,
     (isOpen) => {
         if (isOpen) {
-            name.value = props.user?.name ?? '';
+            name.value = sanitizeName(props.user?.name ?? '');
             location.value = props.user?.location ?? '';
             // Remove o prefixo +351 e formata para apenas 9 dígitos
             const rawPhone = props.user?.phone ?? '';
@@ -52,6 +53,12 @@ watch(
 
 const triggerFileInput = () => {
     fileInputRef.value?.click();
+};
+
+const handleNameInput = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    name.value = sanitizeName(input.value);
+    input.value = name.value;
 };
 
 const handleFileChange = (event: Event) => {
@@ -186,8 +193,9 @@ const handleDeleteAccount = () => {
                         </label>
                         <input
                             id="owner-name"
-                            v-model="name"
+                            :value="name"
                             type="text"
+                            @input="handleNameInput"
                             class="patudo-pill-input"
                             required
                         />

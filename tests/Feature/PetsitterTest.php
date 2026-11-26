@@ -155,6 +155,21 @@ test('petsitter owner can update their profile', function () {
     ]);
 });
 
+test('petsitter profile update rejects digits in the person name and postal code', function () {
+    $owner = User::factory()->create(['name' => 'Ana Silva']);
+    $petsitter = Petsitter::factory()->create(['user_id' => $owner->id]);
+
+    $this->actingAs($owner)->putJson('/api/petsitters/'.$petsitter->user_id, [
+        'name' => 'Ana2 Silva',
+    ])->assertUnprocessable()->assertJsonValidationErrors('name');
+
+    $this->actingAs($owner)->putJson('/api/petsitters/'.$petsitter->user_id, [
+        'postal_code' => '9500123',
+    ])->assertUnprocessable()->assertJsonValidationErrors('postal_code');
+
+    expect($owner->fresh()->name)->toBe('Ana Silva');
+});
+
 test('user cannot update another user petsitter profile', function () {
     $owner = User::factory()->create();
     $otherUser = User::factory()->create();

@@ -20,7 +20,7 @@ beforeEach(function () {
 function becomePetsitterPayload(array $overrides = []): array
 {
     return array_merge([
-        'name' => 'Joana Silva',
+        'name' => 'Joana Conceição',
         'sex' => 'female',
         'service' => 'pet-sitting',
         'age' => 28,
@@ -66,7 +66,17 @@ test('user becomes a pending petsitter with postal code, service and stored docu
     ]);
 
     // o nome do formulário atualiza o utilizador
-    expect($user->fresh()->name)->toBe('Joana Silva');
+    expect($user->fresh()->name)->toBe('Joana Conceição');
+});
+
+test('petsitter registration rejects digits in the person name', function () {
+    $user = User::factory()->create();
+
+    submitBecomePetsitter($this, $user, becomePetsitterPayload(['name' => 'Joana2 Silva']))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('name');
+
+    expect($user->fresh()->name)->not->toBe('Joana2 Silva');
 });
 
 test('sex is optional', function () {

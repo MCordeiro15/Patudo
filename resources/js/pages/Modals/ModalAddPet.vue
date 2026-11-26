@@ -15,8 +15,10 @@ const props = defineProps<{
 
 
 const name = ref('');
+const sanitizeName = (value: string) => value.replace(/[^\p{L} ]/gu, '');
 const species = ref('');
 const breed = ref('');
+const sanitizeBreed = (value: string) => value.replace(/\p{N}/gu, '');
 const size = ref('');
 const specialNeeds = ref('');
 const aggression = ref('');
@@ -55,6 +57,18 @@ const clearPhotoPreview = () => {
         URL.revokeObjectURL(photoPreview.value);
         photoPreview.value = null;
     }
+};
+
+const handleNameInput = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    name.value = sanitizeName(input.value);
+    input.value = name.value;
+};
+
+const handleBreedInput = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    breed.value = sanitizeBreed(input.value);
+    input.value = breed.value;
 };
 
 const removePhoto = () => {
@@ -320,8 +334,9 @@ const submit = async () => {
 
                                 <input
                                     id="animal-name"
-                                    v-model="name"
+                                    :value="name"
                                     type="text"
+                                    @input="handleNameInput"
                                     class="form-control patudo-field rounded-3"
                                     :class="{ 'is-invalid': errors.name }"
                                     placeholder="Ex.: Max"
@@ -364,8 +379,9 @@ const submit = async () => {
 
                                 <input
                                     id="animal-breed"
-                                    v-model="breed"
+                                    :value="breed"
                                     type="text"
+                                    @input="handleBreedInput"
                                     class="form-control patudo-field rounded-3"
                                     :class="{ 'is-invalid': errors.breed }"
                                     placeholder="Ex.: Labrador"

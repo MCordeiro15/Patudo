@@ -27,6 +27,17 @@ test('admin can list all users', function () {
         ->assertJsonCount(3, 'data');
 });
 
+test('admin cannot create a user with digits in the name', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)->postJson('/api/users', [
+        'name' => 'Ana2',
+        'email' => 'ana@example.com',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+    ])->assertUnprocessable()->assertJsonValidationErrors('name');
+});
+
 test('user can view their own profile', function () {
     $user = User::factory()->create();
 
@@ -47,16 +58,26 @@ test('user can update their own profile', function () {
     $user = User::factory()->create(['name' => 'Old Name']);
 
     $response = $this->actingAs($user)->putJson("/api/users/{$user->id}", [
-        'name' => 'New Name',
+        'name' => 'Érica da Conceição',
     ]);
 
     $response->assertOk()
-        ->assertJsonPath('data.name', 'New Name');
+        ->assertJsonPath('data.name', 'Érica da Conceição');
 
     $this->assertDatabaseHas('users', [
         'id' => $user->id,
-        'name' => 'New Name',
+        'name' => 'Érica da Conceição',
     ]);
+});
+
+test('user cannot update their profile with digits in the name', function () {
+    $user = User::factory()->create(['name' => 'Ana Silva']);
+
+    $this->actingAs($user)->putJson("/api/users/{$user->id}", [
+        'name' => 'Ana2 Silva',
+    ])->assertUnprocessable()->assertJsonValidationErrors('name');
+
+    expect($user->fresh()->name)->toBe('Ana Silva');
 });
 
 test('user cannot update another users profile', function () {

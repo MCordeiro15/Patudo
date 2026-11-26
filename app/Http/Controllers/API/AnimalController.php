@@ -45,9 +45,9 @@ class AnimalController extends Controller
 
         $data = $request->validate([
             'user_id' => 'sometimes|exists:users,id',
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255', 'regex:/^[\p{L} ]+$/u'],
             'species' => 'required|string|max:255',
-            'breed' => 'required|string|max:255',
+            'breed' => ['required', 'string', 'max:255', 'regex:/^[^\p{N}]+$/u'],
             'size' => 'required|string|max:255',
             'special_needs' => 'nullable|string',
             'aggression' => 'nullable|string|max:255',
@@ -90,9 +90,9 @@ class AnimalController extends Controller
 
         $data = $request->validate([
             'user_id' => 'sometimes|exists:users,id',
-            'name' => 'sometimes|string|max:255',
+            'name' => ['sometimes', 'string', 'max:255', 'regex:/^[\p{L} ]+$/u'],
             'species' => 'sometimes|string|max:255',
-            'breed' => 'sometimes|string|max:255',
+            'breed' => ['sometimes', 'string', 'max:255', 'regex:/^[^\p{N}]+$/u'],
             'size' => 'sometimes|string|max:255',
             'special_needs' => 'nullable|string',
             'aggression' => 'nullable|string|max:255',

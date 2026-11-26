@@ -28,6 +28,7 @@ const props = defineProps<{
 
 // Form state
 const name = ref('');
+const sanitizeName = (value: string) => value.replace(/[^\p{L} ]/gu, '');
 const phone = ref('');
 const biography = ref('');
 const experience = ref('');
@@ -77,7 +78,7 @@ const sexOptions = [
 
 const populateForm = () => {
     if (!props.petsitter) return;
-    name.value = props.petsitter.name ?? props.petsitter.user?.name ?? '';
+    name.value = sanitizeName(props.petsitter.name ?? props.petsitter.user?.name ?? '');
     // Remove o prefixo +351 e formata para apenas 9 dígitos
     const rawPhone = props.petsitter.phone ?? props.petsitter.user?.phone ?? '';
     if (rawPhone) {
@@ -104,6 +105,12 @@ const populateForm = () => {
         props.petsitter.photo_url ??
         props.petsitter.user?.avatar_url ??
         null;
+};
+
+const handleNameInput = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    name.value = sanitizeName(input.value);
+    input.value = name.value;
 };
 
 const resetForm = () => {
@@ -389,8 +396,9 @@ const submit = async () => {
                         </label>
                         <input
                             id="petsitter-name"
-                            v-model="name"
+                            :value="name"
                             type="text"
+                            @input="handleNameInput"
                             class="patudo-input"
                             :class="{ 'is-invalid': errors.name }"
                             placeholder="Ex: Maria Santos"
