@@ -22,6 +22,12 @@ declare module '@inertiajs/core' {
             name: string;
             auth: Auth;
             sidebarOpen: boolean;
+            // Contadores do menu de admin; null para quem não é admin
+            adminCounts: {
+                pending_petsitters: number;
+                open_reports: number;
+                open_support: number;
+            } | null;
             [key: string]: unknown;
         };
     }
