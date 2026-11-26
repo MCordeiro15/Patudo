@@ -6,6 +6,8 @@
  */
 namespace App\Http\Middleware;
 
+use App\Models\Petsitter;
+use App\Models\SupportTicket;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -46,6 +48,13 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            // Números das bolinhas do menu de admin. A closure só corre quando a prop é enviada
+            // (um router.reload({ only: ['adminCounts'] }) pede só esta); para quem não é admin é null, sem consultas.
+            'adminCounts' => fn () => $request->user()?->isAdmin() ? [
+                'pending_petsitters' => Petsitter::where('approval_status', 'pending')->count(),
+                'open_reports' => SupportTicket::where('type', 'complaint')->where('status', 'open')->count(),
+                'open_support' => SupportTicket::where('type', 'help')->where('status', 'open')->count(),
+            ] : null,
         ];
     }
 }
