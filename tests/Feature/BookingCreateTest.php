@@ -8,6 +8,7 @@
  */
 use App\Models\Animal;
 use App\Models\Booking;
+use App\Models\Notification;
 use App\Models\Petsitter;
 use App\Models\PetsitterService;
 use App\Models\User;
@@ -58,6 +59,23 @@ test('a booking is paid with the balance and created as pending', function () {
 
     // 20 € x 3 dias = 60 €, descontados do saldo
     expect((float) $owner->fresh()->credit)->toBe(40.0);
+});
+
+test('creating a booking sends the petsitter an unread notification linked to the booking', function () {
+    [$owner, $petsitter, $service, $animal] = bookingScenario(credit: 100);
+
+    $response = $this->actingAs($owner)
+        ->postJson('/api/bookings', bookingPayload($petsitter, $service, $animal))
+        ->assertCreated();
+
+    $bookingId = $response->json('data.id');
+    $notification = Notification::where('user_id', $petsitter->user_id)->first();
+
+    expect($notification)->not->toBeNull()
+        ->and($notification->type)->toBe('booking')
+        ->and($notification->message)->toBe('Novo pedido de reserva')
+        ->and($notification->read_at)->toBeNull()
+        ->and($notification->booking_id)->toBe($bookingId);
 });
 
 test('without enough balance it returns 422 and nothing is created or charged', function () {

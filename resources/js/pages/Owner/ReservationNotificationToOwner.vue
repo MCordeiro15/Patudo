@@ -75,7 +75,7 @@ const feedback = ref('');
 const feedbackType = ref<'success' | 'error'>('success');
 
 const showNotifications = ref(false);
-const { unreadCount } = useNotifications();
+const { unreadCount, fetchNotifications } = useNotifications();
 
 function setFeedback(message: string, type: 'success' | 'error') {
     feedback.value = message;
@@ -110,7 +110,7 @@ function formatDay(day: string): string {
 }
 
 // Quem abre o detalhe pode ser o dono ou o petsitter da reserva (bookings.petsitter_id é o id do user)
-const page = usePage<{ auth: { user: { id: number } | null } }>();
+const page = usePage<{ auth: { user: { id: number; is_petsitter?: boolean } | null } }>();
 const viewerIsPetsitter = computed(() => !!booking.value && booking.value.petsitter_id === page.props.auth.user?.id);
 
 // O cartão do detalhe mostra a outra pessoa: o petsitter para o dono, o dono para o petsitter.
@@ -189,6 +189,8 @@ const cancelBooking = async () => {
 };
 
 onMounted(() => {
+    void fetchNotifications();
+
     if (bookingId) {
         void loadBooking();
     }
@@ -253,7 +255,7 @@ onMounted(() => {
             </nav>
 
             <!-- Topo da lista: botão "Pedir reserva" -->
-            <div v-if="!bookingId" class="d-flex justify-content-end mt-4">
+            <div v-if="!bookingId && !page.props.auth.user?.is_petsitter" class="d-flex justify-content-end mt-4">
                 <a
                     href="/"
                     class="btn btn-primary rounded-pill d-inline-flex align-items-center gap-2 px-3"
@@ -264,7 +266,7 @@ onMounted(() => {
             </div>
 
             <!-- Botão de voltar -->
-            <div v-else class="mt-4">
+            <div v-else-if="bookingId" class="mt-4">
                 <a
                     href="/reservations"
                     class="btn btn-outline-secondary rounded-pill d-inline-flex align-items-center gap-2"
@@ -427,7 +429,6 @@ onMounted(() => {
         <ModalNotifications
             :show="showNotifications"
             @close="showNotifications = false"
-            @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
         />
     </main>
 </template>

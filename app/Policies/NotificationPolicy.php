@@ -4,6 +4,7 @@
  * Política de autorização para notificações. Define quem pode visualizar, criar, marcar como lida e eliminar notificações.
  * Authorization policy for notifications. Defines who can view, create, mark as read, and delete notifications.
  */
+
 namespace App\Policies;
 
 use App\Models\Notification;
@@ -43,6 +44,14 @@ class NotificationPolicy
      * Apenas o proprietário da notificação pode marcá-la como lida.
      */
     public function markAsRead(User $user, Notification $notification): bool
+    {
+        return $notification->user_id === $user->id;
+    }
+
+    /**
+     * Apenas o proprietário da notificação pode marcá-la como não lida.
+     */
+    public function markAsUnread(User $user, Notification $notification): bool
     {
         return $notification->user_id === $user->id;
     }

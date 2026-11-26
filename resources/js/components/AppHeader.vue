@@ -3,7 +3,7 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import { Bell, BookOpen, Folder, Home, LayoutGrid, Menu, Search } from '@lucide/vue';
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
@@ -42,7 +42,11 @@ import { toUrl } from '@/lib/utils';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
 const showNotifications = ref(false);
-const { unreadCount } = useNotifications();
+const { unreadCount, fetchNotifications } = useNotifications();
+
+onMounted(() => {
+    void fetchNotifications();
+});
 
 // Tipo TypeScript para Props.
 // TypeScript type for Props.
@@ -307,6 +311,5 @@ const rightNavItems: NavItem[] = [
     <ModalNotifications
         :show="showNotifications"
         @close="showNotifications = false"
-        @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
     />
 </template>

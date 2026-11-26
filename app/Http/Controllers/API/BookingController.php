@@ -9,6 +9,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BookingResource;
 use App\Models\Booking;
+use App\Models\Notification;
 use App\Models\Petsitter;
 use App\Models\PetsitterService;
 use App\Models\User;
@@ -155,6 +156,13 @@ class BookingController extends Controller
             // escreve as linhas na tabela animal_bookings
             $booking->animals()->attach($data['animal_ids']);
 
+            Notification::create([
+                'user_id' => $petsitter->user_id,
+                'type' => 'booking',
+                'message' => 'Novo pedido de reserva',
+                'booking_id' => $booking->id,
+            ]);
+
             return $booking;
         });
 
@@ -255,7 +263,23 @@ class BookingController extends Controller
             ], 403);
         }
 
-        $booking->update(['status' => $data['status']]);
+        DB::transaction(function () use ($booking, $data, $who) {
+            $booking->update(['status' => $data['status']]);
+
+            $messages = [
+                'approved' => 'A reserva foi aceite.',
+                'rejected' => 'A reserva foi recusada.',
+                'cancelled' => 'A reserva foi cancelada.',
+                'completed' => 'A reserva foi concluída.',
+            ];
+
+            Notification::create([
+                'user_id' => $who === 'petsitter' ? $booking->user_id : $booking->petsitter_id,
+                'type' => 'booking',
+                'message' => $messages[$data['status']],
+                'booking_id' => $booking->id,
+            ]);
+        });
 
         return new BookingResource($booking);
     }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { Bell, LogOut, MessageCircle, UserRound } from '@lucide/vue';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import BookingList from '@/components/BookingList.vue';
 import { useNotifications } from '@/composables/useNotifications';
@@ -10,7 +10,11 @@ import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 // A lista de pedidos (cartões, Aceitar/Recusar e ficha do animal) está no BookingList (role="petsitter")
 
 const showNotifications = ref(false);
-const { unreadCount } = useNotifications();
+const { unreadCount, fetchNotifications } = useNotifications();
+
+onMounted(() => {
+    void fetchNotifications();
+});
 </script>
 
 <template>
@@ -75,7 +79,6 @@ const { unreadCount } = useNotifications();
         <ModalNotifications
             :show="showNotifications"
             @close="showNotifications = false"
-            @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
         />
     </main>
 </template>

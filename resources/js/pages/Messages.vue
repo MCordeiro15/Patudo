@@ -208,7 +208,6 @@ onMounted(async () => {
     <ModalNotifications
         :show="showNotifications"
         @close="showNotifications = false"
-        @mark-as-read="fetchNotifications"
     />
 </template>
 

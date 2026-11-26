@@ -2,6 +2,8 @@
 <!-- Vue page: ModalPetDetails.vue -->
 <script setup lang="ts">
 
+import { computed } from 'vue';
+
 export interface PetDetails {
     id?: number | string;
     name?: string;
@@ -28,6 +30,8 @@ const props = defineProps<{
 const emit = defineEmits<{
     (e: 'close'): void;
 }>();
+
+const photos = computed(() => props.pet?.photos?.filter(Boolean).slice(0, 2) ?? []);
 
 const handleClose = () => {
     emit('close');
@@ -68,119 +72,18 @@ const handleClose = () => {
                     </h2>
                 </div>
 
-                <div class="row g-3 mb-3">
-                    <div v-for="index in [0, 1]" :key="index" class="col-6">
+                <div v-if="photos.length" class="row g-3 mb-3">
+                    <div
+                        v-for="(photo, index) in photos"
+                        :key="index"
+                        :class="photos.length === 1 ? 'col-12 d-flex justify-content-center' : 'col-6'"
+                    >
                         <div class="patudo-photo-box">
                             <img
-                                v-if="pet?.photos?.[index]"
-                                :src="pet.photos[index]"
+                                :src="photo"
                                 :alt="`Foto ${index + 1} de ${pet?.name || 'animal'}`"
                                 class="patudo-pet-photo"
                             />
-                            <svg
-                                v-else
-                                viewBox="0 0 100 100"
-                                class="patudo-dog-placeholder"
-                                aria-hidden="true"
-                            >
-                                <circle
-                                    cx="50"
-                                    cy="50"
-                                    r="46"
-                                    fill="#fbe2c4"
-                                    stroke="#231810"
-                                    stroke-width="1.2"
-                                />
-                                <path
-                                    d="M30 22 C20 22, 18 42, 26 48 C30 42, 34 32, 34 25 Z"
-                                    fill="#d9934c"
-                                    stroke="#231810"
-                                    stroke-width="1.5"
-                                />
-                                <path
-                                    d="M70 22 C80 22, 82 42, 74 48 C70 42, 66 32, 66 25 Z"
-                                    fill="#d9934c"
-                                    stroke="#231810"
-                                    stroke-width="1.5"
-                                />
-                                <path
-                                    d="M72 78 C84 74, 88 58, 82 52 C78 58, 76 66, 70 70 Z"
-                                    fill="#e5a967"
-                                    stroke="#231810"
-                                    stroke-width="1.5"
-                                />
-                                <path
-                                    d="M32 54 C28 68, 28 84, 34 90 L66 90 C72 84, 72 68, 68 54 Z"
-                                    fill="#e5a967"
-                                    stroke="#231810"
-                                    stroke-width="1.5"
-                                />
-                                <path
-                                    d="M41 58 C39 70, 41 84, 44 90 L56 90 C59 84, 61 70, 59 58 Z"
-                                    fill="#f7dec2"
-                                />
-                                <path
-                                    d="M36 66 L36 90 M43 72 L43 90 M64 66 L64 90 M57 72 L57 90"
-                                    stroke="#231810"
-                                    stroke-width="1.5"
-                                    stroke-linecap="round"
-                                />
-                                <path
-                                    d="M36 52 Q50 58 64 52"
-                                    fill="none"
-                                    stroke="#1d70b8"
-                                    stroke-width="4"
-                                    stroke-linecap="round"
-                                />
-                                <circle
-                                    cx="50"
-                                    cy="56"
-                                    r="2.5"
-                                    fill="#d1d5db"
-                                    stroke="#231810"
-                                    stroke-width="1"
-                                />
-                                <path
-                                    d="M32 32 C32 18, 68 18, 68 32 C68 46, 60 52, 50 52 C40 52, 32 46, 32 32 Z"
-                                    fill="#e5a967"
-                                    stroke="#231810"
-                                    stroke-width="1.5"
-                                />
-                                <ellipse
-                                    cx="50"
-                                    cy="42"
-                                    rx="10"
-                                    ry="7.5"
-                                    fill="#f7dec2"
-                                />
-                                <path
-                                    d="M39 32 Q42 29 45 32"
-                                    fill="none"
-                                    stroke="#231810"
-                                    stroke-width="1.6"
-                                    stroke-linecap="round"
-                                />
-                                <path
-                                    d="M55 32 Q58 29 61 32"
-                                    fill="none"
-                                    stroke="#231810"
-                                    stroke-width="1.6"
-                                    stroke-linecap="round"
-                                />
-                                <ellipse
-                                    cx="50"
-                                    cy="39"
-                                    rx="3.5"
-                                    ry="2.5"
-                                    fill="#231810"
-                                />
-                                <path
-                                    d="M47 45 C47 50, 53 50, 53 45 Z"
-                                    fill="#ef4444"
-                                    stroke="#231810"
-                                    stroke-width="1"
-                                />
-                            </svg>
                         </div>
                     </div>
                 </div>
@@ -345,8 +248,9 @@ const handleClose = () => {
 
 .patudo-photo-box {
     width: 100%;
-    height: 112px;
-    background-color: var(--patudo-branco);
+    max-width: 220px;
+    aspect-ratio: 1;
+    background-color: #e9ddd3;
     border: 1px solid var(--patudo-terracota);
     border-radius: 10px;
     display: flex;
@@ -359,11 +263,7 @@ const handleClose = () => {
     width: 100%;
     height: 100%;
     object-fit: cover;
-}
-
-.patudo-dog-placeholder {
-    width: 66px;
-    height: 66px;
+    object-position: center;
 }
 
 .patudo-details-box {

@@ -713,7 +713,6 @@ onMounted(() => {
         <ModalNotifications
             :show="showNotifications"
             @close="showNotifications = false"
-            @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
         />
 
         <!-- Pagamento (fictício): o "Pagar" cria a reserva e o servidor desconta o saldo -->
