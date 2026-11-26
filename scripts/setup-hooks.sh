@@ -32,6 +32,6 @@ fi
 
 echo "Tudo configurado! A partir de agora:"
 echo ""
-echo "- git push: exporta todos os dados automaticamente"
+echo "- git push: exporta os dados automaticamente (se criar um commit, repete o push para o enviar)"
 echo "- git pull: atualiza o banco de dados automaticamente"
 echo "- Zero comandos manuais necessários"

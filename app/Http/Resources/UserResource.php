@@ -49,8 +49,6 @@ class UserResource extends JsonResource
             'phone' => $this->when($canSeePrivate, $this->phone),
             'location' => $this->when($canSeePrivate, $this->location),
             'about' => $this->when($canSeePrivate, $this->about),
-            // saldo fictício para pagar reservas: só o próprio e o admin o veem
-            'credit' => $this->when($canSeePrivate, fn () => (float) $this->credit),
             'avatar_url' => $avatarUrl,
             'email_verified_at' => $this->email_verified_at,
             'is_petsitter' => $this->isPetsitter(),

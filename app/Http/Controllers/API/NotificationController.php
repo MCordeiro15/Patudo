@@ -4,6 +4,7 @@
  * Controlador API para gestão de notificações de utilizadores. Fornece endpoints para listar, ver, criar, marcar como lida e eliminar notificações.
  * API controller for user notification management. Provides endpoints to list, view, create, mark as read, and delete notifications.
  */
+
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
@@ -20,9 +21,12 @@ class NotificationController extends Controller
      */
     public function index()
     {
+        $notifications = auth()->user()->notifications()->withinRetention();
+        $unreadCount = (clone $notifications)->whereNull('read_at')->count();
+
         return NotificationResource::collection(
-            auth()->user()->notifications()->latest()->paginate(15)
-        );
+            $notifications->with('booking:id,start_date')->latest()->paginate(15)
+        )->additional(['unread_count' => $unreadCount]);
     }
 
     /**
@@ -48,6 +52,7 @@ class NotificationController extends Controller
             'user_id' => 'required|integer|exists:users,id',
             'type' => 'required|string|max:255',
             'message' => 'required|string',
+            'booking_id' => 'nullable|integer|exists:bookings,id',
         ]);
 
         $notification = Notification::create($data);
@@ -64,6 +69,19 @@ class NotificationController extends Controller
         Gate::authorize('markAsRead', $notification);
 
         $notification->markAsRead();
+
+        return new NotificationResource($notification);
+    }
+
+    /**
+     * Marca uma notificação como não lida. Apenas o proprietário pode alterar a sua notificação.
+     * Marks a notification as unread. Only the owner can change their notification.
+     */
+    public function markAsUnread(Notification $notification)
+    {
+        Gate::authorize('markAsUnread', $notification);
+
+        $notification->markAsUnread();
 
         return new NotificationResource($notification);
     }

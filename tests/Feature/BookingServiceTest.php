@@ -24,7 +24,7 @@ function validBookingPayload(Petsitter $petsitter, PetsitterService $service, An
 }
 
 test('booking is created with the chosen service and its price', function () {
-    $owner = User::factory()->create(['credit' => 500]);
+    $owner = User::factory()->create();
     $animal = Animal::factory()->create(['user_id' => $owner->id]);
     $petsitter = Petsitter::factory()->approved()->create();
     $service = PetsitterService::create(['petsitter_id' => $petsitter->user_id, 'type' => 'pet-sitting', 'price' => 20]);
@@ -48,7 +48,7 @@ test('booking is created with the chosen service and its price', function () {
 });
 
 test('the total price ignores the petsitter base price and uses the service price', function () {
-    $owner = User::factory()->create(['credit' => 500]);
+    $owner = User::factory()->create();
     $animal = Animal::factory()->create(['user_id' => $owner->id]);
     $petsitter = Petsitter::factory()->approved()->create(['price_per_day' => 999]);
     $service = PetsitterService::create(['petsitter_id' => $petsitter->user_id, 'type' => 'passeio', 'price' => 10]);
@@ -60,7 +60,7 @@ test('the total price ignores the petsitter base price and uses the service pric
 });
 
 test('booking requires a service_id', function () {
-    $owner = User::factory()->create(['credit' => 500]);
+    $owner = User::factory()->create();
     $animal = Animal::factory()->create(['user_id' => $owner->id]);
     $petsitter = Petsitter::factory()->approved()->create();
     $service = PetsitterService::create(['petsitter_id' => $petsitter->user_id, 'type' => 'passeio', 'price' => 10]);
@@ -75,7 +75,7 @@ test('booking requires a service_id', function () {
 });
 
 test('booking rejects a service that belongs to another petsitter', function () {
-    $owner = User::factory()->create(['credit' => 500]);
+    $owner = User::factory()->create();
     $animal = Animal::factory()->create(['user_id' => $owner->id]);
     $petsitter = Petsitter::factory()->approved()->create();
     $other = Petsitter::factory()->approved()->create();
@@ -88,7 +88,7 @@ test('booking rejects a service that belongs to another petsitter', function () 
 });
 
 test('booking rejects a service that does not exist', function () {
-    $owner = User::factory()->create(['credit' => 500]);
+    $owner = User::factory()->create();
     $animal = Animal::factory()->create(['user_id' => $owner->id]);
     $petsitter = Petsitter::factory()->approved()->create();
     $service = PetsitterService::create(['petsitter_id' => $petsitter->user_id, 'type' => 'passeio', 'price' => 10]);
@@ -101,7 +101,7 @@ test('booking rejects a service that does not exist', function () {
 });
 
 test('listing and showing bookings include the service', function () {
-    $owner = User::factory()->create(['credit' => 500]);
+    $owner = User::factory()->create();
     $animal = Animal::factory()->create(['user_id' => $owner->id]);
     $petsitter = Petsitter::factory()->approved()->create();
     $service = PetsitterService::create(['petsitter_id' => $petsitter->user_id, 'type' => 'passeio', 'price' => 10]);
@@ -120,7 +120,7 @@ test('listing and showing bookings include the service', function () {
 });
 
 test('an old booking without a service returns service as null', function () {
-    $owner = User::factory()->create(['credit' => 500]);
+    $owner = User::factory()->create();
     $petsitter = Petsitter::factory()->approved()->create();
 
     // reserva antiga: criada sem service_id
@@ -140,7 +140,7 @@ test('an old booking without a service returns service as null', function () {
 });
 
 test('a service that already has bookings cannot be deleted', function () {
-    $owner = User::factory()->create(['credit' => 500]);
+    $owner = User::factory()->create();
     $animal = Animal::factory()->create(['user_id' => $owner->id]);
     $petsitter = Petsitter::factory()->approved()->create();
     $service = PetsitterService::create(['petsitter_id' => $petsitter->user_id, 'type' => 'passeio', 'price' => 10]);

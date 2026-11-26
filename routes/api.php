@@ -129,6 +129,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications', [NotificationController::class, 'store']);
     Route::get('/notifications/{notification}', [NotificationController::class, 'show']);
     Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+    Route::patch('/notifications/{notification}/unread', [NotificationController::class, 'markAsUnread']);
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
 
     // Chat (TalkJS)

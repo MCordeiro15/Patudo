@@ -59,6 +59,18 @@ class Review extends Model
     }
 
     /**
+     * Compatibilidade com o antigo `visible` (seeders exportados antes da coluna status):
+     * visible = false passa a `removed`; visible = true mantém o status. A coluna visible já não existe.
+     * Compatibility with the old `visible` (seeders exported before the status column).
+     */
+    public function setVisibleAttribute(mixed $value): void
+    {
+        if (! $value) {
+            $this->attributes['status'] = self::REMOVED;
+        }
+    }
+
+    /**
      * Relação belongsTo com Booking. Retorna a reserva associada.
      * BelongsTo relationship with Booking. Returns the associated booking.
      */

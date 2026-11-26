@@ -837,7 +837,7 @@ const saveAvailability = async () => {
                         <!-- Secção de serviços e preços do petsitter. -->
                         <!-- Petsitter services and pricing section. -->
                         <section
-                            class="card bg-white border border-primary rounded-4 p-3 px-md-4 h-100 info-card"
+                            class="card bg-white border border-primary rounded-4 p-3 px-md-4 info-card"
                         >
                             <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
                                 <h2 class="h5 fw-semibold mb-0">Serviços e preços</h2>
@@ -942,7 +942,7 @@ const saveAvailability = async () => {
                         <!-- Secção de disponibilidade do petsitter com modo de visualização e edição. -->
                         <!-- Petsitter availability section with view and edit modes. -->
                         <section
-                            class="card bg-white border border-primary rounded-4 p-3 px-md-4 h-100 info-card"
+                            class="card bg-white border border-primary rounded-4 p-3 px-md-4 info-card"
                         >
                             <div
                                 class="d-flex align-items-center justify-content-between mb-3"
@@ -1241,7 +1241,6 @@ const saveAvailability = async () => {
         <ModalNotifications
             :show="showNotifications"
             @close="showNotifications = false"
-            @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
         />
 
         <!-- Delete Post Modal -->

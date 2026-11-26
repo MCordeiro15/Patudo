@@ -507,7 +507,6 @@ onMounted(() => {
         <ModalNotifications
             :show="showNotifications"
             @close="showNotifications = false"
-            @mark-as-read="unreadCount = Math.max(0, unreadCount - 1)"
         />
     </main>
 </template>

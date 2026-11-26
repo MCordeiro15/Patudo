@@ -196,3 +196,22 @@ test('the migration turns hidden reviews into removed ones', function () {
     expect(\Illuminate\Support\Facades\Schema::hasColumn('reviews', 'visible'))->toBeFalse()
         ->and(\Illuminate\Support\Facades\Schema::hasColumn('reviews', 'status'))->toBeTrue();
 });
+
+test('old exported seeders with visible still work (visible false becomes removed)', function () {
+    $petsitter = Petsitter::factory()->approved()->create();
+    $owner = User::factory()->create();
+    $booking = fn () => Booking::create([
+        'user_id' => $owner->id, 'petsitter_id' => $petsitter->user_id,
+        'start_date' => now()->subDays(5)->toDateString(), 'end_date' => now()->subDays(3)->toDateString(),
+        'status' => 'completed', 'total_price' => 30,
+    ]);
+
+    // os seeders correm com o modelo desprotegido, como o ExportedDataSeeder antigo
+    [$shown, $hidden] = Review::unguarded(fn () => [
+        Review::create(['booking_id' => $booking()->id, 'petsitter_id' => $petsitter->user_id, 'star_rating' => 5, 'comment' => 'a', 'visible' => true]),
+        Review::create(['booking_id' => $booking()->id, 'petsitter_id' => $petsitter->user_id, 'star_rating' => 1, 'comment' => 'b', 'visible' => false]),
+    ]);
+
+    expect($shown->fresh()->status)->toBe(Review::PUBLISHED)
+        ->and($hidden->fresh()->status)->toBe(Review::REMOVED);
+});

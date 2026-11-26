@@ -5,6 +5,7 @@
  * Tests for changing a booking's status (PATCH /api/bookings/{booking}/status) and for the petsitter's listing.
  */
 use App\Models\Booking;
+use App\Models\Notification;
 use App\Models\Petsitter;
 use App\Models\User;
 
@@ -21,7 +22,7 @@ function makeBookingWithStatus(User $owner, Petsitter $petsitter, string $status
     ]);
 }
 
-test('petsitter can make the allowed status changes', function (string $from, string $to) {
+test('petsitter can make the allowed status changes and notify the owner', function (string $from, string $to, string $message) {
     $petsitter = Petsitter::factory()->approved()->create();
     $booking = makeBookingWithStatus(User::factory()->create(), $petsitter, $from);
 
@@ -31,20 +32,34 @@ test('petsitter can make the allowed status changes', function (string $from, st
         ->assertJsonPath('data.status', $to);
 
     expect($booking->fresh()->status)->toBe($to);
+    $notification = Notification::where('user_id', $booking->user_id)->first();
+    expect($notification)->not->toBeNull()
+        ->and($notification->type)->toBe('booking')
+        ->and($notification->message)->toBe($message)
+        ->and($notification->read_at)->toBeNull()
+        ->and($notification->booking_id)->toBe($booking->id);
 })->with([
-    'aceitar' => ['pending', 'approved'],
-    'recusar' => ['pending', 'rejected'],
-    'concluir' => ['approved', 'completed'],
+    'aceitar' => ['pending', 'approved', 'A reserva foi aceite.'],
+    'recusar' => ['pending', 'rejected', 'A reserva foi recusada.'],
+    'concluir' => ['approved', 'completed', 'A reserva foi concluída.'],
 ]);
 
-test('owner can cancel a pending or approved booking', function (string $from) {
+test('owner can cancel a pending or approved booking and notify the petsitter', function (string $from) {
     $owner = User::factory()->create();
-    $booking = makeBookingWithStatus($owner, Petsitter::factory()->approved()->create(), $from);
+    $petsitter = Petsitter::factory()->approved()->create();
+    $booking = makeBookingWithStatus($owner, $petsitter, $from);
 
     $this->actingAs($owner)
         ->patchJson("/api/bookings/{$booking->id}/status", ['status' => 'cancelled'])
         ->assertOk()
         ->assertJsonPath('data.status', 'cancelled');
+
+    $notification = Notification::where('user_id', $petsitter->user_id)->first();
+    expect($notification)->not->toBeNull()
+        ->and($notification->type)->toBe('booking')
+        ->and($notification->message)->toBe('A reserva foi cancelada.')
+        ->and($notification->read_at)->toBeNull()
+        ->and($notification->booking_id)->toBe($booking->id);
 })->with(['pending', 'approved']);
 
 test('a status change that does not exist returns 422 and keeps the status', function (string $from, string $to) {

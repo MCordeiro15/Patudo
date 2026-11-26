@@ -1,25 +1,26 @@
 <?php
 
 /**
- * Testes da criação de reservas (KAN-215): disponibilidade do petsitter pelos dias da semana,
- * pagamento fictício com o saldo do utilizador e regras já existentes do POST /api/bookings.
- * Tests for booking creation (KAN-215): petsitter availability by weekday, fictitious payment with
- * the user's balance and the existing POST /api/bookings rules.
+ * Testes da criação de reservas (KAN-215): disponibilidade do petsitter pelos dias da semana
+ * e regras já existentes do POST /api/bookings.
+ * Tests for booking creation (KAN-215): petsitter availability by weekday and the existing
+ * POST /api/bookings rules.
  */
 use App\Models\Animal;
 use App\Models\Booking;
+use App\Models\Notification;
 use App\Models\Petsitter;
 use App\Models\PetsitterService;
 use App\Models\User;
 
 /**
- * Cenário base: dono com saldo, animal dele, petsitter aprovado (segunda a sexta) com serviço a 20 €/dia.
+ * Cenário base: dono, animal dele, petsitter aprovado (segunda a sexta) com serviço a 20 €/dia.
  *
  * @return array{0: User, 1: Petsitter, 2: PetsitterService, 3: Animal}
  */
-function bookingScenario(float $credit = 500, array $availability = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']): array
+function bookingScenario(array $availability = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']): array
 {
-    $owner = User::factory()->create(['credit' => $credit]);
+    $owner = User::factory()->create();
     $animal = Animal::factory()->create(['user_id' => $owner->id]);
     $petsitter = Petsitter::factory()->approved()->create(['availability_days' => $availability]);
     $service = PetsitterService::create(['petsitter_id' => $petsitter->user_id, 'type' => 'pet-sitting', 'price' => 20]);
@@ -45,8 +46,8 @@ function bookingPayload(Petsitter $petsitter, PetsitterService $service, Animal 
     ], $overrides);
 }
 
-test('a booking is paid with the balance and created as pending', function () {
-    [$owner, $petsitter, $service, $animal] = bookingScenario(credit: 100);
+test('a booking is created as pending with the total from the service price', function () {
+    [$owner, $petsitter, $service, $animal] = bookingScenario();
 
     $this->actingAs($owner)
         ->postJson('/api/bookings', bookingPayload($petsitter, $service, $animal))
@@ -56,30 +57,25 @@ test('a booking is paid with the balance and created as pending', function () {
         ->assertJsonPath('data.zone', 'Ponta Delgada')
         ->assertJsonPath('data.message', 'Ele gosta de passear de manhã.');
 
-    // 20 € x 3 dias = 60 €, descontados do saldo
-    expect((float) $owner->fresh()->credit)->toBe(40.0);
+    // 20 € x 3 dias = 60 €
+    expect((float) Booking::first()->total_price)->toBe(60.0);
 });
 
-test('without enough balance it returns 422 and nothing is created or charged', function () {
-    [$owner, $petsitter, $service, $animal] = bookingScenario(credit: 59.99);
+test('creating a booking sends the petsitter an unread notification linked to the booking', function () {
+    [$owner, $petsitter, $service, $animal] = bookingScenario();
 
-    $this->actingAs($owner)
-        ->postJson('/api/bookings', bookingPayload($petsitter, $service, $animal))
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('credit');
-
-    expect(Booking::count())->toBe(0)
-        ->and((float) $owner->fresh()->credit)->toBe(59.99);
-});
-
-test('the exact balance is enough and leaves it at zero', function () {
-    [$owner, $petsitter, $service, $animal] = bookingScenario(credit: 60);
-
-    $this->actingAs($owner)
+    $response = $this->actingAs($owner)
         ->postJson('/api/bookings', bookingPayload($petsitter, $service, $animal))
         ->assertCreated();
 
-    expect((float) $owner->fresh()->credit)->toBe(0.0);
+    $bookingId = $response->json('data.id');
+    $notification = Notification::where('user_id', $petsitter->user_id)->first();
+
+    expect($notification)->not->toBeNull()
+        ->and($notification->type)->toBe('booking')
+        ->and($notification->message)->toBe('Novo pedido de reserva')
+        ->and($notification->read_at)->toBeNull()
+        ->and($notification->booking_id)->toBe($bookingId);
 });
 
 test('a day the petsitter does not work returns 422 on start_date with the day name', function () {
@@ -91,12 +87,11 @@ test('a day the petsitter does not work returns 422 on start_date with the day n
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['start_date' => 'quarta-feira']);
 
-    expect(Booking::count())->toBe(0)
-        ->and((float) $owner->fresh()->credit)->toBe(500.0);
+    expect(Booking::count())->toBe(0);
 });
 
 test('a long booking needs every weekday', function () {
-    [$owner, $petsitter, $service, $animal] = bookingScenario(credit: 1000);
+    [$owner, $petsitter, $service, $animal] = bookingScenario();
     $monday = now()->next('Monday');
 
     // segunda a segunda seguinte passa pelo fim de semana: a factory só trabalha de segunda a sexta
@@ -167,7 +162,7 @@ test('exit hour before entrance hour on the same day returns 422', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors('exit_hour');
 
-    expect((float) $owner->fresh()->credit)->toBe(500.0);
+    expect(Booking::count())->toBe(0);
 });
 
 test('the message is limited to 500 characters', function () {
@@ -179,17 +174,11 @@ test('the message is limited to 500 characters', function () {
         ->assertJsonValidationErrors('message');
 });
 
-test('the owner sees their own balance in /api/me', function () {
-    $owner = User::factory()->create(['credit' => 123.45]);
-
-    $this->actingAs($owner)->getJson('/api/me')->assertJsonPath('data.credit', 123.45);
-});
-
-test('a petsitter cannot create a booking (403) and is not charged', function () {
+test('a petsitter cannot create a booking (403)', function () {
     [, $petsitter, $service] = bookingScenario();
 
-    // outro petsitter, aprovado (is_petsitter = true), com saldo e um animal seu
-    $otherPetsitter = User::factory()->petsitter()->create(['credit' => 500]);
+    // outro petsitter, aprovado (is_petsitter = true), com um animal seu
+    $otherPetsitter = User::factory()->petsitter()->create();
     $ownAnimal = Animal::factory()->create(['user_id' => $otherPetsitter->id]);
 
     $this->actingAs($otherPetsitter)
@@ -197,8 +186,7 @@ test('a petsitter cannot create a booking (403) and is not charged', function ()
         ->assertForbidden()
         ->assertJsonPath('message', 'Um petsitter não pode fazer reservas.');
 
-    expect(Booking::count())->toBe(0)
-        ->and((float) $otherPetsitter->fresh()->credit)->toBe(500.0);
+    expect(Booking::count())->toBe(0);
 });
 
 test('a candidate still pending approval can book as an owner', function () {
@@ -206,7 +194,6 @@ test('a candidate still pending approval can book as an owner', function () {
 
     // candidatura pendente: ainda não é petsitter (is_petsitter = false)
     $candidate = Petsitter::factory()->create(['approval_status' => 'pending'])->user;
-    $candidate->forceFill(['credit' => 500])->save(); // credit não está no fillable
     $animal = Animal::factory()->create(['user_id' => $candidate->id]);
 
     $this->actingAs($candidate)

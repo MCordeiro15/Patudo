@@ -8,7 +8,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
     (e: 'close'): void;
-    (e: 'markAsRead', id: number): void;
     (e: 'delete', id: number): void;
 }>();
 
@@ -19,6 +18,7 @@ const {
     unreadCount,
     fetchNotifications,
     markAsRead,
+    markAsUnread,
     deleteNotification,
 } = useNotifications();
 
@@ -48,11 +48,12 @@ const typeLabels: Record<string, string> = {
 };
 
 const typeIcons: Record<string, string> = {
-    booking: '📅',
     review: '⭐',
     system: '⚙️',
     message: '💬',
 };
+
+const bookingDay = (date: string | null) => date?.slice(8, 10) ?? '';
 
 watch(
     () => props.show,
@@ -71,9 +72,13 @@ const handleClose = () => {
     emit('close');
 };
 
-const handleSelect = (notification: NotificationItem) => {
+const handleSelect = async (notification: NotificationItem) => {
     selectedNotification.value = notification;
     activeTab.value = 'detail';
+
+    if (!notification.read) {
+        await markAsRead(notification.id);
+    }
 };
 
 const handleBack = () => {
@@ -81,20 +86,27 @@ const handleBack = () => {
     activeTab.value = 'list';
 };
 
-const handleMarkAsRead = async (id: number) => {
-    await markAsRead(id);
-    successMessage.value = 'Notificação marcada como lida.';
-    emit('markAsRead', id);
-    if (selectedNotification.value && selectedNotification.value.id === id) {
-        selectedNotification.value = { ...selectedNotification.value };
-    }
+const handleToggleRead = async (notification: NotificationItem) => {
+    const wasRead = notification.read;
+    const updated = wasRead
+        ? await markAsUnread(notification.id)
+        : await markAsRead(notification.id);
+
+    if (!updated) return;
+
+    successMessage.value = wasRead
+        ? 'Notificação marcada como não lida.'
+        : 'Notificação marcada como lida.';
     setTimeout(() => {
         successMessage.value = '';
     }, 3000);
 };
 
 const handleDelete = async (id: number) => {
-    await deleteNotification(id);
+    const deleted = await deleteNotification(id);
+
+    if (!deleted) return;
+
     successMessage.value = 'Notificação apagada.';
     emit('delete', id);
     handleBack();
@@ -246,7 +258,14 @@ const timeAgo = (dateString: string) => {
                                 @click="handleSelect(notification)"
                             >
                                 <div class="patudo-notification-icon">
-                                    {{ typeIcons[notification.type] || '🔔' }}
+                                    <span
+                                        v-if="notification.type === 'booking' && notification.booking_start_date"
+                                        class="patudo-booking-calendar"
+                                        :aria-label="`Dia da reserva: ${notification.booking_start_date}`"
+                                    >
+                                        {{ bookingDay(notification.booking_start_date) }}
+                                    </span>
+                                    <template v-else>{{ typeIcons[notification.type] || '🔔' }}</template>
                                 </div>
                                 <div class="patudo-notification-content">
                                     <div class="patudo-notification-top-row">
@@ -271,7 +290,14 @@ const timeAgo = (dateString: string) => {
                         <div class="patudo-detail-card">
                             <div class="patudo-detail-icon-row">
                                 <div class="patudo-detail-icon">
-                                    {{ typeIcons[selectedNotification.type] || '🔔' }}
+                                    <span
+                                        v-if="selectedNotification.type === 'booking' && selectedNotification.booking_start_date"
+                                        class="patudo-booking-calendar"
+                                        :aria-label="`Dia da reserva: ${selectedNotification.booking_start_date}`"
+                                    >
+                                        {{ bookingDay(selectedNotification.booking_start_date) }}
+                                    </span>
+                                    <template v-else>{{ typeIcons[selectedNotification.type] || '🔔' }}</template>
                                 </div>
                                 <div class="patudo-detail-meta">
                                     <span class="patudo-detail-type">
@@ -303,14 +329,26 @@ const timeAgo = (dateString: string) => {
                             </div>
 
                             <div class="patudo-detail-actions">
+                                <a
+                                    v-if="selectedNotification.booking_url"
+                                    :href="selectedNotification.booking_url"
+                                    class="btn-patudo-solid-pill text-decoration-none"
+                                >
+                                    Ver reserva
+                                </a>
                                 <button
-                                    v-if="!selectedNotification.read"
                                     type="button"
                                     class="btn-patudo-solid-pill"
                                     :disabled="isLoading"
-                                    @click="handleMarkAsRead(selectedNotification.id)"
+                                    @click="handleToggleRead(selectedNotification)"
                                 >
-                                    {{ isLoading ? 'A processar...' : 'Marcar como lida' }}
+                                    {{
+                                        isLoading
+                                            ? 'A processar...'
+                                            : selectedNotification.read
+                                              ? 'Marcar como não lida'
+                                              : 'Marcar como lida'
+                                    }}
                                 </button>
                                 <button
                                     type="button"
@@ -577,6 +615,34 @@ const timeAgo = (dateString: string) => {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.patudo-booking-calendar {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    width: 24px;
+    height: 23px;
+    padding-bottom: 1px;
+    border: 1.5px solid #c4450c;
+    border-radius: 4px;
+    background-color: #ffffff;
+    color: #231810;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.patudo-booking-calendar::before {
+    position: absolute;
+    top: -1.5px;
+    right: -1.5px;
+    left: -1.5px;
+    height: 7px;
+    border-radius: 4px 4px 0 0;
+    background-color: #c4450c;
+    content: '';
 }
 
 .patudo-notification-content {

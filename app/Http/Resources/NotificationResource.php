@@ -23,6 +23,9 @@ class NotificationResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
+            'booking_id' => $this->booking_id,
+            'booking_start_date' => $this->booking?->start_date,
+            'booking_url' => $this->booking_id ? "/reservations?booking={$this->booking_id}" : null,
             'type' => $this->type,
             'message' => $this->message,
             'read' => $this->isRead(),

@@ -4,14 +4,18 @@
  * Modelo Eloquent para notificações de utilizadores. Contém tipo, mensagem e estado de leitura. Relaciona-se com o utilizador destinatário.
  * Eloquent model for user notifications. Contains type, message, and read status. Relates to the recipient user.
  */
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $user_id
+ * @property int|null $booking_id
  * @property string $type
  * @property string $message
  * @property Carbon|null $read_at
@@ -21,12 +25,17 @@ use Illuminate\Support\Carbon;
  */
 class Notification extends Model
 {
+    use Prunable;
+
+    public const RETENTION_DAYS = 30;
+
     /**
      * Campos que podem ser preenchidos em massa via create() ou fill().
      * Fields that can be mass-assigned via create() or fill().
      */
     protected $fillable = [
         'user_id',
+        'booking_id',
         'type',
         'message',
         'read_at',
@@ -37,6 +46,16 @@ class Notification extends Model
         return [
             'read_at' => 'datetime',
         ];
+    }
+
+    public function scopeWithinRetention(Builder $query): Builder
+    {
+        return $query->where('created_at', '>=', now()->subDays(self::RETENTION_DAYS));
+    }
+
+    public function prunable(): Builder
+    {
+        return static::where('created_at', '<', now()->subDays(self::RETENTION_DAYS));
     }
 
     /**
@@ -58,11 +77,25 @@ class Notification extends Model
     }
 
     /**
+     * Marca a notificação como não lida.
+     * Marks the notification as unread.
+     */
+    public function markAsUnread(): void
+    {
+        $this->update(['read_at' => null]);
+    }
+
+    /**
      * Relação belongsTo com User. Retorna o utilizador destinatário desta notificação.
      * BelongsTo relationship with User. Returns the recipient user of this notification.
      */
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class);
     }
 }
