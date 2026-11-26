@@ -18,7 +18,7 @@ class AuthTest extends TestCase
     public function test_register_creates_user_and_logs_in(): void
     {
         $response = $this->postJson('/api/register', [
-            'name' => 'Ana',
+            'name' => 'Ana Conceição',
             'email' => 'ana@example.com',
             'phone' => '912345678',
             'password' => 'password123',
@@ -26,8 +26,18 @@ class AuthTest extends TestCase
         ]);
 
         $response->assertCreated();
-        $this->assertDatabaseHas('users', ['email' => 'ana@example.com']);
+        $this->assertDatabaseHas('users', ['email' => 'ana@example.com', 'name' => 'Ana Conceição']);
         $this->assertAuthenticated();
+    }
+
+    public function test_register_rejects_a_name_with_digits(): void
+    {
+        $this->postJson('/api/register', [
+            'name' => 'Ana2',
+            'email' => 'ana@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ])->assertUnprocessable()->assertJsonValidationErrors('name');
     }
 
     public function test_register_fails_with_duplicate_email(): void

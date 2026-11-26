@@ -129,3 +129,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/chat/session', [ChatController::class, 'session']);
     Route::get('/chat/contacts', [ChatController::class, 'contacts']);
 });
+
+/*
+|--------------------------------------------------------------------------
+| Rotas de administração — /api/admin/*, só para admins
+|--------------------------------------------------------------------------
+| Sem sessão devolvem 401 (auth:sanctum) e quem não é admin recebe 403 (can:admin).
+| As rotas de cada página (utilizadores, reservas, avaliações, denúncias, suporte,
+| definições) entram aqui nos tickets seguintes.
+*/
+Route::middleware(['auth:sanctum', 'can:admin'])->prefix('admin')->name('api.admin.')->group(function () {
+    //
+});

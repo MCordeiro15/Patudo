@@ -74,7 +74,7 @@ test('user can create an animal', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->postJson('/api/animals', [
-        'name' => 'Bobby',
+        'name' => 'Bóbby',
         'species' => 'Dog',
         'breed' => 'Bulldog',
         'size' => 'Small',
@@ -83,7 +83,7 @@ test('user can create an animal', function () {
 
     $response->assertCreated()
         ->assertJsonFragment([
-            'name' => 'Bobby',
+            'name' => 'Bóbby',
             'species' => 'Dog',
             'size' => 'Small',
             'special_needs' => 'Allergic to chicken',
@@ -91,10 +91,58 @@ test('user can create an animal', function () {
 
     $this->assertDatabaseHas('animals', [
         'user_id' => $user->id,
-        'name' => 'Bobby',
+        'name' => 'Bóbby',
         'species' => 'Dog',
         'size' => 'Small',
     ]);
+});
+
+test('animal names with digits are rejected when creating or updating', function () {
+    $user = User::factory()->create();
+    $animal = Animal::create([
+        'user_id' => $user->id,
+        'name' => 'Mimi',
+        'species' => 'Cat',
+        'breed' => 'Siamese',
+        'size' => 'Small',
+    ]);
+
+    $this->actingAs($user)->postJson('/api/animals', [
+        'name' => 'Mimi2',
+        'species' => 'Cat',
+        'breed' => 'Siamese',
+        'size' => 'Small',
+    ])->assertUnprocessable()->assertJsonValidationErrors('name');
+
+    $this->actingAs($user)->putJson("/api/animals/{$animal->id}", [
+        'name' => 'Mimi2',
+    ])->assertUnprocessable()->assertJsonValidationErrors('name');
+
+    expect($animal->fresh()->name)->toBe('Mimi');
+});
+
+test('animal breeds with digits are rejected when creating or updating', function () {
+    $user = User::factory()->create();
+    $animal = Animal::create([
+        'user_id' => $user->id,
+        'name' => 'Mimi',
+        'species' => 'Cat',
+        'breed' => 'Siamese',
+        'size' => 'Small',
+    ]);
+
+    $this->actingAs($user)->postJson('/api/animals', [
+        'name' => 'Max',
+        'species' => 'Dog',
+        'breed' => 'Husky2',
+        'size' => 'Medium',
+    ])->assertUnprocessable()->assertJsonValidationErrors('breed');
+
+    $this->actingAs($user)->putJson("/api/animals/{$animal->id}", [
+        'breed' => 'Siamese2',
+    ])->assertUnprocessable()->assertJsonValidationErrors('breed');
+
+    expect($animal->fresh()->breed)->toBe('Siamese');
 });
 
 test('fails to create animal when validation fails', function () {

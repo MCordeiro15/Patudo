@@ -81,9 +81,23 @@ Route::inertia('/reservations', 'Owner/ReservationNotificationToOwner')
     ->middleware('auth')
     ->name('bookings.reservations');
 
-Route::inertia('/admin/petsitters/pending', 'Admin/PendingPetsitters')
-    ->middleware(['auth', 'can:admin'])
-    ->name('admin.petsitters.pending');
+// Páginas de administração: só para admins (403 para os outros, login para quem não tem sessão).
+// Os dados de cada página são carregados pela API (/api/admin/*), que também exige admin.
+Route::middleware(['auth', 'can:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::inertia('/petsitters/pending', 'Admin/VerificationsView')->name('petsitters.pending');
+    Route::inertia('/users', 'Admin/UsersView')->name('users');
+    Route::get('/users/{user}', fn (string $user) => Inertia::render('Admin/UserDetailView', ['userId' => (int) $user]))
+        ->whereNumber('user')
+        ->name('users.show');
+    Route::inertia('/bookings', 'Admin/BookingsView')->name('bookings');
+    Route::get('/bookings/{booking}', fn (string $booking) => Inertia::render('Admin/BookingDetailView', ['bookingId' => (int) $booking]))
+        ->whereNumber('booking')
+        ->name('bookings.show');
+    Route::inertia('/reviews', 'Admin/ReviewsView')->name('reviews');
+    Route::inertia('/reports', 'Admin/ReportsView')->name('reports');
+    Route::inertia('/support', 'Admin/SupportView')->name('support');
+    Route::inertia('/settings', 'Admin/SettingsView')->name('settings');
+});
 
 // Pagamento confirmado (dono)
 Route::inertia('/payment-confirmed', 'Payment/PaymentConfirmed')

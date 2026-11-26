@@ -35,7 +35,7 @@ class UserController extends Controller
         Gate::authorize('create', User::class);
 
         $data = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255', 'regex:/^[\p{L} ]+$/u'],
             'email' => 'required|email|unique:users,email',
             'phone' => 'nullable|string|max:20',
             'password' => 'required|min:8|confirmed',
@@ -77,7 +77,7 @@ class UserController extends Controller
         Gate::authorize('update', $user);
 
         $data = $request->validate([
-            'name' => 'sometimes|string|max:255|unique:users,name,' . $user->id,
+            'name' => ['sometimes', 'string', 'max:255', 'regex:/^[\p{L} ]+$/u', 'unique:users,name,' . $user->id],
             'email' => 'sometimes|email|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'location' => 'nullable|string|max:255',

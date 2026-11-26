@@ -11,8 +11,10 @@ const emit = defineEmits<{
 }>();
 
 const name = ref('');
+const sanitizeName = (value: string) => value.replace(/[^\p{L} ]/gu, '');
 const species = ref<'Cão' | 'Gato' | ''>('');
 const breed = ref('');
+const sanitizeBreed = (value: string) => value.replace(/\p{N}/gu, '');
 const age = ref<string>('');
 const notes = ref('');
 const photoFile = ref<File | null>(null);
@@ -29,6 +31,18 @@ const isValid = computed(
         breed.value.trim().length > 0 &&
         age.value !== '',
 );
+
+const handleNameInput = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    name.value = sanitizeName(input.value);
+    input.value = name.value;
+};
+
+const handleBreedInput = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    breed.value = sanitizeBreed(input.value);
+    input.value = breed.value;
+};
 
 const clearPreview = () => {
     if (photoPreview.value) URL.revokeObjectURL(photoPreview.value);
@@ -281,7 +295,8 @@ onBeforeUnmount(clearPreview);
                     <label for="reservation-pet-name" class="field-label">Nome *</label>
                     <input
                         id="reservation-pet-name"
-                        v-model="name"
+                        :value="name"
+                        @input="handleNameInput"
                         class="pet-control"
                         :class="{ 'is-invalid': errors.name }"
                         maxlength="255"
@@ -320,7 +335,8 @@ onBeforeUnmount(clearPreview);
                         <label for="reservation-pet-breed" class="field-label">Raça</label>
                         <input
                             id="reservation-pet-breed"
-                            v-model="breed"
+                            :value="breed"
+                            @input="handleBreedInput"
                             class="pet-control"
                             :class="{ 'is-invalid': errors.breed }"
                             maxlength="255"
