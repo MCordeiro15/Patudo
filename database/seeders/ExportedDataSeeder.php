@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Hash;
 /**
  * SEEDER GERADO AUTOMATICAMENTE - NÃO EDITE MANUALMENTE
  * Este arquivo é gerado pelo comando php artisan db:export
- * Última atualização: 2026-11-26 10:53:21
+ * Última atualização: 2026-11-26 10:57:44
  */
 class ExportedDataSeeder extends Seeder
 {
@@ -2276,7 +2276,7 @@ class ExportedDataSeeder extends Seeder
     'user_id' => 9,
     'name' => 'Thor',
     'species' => 'Cão',
-    'breed' => 'Cão de File',
+    'breed' => 'Cão de Fila',
     'size' => 'large',
     'sex' => 'macho',
     'weight' => '15.00',
