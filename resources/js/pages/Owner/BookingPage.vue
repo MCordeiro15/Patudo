@@ -57,8 +57,7 @@ watch([sameDay, entranceHour, exitHour], ([same, entrance, exit]) => {
 });
 const submitting = ref(false);
 
-// Pagamento fictício: o saldo do utilizador (vem de /api/me) e o modal de pagamento
-const credit = ref<number | null>(null);
+// Pagamento fictício: o modal de pagamento
 const showPayment = ref(false);
 
 // Dados carregados
@@ -328,39 +327,21 @@ const unavailableDays = computed(() => {
     return missing.map((key) => weekdayLabels[key]);
 });
 
-const hasEnoughCredit = computed(() => credit.value === null || credit.value >= totalPrice.value);
-
-// Só deixa pagar com o formulário completo, dias disponíveis e saldo suficiente
-const canPay = computed(() => isFormValid.value && unavailableDays.value.length === 0 && hasEnoughCredit.value);
+// Só deixa pagar com o formulário completo e dias disponíveis
+const canPay = computed(() => isFormValid.value && unavailableDays.value.length === 0);
 
 const serviceLabelForPayment = computed(() => `Serviço de ${selectedServiceLabel.value} - Petsitter ${displayName.value}`);
 
-const formatEuros = (value: number) => `${value.toFixed(2).replace('.', ',')} €`;
-
-const loadCredit = async () => {
-    try {
-        const res = await apiFetch('/api/me');
-        if (res.ok) credit.value = Number((await res.json()).data?.credit ?? 0);
-    } catch {
-        // sem saldo carregado: o servidor continua a verificar ao pagar
-    }
-};
-
-// "Pagar" no modal: cria a reserva (o servidor desconta o saldo) e fecha o modal
+// "Pagar" no modal: cria a reserva e fecha o modal
 const payAndBook = async () => {
-    const total = totalPrice.value;
     await submitBooking();
     showPayment.value = false;
-    if (feedback.value.includes('sucesso') && credit.value !== null) {
-        credit.value = Math.max(0, credit.value - total);
-    }
 };
 
 onMounted(() => {
     void loadPetsitter();
     void loadAnimals();
     void loadServices();
-    void loadCredit();
 });
 </script>
 
@@ -696,14 +677,6 @@ onMounted(() => {
                             <span>€ {{ totalPrice.toFixed(2) }}</span>
                         </div>
 
-                        <!-- saldo fictício com que se paga a reserva -->
-                        <p v-if="credit !== null" class="summary-note mb-2">
-                            Saldo disponível: <strong>{{ formatEuros(credit) }}</strong>
-                        </p>
-                        <p v-if="!hasEnoughCredit" class="summary-note text-danger mb-2">
-                            Saldo insuficiente para esta reserva.
-                        </p>
-
                         <button
                             type="button"
                             class="btn btn-primary w-100"
@@ -730,7 +703,7 @@ onMounted(() => {
             @close="showNotifications = false"
         />
 
-        <!-- Pagamento (fictício): o "Pagar" cria a reserva e o servidor desconta o saldo -->
+        <!-- Pagamento (fictício): o "Pagar" cria a reserva -->
         <ModalPayment
             :show="showPayment"
             :service-label="serviceLabelForPayment"

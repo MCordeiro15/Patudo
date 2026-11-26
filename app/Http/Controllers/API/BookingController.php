@@ -12,7 +12,6 @@ use App\Models\Booking;
 use App\Models\Notification;
 use App\Models\Petsitter;
 use App\Models\PetsitterService;
-use App\Models\User;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -127,18 +126,8 @@ class BookingController extends Controller
         $days = (int) Carbon::parse($data['start_date'])->diffInDays(Carbon::parse($data['end_date'])) + 1;
         $total = $service->price * $days;
 
-        // transaction: ou paga E grava a reserva E os animais, ou não faz nada
+        // transaction: ou grava a reserva E os animais E a notificação, ou não faz nada
         $booking = DB::transaction(function () use ($data, $user, $petsitter, $service, $total) {
-            // pagamento fictício com o saldo: desconta só se chegar. É um único UPDATE, por isso
-            // dois pedidos ao mesmo tempo nunca deixam o saldo negativo.
-            $paid = User::whereKey($user->id)->where('credit', '>=', $total)->decrement('credit', $total);
-
-            if (! $paid) {
-                throw ValidationException::withMessages([
-                    'credit' => 'Saldo insuficiente para pagar esta reserva.',
-                ]);
-            }
-
             $booking = Booking::create([
                 'user_id' => $user->id,            // vem da sessão, não do pedido
                 'petsitter_id' => $petsitter->user_id,

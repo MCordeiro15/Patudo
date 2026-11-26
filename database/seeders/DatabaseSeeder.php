@@ -141,9 +141,5 @@ class DatabaseSeeder extends Seeder
                 ['type' => 'passeio', 'price' => 10],
             ]);
         }
-
-        // 8. Saldo fictício para testar reservas: quem ainda não tem saldo começa com 500 €
-        //    (os utilizadores criados pelo registo começam com 0 €)
-        User::where('credit', 0)->update(['credit' => 500]);
     }
 }
