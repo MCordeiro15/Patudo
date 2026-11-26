@@ -48,6 +48,13 @@ const entranceHour = ref('');
 const exitHour = ref('');
 const zone = ref('');
 const feedback = ref('');
+
+// No mesmo dia, a hora de saída tem de ser depois da de entrada (a API também o exige).
+// Se ficar igual ou antes, é removida. As horas vêm em "HH:MM", por isso comparar as strings chega.
+const sameDay = computed(() => !!startDate.value && startDate.value === endDate.value);
+watch([sameDay, entranceHour, exitHour], ([same, entrance, exit]) => {
+    if (same && entrance && exit && exit <= entrance) exitHour.value = '';
+});
 const submitting = ref(false);
 
 // Pagamento fictício: o saldo do utilizador (vem de /api/me) e o modal de pagamento
@@ -578,6 +585,7 @@ onMounted(() => {
                                         v-model="exitHour"
                                         type="time"
                                         class="form-control booking-input"
+                                        :min="sameDay ? entranceHour || undefined : undefined"
                                     />
                                 </div>
                             </div>
