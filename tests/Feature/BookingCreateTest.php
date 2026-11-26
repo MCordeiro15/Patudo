@@ -202,3 +202,32 @@ test('the owner sees their own balance in /api/me', function () {
 
     $this->actingAs($owner)->getJson('/api/me')->assertJsonPath('data.credit', 123.45);
 });
+
+test('a petsitter cannot create a booking (403) and is not charged', function () {
+    [, $petsitter, $service] = bookingScenario();
+
+    // outro petsitter, aprovado (is_petsitter = true), com saldo e um animal seu
+    $otherPetsitter = User::factory()->petsitter()->create(['credit' => 500]);
+    $ownAnimal = Animal::factory()->create(['user_id' => $otherPetsitter->id]);
+
+    $this->actingAs($otherPetsitter)
+        ->postJson('/api/bookings', bookingPayload($petsitter, $service, $ownAnimal))
+        ->assertForbidden()
+        ->assertJsonPath('message', 'Um petsitter não pode fazer reservas.');
+
+    expect(Booking::count())->toBe(0)
+        ->and((float) $otherPetsitter->fresh()->credit)->toBe(500.0);
+});
+
+test('a candidate still pending approval can book as an owner', function () {
+    [, $petsitter, $service] = bookingScenario();
+
+    // candidatura pendente: ainda não é petsitter (is_petsitter = false)
+    $candidate = Petsitter::factory()->create(['approval_status' => 'pending'])->user;
+    $candidate->forceFill(['credit' => 500])->save(); // credit não está no fillable
+    $animal = Animal::factory()->create(['user_id' => $candidate->id]);
+
+    $this->actingAs($candidate)
+        ->postJson('/api/bookings', bookingPayload($petsitter, $service, $animal))
+        ->assertCreated();
+});

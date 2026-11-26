@@ -7,7 +7,6 @@ import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import ModalReportPetsitter from '@/pages/Modals/ModalReportPetsitter.vue';
 import { useNotifications } from '@/composables/useNotifications';
 import type { Post } from '@/types/post';
-import ModalReviewPetsitter from '@/pages/Modals/ModalReviewPetsitter.vue';
 
 // O id vem do controller (/petsitters/{id}) ou do URL: /profile-owner-view?petsitter=ID
 const props = defineProps<{ petsitterId?: number | string }>();
@@ -100,11 +99,6 @@ const showReportModal = ref(false);
 const showNotifications = ref(false);
 const { unreadCount } = useNotifications();
 
-const showReviewModal = ref(false);
-const openReviewModal = () => {
-    showReviewModal.value = true;
-};
-
 const submitReport = async (payload: { reason: string; description: string }) => {
     if (!petsitterId) return;
     feedback.value = '';
@@ -121,23 +115,6 @@ const submitReport = async (payload: { reason: string; description: string }) =>
     feedback.value = res.ok
         ? 'Denúncia enviada. Obrigado!'
         : 'Não foi possível enviar a denúncia.';
-};
-
-const submitReview = async (payload: { petsitter_id?: number | string; rating: number; tags: string[]; comment: string }) => {
-    if (!petsitterId) return;
-    feedback.value = '';
-    await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
-    const res = await apiFetch(`/api/petsitters/${petsitterId}/reviews`, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-    });
-    if (res.ok) {
-        feedback.value = 'Avaliação enviada com sucesso!';
-        showReviewModal.value = false;
-        await loadPetsitter();
-    } else {
-        feedback.value = (await res.json().catch(() => ({}))).message ?? 'Não foi possível enviar a avaliação.';
-    }
 };
 
 onMounted(() => {
@@ -403,7 +380,6 @@ const displayMemberSince = computed(() =>
                                         >
                                             Reservar
                                         </button>
-                                        <button type="button" class="action-btn" @click="openReviewModal">Avaliar</button>
                                         <!-- abre o chat com este petsitter -->
                                         <Link
                                             v-if="petsitterId"
@@ -511,18 +487,6 @@ const displayMemberSince = computed(() =>
                 :petsitter-id="petsitterId ?? undefined"
                 @close="showReportModal = false"
                 @submit="submitReport"
-            />
-
-            <ModalReviewPetsitter
-                :show="showReviewModal"
-                :petsitter="{
-                    id: petsitterId ?? undefined,
-                    name: displayName,
-                    avatar_url: petsitter?.avatar_url ?? null,
-                    service_summary: 'Cuidado de animais'
-                }"
-                @close="showReviewModal = false"
-                @submit="submitReview"
             />
 
             <ModalNotifications
