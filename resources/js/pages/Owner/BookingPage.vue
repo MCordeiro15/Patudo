@@ -67,9 +67,13 @@ const servicesError = ref('');
 
 type PetsitterServiceData = {
     id: number;
-    type: 'pet-sitting' | 'passeio';
+    type: string; // texto livre (os dois tipos antigos têm nome bonito)
     price: number;
 };
+
+// Nome a mostrar: os dois tipos antigos têm nome bonito, os outros aparecem como o petsitter os escreveu
+const serviceLabel = (type: string) =>
+    ({ passeio: 'Passeios', 'pet-sitting': 'Pet sitting' } as Record<string, string>)[type] ?? type;
 
 const services = ref<PetsitterServiceData[]>([]);
 
@@ -99,11 +103,7 @@ const selectedService = computed(() =>
 
 const selectedServicePrice = computed(() => selectedService.value?.price ?? 0);
 
-const selectedServiceLabel = computed(() => {
-    if (selectedService.value?.type === 'passeio') return 'Passeios';
-    if (selectedService.value?.type === 'pet-sitting') return 'Pet sitting';
-    return '—';
-});
+const selectedServiceLabel = computed(() => (selectedService.value ? serviceLabel(selectedService.value.type) : '—'));
 
 const selectedAnimalNames = computed(() => {
     const names = animals.value
@@ -441,7 +441,7 @@ onMounted(() => {
                                     @click="selectedServiceId = service.id"
                                 >
                                     <strong>
-                                        {{ service.type === 'passeio' ? 'Passeios' : 'Pet sitting' }}
+                                        {{ serviceLabel(service.type) }}
                                     </strong>
 
                                     <small>

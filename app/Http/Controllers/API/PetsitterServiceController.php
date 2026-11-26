@@ -35,15 +35,16 @@ class PetsitterServiceController extends Controller
     {
         Gate::authorize('create', [PetsitterService::class, $petsitter]);
 
+        // o tipo é texto livre (o petsitter escreve o nome do serviço), até 50 caracteres
         $data = $request->validate([
             'type' => [
                 'required',
                 'string',
-                Rule::in(PetsitterService::TYPES),
+                'max:50',
                 Rule::unique('petsitter_services', 'type')->where('petsitter_id', $petsitter->user_id),
             ],
             'price' => 'required|numeric|min:0',
-        ]);
+        ], $this->messages());
 
         $service = $petsitter->services()->create($data);
 
@@ -63,13 +64,13 @@ class PetsitterServiceController extends Controller
                 'sometimes',
                 'required',
                 'string',
-                Rule::in(PetsitterService::TYPES),
+                'max:50',
                 Rule::unique('petsitter_services', 'type')
                     ->where('petsitter_id', $service->petsitter_id)
                     ->ignore($service->id),
             ],
             'price' => 'sometimes|required|numeric|min:0',
-        ]);
+        ], $this->messages());
 
         $service->update($data);
 
@@ -94,5 +95,15 @@ class PetsitterServiceController extends Controller
         $service->delete();
 
         return response()->noContent();
+    }
+
+    /** Mensagens de erro em português para o tipo do serviço. / Portuguese error messages for the service type. */
+    private function messages(): array
+    {
+        return [
+            'type.required' => 'Escreve o nome do serviço.',
+            'type.max' => 'O nome do serviço pode ter no máximo 50 caracteres.',
+            'type.unique' => 'Já tens um serviço com este nome.',
+        ];
     }
 }

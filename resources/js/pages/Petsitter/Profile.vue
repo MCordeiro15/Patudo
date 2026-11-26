@@ -49,7 +49,7 @@ const SERVICE_OPTIONS = [
 
 type PetsitterService = {
     id: number;
-    type: (typeof SERVICE_OPTIONS)[number]['value'];
+    type: string; // texto livre; os dois tipos antigos têm nome bonito em SERVICE_OPTIONS
     price: number;
 };
 
@@ -97,13 +97,6 @@ const isAdmin = computed(() => props.isAdmin ?? false);
 // Propriedade computada que determina se o utilizador pode editar o perfil.
 // Computed property that determines if the user can edit the profile.
 const canEdit = computed(() => isOwnProfile.value || isAdmin.value);
-const availableServiceTypes = computed(() =>
-    SERVICE_OPTIONS.filter((option) =>
-        !services.value.some(
-            (service) => service.type === option.value && service.id !== editingServiceId.value,
-        ),
-    ),
-);
 
 // Propriedade computada que retorna os dias de disponibilidade atuais.
 // Computed property that returns the current availability days.
@@ -255,7 +248,7 @@ const servicesLoading = ref(false);
 const servicesError = ref('');
 const serviceFormOpen = ref(false);
 const editingServiceId = ref<number | null>(null);
-const serviceForm = ref({ type: '' as PetsitterService['type'] | '', price: '' });
+const serviceForm = ref({ type: '', price: '' });
 const serviceFieldErrors = ref<{ type?: string; price?: string }>({});
 const serviceFormError = ref('');
 const savingService = ref(false);
@@ -418,9 +411,9 @@ const loadServices = async () => {
 };
 
 function beginCreateService() {
-    if (!isOwnProfile.value || !availableServiceTypes.value.length) return;
+    if (!isOwnProfile.value) return;
     editingServiceId.value = null;
-    serviceForm.value = { type: availableServiceTypes.value[0]!.value, price: '' };
+    serviceForm.value = { type: '', price: '' };
     serviceFieldErrors.value = {};
     serviceFormError.value = '';
     serviceFormOpen.value = true;
@@ -429,7 +422,8 @@ function beginCreateService() {
 function beginEditService(service: PetsitterService) {
     if (!isOwnProfile.value) return;
     editingServiceId.value = service.id;
-    serviceForm.value = { type: service.type, price: String(service.price) };
+    // mostra o nome bonito (ex.: "Pet Sitting" em vez de "pet-sitting")
+    serviceForm.value = { type: serviceTypeLabel(service.type), price: String(service.price) };
     serviceFieldErrors.value = {};
     serviceFormError.value = '';
     serviceFormOpen.value = true;
@@ -440,6 +434,17 @@ function cancelServiceForm() {
     editingServiceId.value = null;
     serviceFieldErrors.value = {};
     serviceFormError.value = '';
+}
+
+// O que vai para a API: se ao editar o nome ficou igual ao nome bonito, mantém o tipo guardado
+// (ex.: "Pet Sitting" volta a "pet-sitting"), para só mudar o preço sem renomear o serviço.
+function servicePayload() {
+    const type = serviceForm.value.type.trim();
+    const original = services.value.find((service) => service.id === editingServiceId.value);
+    if (original && type === serviceTypeLabel(original.type)) {
+        return { type: original.type, price: serviceForm.value.price };
+    }
+    return { type, price: serviceForm.value.price };
 }
 
 async function saveService() {
@@ -467,7 +472,7 @@ async function saveService() {
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-XSRF-TOKEN': xsrfToken,
                 },
-                body: JSON.stringify(serviceForm.value),
+                body: JSON.stringify(servicePayload()),
             },
         );
         const data = await response.json().catch(() => ({}));
@@ -842,7 +847,7 @@ const saveAvailability = async () => {
                             <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
                                 <h2 class="h5 fw-semibold mb-0">Serviços e preços</h2>
                                 <button
-                                    v-if="isOwnProfile && availableServiceTypes.length > 0"
+                                    v-if="isOwnProfile"
                                     type="button"
                                     class="btn btn-primary btn-sm"
                                     @click="beginCreateService"
@@ -853,9 +858,6 @@ const saveAvailability = async () => {
 
                             <p v-if="servicesLoading" class="small text-muted">A carregar serviços...</p>
                             <p v-if="servicesError" class="small text-danger" role="alert">{{ servicesError }}</p>
-                            <p v-if="isOwnProfile && !availableServiceTypes.length" class="small text-muted">
-                                Já estão configurados todos os tipos de serviço disponíveis.
-                            </p>
 
                             <div
                                 v-for="service in services"
@@ -892,19 +894,17 @@ const saveAvailability = async () => {
                             <form v-if="serviceFormOpen" class="border-top pt-3 mt-3" @submit.prevent="saveService">
                                 <h3 class="h6 fw-semibold">{{ editingServiceId === null ? 'Novo serviço' : 'Editar serviço' }}</h3>
                                 <div class="mb-2">
-                                    <label for="service-type" class="form-label small">Tipo</label>
-                                    <select
+                                    <label for="service-type" class="form-label small">Serviço</label>
+                                    <input
                                         id="service-type"
                                         v-model="serviceForm.type"
-                                        class="form-select form-select-sm"
+                                        type="text"
+                                        maxlength="50"
+                                        placeholder="Ex.: Passeio, Banho e tosquia"
+                                        class="form-control form-control-sm"
                                         :class="{ 'is-invalid': serviceFieldErrors.type }"
                                         :aria-invalid="!!serviceFieldErrors.type"
-                                    >
-                                        <option value="" disabled>Selecione um serviço</option>
-                                        <option v-for="option in availableServiceTypes" :key="option.value" :value="option.value">
-                                            {{ option.label }}
-                                        </option>
-                                    </select>
+                                    />
                                     <div v-if="serviceFieldErrors.type" class="invalid-feedback d-block" role="alert">
                                         {{ serviceFieldErrors.type }}
                                     </div>
