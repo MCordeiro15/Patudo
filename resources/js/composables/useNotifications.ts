@@ -25,7 +25,7 @@ export type UseNotificationsReturn = {
     fetchNotifications: () => Promise<void>;
     markAsRead: (id: number) => Promise<boolean>;
     markAsUnread: (id: number) => Promise<boolean>;
-    deleteNotification: (id: number) => Promise<void>;
+    deleteNotification: (id: number) => Promise<boolean>;
     clearErrors: () => void;
 };
 
@@ -34,6 +34,19 @@ const isLoading = ref(false);
 const errors = ref<string[]>([]);
 
 const unreadCount = ref(0);
+let pendingRequests = 0;
+let fetchSequence = 0;
+let stateRevision = 0;
+
+function beginRequest(): void {
+    pendingRequests += 1;
+    isLoading.value = true;
+}
+
+function endRequest(): void {
+    pendingRequests = Math.max(0, pendingRequests - 1);
+    isLoading.value = pendingRequests > 0;
+}
 
 async function fetchCsrfToken() {
     await fetch('/sanctum/csrf-cookie', {
@@ -62,12 +75,7 @@ async function apiRequest(url: string, options: RequestInit = {}): Promise<any> 
 
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw {
-            response: {
-                data: errorData,
-            },
-            status: response.status,
-        };
+        throw new Error(errorData.message ?? `HTTP ${response.status}`);
     }
 
     return response.json().catch(() => ({}));
@@ -75,137 +83,88 @@ async function apiRequest(url: string, options: RequestInit = {}): Promise<any> 
 
 export const useNotifications = (): UseNotificationsReturn => {
     const fetchNotifications = async (): Promise<void> => {
-        isLoading.value = true;
+        const requestSequence = ++fetchSequence;
+        const revisionAtStart = stateRevision;
+        beginRequest();
         errors.value = [];
         try {
-            await fetchCsrfToken();
+            const data = await apiRequest('/api/notifications');
 
-            const response = await fetch('/api/notifications', {
-                method: 'GET',
-                credentials: 'same-origin',
-                headers: {
-                    Accept: 'application/json',
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
+            if (requestSequence === fetchSequence && revisionAtStart === stateRevision) {
+                notifications.value = data.data ?? [];
+                unreadCount.value = data.unread_count ?? notifications.value.filter((n) => !n.read).length;
             }
-
-            const data = await response.json();
-            notifications.value = data.data ?? [];
-            unreadCount.value = data.unread_count ?? notifications.value.filter((n) => !n.read).length;
         } catch (error: any) {
-            errors.value.push(
-                error.message ?? 'Falha ao carregar notificações',
-            );
+            if (requestSequence === fetchSequence) {
+                errors.value.push(error.message ?? 'Falha ao carregar notificações');
+            }
         } finally {
-            isLoading.value = false;
+            endRequest();
         }
     };
 
     const markAsRead = async (id: number): Promise<boolean> => {
-        isLoading.value = true;
+        beginRequest();
         errors.value = [];
         try {
-            await fetchCsrfToken();
-
-            const response = await fetch(`/api/notifications/${id}/read`, {
-                method: 'PATCH',
-                credentials: 'same-origin',
-                headers: {
-                    Accept: 'application/json',
-                    'X-XSRF-TOKEN': getXsrfToken(),
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
+            await apiRequest(`/api/notifications/${id}/read`, { method: 'PATCH' });
 
             const notification = notifications.value.find((n) => n.id === id);
             if (notification && !notification.read) {
                 notification.read = true;
                 notification.read_at = new Date().toISOString();
                 unreadCount.value = Math.max(0, unreadCount.value - 1);
+                stateRevision += 1;
             }
             return true;
         } catch (error: any) {
-            errors.value.push(
-                error.message ?? 'Falha ao marcar como lida',
-            );
+            errors.value.push(error.message ?? 'Falha ao marcar como lida');
             return false;
         } finally {
-            isLoading.value = false;
+            endRequest();
         }
     };
 
     const markAsUnread = async (id: number): Promise<boolean> => {
-        isLoading.value = true;
+        beginRequest();
         errors.value = [];
         try {
-            await fetchCsrfToken();
-
-            const response = await fetch(`/api/notifications/${id}/unread`, {
-                method: 'PATCH',
-                credentials: 'same-origin',
-                headers: {
-                    Accept: 'application/json',
-                    'X-XSRF-TOKEN': getXsrfToken(),
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
+            await apiRequest(`/api/notifications/${id}/unread`, { method: 'PATCH' });
 
             const notification = notifications.value.find((n) => n.id === id);
             if (notification && notification.read) {
                 notification.read = false;
                 notification.read_at = null;
                 unreadCount.value += 1;
+                stateRevision += 1;
             }
             return true;
         } catch (error: any) {
-            errors.value.push(
-                error.message ?? 'Falha ao marcar como não lida',
-            );
+            errors.value.push(error.message ?? 'Falha ao marcar como não lida');
             return false;
         } finally {
-            isLoading.value = false;
+            endRequest();
         }
     };
 
-    const deleteNotification = async (id: number): Promise<void> => {
-        isLoading.value = true;
+    const deleteNotification = async (id: number): Promise<boolean> => {
+        beginRequest();
         errors.value = [];
         try {
-            await fetchCsrfToken();
-
-            const response = await fetch(`/api/notifications/${id}`, {
-                method: 'DELETE',
-                credentials: 'same-origin',
-                headers: {
-                    Accept: 'application/json',
-                    'X-XSRF-TOKEN': getXsrfToken(),
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
+            await apiRequest(`/api/notifications/${id}`, { method: 'DELETE' });
 
             const notification = notifications.value.find((n) => n.id === id);
             if (notification && !notification.read) {
                 unreadCount.value = Math.max(0, unreadCount.value - 1);
             }
             notifications.value = notifications.value.filter((n) => n.id !== id);
+            stateRevision += 1;
+            return true;
         } catch (error: any) {
-            errors.value.push(
-                error.message ?? 'Falha ao apagar notificação',
-            );
+            errors.value.push(error.message ?? 'Falha ao apagar notificação');
+            return false;
         } finally {
-            isLoading.value = false;
+            endRequest();
         }
     };
 

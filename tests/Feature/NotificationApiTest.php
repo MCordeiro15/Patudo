@@ -8,6 +8,7 @@ use App\Models\Booking;
 use App\Models\Notification;
 use App\Models\Petsitter;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 
 test('unauthenticated user cannot access notifications', function () {
     $this->getJson('/api/notifications')->assertUnauthorized();
@@ -89,6 +90,86 @@ test('user notifications are ordered newest first', function () {
         ->assertJsonCount(2, 'data')
         ->assertJsonPath('data.0.message', 'Notificação recente')
         ->assertJsonPath('data.1.message', 'Notificação antiga');
+});
+
+test('notification history includes only the last 30 days regardless of read status', function () {
+    $this->travelTo(Carbon::parse('2026-11-26 12:00:00'));
+    $user = User::factory()->create();
+
+    $expiredUnread = Notification::create([
+        'user_id' => $user->id,
+        'type' => 'booking',
+        'message' => 'Não lida expirada',
+    ]);
+    $expiredUnread->forceFill(['created_at' => now()->subDays(31)])->save();
+    $expiredRead = Notification::create([
+        'user_id' => $user->id,
+        'type' => 'booking',
+        'message' => 'Lida expirada',
+        'read_at' => now()->subDays(30),
+    ]);
+    $expiredRead->forceFill(['created_at' => now()->subDays(31)])->save();
+    $boundaryRead = Notification::create([
+        'user_id' => $user->id,
+        'type' => 'booking',
+        'message' => 'Lida no limite',
+        'read_at' => now()->subDays(29),
+    ]);
+    $boundaryRead->forceFill(['created_at' => now()->subDays(30)])->save();
+    $recentUnread = Notification::create([
+        'user_id' => $user->id,
+        'type' => 'booking',
+        'message' => 'Não lida recente',
+    ]);
+    $recentRead = Notification::create([
+        'user_id' => $user->id,
+        'type' => 'booking',
+        'message' => 'Lida recente',
+        'read_at' => now(),
+    ]);
+
+    $response = $this->actingAs($user)->getJson('/api/notifications');
+
+    $response->assertOk()
+        ->assertJsonCount(3, 'data')
+        ->assertJsonPath('unread_count', 1);
+
+    $listedIds = collect($response->json('data'))->pluck('id');
+    expect($listedIds)->toContain($boundaryRead->id, $recentUnread->id, $recentRead->id)
+        ->and($listedIds)->not->toContain($expiredUnread->id)
+        ->and($listedIds)->not->toContain($expiredRead->id);
+});
+
+test('expired notifications are pruned regardless of read status', function () {
+    $this->travelTo(Carbon::parse('2026-11-26 12:00:00'));
+    $user = User::factory()->create();
+
+    $expiredUnread = Notification::create([
+        'user_id' => $user->id,
+        'type' => 'booking',
+        'message' => 'Não lida expirada',
+    ]);
+    $expiredUnread->forceFill(['created_at' => now()->subDays(31)])->save();
+    $expiredRead = Notification::create([
+        'user_id' => $user->id,
+        'type' => 'booking',
+        'message' => 'Lida expirada',
+        'read_at' => now()->subDays(30),
+    ]);
+    $expiredRead->forceFill(['created_at' => now()->subDays(31)])->save();
+    $retained = Notification::create([
+        'user_id' => $user->id,
+        'type' => 'booking',
+        'message' => 'No limite dos 30 dias',
+    ]);
+    $retained->forceFill(['created_at' => now()->subDays(30)])->save();
+
+    $this->artisan('model:prune', ['--model' => [Notification::class]])
+        ->assertExitCode(0);
+
+    $this->assertDatabaseMissing('notifications', ['id' => $expiredUnread->id]);
+    $this->assertDatabaseMissing('notifications', ['id' => $expiredRead->id]);
+    $this->assertDatabaseHas('notifications', ['id' => $retained->id]);
 });
 
 test('user can view their own notification', function () {

@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { Bell, LogOut, MessageCircle, UserRound } from '@lucide/vue';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import BookingList from '@/components/BookingList.vue';
 import { useNotifications } from '@/composables/useNotifications';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
-// A lista de pedidos (cartões, Aceitar/Recusar e ficha do animal) está no BookingList (role="petsitter")
+// A página é partilhada: petsitters veem pedidos recebidos e donos veem os seus pedidos pendentes.
+const page = usePage<{ auth: { user: { is_petsitter?: boolean } | null } }>();
+const viewerIsPetsitter = computed(() => page.props.auth.user?.is_petsitter === true);
 
 const showNotifications = ref(false);
 const { unreadCount, fetchNotifications } = useNotifications();
@@ -73,7 +75,10 @@ onMounted(() => {
             <h1 class="text-center fw-bold display-5 mt-5 mb-5">Pedidos de reserva</h1>
 
             <!-- Lista de pedidos -->
-            <BookingList role="petsitter" />
+            <BookingList
+                :role="viewerIsPetsitter ? 'petsitter' : 'owner'"
+                :pending-only="!viewerIsPetsitter"
+            />
         </div>
 
         <ModalNotifications

@@ -21,10 +21,11 @@ class NotificationController extends Controller
      */
     public function index()
     {
-        $unreadCount = auth()->user()->notifications()->whereNull('read_at')->count();
+        $notifications = auth()->user()->notifications()->withinRetention();
+        $unreadCount = (clone $notifications)->whereNull('read_at')->count();
 
         return NotificationResource::collection(
-            auth()->user()->notifications()->with('booking:id,start_date')->latest()->paginate(15)
+            $notifications->with('booking:id,start_date')->latest()->paginate(15)
         )->additional(['unread_count' => $unreadCount]);
     }
 

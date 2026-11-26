@@ -28,6 +28,7 @@ const {
     activePerson,
     activeOnline,
     tokenFetcher,
+    totalUnread,
     ready,
     error,
     start,
@@ -96,8 +97,19 @@ onMounted(async () => {
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark bg-transparent border-0 p-0 position-relative">
+                    <a
+                        href="/messages"
+                        class="text-dark bg-transparent border-0 p-0 position-relative"
+                        :aria-label="totalUnread > 0 ? `Mensagens, ${totalUnread} por ler` : 'Mensagens'"
+                    >
                         <MessageCircle :size="25" fill="none" />
+                        <span
+                            v-if="totalUnread > 0"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style="font-size: 0.6rem"
+                        >
+                            {{ totalUnread > 9 ? '9+' : totalUnread }}
+                        </span>
                     </a>
                     <button
                         type="button"

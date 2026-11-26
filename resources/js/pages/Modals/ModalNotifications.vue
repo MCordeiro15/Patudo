@@ -103,7 +103,10 @@ const handleToggleRead = async (notification: NotificationItem) => {
 };
 
 const handleDelete = async (id: number) => {
-    await deleteNotification(id);
+    const deleted = await deleteNotification(id);
+
+    if (!deleted) return;
+
     successMessage.value = 'Notificação apagada.';
     emit('delete', id);
     handleBack();

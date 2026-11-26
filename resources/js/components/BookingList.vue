@@ -4,8 +4,8 @@
 // Estados da lista: carregamento, erro (com "Tentar novamente") e vazio.
 // role="petsitter" -> página Pedidos: os pedidos PENDENTES em que o user é o petsitter (Recusar / Aceitar).
 //                     Depois de respondido, o pedido sai daqui e passa para as Reservas.
-// role="owner"     -> página Reservas, com filtro por estado:
-//                     - as reservas em que o user é o dono, em todos os estados;
+// role="owner"     -> pedidos pendentes do dono (pendingOnly) ou Reservas com filtro por estado:
+//                     - as reservas em que o user é o dono, já respondidas;
 //                     - as reservas em que o user é o petsitter e que já não estão pendentes.
 //                     Cada cartão mostra a outra pessoa, os animais, as datas, o preço total e o estado,
 //                     e os botões do lado do user (dono: Cancelar/Conversar/Avaliar; petsitter: Conversar/Concluir).
@@ -16,9 +16,12 @@ import type { Animal } from '@/types';
 import ModalPetDetails, { type PetDetails } from '@/pages/Modals/ModalPetDetails.vue';
 import ModalReviewPetsitter, { type ReviewPayload } from '@/pages/Modals/ModalReviewPetsitter.vue';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
     role: 'owner' | 'petsitter';
-}>();
+    pendingOnly?: boolean;
+}>(), {
+    pendingOnly: false,
+});
 
 // Pessoa da reserva (BookingResource): nome, localidade e foto
 type Person = { id: number; name: string | null; location: string | null; avatar_url: string | null } | null;
@@ -173,7 +176,6 @@ const statusShort: Record<string, string> = {
 
 const statusFilters: { value: 'all' | BookingStatus; label: string }[] = [
     { value: 'all', label: 'Todas' },
-    { value: 'pending', label: 'Pendentes' },
     { value: 'approved', label: 'Aceites' },
     { value: 'rejected', label: 'Rejeitadas' },
     { value: 'cancelled', label: 'Canceladas' },
@@ -221,16 +223,16 @@ const loadBookings = async () => {
     loadError.value = '';
     try {
         // Pedidos: só os pendentes, filtrados na API (?pending=1).
-        // Reservas: todos os estados (o filtro por estado é feito aqui, nos botões de filtro).
+        // Reservas: só estados já respondidos, com filtro adicional nos botões.
         // A API pagina de 15 em 15, por isso lê todas as páginas.
-        const pendingParam = props.role === 'petsitter' ? '&pending=1' : '';
+        const pendingParam = props.role === 'petsitter' || props.pendingOnly ? '&pending=1' : '';
         const all: BookingItem[] = [];
         let pageNumber = 1;
         let lastPage = 1;
         do {
             const res = await apiFetch(`/api/bookings?page=${pageNumber}${pendingParam}`);
             if (!res.ok) {
-                loadError.value = props.role === 'petsitter'
+                loadError.value = props.role === 'petsitter' || props.pendingOnly
                     ? 'Não foi possível carregar os pedidos de reserva.'
                     : 'Não foi possível carregar as reservas.';
                 return;
@@ -241,11 +243,12 @@ const loadBookings = async () => {
             pageNumber++;
         } while (pageNumber <= lastPage);
 
-        // A API devolve as reservas onde és dono OU petsitter.
-        // Pedidos: os pendentes recebidos (o ?pending=1 também traz os teus pedidos como dono, por isso filtra-se aqui). Reservas: as tuas como dono + as recebidas já respondidas.
+        // A API devolve as reservas onde és dono OU petsitter; o lado e estado determinam a aba.
         bookings.value = props.role === 'petsitter'
             ? all.filter((b) => isPetsitterOf(b) && b.status === 'pending')
-            : all.filter((b) => b.user_id === currentUserId.value || (isPetsitterOf(b) && b.status !== 'pending'));
+            : props.pendingOnly
+                ? all.filter((b) => b.user_id === currentUserId.value && b.status === 'pending')
+                : all.filter((b) => (b.user_id === currentUserId.value || isPetsitterOf(b)) && b.status !== 'pending');
     } catch {
         loadError.value = 'Erro de conexão. Tente novamente.';
     } finally {
@@ -274,6 +277,9 @@ const updateStatus = async (b: BookingItem, newStatus: 'approved' | 'rejected' |
             if (props.role === 'petsitter') {
                 bookings.value = bookings.value.filter((item) => item.id !== b.id);
                 setFeedback(`${successMessages[newStatus]} Podes vê-la nas Reservas.`, 'success');
+            } else if (props.pendingOnly) {
+                bookings.value = bookings.value.filter((item) => item.id !== b.id);
+                setFeedback(successMessages[newStatus], 'success');
             } else {
                 b.status = newStatus;
                 setFeedback(successMessages[newStatus], 'success');
@@ -409,7 +415,7 @@ onMounted(() => {
 
     <template v-else>
         <!-- Filtro por estado (só nas Reservas; nos Pedidos estão todos pendentes) -->
-        <div v-if="role === 'owner'" class="status-filters d-flex flex-wrap gap-2 mb-4" role="group" aria-label="Filtrar por estado">
+        <div v-if="role === 'owner' && !pendingOnly" class="status-filters d-flex flex-wrap gap-2 mb-4" role="group" aria-label="Filtrar por estado">
             <button
                 v-for="f in statusFilters"
                 :key="f.value"
@@ -425,8 +431,8 @@ onMounted(() => {
 
         <!-- Estado vazio -->
         <div v-if="filteredBookings.length === 0" class="text-center text-secondary py-5">
-            <template v-if="role === 'petsitter'">
-                Não tens pedidos de reserva pendentes.
+            <template v-if="role === 'petsitter' || pendingOnly">
+                Ainda não tens pedidos de reserva pendentes.
             </template>
             <template v-else>
                 {{ bookings.length === 0

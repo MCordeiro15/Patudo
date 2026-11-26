@@ -7,7 +7,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Support\Carbon;
 
 /**
@@ -23,6 +25,10 @@ use Illuminate\Support\Carbon;
  */
 class Notification extends Model
 {
+    use Prunable;
+
+    public const RETENTION_DAYS = 30;
+
     /**
      * Campos que podem ser preenchidos em massa via create() ou fill().
      * Fields that can be mass-assigned via create() or fill().
@@ -40,6 +46,16 @@ class Notification extends Model
         return [
             'read_at' => 'datetime',
         ];
+    }
+
+    public function scopeWithinRetention(Builder $query): Builder
+    {
+        return $query->where('created_at', '>=', now()->subDays(self::RETENTION_DAYS));
+    }
+
+    public function prunable(): Builder
+    {
+        return static::where('created_at', '<', now()->subDays(self::RETENTION_DAYS));
     }
 
     /**
