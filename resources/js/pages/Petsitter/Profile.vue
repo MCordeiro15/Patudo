@@ -42,6 +42,17 @@ type PetsitterProfile = {
     updated_at: string;
 };
 
+const SERVICE_OPTIONS = [
+    { value: 'pet-sitting', label: 'Pet Sitting' },
+    { value: 'passeio', label: 'Passeio' },
+] as const;
+
+type PetsitterService = {
+    id: number;
+    type: (typeof SERVICE_OPTIONS)[number]['value'];
+    price: number;
+};
+
 // Opções de dias da semana para o seletor de disponibilidade.
 // Weekday options for the availability selector.
 const DAY_OPTIONS: Array<{ value: string; label: string }> = [
@@ -86,6 +97,13 @@ const isAdmin = computed(() => props.isAdmin ?? false);
 // Propriedade computada que determina se o utilizador pode editar o perfil.
 // Computed property that determines if the user can edit the profile.
 const canEdit = computed(() => isOwnProfile.value || isAdmin.value);
+const availableServiceTypes = computed(() =>
+    SERVICE_OPTIONS.filter((option) =>
+        !services.value.some(
+            (service) => service.type === option.value && service.id !== editingServiceId.value,
+        ),
+    ),
+);
 
 // Propriedade computada que retorna os dias de disponibilidade atuais.
 // Computed property that returns the current availability days.
@@ -120,9 +138,11 @@ const serviceTags = computed(() => {
     return tags.length > 0 ? tags : ['Cuidador'];
 });
 
-// Formata um valor numérico como preço em euros.
-// Formats a numeric value as a price in euros.
-const formatPrice = (price: number) => `${price.toFixed(0)} €`;
+const formatServicePrice = (price: number) =>
+    `${Number(price).toLocaleString('pt-PT', { maximumFractionDigits: 2 })} €`;
+
+const serviceTypeLabel = (type: PetsitterService['type']) =>
+    SERVICE_OPTIONS.find((option) => option.value === type)?.label ?? type;
 
 // Formata uma classificação numérica para exibição.
 // Formats a numeric rating for display.
@@ -203,12 +223,6 @@ const displayExperience = computed(() => {
     return petsitter.value?.experience ?? '';
 });
 
-// Propriedade computada que retorna o preço por dia.
-// Computed property that returns the price per day.
-const displayPricePerDay = computed(() => {
-    return petsitter.value?.price_per_day ?? 0;
-});
-
 // Propriedade computada que retorna a classificação média.
 // Computed property that returns the average rating.
 const displayRating = computed(() => {
@@ -235,6 +249,17 @@ const deletingPost = ref(false);
 // Estado do modal de edição de post
 const showEditPostModal = ref(false);
 const editingPostId = ref<number | null>(null);
+
+const services = ref<PetsitterService[]>([]);
+const servicesLoading = ref(false);
+const servicesError = ref('');
+const serviceFormOpen = ref(false);
+const editingServiceId = ref<number | null>(null);
+const serviceForm = ref({ type: '' as PetsitterService['type'] | '', price: '' });
+const serviceFieldErrors = ref<{ type?: string; price?: string }>({});
+const serviceFormError = ref('');
+const savingService = ref(false);
+const deletingServiceId = ref<number | null>(null);
 
 // só o dono do perfil, se aprovado, pode publicar (o back-end devolve 403 aos outros)
 const canPost = computed(
@@ -366,6 +391,144 @@ const onPostUpdated = (updatedPost: Post) => {
 };
 
 onMounted(loadPosts);
+
+const loadServices = async () => {
+    if (!petsitter.value?.user_id) return;
+
+    servicesLoading.value = true;
+    servicesError.value = '';
+
+    try {
+        const response = await fetch(`/api/petsitters/${petsitter.value.user_id}/services`, {
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        });
+        const data = await response.json().catch(() => ({}));
+
+        if (response.ok) {
+            services.value = data.data ?? [];
+        } else {
+            servicesError.value = data.message ?? 'Não foi possível carregar os serviços.';
+        }
+    } catch {
+        servicesError.value = 'Erro de rede ao carregar os serviços.';
+    } finally {
+        servicesLoading.value = false;
+    }
+};
+
+function beginCreateService() {
+    if (!isOwnProfile.value || !availableServiceTypes.value.length) return;
+    editingServiceId.value = null;
+    serviceForm.value = { type: availableServiceTypes.value[0]!.value, price: '' };
+    serviceFieldErrors.value = {};
+    serviceFormError.value = '';
+    serviceFormOpen.value = true;
+}
+
+function beginEditService(service: PetsitterService) {
+    if (!isOwnProfile.value) return;
+    editingServiceId.value = service.id;
+    serviceForm.value = { type: service.type, price: String(service.price) };
+    serviceFieldErrors.value = {};
+    serviceFormError.value = '';
+    serviceFormOpen.value = true;
+}
+
+function cancelServiceForm() {
+    serviceFormOpen.value = false;
+    editingServiceId.value = null;
+    serviceFieldErrors.value = {};
+    serviceFormError.value = '';
+}
+
+async function saveService() {
+    if (!isOwnProfile.value || !petsitter.value?.user_id) return;
+
+    savingService.value = true;
+    serviceFieldErrors.value = {};
+    serviceFormError.value = '';
+
+    try {
+        await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
+        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+        const xsrfToken = match ? decodeURIComponent(match[1]) : '';
+        const isEditing = editingServiceId.value !== null;
+        const response = await fetch(
+            isEditing
+                ? `/api/services/${editingServiceId.value}`
+                : `/api/petsitters/${petsitter.value.user_id}/services`,
+            {
+                method: isEditing ? 'PUT' : 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-XSRF-TOKEN': xsrfToken,
+                },
+                body: JSON.stringify(serviceForm.value),
+            },
+        );
+        const data = await response.json().catch(() => ({}));
+
+        if (response.ok) {
+            const savedService = data.data as PetsitterService;
+            const index = services.value.findIndex((service) => service.id === savedService.id);
+            if (index === -1) services.value.push(savedService);
+            else services.value[index] = savedService;
+            services.value.sort((a, b) => a.type.localeCompare(b.type));
+            cancelServiceForm();
+        } else if (data.errors) {
+            serviceFieldErrors.value = Object.fromEntries(
+                Object.entries(data.errors).map(([field, messages]) => [field, (messages as string[])[0]]),
+            );
+            serviceFormError.value = data.message ?? '';
+        } else {
+            serviceFormError.value = data.message ?? 'Não foi possível guardar o serviço.';
+        }
+    } catch {
+        serviceFormError.value = 'Erro de rede ao guardar o serviço.';
+    } finally {
+        savingService.value = false;
+    }
+}
+
+async function deleteService(service: PetsitterService) {
+    if (!isOwnProfile.value || !window.confirm(`Tem a certeza que quer apagar o serviço ${serviceTypeLabel(service.type)}?`)) return;
+
+    deletingServiceId.value = service.id;
+    servicesError.value = '';
+
+    try {
+        await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
+        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+        const xsrfToken = match ? decodeURIComponent(match[1]) : '';
+        const response = await fetch(`/api/services/${service.id}`, {
+            method: 'DELETE',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': xsrfToken,
+            },
+        });
+
+        if (response.ok || response.status === 204) {
+            services.value = services.value.filter((item) => item.id !== service.id);
+            if (editingServiceId.value === service.id) cancelServiceForm();
+        } else {
+            const data = await response.json().catch(() => ({}));
+            servicesError.value = data.message ?? 'Não foi possível apagar o serviço.';
+        }
+    } catch {
+        servicesError.value = 'Erro de rede ao apagar o serviço.';
+    } finally {
+        deletingServiceId.value = null;
+    }
+}
+
+onMounted(loadServices);
 
 // Propriedade computada que verifica se o perfil existe.
 // Computed property that checks if the profile exists.
@@ -676,13 +839,102 @@ const saveAvailability = async () => {
                         <section
                             class="card bg-white border border-primary rounded-4 p-3 px-md-4 h-100 info-card"
                         >
-                            <h2 class="h5 fw-semibold mb-3">
-                                Serviços e preços
-                            </h2>
-                            <div class="price-row border-bottom pb-1 small text-muted">
-                                <span>Dog Sitting (diária)</span>
-                                <span>{{ formatPrice(displayPricePerDay) }}</span>
+                            <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                                <h2 class="h5 fw-semibold mb-0">Serviços e preços</h2>
+                                <button
+                                    v-if="isOwnProfile && availableServiceTypes.length > 0"
+                                    type="button"
+                                    class="btn btn-primary btn-sm"
+                                    @click="beginCreateService"
+                                >
+                                    Adicionar serviço
+                                </button>
                             </div>
+
+                            <p v-if="servicesLoading" class="small text-muted">A carregar serviços...</p>
+                            <p v-if="servicesError" class="small text-danger" role="alert">{{ servicesError }}</p>
+                            <p v-if="isOwnProfile && !availableServiceTypes.length" class="small text-muted">
+                                Já estão configurados todos os tipos de serviço disponíveis.
+                            </p>
+
+                            <div
+                                v-for="service in services"
+                                :key="service.id"
+                                class="border-bottom pb-2 mb-2 small text-muted"
+                            >
+                                <div class="d-flex align-items-center justify-content-between gap-2">
+                                    <span>{{ serviceTypeLabel(service.type) }}</span>
+                                    <span class="fw-semibold">{{ formatServicePrice(service.price) }}</span>
+                                </div>
+                                <div v-if="isOwnProfile" class="d-flex justify-content-end gap-2 mt-2">
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-primary btn-sm"
+                                        @click="beginEditService(service)"
+                                    >
+                                        Editar
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-danger btn-sm"
+                                        :disabled="deletingServiceId === service.id"
+                                        @click="deleteService(service)"
+                                    >
+                                        {{ deletingServiceId === service.id ? 'A apagar...' : 'Apagar' }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <p v-if="!servicesLoading && !services.length" class="small text-muted mb-0">
+                                Ainda não foram adicionados serviços.
+                            </p>
+
+                            <form v-if="serviceFormOpen" class="border-top pt-3 mt-3" @submit.prevent="saveService">
+                                <h3 class="h6 fw-semibold">{{ editingServiceId === null ? 'Novo serviço' : 'Editar serviço' }}</h3>
+                                <div class="mb-2">
+                                    <label for="service-type" class="form-label small">Tipo</label>
+                                    <select
+                                        id="service-type"
+                                        v-model="serviceForm.type"
+                                        class="form-select form-select-sm"
+                                        :class="{ 'is-invalid': serviceFieldErrors.type }"
+                                        :aria-invalid="!!serviceFieldErrors.type"
+                                    >
+                                        <option value="" disabled>Selecione um serviço</option>
+                                        <option v-for="option in availableServiceTypes" :key="option.value" :value="option.value">
+                                            {{ option.label }}
+                                        </option>
+                                    </select>
+                                    <div v-if="serviceFieldErrors.type" class="invalid-feedback d-block" role="alert">
+                                        {{ serviceFieldErrors.type }}
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="service-price" class="form-label small">Preço (€)</label>
+                                    <input
+                                        id="service-price"
+                                        v-model="serviceForm.price"
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        class="form-control form-control-sm"
+                                        :class="{ 'is-invalid': serviceFieldErrors.price }"
+                                        :aria-invalid="!!serviceFieldErrors.price"
+                                    />
+                                    <div v-if="serviceFieldErrors.price" class="invalid-feedback d-block" role="alert">
+                                        {{ serviceFieldErrors.price }}
+                                    </div>
+                                </div>
+                                <p v-if="serviceFormError" class="small text-danger" role="alert">{{ serviceFormError }}</p>
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" :disabled="savingService" @click="cancelServiceForm">
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" class="btn btn-primary btn-sm" :disabled="savingService">
+                                        {{ savingService ? 'A guardar...' : 'Guardar' }}
+                                    </button>
+                                </div>
+                            </form>
                         </section>
                     </div>
 

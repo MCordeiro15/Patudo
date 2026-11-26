@@ -144,6 +144,7 @@ onMounted(() => {
     void loadPosts();
     void loadFavourite();
     void loadPetsitter();
+    void loadServices();
 });
 
 type PetsitterData = {
@@ -162,7 +163,16 @@ type PetsitterData = {
     user?: { name: string };
 };
 
+type PetsitterService = {
+    id: number;
+    type: 'pet-sitting' | 'passeio';
+    price: number;
+};
+
 const petsitter = ref<PetsitterData | null>(null);
+const services = ref<PetsitterService[]>([]);
+const servicesLoading = ref(false);
+const servicesError = ref('');
 
 const loadPetsitter = async () => {
     if (!petsitterId) return;
@@ -170,6 +180,28 @@ const loadPetsitter = async () => {
     if (res.ok) petsitter.value = (await res.json()).data;
     else feedback.value = 'Não foi possível carregar o petsitter.';
 };
+
+const loadServices = async () => {
+    if (!petsitterId) return;
+    servicesLoading.value = true;
+    servicesError.value = '';
+
+    try {
+        const res = await apiFetch(`/api/petsitters/${petsitterId}/services`);
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) services.value = data.data ?? [];
+        else servicesError.value = data.message ?? 'Não foi possível carregar os serviços.';
+    } catch {
+        servicesError.value = 'Erro de rede ao carregar os serviços.';
+    } finally {
+        servicesLoading.value = false;
+    }
+};
+
+const serviceTypeLabel = (type: PetsitterService['type']) =>
+    type === 'passeio' ? 'Passeio' : 'Pet Sitting';
+const formatServicePrice = (price: number) =>
+    `${Number(price).toLocaleString('pt-PT', { maximumFractionDigits: 2 })} €`;
 
 const sizeLabels: Record<string, string> = { small: 'Porte Pequeno', medium: 'Porte Médio', large: 'Porte Grande' };
 const typeLabels: Record<string, string> = { dog: 'Cão', cat: 'Gato', bird: 'Ave', other: 'Outro' };
@@ -220,9 +252,6 @@ const displayRating = computed(() => {
 const displayReviews = computed(() => (petsitter.value ? petsitter.value.reviews_count : ''));
 const displayMemberSince = computed(() =>
     petsitter.value?.created_at ? new Date(petsitter.value.created_at).toLocaleDateString('pt-PT') : '01/01/1990',
-);
-const displayPrice = computed(() =>
-    petsitter.value ? (petsitter.value.price_per_day ?? 0) : 20,
 );
 </script>
 
@@ -410,9 +439,19 @@ const displayPrice = computed(() =>
                     <div class="col-12 col-md-6">
                         <section class="card bg-white border border-primary rounded-4 p-3 h-100 info-card">
                             <h2 class="h6 fw-semibold mb-2">Serviços e preços</h2>
-                            <div class="d-flex justify-content-between border-bottom pb-1">
-                                <span>Dog Sitting (diária)</span><span>€ {{ displayPrice }}</span>
+                            <p v-if="servicesLoading" class="small text-muted">A carregar serviços...</p>
+                            <p v-if="servicesError" class="small text-danger" role="alert">{{ servicesError }}</p>
+                            <div
+                                v-for="service in services"
+                                :key="service.id"
+                                class="d-flex justify-content-between border-bottom pb-1 mb-2"
+                            >
+                                <span>{{ serviceTypeLabel(service.type) }}</span>
+                                <span>{{ formatServicePrice(service.price) }}</span>
                             </div>
+                            <p v-if="petsitterId && !servicesLoading && !services.length && !servicesError" class="small text-muted mb-0">
+                                Ainda não foram adicionados serviços.
+                            </p>
                         </section>
                     </div>
                     <div class="col-12 col-md-6">
