@@ -76,6 +76,10 @@ const sexOptions = [
     { value: 'other', label: 'Outro' },
 ];
 
+// Limites do preço por dia: os mesmos do back-end e do ModalFormPetsitter (Petsitter::MIN/MAX_PRICE_PER_DAY)
+const MIN_PRICE = 5;
+const MAX_PRICE = 200;
+
 const populateForm = () => {
     if (!props.petsitter) return;
     name.value = sanitizeName(props.petsitter.name ?? props.petsitter.user?.name ?? '');
@@ -465,7 +469,9 @@ const submit = async () => {
                                 v-model.number="pricePerDay"
                                 type="number"
                                 step="0.01"
-                                min="0"
+                                :min="MIN_PRICE"
+                                :max="MAX_PRICE"
+                                :placeholder="`${MIN_PRICE} a ${MAX_PRICE} €`"
                                 class="patudo-input"
                                 :class="{ 'is-invalid': errors.price_per_day }"
                                 required
