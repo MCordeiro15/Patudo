@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Bell, CalendarDays, LogOut, MessageCircle, UserRound, ChevronLeft, Dog, Plus } from '@lucide/vue';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import type { Animal } from '@/types';
 import { useNotifications } from '@/composables/useNotifications';
@@ -34,6 +34,13 @@ function apiFetch(url: string, options: RequestInit = {}) {
 // Estado do formulário
 const startDate = ref('');
 const endDate = ref('');
+
+// Se a data de saída ficar antes da de entrada (ex.: mudaram a entrada depois), a saída é removida.
+// As datas vêm em "AAAA-MM-DD", por isso comparar as strings chega.
+watch([startDate, endDate], ([start, end]) => {
+    if (start && end && end < start) endDate.value = '';
+});
+
 const selectedAnimals = ref<number[]>([]);
 const notes = ref('');
 const selectedServiceId = ref<number | null>(null);
