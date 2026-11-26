@@ -42,6 +42,8 @@ O banco de dados é atualizado automaticamente a cada `git pull`. O storage link
 - Um git hook exporta automaticamente todos os dados (users, petsitters, animais, posts, bookings, reviews, fotos)
 - Os dados são guardados em `ExportedDataSeeder.php` e incluídos no push
 
+Se a exportação gerar alterações, o hook cria um commit e cancela esse primeiro push: o Git já tinha preparado o commit antigo antes de executar o hook. Repete o mesmo comando `git push` para enviar o novo commit. Se os dados não mudaram, o push continua normalmente.
+
 **Quando os colegas fazem `git pull`:**
 - Um git hook deteta que os dados mudaram
 - Roda automaticamente `migrate:fresh --seed` para atualizar o banco de dados

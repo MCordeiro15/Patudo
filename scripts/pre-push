@@ -19,28 +19,30 @@ cd "$PROJECT_ROOT"
 
 # Exportar todos os dados
 echo "Exportando dados do banco de dados..."
-php "$ARTISAN" db:export
-
-# Verificar se o export foi bem-sucedido
-if [ $? -ne 0 ]; then
+if ! php "$ARTISAN" db:export; then
     echo "Erro ao exportar dados. Push cancelado."
     exit 1
 fi
 
 # Adicionar o seeder exportado
-git add database/seeders/ExportedDataSeeder.php
+if ! git add -- database/seeders/ExportedDataSeeder.php; then
+    echo "Erro ao adicionar os dados exportados. Push cancelado."
+    exit 1
+fi
 
 # Verificar se há mudanças para commitar
-if git diff --cached --quiet; then
+if git diff --cached --quiet -- database/seeders/ExportedDataSeeder.php; then
     echo "Nenhuma mudança nos dados. Continuando com o push."
 else
     # Commitar as mudanças
-    git commit -m "Auto-export: atualizar dados do banco de dados" --trailer "Co-authored-by: Junie <junie@jetbrains.com>"
-
-    if [ $? -ne 0 ]; then
-        echo "Erro ao commitar dados. Push cancelado."
+    if ! git commit -m "Auto-export: atualizar dados do banco de dados" --trailer "Co-authored-by: Junie <junie@jetbrains.com>" -- database/seeders/ExportedDataSeeder.php; then
+        echo "Erro ao commitar os dados. Push cancelado."
         exit 1
     fi
+
+    echo "Os dados foram exportados num novo commit. O push atual foi cancelado porque o Git já tinha preparado o commit antigo para envio."
+    echo "Repete o mesmo comando git push para enviar também o commit com os dados."
+    exit 1
 fi
 
 # Continuar com o push

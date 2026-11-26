@@ -158,7 +158,6 @@ class ExportDatabase extends Command
         $content .= "/**\n";
         $content .= " * SEEDER GERADO AUTOMATICAMENTE - NÃO EDITE MANUALMENTE\n";
         $content .= " * Este arquivo é gerado pelo comando php artisan db:export\n";
-        $content .= " * Última atualização: " . now()->format('Y-m-d H:i:s') . "\n";
         $content .= " */\n";
         $content .= "class ExportedDataSeeder extends Seeder\n";
         $content .= "{\n";
