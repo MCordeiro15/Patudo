@@ -1,19 +1,23 @@
 <?php
 
+use App\Http\Controllers\API\Admin\UserController as AdminUserController;
 use App\Http\Controllers\API\AnimalController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BookingController;
+use App\Http\Controllers\API\ChatController;
 use App\Http\Controllers\API\FavouriteController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\PetsitterAvailabilityController;
 use App\Http\Controllers\API\PetsitterController;
+use App\Http\Controllers\API\PetsitterServiceController;
 use App\Http\Controllers\API\PostController;
+use App\Http\Controllers\API\PostFavouriteController;
 use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\SupportTicketsController;
 use App\Http\Controllers\API\UserController;
-use App\Http\Controllers\API\PetsitterServiceController;
-use App\Http\Controllers\API\PostFavouriteController;
-use App\Http\Controllers\API\ChatController;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,9 +38,9 @@ Route::get('/petsitters/{id}/availability', [PetsitterAvailabilityController::cl
 |--------------------------------------------------------------------------
 */
 Route::middleware([
-    \Illuminate\Cookie\Middleware\EncryptCookies::class,
-    \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-    \Illuminate\Session\Middleware\StartSession::class,
+    EncryptCookies::class,
+    AddQueuedCookiesToResponse::class,
+    StartSession::class,
 ])->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
@@ -45,9 +49,9 @@ Route::middleware([
 // Logout precisa de sessão para invalidar
 Route::middleware([
     'auth:sanctum',
-    \Illuminate\Cookie\Middleware\EncryptCookies::class,
-    \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-    \Illuminate\Session\Middleware\StartSession::class,
+    EncryptCookies::class,
+    AddQueuedCookiesToResponse::class,
+    StartSession::class,
 ])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
@@ -139,5 +143,11 @@ Route::middleware('auth:sanctum')->group(function () {
 | definições) entram aqui nos tickets seguintes.
 */
 Route::middleware(['auth:sanctum', 'can:admin'])->prefix('admin')->name('api.admin.')->group(function () {
-    //
+    Route::get('/users/export', [AdminUserController::class, 'export'])->name('users.export');
+    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}/notes', [AdminUserController::class, 'notes'])->name('users.notes.index');
+    Route::post('/users/{user}/notes', [AdminUserController::class, 'storeNote'])->name('users.notes.store');
+    Route::post('/users/{user}/suspend', [AdminUserController::class, 'suspend'])->name('users.suspend');
+    Route::post('/users/{user}/warning', [AdminUserController::class, 'sendWarning'])->name('users.warning');
+    Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
 });

@@ -4,6 +4,7 @@
  * Modelo Eloquent principal para utilizadores. Suporta autenticação, 2FA, passkeys, roles (admin, petsitter) e relações com animais, reservas, posts, petsitter, reviews e favoritos.
  * Main Eloquent model for users. Supports authentication, 2FA, passkeys, roles (admin, petsitter), and relationships with animals, bookings, posts, petsitter, reviews, and favorites.
  */
+
 namespace App\Models;
 
 use Database\Factories\UserFactory;
@@ -11,6 +12,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -139,5 +141,10 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     public function notifications()
     {
         return $this->hasMany(Notification::class);
+    }
+
+    public function notes(): HasMany
+    {
+        return $this->hasMany(UserNote::class);
     }
 }
