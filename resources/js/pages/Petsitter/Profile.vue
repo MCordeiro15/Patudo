@@ -827,7 +827,7 @@ const saveAvailability = async () => {
                     class="card bg-white border border-primary rounded-4 p-3 px-md-4 mb-3 about-card"
                 >
                     <h2 class="h5 fw-semibold mb-3">Sobre mim</h2>
-                    <p class="text-muted fs-5 mb-0 ps-md-2">
+                    <p class="text-muted fs-6 mb-0 ps-md-2">
                         {{ displayBiography }}
                     </p>
                 </section>
