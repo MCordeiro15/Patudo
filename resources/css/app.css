@@ -28,6 +28,17 @@
     --bs-border-color: rgba(122, 102, 87, 0.25);
     --bs-border-radius-lg: 1rem;
     --bs-border-radius-xl: 1.5rem;
+
+    --bs-font-sans-serif: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --bs-body-font-family: var(--bs-font-sans-serif);
+}
+
+html, body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+button, input, select, textarea, .btn, .form-control, .table {
+    font-family: inherit;
 }
 
 .btn-primary {
@@ -127,6 +138,108 @@
     z-index: 1;
 }
 
+.patudo-navbar {
+    width: 200px;
+    min-width: 200px;
+    min-height: 100vh;
+    background-color: #ffffff;
+    border-right: 1px solid var(--patudo-laranjaVivo);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+.patudo-navbar .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    margin-bottom: 1.5rem;
+    text-decoration: none;
+    color: var(--patudo-castanhoDark);
+}
+
+.patudo-navbar .navbar-brand img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.patudo-navbar .navbar-section-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--patudo-castanhoMid);
+    font-weight: 600;
+    padding: 0 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.patudo-navbar .navbar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.patudo-navbar .navbar-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+
+    padding: 0.65rem 1rem;
+    border-radius: 25px;
+
+    color: var(--patudo-castanhoDark);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    transition: background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.patudo-navbar .navbar-link:hover {
+    background-color: rgba(194, 65, 12, 0.08);
+    color: var(--patudo-terracota);
+}
+
+.patudo-navbar .navbar-link.active {
+    background-color: var(--patudo-castanhoDark);
+    color: #ffffff;
+}
+
+.patudo-navbar .navbar-link.active:hover {
+    background-color: var(--patudo-castanhoDark);
+    color: #ffffff;
+}
+
+.patudo-navbar .navbar-badge {
+    background-color: var(--patudo-terracota);
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+
+    min-width: 24px;
+    height: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    padding: 0 0.4rem;
+}
+
+.patudo-navbar .navbar-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--patudo-laranjaVivo);
+}
+
+.patudo-navbar .navbar-link.logout {
+    justify-content: flex-start;
+}
+
 .card {
     background-color: #ffffff;
     border: 1px solid var(--patudo-terracota);
@@ -182,4 +295,3 @@
 .nav-pills .nav-link:not(.active):hover {
     color: var(--patudo-terracota, #c2410c) !important;
 }
-

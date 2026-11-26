@@ -99,6 +99,10 @@ Route::middleware(['auth', 'can:admin'])->prefix('admin')->name('admin.')->group
     Route::inertia('/settings', 'Admin/SettingsView')->name('settings');
 });
 
+Route::inertia('/admin/bookings', 'Admin/BookingsView')
+    ->middleware(['auth', 'can:admin'])
+    ->name('admin.bookings');
+
 // Pagamento confirmado (dono)
 Route::inertia('/payment-confirmed', 'Payment/PaymentConfirmed')
     ->middleware('auth')
