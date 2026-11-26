@@ -23,6 +23,8 @@ class AdminUserResource extends JsonResource
             'is_petsitter' => $this->is_petsitter,
             'type' => $this->is_admin ? 'admin' : ($this->is_petsitter ? 'petsitter' : 'owner'),
             'account_status' => $this->account_status,
+            'suspended_until' => $this->suspended_until,
+            'suspension_reason' => $this->suspension_reason,
             'email_verified_at' => $this->email_verified_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

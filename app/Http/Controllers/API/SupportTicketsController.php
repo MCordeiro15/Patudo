@@ -4,6 +4,7 @@
  * Controlador API para gestão de tickets de suporte. Permite criar reclamações, listar tickets, claim por admins e fechar tickets.
  * API controller for support tickets management. Allows creating complaints, listing tickets, admin claim, and closing tickets.
  */
+
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
@@ -23,13 +24,30 @@ class SupportTicketsController extends Controller
         Gate::authorize('create', SupportTicket::class);
 
         $data = $request->validate([
-            'reported_user_id' => 'nullable|exists:users,id',
+            'reported_user_id' => 'required_if:type,complaint|nullable|exists:users,id',
             'subject' => 'required|string|max:255',
             'description' => 'required|string',
             'type' => 'required|string|in:complaint,help',
         ]);
 
-        $data['user_id'] = $request->user()->id;
+        $user = $request->user();
+
+        if ($user->account_status === 'banned') {
+            return response()->json([
+                'message' => 'A sua conta não pode criar tickets de suporte.',
+                'account_status' => 'banned',
+            ], 403);
+        }
+
+        if ($user->account_status === 'suspended'
+            && ($data['type'] !== 'help' || ! empty($data['reported_user_id']))) {
+            return response()->json([
+                'message' => 'Durante a suspensão apenas pode criar um pedido de suporte geral.',
+                'account_status' => 'suspended',
+            ], 403);
+        }
+
+        $data['user_id'] = $user->id;
         $data['status'] = 'open';
 
         $ticket = SupportTicket::create($data);

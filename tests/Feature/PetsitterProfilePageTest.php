@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Ficheiro PHP: PetsitterProfilePageTest.php
  * PHP file: PetsitterProfilePageTest.php
@@ -50,6 +49,19 @@ test('user can view the selected approved petsitter profile without private data
             ->where('petsitter.name', $petsitter->user->name)
             ->missing('petsitter.identification_documents')
         );
+});
+
+test('users cannot view a suspended petsitter profile', function () {
+    $viewer = User::factory()->create();
+    $petsitter = Petsitter::factory()->approved()->create();
+    $petsitter->user->update([
+        'account_status' => 'suspended',
+        'suspended_until' => now()->addDays(7),
+    ]);
+
+    $this->actingAs($viewer)
+        ->get('/petsitters/'.$petsitter->user_id)
+        ->assertForbidden();
 });
 
 test('user cannot view another petsitter profile that is not approved', function () {

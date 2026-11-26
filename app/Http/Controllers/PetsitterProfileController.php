@@ -4,6 +4,7 @@
  * Classe base abstrata para todos os controladores da aplicação. Fornece funcionalidade comum.
  * Abstract base class for all application controllers. Provides common functionality.
  */
+
 namespace App\Http\Controllers;
 
 use App\Models\Petsitter;
@@ -20,10 +21,12 @@ class PetsitterProfileController extends Controller
     {
         $user = $request->user();
 
+        abort_if(in_array($user->account_status, ['suspended', 'banned'], true), 403);
+
         // Se não tem perfil de petsitter, ou a candidatura ainda não foi aprovada,
         // redireciona para o perfil de utilizador (owner)
         $petsitter = Petsitter::where('user_id', $user->id)->first();
-        if ( ! $petsitter || $petsitter->approval_status !== 'approved') {
+        if (! $petsitter || $petsitter->approval_status !== 'approved') {
             return redirect()->route('owner.profile');
         }
 
@@ -38,6 +41,13 @@ class PetsitterProfileController extends Controller
     public function show(Request $request, Petsitter $petsitter)
     {
         $viewer = $request->user();
+
+        abort_if(in_array($viewer->account_status, ['suspended', 'banned'], true), 403);
+        abort_if(
+            in_array($petsitter->user?->account_status, ['suspended', 'banned'], true) && ! $viewer->isAdmin(),
+            403,
+        );
+
         $isOwnProfile = $viewer->id === $petsitter->user_id;
 
         // o próprio, com a candidatura pendente ou recusada, vê o perfil de owner
@@ -80,7 +90,7 @@ class PetsitterProfileController extends Controller
                     ? (str_starts_with($petsitter->profile_photo, 'data:')
                         ? $petsitter->profile_photo
                         : Storage::disk('public')->url($petsitter->profile_photo))
-                    : 'https://ui-avatars.com/api/?name=' . urlencode($petsitter->user->name ?? 'P') . '&background=random',
+                    : 'https://ui-avatars.com/api/?name='.urlencode($petsitter->user->name ?? 'P').'&background=random',
                 'biography' => $petsitter->biography,
                 'experience' => $petsitter->experience ?? '',
                 'service_location' => $petsitter->service_location,

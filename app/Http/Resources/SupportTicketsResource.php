@@ -4,6 +4,7 @@
  * Recurso API que transforma o modelo SupportTicketsResource em JSON para resposta da API. Define quais os atributos e relações são expostos ao front-end.
  * API resource that transforms the SupportTicketsResource model into JSON for API responses. Defines which attributes and relationships are exposed to the front-end.
  */
+
 namespace App\Http\Resources;
 
 use App\Models\SupportTicket;
@@ -35,8 +36,10 @@ class SupportTicketsResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'creator' => new UserResource($this->whenLoaded('creator')),
+            'reporter' => new UserResource($this->whenLoaded('creator')),
             'claimant' => new UserResource($this->whenLoaded('claimant')),
             'reportedUser' => new UserResource($this->whenLoaded('reportedUser')),
+            'reported_user' => new UserResource($this->whenLoaded('reportedUser')),
         ];
     }
 }

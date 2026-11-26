@@ -4,6 +4,7 @@
  * Controlador API para gestão do calendário de disponibilidade de petsitters. Permite listar, ativar e desativar datas específicas.
  * API controller for petsitter availability calendar management. Allows listing, enabling, and disabling specific dates.
  */
+
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
@@ -26,6 +27,10 @@ class PetsitterAvailabilityController extends Controller
 
         if (! $petsitter) {
             return response()->json(['message' => 'Petsitter não encontrado.'], 404);
+        }
+
+        if (in_array($petsitter->user?->account_status, ['suspended', 'banned'], true)) {
+            return response()->json(['message' => 'Perfil indisponível.'], 403);
         }
 
         $validated = $request->validate([
