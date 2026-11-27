@@ -36,6 +36,32 @@ test('database export import creates an approved petsitter profile and restores 
     expect($user->fresh()->is_petsitter)->toBeTrue();
 });
 
+test('database export import restores petsitter JSON fields as arrays', function () {
+    $user = User::factory()->create(['is_petsitter' => true]);
+
+    app(ImportExportedPetsitters::class)->import(
+        [['id' => 404, 'email' => $user->email, 'is_petsitter' => true]],
+        [[
+            'user_id' => 404,
+            'experience' => 'Experiência restaurada.',
+            'service_location' => 'Ponta Delgada',
+            'age' => 30,
+            'price_per_day' => 15,
+            'accepted_sizes' => '["small", "large"]',
+            'accepted_animal_types' => '["dog", "cat"]',
+            'availability_days' => '["monday", "friday"]',
+            'approval_status' => 'approved',
+            'identification_documents' => 'document.pdf',
+        ]]
+    );
+
+    $petsitter = Petsitter::findOrFail($user->id);
+
+    expect($petsitter->accepted_sizes)->toBe(['small', 'large'])
+        ->and($petsitter->accepted_animal_types)->toBe(['dog', 'cat'])
+        ->and($petsitter->availability_days)->toBe(['monday', 'friday']);
+});
+
 test('database export import removes approved status when the exported user is not a petsitter', function () {
     $user = User::factory()->create(['is_petsitter' => true]);
 
@@ -139,6 +165,7 @@ test('database export includes notifications and preserves their user and bookin
         ->toContain("'user_id' => {$user->id}")
         ->toContain("'booking_id' => {$booking->id}")
         ->toContain("'message' => '{$notification->message}'")
+        ->toContain('ImportExportedPetsitters::class)->import($users, $petsitters);')
         ->toContain('Booking::forceCreate($bookingCreateData);')
         ->toContain("array_key_exists('service_id', \$bookingCreateData)")
         ->toContain('Notification::forceCreate(array_intersect_key($notificationData, $notificationColumns));');

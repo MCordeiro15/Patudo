@@ -585,12 +585,7 @@ class ExportedDataSeeder extends Seeder
     'postal_code' => '9600-580',
   ),
 );
-        $petsitterColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('petsitters'));
-        foreach ($petsitters as $petsitterData) {
-            $petsitterCreateData = array_intersect_key($petsitterData, $petsitterColumns);
-            $petsitter = Petsitter::firstOrNew(['user_id' => $petsitterData['user_id']]);
-            $petsitter->forceFill($petsitterCreateData)->save();
-        }
+        app(\App\Services\ImportExportedPetsitters::class)->import($users, $petsitters);
 
         // Export Animals (13 animals)
         $animals = array (

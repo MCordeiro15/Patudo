@@ -107,12 +107,7 @@ class ExportDatabase extends Command
         // Petsitters
         $content .= "        // Export Petsitters (" . count($petsittersArray) . " petsitters)\n";
         $content .= "        \$petsitters = " . var_export($petsittersArray, true) . ";\n";
-        $content .= "        \$petsitterColumns = array_flip(\\Illuminate\\Support\\Facades\\Schema::getColumnListing('petsitters'));\n";
-        $content .= "        foreach (\$petsitters as \$petsitterData) {\n";
-        $content .= "            \$petsitterCreateData = array_intersect_key(\$petsitterData, \$petsitterColumns);\n";
-        $content .= "            \$petsitter = Petsitter::firstOrNew(['user_id' => \$petsitterData['user_id']]);\n";
-        $content .= "            \$petsitter->forceFill(\$petsitterCreateData)->save();\n";
-        $content .= "        }\n\n";
+        $content .= "        app(\\App\\Services\\ImportExportedPetsitters::class)->import(\$users, \$petsitters);\n\n";
 
         // Animals (delete all first, then recreate)
         $content .= "        // Export Animals (" . count($animalsArray) . " animals)\n";
