@@ -55,6 +55,9 @@ class HandleInertiaRequests extends Middleware
                 'user' => $authUser,
                 'isAdmin' => $request->user()?->isAdmin() ?? false,
             ],
+            'unreadNotificationCount' => fn () => $user
+                ? $user->notifications()->withinRetention()->whereNull('read_at')->count()
+                : 0,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             // Números das bolinhas do menu de admin. A closure só corre quando a prop é enviada
             // (um router.reload({ only: ['adminCounts'] }) pede só esta); para quem não é admin é null, sem consultas.

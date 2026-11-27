@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { Bell, LogOut, MessageCircle, UserRound, Dog } from '@lucide/vue';
+import { LogOut, UserRound, Dog } from '@lucide/vue';
 import { ref, onMounted } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
-import { useNotifications } from '@/composables/useNotifications';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 
 defineOptions({ layout: false });
 
@@ -63,8 +62,6 @@ const exitHour = ref<string | null>(null);
 const loadError = ref('');
 
 const payment = ref<PaymentData>(emptyPayment);
-const showNotifications = ref(false);
-const { unreadCount } = useNotifications();
 
 const formatDate = (iso?: string) => (iso ? new Date(iso).toLocaleDateString('pt-PT') : '--');
 
@@ -149,15 +146,7 @@ onMounted(() => {
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark"
-                        ><MessageCircle :size="25"
-                    /></a>
-                    <button type="button" class="text-dark bg-transparent border-0 p-0 position-relative" @click="showNotifications = true">
-                        <Bell :size="25" />
-                        <span v-if="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                            {{ unreadCount > 9 ? '9+' : unreadCount }}
-                        </span>
-                    </button>
+                    <HeaderNotificationsChat />
                     <a href="/profile" class="text-dark" aria-label="Perfil">
                         <UserRound :size="25" />
                     </a>
@@ -237,10 +226,6 @@ onMounted(() => {
             </div>
         </div>
 
-        <ModalNotifications
-            :show="showNotifications"
-            @close="showNotifications = false"
-        />
     </main>
 </template>
 

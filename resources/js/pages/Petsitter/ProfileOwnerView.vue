@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { Bell, Check, Heart, LogOut, MessageCircle, UserRound, X } from '@lucide/vue';
+import { Check, Heart, LogOut, UserRound, X } from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 import ModalReportPetsitter from '@/pages/Modals/ModalReportPetsitter.vue';
-import { useNotifications } from '@/composables/useNotifications';
 import type { Post } from '@/types/post';
 
 // O id vem do controller (/petsitters/{id}) ou do URL: /profile-owner-view?petsitter=ID
@@ -97,8 +96,6 @@ const toggleFavourite = async () => {
 };
 
 const showReportModal = ref(false);
-const showNotifications = ref(false);
-const { unreadCount } = useNotifications();
 
 const submitReport = async (payload: { reason: string; description: string }) => {
     if (!petsitterId) return;
@@ -282,21 +279,14 @@ const displayMemberSince = computed(() =>
                     </div>
 
                     <div class="d-flex align-items-center gap-3">
-                        <a href="/messages" class="text-dark"
-                        ><MessageCircle :size="25"
-                        /></a>
-                        <button type="button" class="text-dark bg-transparent border-0 p-0 position-relative" @click="showNotifications = true">
-                            <Bell :size="25" />
-                            <span v-if="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                                {{ unreadCount > 9 ? '9+' : unreadCount }}
-                            </span>
-                        </button>
-                        <button
-                            type="button"
+                        <HeaderNotificationsChat />
+                        <Link
+                            href="/profile"
                             class="text-dark p-0 border-0 bg-transparent"
+                            aria-label="Abrir o meu perfil"
                         >
                             <UserRound :size="25" />
-                        </button>
+                        </Link>
                         <Link
                             href="/logout"
                             method="post"
@@ -493,10 +483,6 @@ const displayMemberSince = computed(() =>
                 @submit="submitReport"
             />
 
-            <ModalNotifications
-                :show="showNotifications"
-                @close="showNotifications = false"
-            />
         </main>
     </div>
 </template>

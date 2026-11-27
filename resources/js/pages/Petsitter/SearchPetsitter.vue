@@ -4,20 +4,16 @@
 import { ref, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import {
-    Bell,
     ChevronRight,
     Heart,
     LogOut,
     MapPin,
-    MessageCircle,
     Star,
     UserRound,
 } from '@lucide/vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
-import { useChat } from '@/composables/useChat';
-import { useNotifications } from '@/composables/useNotifications';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 
 //defineOptions({ layout: null });
 
@@ -38,9 +34,6 @@ const petsitters = ref<PetsitterApiData[]>([]);
 const favourites = ref<number[]>([]);
 const error = ref<string | null>(null);
 const loading = ref(true);
-const showNotifications = ref(false);
-const { unreadCount, fetchNotifications } = useNotifications();
-const { totalUnread, start: startChat } = useChat();
 
 function isFavourite(petsitterId: number): boolean {
     return favourites.value.includes(petsitterId);
@@ -206,8 +199,6 @@ async function toggleFavourite(petsitterId: number) {
 onMounted(() => {
     fetchPetsitters();
     fetchFavourites();
-    fetchNotifications();
-    void startChat();
 });
 </script>
 
@@ -262,26 +253,7 @@ onMounted(() => {
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a
-                        href="/messages"
-                        class="text-dark position-relative"
-                        :aria-label="totalUnread > 0 ? `Mensagens, ${totalUnread} por ler` : 'Mensagens'"
-                    >
-                        <MessageCircle :size="25" />
-                        <span
-                            v-if="totalUnread > 0"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            style="font-size: 0.6rem;"
-                        >
-                            {{ totalUnread > 9 ? '9+' : totalUnread }}
-                        </span>
-                    </a>
-                    <button type="button" class="text-dark bg-transparent border-0 p-0 position-relative" @click="showNotifications = true">
-                        <Bell :size="25" />
-                        <span v-if="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                            {{ unreadCount > 9 ? '9+' : unreadCount }}
-                        </span>
-                    </button>
+                    <HeaderNotificationsChat />
                     <button
                         type="button"
                         class="text-dark p-0 border-0 bg-transparent"
@@ -443,10 +415,6 @@ onMounted(() => {
         </div>
     </main>
 
-    <ModalNotifications
-        :show="showNotifications"
-        @close="showNotifications = false"
-    />
 </template>
 
 <style scoped>

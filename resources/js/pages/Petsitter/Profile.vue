@@ -3,21 +3,18 @@
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import {
-    Bell,
-    MessageCircle,
     Save,
     Trash2,
     UserRound, LogOut,
 } from '@lucide/vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 import { computed, onMounted, ref } from 'vue';
 import ModalDeletePost from '@/pages/Modals/ModalDeletePost.vue';
 import ModalEditPetsitterProfile from '@/pages/Modals/ModalEditPetsitterProfile.vue';
 import ModalEditPost from '@/pages/Modals/ModalEditPost.vue';
 import ModalNewPost from '@/pages/Modals/ModalNewPost.vue';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
-import { useNotifications } from '@/composables/useNotifications';
 import type { PetsitterProfile as PetsitterProfileType, Post } from '@/types';
 
 // Tipo TypeScript para PetsitterProfile.
@@ -86,8 +83,6 @@ const saveSuccess = ref(false);
 
 // Edit profile modal state
 const showEditProfileModal = ref(false);
-const showNotifications = ref(false);
-const { unreadCount } = useNotifications();
 
 // Propriedade computada que retorna os dados do petsitter a partir das props.
 // Computed property that returns petsitter data from props.
@@ -679,23 +674,7 @@ const saveAvailability = async () => {
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark"
-                    ><MessageCircle :size="25"
-                    /></a>
-                    <button
-                        type="button"
-                        class="text-dark bg-transparent border-0 p-0 position-relative"
-                        @click="showNotifications = true"
-                    >
-                        <Bell :size="25" />
-                        <span
-                            v-if="unreadCount > 0"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            style="font-size: 0.6rem"
-                        >
-                            {{ unreadCount > 9 ? '9+' : unreadCount }}
-                        </span>
-                    </button>
+                    <HeaderNotificationsChat />
                     <button
                         type="button"
                         class="text-dark p-0 border-0 bg-transparent"
@@ -1241,12 +1220,6 @@ const saveAvailability = async () => {
             :show="showNewPostModal"
             @close="showNewPostModal = false"
             @created="onPostCreated"
-        />
-
-        <!-- Notifications Modal -->
-        <ModalNotifications
-            :show="showNotifications"
-            @close="showNotifications = false"
         />
 
         <!-- Delete Post Modal -->
