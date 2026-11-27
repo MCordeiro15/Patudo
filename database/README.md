@@ -39,7 +39,7 @@ O banco de dados é atualizado automaticamente a cada `git pull`. O storage link
 ## Como funciona o sistema automático
 
 **Quando tu fazes `git push`:**
-- Um git hook exporta automaticamente todos os dados (users, petsitters, animais, posts, bookings, reviews, notificações e fotos)
+- Um git hook exporta um snapshot dos dados de negócio (users, petsitters, animais, posts, serviços, reservas, avaliações, notificações, disponibilidades, favoritos, tickets de suporte, notas e fotos)
 - Antes da exportação, sincroniza `is_petsitter` com o perfil aprovado; uma candidatura pendente nunca é aprovada automaticamente
 - Os dados são guardados em `ExportedDataSeeder.php` e incluídos no push
 
@@ -48,15 +48,19 @@ Se a exportação gerar alterações, o hook cria um commit e cancela esse prime
 **Quando os colegas fazem `git pull`:**
 - Um git hook deteta que os dados mudaram
 - Roda automaticamente `migrate:fresh --seed` para atualizar o banco de dados
-- Restaura perfis de petsitter que ainda não existam e aplica os papéis/estados exportados
+- Restaura apenas o snapshot exportado, preservando IDs e relações; registos removidos não voltam a aparecer como dados de demonstração
 - Cria automaticamente o storage link para as fotos aparecerem
 - Os colegas recebem tudo sem rodar nenhum comando manual
+
+O export não inclui tabelas temporárias ou credenciais de autenticação, como sessões, tokens de acesso/reset e passkeys.
 
 **Resumo:** Criaste uma conta, fizeste uma reserva, subiste uma foto? Faz `git push` e todos os colegas recebem tudo com `git pull`.
 
 Para uma conta ser petsitter, tem de existir um perfil aprovado. Marcar apenas `is_petsitter` como `true` não cria os dados do perfil nem aprova uma candidatura; o fluxo mantém a conta como não-petsitter até existir um perfil aprovado.
 
-## O que é criado pelos seeders
+## Dados de demonstração padrão
+
+Estes dados só são criados quando ainda não existe `ExportedDataSeeder.php`. Quando existe um snapshot, o `DatabaseSeeder` usa apenas esse snapshot e não volta a criar os dados de demonstração apagados.
 
 - **12 Users**: Admin, Test User, Miguel, 6 Petsitters (Sofia, Tiago, João, Inês, Maria, Rui) e 3 Clientes (Ana, Pedro, Carla)
 - **7 Petsitters**: Perfis completos com biografia, experiência, preço, localização e avaliações

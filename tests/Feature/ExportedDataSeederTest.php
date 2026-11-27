@@ -1,10 +1,12 @@
 <?php
 
+use App\Models\Animal;
 use App\Models\Booking;
 use App\Models\Notification;
 use App\Models\Petsitter;
 use App\Models\User;
 use App\Services\ImportExportedPetsitters;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 test('database export import creates an approved petsitter profile and restores its role', function () {
@@ -134,10 +136,65 @@ test('database export includes notifications and preserves their user and bookin
     $this->artisan('db:export')->assertSuccessful();
 
     expect($generatedSeeder)
-        ->toContain("'user_email' => '{$user->email}'")
+        ->toContain("'user_id' => {$user->id}")
         ->toContain("'booking_id' => {$booking->id}")
         ->toContain("'message' => '{$notification->message}'")
         ->toContain('Booking::forceCreate($bookingCreateData);')
-        ->toContain("User::where('email', \$notificationData['user_email'] ?? null)->value('id')")
-        ->toContain('Notification::forceCreate($notificationCreateData);');
+        ->toContain("array_key_exists('service_id', \$bookingCreateData)")
+        ->toContain('Notification::forceCreate(array_intersect_key($notificationData, $notificationColumns));');
+});
+
+test('database export preserves animal ids referenced by animal bookings', function () {
+    $user = User::factory()->create();
+    $animal = Animal::forceCreate([
+        'id' => 701,
+        'user_id' => $user->id,
+        'name' => 'Animal com ID não sequencial',
+        'species' => 'Dog',
+        'breed' => 'Labrador',
+        'size' => 'Medium',
+    ]);
+    $generatedSeeder = null;
+
+    File::shouldReceive('put')->once()->andReturnUsing(function ($path, $contents) use (&$generatedSeeder) {
+        $generatedSeeder = $contents;
+
+        return true;
+    });
+
+    $this->artisan('db:export')->assertSuccessful();
+
+    expect($generatedSeeder)
+        ->toContain("'id' => {$animal->id}")
+        ->toContain('Animal::forceCreate($animalCreateData);');
+});
+
+test('database export includes other domain data and excludes deleted records from the next snapshot', function () {
+    $user = User::factory()->create();
+    $note = 'Nota de suporte atualizada';
+    DB::table('user_notes')->insert([
+        'user_id' => $user->id,
+        'admin_id' => null,
+        'note' => $note,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+    $generatedSeeders = [];
+
+    File::shouldReceive('put')->twice()->andReturnUsing(function ($path, $contents) use (&$generatedSeeders) {
+        $generatedSeeders[] = $contents;
+
+        return true;
+    });
+
+    $this->artisan('db:export')->assertSuccessful();
+    DB::table('user_notes')->delete();
+    $this->artisan('db:export')->assertSuccessful();
+
+    expect($generatedSeeders[0])
+        ->toContain($note)
+        ->toContain("foreach (['user_notes', 'support_tickets'");
+    expect($generatedSeeders[1])
+        ->not->toContain($note)
+        ->toContain("foreach (['user_notes', 'support_tickets'");
 });

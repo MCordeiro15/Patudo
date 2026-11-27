@@ -22,23 +22,27 @@ use Illuminate\Validation\Rule;
 class PetsitterController extends Controller
 {
     /**
-     * Lista todos os registos com paginação. Admin vê todos, utilizador normal vê apenas os seus.
-     * Lists all records with pagination. Admin sees all, normal user sees only their own.
+     * Lista petsitters aprovados; admin pode filtrar candidaturas para gestão.
+     * Lists approved petsitters; admins can filter applications for management.
      */
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Petsitter::class);
 
-        $query = Petsitter::with('user', 'services');
+        $query = Petsitter::with('user', 'services')
+            ->whereHas('user', fn ($query) => $query->where('is_admin', false));
 
         if ($request->user()?->isAdmin()) {
-            // Admin vê todos; opcionalmente filtra por estado de aprovação.
+            // A listagem padrão é a pesquisa da home; os filtros explícitos servem à gestão de candidaturas.
             $filters = $request->validate([
                 'approval_status' => ['sometimes', Rule::in(['pending', 'approved', 'rejected'])],
             ]);
 
             if (isset($filters['approval_status'])) {
                 $query->where('approval_status', $filters['approval_status']);
+            } else {
+                $query->where('approval_status', 'approved')
+                    ->whereHas('user', fn ($query) => $query->where('is_petsitter', true));
             }
         } else {
             $query->where('approval_status', 'approved')
@@ -56,6 +60,7 @@ class PetsitterController extends Controller
         $query = Petsitter::with('user')
             ->where('approval_status', 'approved')
             ->whereHas('user', fn ($query) => $query
+                ->where('is_admin', false)
                 ->where('is_petsitter', true)
                 ->where(function ($query) {
                     $query
