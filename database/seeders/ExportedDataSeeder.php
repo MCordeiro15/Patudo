@@ -11,6 +11,7 @@ use App\Models\Booking;
 use App\Models\Review;
 use App\Models\AnimalBooking;
 use App\Models\PetsitterService;
+use App\Models\Notification;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -2519,6 +2520,7 @@ class ExportedDataSeeder extends Seeder
         }
 
         // Export Bookings (22 bookings)
+        if (\Illuminate\Support\Facades\Schema::hasTable('notifications')) { Notification::query()->delete(); }
         Booking::query()->delete();
 
         // Export Petsitter Services (4 services)
@@ -2564,6 +2566,7 @@ class ExportedDataSeeder extends Seeder
         $bookings = array (
   0 => 
   array (
+    'id' => 1,
     'petsitter_id' => 1,
     'user_id' => 10,
     'service_id' => NULL,
@@ -2578,6 +2581,7 @@ class ExportedDataSeeder extends Seeder
   ),
   1 => 
   array (
+    'id' => 2,
     'petsitter_id' => 2,
     'user_id' => 11,
     'service_id' => NULL,
@@ -2592,6 +2596,7 @@ class ExportedDataSeeder extends Seeder
   ),
   2 => 
   array (
+    'id' => 3,
     'petsitter_id' => 3,
     'user_id' => 12,
     'service_id' => NULL,
@@ -2606,6 +2611,7 @@ class ExportedDataSeeder extends Seeder
   ),
   3 => 
   array (
+    'id' => 4,
     'petsitter_id' => 4,
     'user_id' => 10,
     'service_id' => NULL,
@@ -2620,6 +2626,7 @@ class ExportedDataSeeder extends Seeder
   ),
   4 => 
   array (
+    'id' => 5,
     'petsitter_id' => 5,
     'user_id' => 11,
     'service_id' => NULL,
@@ -2634,6 +2641,7 @@ class ExportedDataSeeder extends Seeder
   ),
   5 => 
   array (
+    'id' => 6,
     'petsitter_id' => 6,
     'user_id' => 12,
     'service_id' => NULL,
@@ -2648,6 +2656,7 @@ class ExportedDataSeeder extends Seeder
   ),
   6 => 
   array (
+    'id' => 7,
     'petsitter_id' => 7,
     'user_id' => 10,
     'service_id' => NULL,
@@ -2662,6 +2671,7 @@ class ExportedDataSeeder extends Seeder
   ),
   7 => 
   array (
+    'id' => 8,
     'petsitter_id' => 1,
     'user_id' => 15,
     'service_id' => 2,
@@ -2676,6 +2686,7 @@ class ExportedDataSeeder extends Seeder
   ),
   8 => 
   array (
+    'id' => 9,
     'petsitter_id' => 1,
     'user_id' => 15,
     'service_id' => 2,
@@ -2690,6 +2701,7 @@ class ExportedDataSeeder extends Seeder
   ),
   9 => 
   array (
+    'id' => 10,
     'petsitter_id' => 1,
     'user_id' => 9,
     'service_id' => 2,
@@ -2704,6 +2716,7 @@ class ExportedDataSeeder extends Seeder
   ),
   10 => 
   array (
+    'id' => 11,
     'petsitter_id' => 1,
     'user_id' => 9,
     'service_id' => 2,
@@ -2718,6 +2731,7 @@ class ExportedDataSeeder extends Seeder
   ),
   11 => 
   array (
+    'id' => 12,
     'petsitter_id' => 7,
     'user_id' => 9,
     'service_id' => 3,
@@ -2732,6 +2746,7 @@ class ExportedDataSeeder extends Seeder
   ),
   12 => 
   array (
+    'id' => 13,
     'petsitter_id' => 7,
     'user_id' => 9,
     'service_id' => 3,
@@ -2746,6 +2761,7 @@ class ExportedDataSeeder extends Seeder
   ),
   13 => 
   array (
+    'id' => 14,
     'petsitter_id' => 7,
     'user_id' => 14,
     'service_id' => 3,
@@ -2760,6 +2776,7 @@ class ExportedDataSeeder extends Seeder
   ),
   14 => 
   array (
+    'id' => 15,
     'petsitter_id' => 1,
     'user_id' => 14,
     'service_id' => 1,
@@ -2774,6 +2791,7 @@ class ExportedDataSeeder extends Seeder
   ),
   15 => 
   array (
+    'id' => 16,
     'petsitter_id' => 1,
     'user_id' => 14,
     'service_id' => 1,
@@ -2788,6 +2806,7 @@ class ExportedDataSeeder extends Seeder
   ),
   16 => 
   array (
+    'id' => 17,
     'petsitter_id' => 1,
     'user_id' => 14,
     'service_id' => 1,
@@ -2802,6 +2821,7 @@ class ExportedDataSeeder extends Seeder
   ),
   17 => 
   array (
+    'id' => 18,
     'petsitter_id' => 7,
     'user_id' => 9,
     'service_id' => 3,
@@ -2816,6 +2836,7 @@ class ExportedDataSeeder extends Seeder
   ),
   18 => 
   array (
+    'id' => 19,
     'petsitter_id' => 7,
     'user_id' => 9,
     'service_id' => 3,
@@ -2830,6 +2851,7 @@ class ExportedDataSeeder extends Seeder
   ),
   19 => 
   array (
+    'id' => 20,
     'petsitter_id' => 17,
     'user_id' => 9,
     'service_id' => 4,
@@ -2844,6 +2866,7 @@ class ExportedDataSeeder extends Seeder
   ),
   20 => 
   array (
+    'id' => 21,
     'petsitter_id' => 17,
     'user_id' => 9,
     'service_id' => 4,
@@ -2858,6 +2881,7 @@ class ExportedDataSeeder extends Seeder
   ),
   21 => 
   array (
+    'id' => 22,
     'petsitter_id' => 17,
     'user_id' => 9,
     'service_id' => 4,
@@ -2875,12 +2899,11 @@ class ExportedDataSeeder extends Seeder
         $bookingColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('bookings'));
         foreach ($bookings as $bookingData) {
             $bookingCreateData = array_intersect_key($bookingData, $bookingColumns);
-            unset($bookingCreateData['id']);
             // se o serviço não foi recriado, fica sem serviço em vez de falhar a FK
             if (!in_array($bookingCreateData['service_id'] ?? null, $serviceIds)) {
                 $bookingCreateData['service_id'] = null;
             }
-            Booking::create($bookingCreateData);
+            Booking::forceCreate($bookingCreateData);
         }
 
         // Export Reviews (7 reviews)
@@ -3002,6 +3025,616 @@ class ExportedDataSeeder extends Seeder
             $abCreateData = $abData;
             unset($abCreateData['id']);
             AnimalBooking::create($abCreateData);
+        }
+
+        // Export Notifications (9 notifications)
+        if (\Illuminate\Support\Facades\Schema::hasTable('notifications')) {
+            $notificationColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('notifications'));
+            $notifications = array (
+  0 => 
+  array (
+    'id' => 1,
+    'user_email' => 'petssiter@patudo.com',
+    'booking_id' => 20,
+    'type' => 'booking',
+    'message' => 'Novo pedido de reserva',
+    'read_at' => NULL,
+    'created_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2240,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:25:23.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+    'updated_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2242,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:25:23.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+  ),
+  1 => 
+  array (
+    'id' => 2,
+    'user_email' => 'admin@admin.com',
+    'booking_id' => 19,
+    'type' => 'booking',
+    'message' => 'A reserva foi cancelada.',
+    'read_at' => NULL,
+    'created_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2217,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:32:26.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+    'updated_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2245,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:32:26.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+  ),
+  2 => 
+  array (
+    'id' => 3,
+    'user_email' => 'admin@admin.com',
+    'booking_id' => 18,
+    'type' => 'booking',
+    'message' => 'A reserva foi cancelada.',
+    'read_at' => NULL,
+    'created_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2229,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:32:28.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+    'updated_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2231,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:32:28.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+  ),
+  3 => 
+  array (
+    'id' => 4,
+    'user_email' => 'admin@admin.com',
+    'booking_id' => 13,
+    'type' => 'booking',
+    'message' => 'A reserva foi cancelada.',
+    'read_at' => NULL,
+    'created_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2244,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:32:29.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+    'updated_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2241,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:32:29.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+  ),
+  4 => 
+  array (
+    'id' => 5,
+    'user_email' => 'admin@admin.com',
+    'booking_id' => 12,
+    'type' => 'booking',
+    'message' => 'A reserva foi cancelada.',
+    'read_at' => NULL,
+    'created_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2238,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:32:30.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+    'updated_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2233,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:32:30.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+  ),
+  5 => 
+  array (
+    'id' => 6,
+    'user_email' => 'petssiter@patudo.com',
+    'booking_id' => 21,
+    'type' => 'booking',
+    'message' => 'Novo pedido de reserva',
+    'read_at' => NULL,
+    'created_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2235,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:46:27.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+    'updated_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2234,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:46:27.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+  ),
+  6 => 
+  array (
+    'id' => 7,
+    'user_email' => 'miguel@gmail.com',
+    'booking_id' => 21,
+    'type' => 'booking',
+    'message' => 'A reserva foi aceite.',
+    'read_at' => NULL,
+    'created_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2236,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:48:25.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+    'updated_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2219,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:48:25.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+  ),
+  7 => 
+  array (
+    'id' => 8,
+    'user_email' => 'petssiter@patudo.com',
+    'booking_id' => 22,
+    'type' => 'booking',
+    'message' => 'Novo pedido de reserva',
+    'read_at' => NULL,
+    'created_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2232,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:53:00.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+    'updated_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2177,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:53:00.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+  ),
+  8 => 
+  array (
+    'id' => 9,
+    'user_email' => 'miguel@gmail.com',
+    'booking_id' => 22,
+    'type' => 'booking',
+    'message' => 'A reserva foi aceite.',
+    'read_at' => NULL,
+    'created_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2176,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:54:53.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+    'updated_at' => 
+    \Carbon\CarbonImmutable::__set_state(array(
+       'endOfTime' => false,
+       'startOfTime' => false,
+       'constructedObjectId' => 2174,
+       'clock' => NULL,
+       'localMonthsOverflow' => NULL,
+       'localYearsOverflow' => NULL,
+       'localStrictModeEnabled' => NULL,
+       'localHumanDiffOptions' => NULL,
+       'localToStringFormat' => NULL,
+       'localSerializer' => NULL,
+       'localMacros' => NULL,
+       'localGenericMacros' => NULL,
+       'localFormatFunction' => NULL,
+       'localTranslator' => NULL,
+       'dumpProperties' => 
+      array (
+        0 => 'date',
+        1 => 'timezone_type',
+        2 => 'timezone',
+      ),
+       'dumpLocale' => NULL,
+       'dumpDateProperties' => NULL,
+       'date' => '2026-11-27 10:54:53.000000',
+       'timezone_type' => 3,
+       'timezone' => 'UTC',
+    )),
+  ),
+);
+            foreach ($notifications as $notificationData) {
+                $userId = User::where('email', $notificationData['user_email'] ?? null)->value('id');
+                if (!$userId) { continue; }
+                $notificationCreateData = array_intersect_key([
+                    'id' => $notificationData['id'],
+                    'user_id' => $userId,
+                    'booking_id' => $notificationData['booking_id'] ?? null,
+                    'type' => $notificationData['type'],
+                    'message' => $notificationData['message'],
+                    'read_at' => $notificationData['read_at'],
+                    'created_at' => $notificationData['created_at'],
+                    'updated_at' => $notificationData['updated_at'],
+                ], $notificationColumns);
+                if (!empty($notificationCreateData['booking_id']) && !Booking::whereKey($notificationCreateData['booking_id'])->exists()) {
+                    $notificationCreateData['booking_id'] = null;
+                }
+                Notification::forceCreate($notificationCreateData);
+            }
         }
 
         \Illuminate\Support\Facades\Event::dispatch(null);
