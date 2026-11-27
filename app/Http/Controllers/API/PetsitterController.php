@@ -10,7 +10,6 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PetsitterResource;
 use App\Models\Petsitter;
-use App\Models\PetsitterService;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -84,17 +83,18 @@ class PetsitterController extends Controller
             'service_location' => 'required|string|max:255',
             'postal_code' => ['required', 'string', 'regex:/^\d{4}-\d{3}$/'],
             'age' => 'required|integer|min:18|max:99',
-            'price_per_day' => 'required|numeric|min:0',
+            'price_per_day' => ['required', ...$this->pricePerDayRule()],
             'accepted_sizes' => 'nullable|array',
             'accepted_sizes.*' => 'string|in:small,medium,large',
             'accepted_animal_types' => 'nullable|array',
             'accepted_animal_types.*' => 'string',
             'sex' => 'nullable|string|in:male,female,other',
-            // o serviço é criado logo, ligado ao novo petsitter, com o preço de price_per_day
-            'service' => ['required', Rule::in(PetsitterService::TYPES)],
+            // o primeiro serviço, escrito pelo candidato (ex.: "Passeios ao fim de semana"); é criado logo,
+            // ligado ao novo petsitter, com o preço de price_per_day. Os outros serviços criam-se no perfil.
+            'service' => ['required', 'string', 'max:50'],
             // Cartão de Cidadão: JPG, PNG ou PDF até 10 MB
             'identification_documents' => 'required|file|mimes:jpg,jpeg,png,pdf|max:10240',
-        ]);
+        ], $this->pricePerDayMessages());
 
         if (! $request->user()?->isAdmin() || empty($data['user_id'])) {
             $data['user_id'] = $request->user()->id;
@@ -164,7 +164,7 @@ class PetsitterController extends Controller
             'experience' => 'sometimes|string',
             'service_location' => 'sometimes|string|max:255',
             'postal_code' => ['sometimes', 'nullable', 'string', 'regex:/^\d{4}-\d{3}$/'],
-            'price_per_day' => 'sometimes|numeric|min:0',
+            'price_per_day' => ['sometimes', ...$this->pricePerDayRule()],
             'age' => 'sometimes|integer|min:18|max:99',
             'accepted_sizes' => 'sometimes|nullable|array',
             'accepted_sizes.*' => 'string',
@@ -172,7 +172,7 @@ class PetsitterController extends Controller
             'accepted_animal_types' => 'sometimes|nullable|array',
             'accepted_animal_types.*' => 'string',
             'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:20480',
-        ]);
+        ], $this->pricePerDayMessages());
 
         // Separar os dados do usuário dos dados do petsitter
         $userData = [];
@@ -215,6 +215,33 @@ class PetsitterController extends Controller
         }
 
         return new PetsitterResource($petsitter->load('user'));
+    }
+
+    /**
+     * Regra do preço por dia: um número entre Petsitter::MIN_PRICE_PER_DAY e MAX_PRICE_PER_DAY.
+     *
+     * @return array<int, string>
+     */
+    private function pricePerDayRule(): array
+    {
+        return ['numeric', 'between:'.Petsitter::MIN_PRICE_PER_DAY.','.Petsitter::MAX_PRICE_PER_DAY];
+    }
+
+    /**
+     * Mensagens em português do preço por dia e do serviço (aparecem por baixo do campo no formulário).
+     *
+     * @return array<string, string>
+     */
+    private function pricePerDayMessages(): array
+    {
+        return [
+            'price_per_day.required' => 'Indica o preço por dia.',
+            'price_per_day.numeric' => 'O preço tem de ser um número.',
+            'price_per_day.between' => 'O preço por dia tem de estar entre '.Petsitter::MIN_PRICE_PER_DAY
+                .' € e '.Petsitter::MAX_PRICE_PER_DAY.' €.',
+            'service.required' => 'Escreve o teu serviço.',
+            'service.max' => 'O serviço pode ter no máximo 50 caracteres.',
+        ];
     }
 
     /**
