@@ -408,10 +408,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.patudo-page {
-    background-color: var(--patudo-branco, #fffaf3);
-}
-
 .page-title {
     color: var(--patudo-castanhoDark, #2e1d14);
 }

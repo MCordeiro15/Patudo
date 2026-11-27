@@ -27,7 +27,7 @@ const links = computed(() => [
         >
             Admin
         </button>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu admin-dropdown-menu">
             <li v-for="item in links" :key="item.href">
                 <Link
                     :href="item.href"
@@ -42,3 +42,12 @@ const links = computed(() => [
         </ul>
     </div>
 </template>
+
+<style scoped>
+.admin-dropdown-menu .dropdown-item:hover,
+.admin-dropdown-menu .dropdown-item:focus,
+.admin-dropdown-menu .dropdown-item:active {
+    background-color: var(--patudo-bege);
+    color: var(--patudo-terracota);
+}
+</style>

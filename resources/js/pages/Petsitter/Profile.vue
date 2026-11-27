@@ -1242,10 +1242,6 @@ const saveAvailability = async () => {
 </template>
 
 <style scoped>
-.patudo-page {
-    background-color: #fffaf3;
-}
-
 .profile-avatar {
     width: 140px;
     height: 140px;
