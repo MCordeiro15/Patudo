@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import { Head } from '@inertiajs/vue3';
+
 // TODO: implementar lógica da página
 </script>
 
 <template>
+    <Head title="Avaliações" />
+
     <main class="patudo-page-shell">
         <div class="patudo-content container py-4">
-            <h1>Título da Página</h1>
+            <h1>Avaliações</h1>
         </div>
     </main>
 </template>

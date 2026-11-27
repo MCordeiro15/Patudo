@@ -464,9 +464,6 @@ const displayMemberSince = computed(() =>
                             <h3 class="fs-2 mb-2">{{ post.title }}</h3>
                             <p class="text-muted mb-auto post-text small">{{ post.description }}</p>
                             <small class="text-muted">{{ formatDate(post.created_at) }}</small>
-                            <button type="button" class="like-btn position-absolute bottom-0 end-0">
-                                <Heart :size="26" />
-                            </button>
                         </div>
                     </div>
                 </section>
@@ -488,10 +485,6 @@ const displayMemberSince = computed(() =>
 </template>
 
 <style scoped>
-.patudo-page {
-    background-color: #fffaf3;
-}
-
 .nav-pills .nav-link.active {
     background-color: var(--patudo-terracota, #c2410c) !important;
     color: #ffffff !important;
@@ -573,16 +566,5 @@ const displayMemberSince = computed(() =>
 }
 .post-text {
     max-width: 380px;
-}
-.like-btn {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    border: 0;
-    background: #c8470f;
-    color: #3a1a0a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 </style>

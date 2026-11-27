@@ -62,8 +62,3 @@ const showOwnerNavigation = computed(() => !viewerIsPetsitter.value || page.prop
     </main>
 </template>
 
-<style scoped>
-.patudo-page {
-    background-color: var(--patudo-branco, #fffaf3);
-}
-</style>

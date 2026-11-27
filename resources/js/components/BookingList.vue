@@ -10,8 +10,8 @@
 //                     Cada cartão mostra a outra pessoa, os animais, as datas, o preço total e o estado,
 //                     e os botões do lado do user (dono: Cancelar/Conversar/Avaliar; petsitter: Conversar/Concluir).
 import { usePage } from '@inertiajs/vue3';
-import { ChevronRight, MapPin, UserRound } from '@lucide/vue';
-import { computed, onMounted, ref, watch } from 'vue';
+import { ChevronDown, ChevronRight, MapPin, Menu, UserRound } from '@lucide/vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { Animal } from '@/types';
 import ModalPetDetails, { type PetDetails } from '@/pages/Modals/ModalPetDetails.vue';
 import ModalReviewPetsitter, { type ReviewPayload } from '@/pages/Modals/ModalReviewPetsitter.vue';
@@ -181,6 +181,22 @@ const statusFilters: { value: 'all' | BookingStatus; label: string }[] = [
     { value: 'cancelled', label: 'Canceladas' },
     { value: 'completed', label: 'Concluídas' },
 ];
+const statusMenu = ref<HTMLDetailsElement | null>(null);
+const selectedStatusLabel = computed(() =>
+    statusFilters.find((filter) => filter.value === statusFilter.value)?.label ?? 'Todas',
+);
+
+function selectStatusFilter(value: 'all' | BookingStatus) {
+    statusFilter.value = value;
+    statusMenu.value?.removeAttribute('open');
+}
+
+function closeStatusMenuOnOutsideClick(event: MouseEvent) {
+    const menu = statusMenu.value;
+    if (menu?.open && event.target instanceof Node && !menu.contains(event.target)) {
+        menu.removeAttribute('open');
+    }
+}
 
 // ---------- Lista: filtro, ordenação e paginação ----------
 // Mais recente primeiro (created_at; em empate, id mais alto primeiro)
@@ -384,6 +400,11 @@ const submitBookingReview = async (payload: ReviewPayload) => {
 
 onMounted(() => {
     void loadBookings();
+    document.addEventListener('click', closeStatusMenuOnOutsideClick);
+});
+
+onBeforeUnmount(() => {
+    document.removeEventListener('click', closeStatusMenuOnOutsideClick);
 });
 </script>
 
@@ -415,19 +436,26 @@ onMounted(() => {
 
     <template v-else>
         <!-- Filtro por estado (só nas Reservas; nos Pedidos estão todos pendentes) -->
-        <div v-if="role === 'owner' && !pendingOnly" class="status-filters d-flex flex-wrap gap-2 mb-4" role="group" aria-label="Filtrar por estado">
-            <button
-                v-for="f in statusFilters"
-                :key="f.value"
-                type="button"
-                class="btn btn-sm rounded-pill filter-chip"
-                :class="statusFilter === f.value ? 'active' : ''"
-                :aria-pressed="statusFilter === f.value"
-                @click="statusFilter = f.value"
-            >
-                {{ f.label }}
-            </button>
-        </div>
+        <details v-if="role === 'owner' && !pendingOnly" ref="statusMenu" class="status-filter-menu mb-4">
+            <summary class="status-filter-trigger" aria-label="Filtrar reservas por estado">
+                <Menu :size="20" aria-hidden="true" />
+                <span>Estado: {{ selectedStatusLabel }}</span>
+                <ChevronDown :size="16" aria-hidden="true" />
+            </summary>
+            <div class="status-filter-options" role="group" aria-label="Filtrar por estado">
+                <button
+                    v-for="f in statusFilters"
+                    :key="f.value"
+                    type="button"
+                    class="status-filter-option"
+                    :class="{ active: statusFilter === f.value }"
+                    :aria-pressed="statusFilter === f.value"
+                    @click="selectStatusFilter(f.value)"
+                >
+                    {{ f.label }}
+                </button>
+            </div>
+        </details>
 
         <!-- Estado vazio -->
         <div v-if="filteredBookings.length === 0" class="text-center text-secondary py-5">
@@ -624,7 +652,7 @@ onMounted(() => {
                         <a
                             v-else
                             :href="`/reservations?booking=${b.id}`"
-                            class="btn btn-outline-primary btn-sm rounded-pill flex-fill"
+                            class="btn btn-primary btn-sm rounded-pill flex-fill"
                         >
                             Ver detalhe
                         </a>
@@ -671,7 +699,7 @@ onMounted(() => {
 
                             <a
                                 :href="`/reservations?booking=${b.id}`"
-                                class="btn btn-outline-primary btn-sm rounded-pill flex-fill"
+                                class="btn btn-primary btn-sm rounded-pill flex-fill"
                             >
                                 Ver detalhe
                             </a>
@@ -681,7 +709,7 @@ onMounted(() => {
                         <a
                             v-else
                             :href="`/reservations?booking=${b.id}`"
-                            class="btn btn-outline-primary btn-sm rounded-pill flex-fill"
+                            class="btn btn-primary btn-sm rounded-pill flex-fill"
                         >
                             Ver detalhe
                         </a>
@@ -948,27 +976,73 @@ onMounted(() => {
 }
 
 .status-cancelled {
-    background-color: #e6dfd9;
-    color: #7a6657;
+    background-color: #f9c9c9;
+    color: #dc2626;
 }
 
-/* Filtro por estado */
-.filter-chip {
+/* Menu de filtros por estado */
+.status-filter-menu {
+    position: relative;
+    width: fit-content;
+}
+
+.status-filter-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid var(--patudo-terracota, #c2410c);
+    border-radius: 999px;
     color: var(--patudo-terracota, #c2410c);
     background-color: #ffffff;
-    border: 1px solid var(--patudo-terracota, #c2410c);
     font-weight: 600;
+    cursor: pointer;
+    list-style: none;
 }
 
-.filter-chip:hover {
+.status-filter-trigger::-webkit-details-marker {
+    display: none;
+}
+
+.status-filter-trigger:hover,
+.status-filter-menu[open] .status-filter-trigger {
     background-color: #fdeee4;
     color: var(--patudo-terracota, #c2410c);
 }
 
-.filter-chip.active {
+.status-filter-options {
+    position: absolute;
+    top: calc(100% + 0.45rem);
+    left: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    min-width: 12rem;
+    padding: 0.35rem;
+    border: 1px solid var(--patudo-terracota, #c2410c);
+    border-radius: 0.85rem;
+    background-color: #ffffff;
+    box-shadow: 0 0.5rem 1.25rem rgb(46 29 20 / 14%);
+}
+
+.status-filter-option {
+    padding: 0.5rem 0.7rem;
+    border: 0;
+    border-radius: 0.55rem;
+    color: var(--patudo-terracota, #c2410c);
+    background: transparent;
+    font-weight: 600;
+    text-align: left;
+}
+
+.status-filter-option:hover,
+.status-filter-option:focus-visible {
+    background-color: #fdeee4;
+}
+
+.status-filter-option.active {
     color: #ffffff;
     background-color: var(--patudo-terracota, #c2410c);
-    border-color: var(--patudo-terracota, #c2410c);
 }
 
 /* Paginação com as cores do tema */

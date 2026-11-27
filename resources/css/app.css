@@ -113,6 +113,46 @@
     line-height: normal;
 }
 
+.patudo-icon-action {
+    display: inline-flex;
+    width: 2.25rem;
+    height: 2.25rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.patudo-icon-action:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.patudo-icon-action-edit,
+.patudo-icon-action-add {
+    color: var(--patudo-terracota, #c2410c);
+}
+
+.patudo-icon-action-edit:hover,
+.patudo-icon-action-edit:focus-visible,
+.patudo-icon-action-add:hover,
+.patudo-icon-action-add:focus-visible {
+    background-color: #fdeee4;
+}
+
+.patudo-icon-action-delete {
+    color: #dc2626;
+}
+
+.patudo-icon-action-delete:hover,
+.patudo-icon-action-delete:focus-visible {
+    background-color: #fee2e2;
+}
+
 .patudo-page-shell {
     min-height: 100vh;
     display: flex;
