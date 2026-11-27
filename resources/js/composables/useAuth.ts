@@ -65,7 +65,7 @@ export async function loadUser() {
 export async function login(
     email: string,
     password: string,
-    redirectTo: string = '/petsitters',
+    redirectTo: string = '/dashboard',
 ) {
     isLoading.value = true;
 
@@ -129,7 +129,7 @@ export async function register(
     password: string,
     passwordConfirmation: string,
     phone: string | null = null,
-    redirectTo: string = '/petsitters',
+    redirectTo: string = '/dashboard',
 ) {
     isLoading.value = true;
 
