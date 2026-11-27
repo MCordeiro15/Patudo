@@ -103,6 +103,7 @@ Route::middleware(['auth:sanctum', EnsureAccountActive::class])->group(function 
     Route::delete('/favourites/{petsitter}', [FavouriteController::class, 'destroy']);
 
     // Bookings
+    Route::get('/bookings/availability', [BookingController::class, 'availability']);
     Route::apiResource('bookings', BookingController::class)->only(['index', 'store', 'show']);
     Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus']);
 

@@ -22,6 +22,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        if (file_exists(database_path('seeders/ExportedDataSeeder.php'))) {
+            $this->call(ExportedDataSeeder::class);
+
+            return;
+        }
+
         // 1. Create petsitters with test data
         $this->call(PetsitterSeeder::class);
 
@@ -120,17 +126,11 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Se existir o ExportedDataSeeder (gerado automaticamente), usa-o
-        // Caso contrário, usa os seeders normais
-        if (file_exists(database_path('seeders/ExportedDataSeeder.php'))) {
-            $this->call(ExportedDataSeeder::class);
-        } else {
-            // 5. Create posts for petsitters
-            $this->call(PostSeeder::class);
+        // 5. Create posts for petsitters
+        $this->call(PostSeeder::class);
 
-            // 6. Create bookings and reviews
-            $this->call(BookingSeeder::class);
-        }
+        // 6. Create bookings and reviews
+        $this->call(BookingSeeder::class);
 
         // 7. Serviços da Sofia (petsitter 1), para haver alguém reservável depois do seed.
         //    Só cria se ela ainda não tiver serviços (o export pode já os trazer).

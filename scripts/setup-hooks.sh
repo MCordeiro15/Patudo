@@ -5,11 +5,23 @@
 
 echo "Configurando git hooks automáticos..."
 
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+if ! cd "$PROJECT_ROOT"; then
+    echo "Erro: não foi possível aceder a $PROJECT_ROOT"
+    exit 1
+fi
+
 # Configurar Git para usar scripts/ como diretório de hooks
-git config core.hooksPath scripts
+if ! git config core.hooksPath scripts; then
+    echo "Erro: não foi possível configurar core.hooksPath."
+    exit 1
+fi
 
 # Garantir que os hooks são executáveis
-chmod +x scripts/pre-push scripts/post-merge
+if ! chmod +x scripts/pre-push scripts/post-merge; then
+    echo "Erro: não foi possível tornar os hooks executáveis."
+    exit 1
+fi
 
 echo "Git hooks configurados com sucesso!"
 echo ""
@@ -19,7 +31,10 @@ echo "Configurando banco de dados..."
 if [ -f "artisan" ]; then
     if [ -f "database/seeders/ExportedDataSeeder.php" ]; then
         echo "ExportedDataSeeder encontrado. Criando banco de dados..."
-        php artisan migrate:fresh --seed --no-interaction
+        if ! php artisan migrate:fresh --seed --no-interaction; then
+            echo "Erro ao criar a base de dados a partir do snapshot."
+            exit 1
+        fi
         php artisan storage:link 2>/dev/null
         echo "Banco de dados criado com sucesso!"
         echo ""

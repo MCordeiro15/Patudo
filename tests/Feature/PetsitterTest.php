@@ -46,18 +46,38 @@ test('public and regular listings hide approved profiles when the user is no lon
     $this->getJson('/api/petsitters/'.$petsitter->user_id)->assertForbidden();
 });
 
-test('admin user sees all petsitters regardless of approval status', function () {
+test('admin default listing only shows approved petsitters', function () {
     $admin = User::factory()->admin()->create();
 
     $approvedPetsitter = Petsitter::factory()->approved()->create();
     $pendingPetsitter = Petsitter::factory()->create(['approval_status' => 'pending']);
+    $rejectedPetsitter = Petsitter::factory()->rejected()->create();
 
     $response = $this->actingAs($admin)->getJson('/api/petsitters');
 
     $response->assertOk()
-        ->assertJsonCount(2, 'data')
+        ->assertJsonCount(1, 'data')
         ->assertJsonFragment(['user_id' => $approvedPetsitter->user_id])
-        ->assertJsonFragment(['user_id' => $pendingPetsitter->user_id]);
+        ->assertJsonMissing(['user_id' => $pendingPetsitter->user_id])
+        ->assertJsonMissing(['user_id' => $rejectedPetsitter->user_id]);
+});
+
+test('petsitter listings do not include profiles owned by administrators', function () {
+    $admin = User::factory()->admin()->create();
+    $adminPetsitter = Petsitter::factory()->approved()->create(['user_id' => $admin->id]);
+    $regularPetsitter = Petsitter::factory()->approved()->create();
+
+    $this->actingAs($admin)->getJson('/api/petsitters')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonFragment(['user_id' => $regularPetsitter->user_id])
+        ->assertJsonMissing(['user_id' => $adminPetsitter->user_id]);
+
+    $this->getJson('/api/petsitters/public')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonFragment(['user_id' => $regularPetsitter->user_id])
+        ->assertJsonMissing(['user_id' => $adminPetsitter->user_id]);
 });
 
 test('admin can filter petsitters by approval status', function () {

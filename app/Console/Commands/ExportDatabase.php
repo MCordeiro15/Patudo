@@ -7,17 +7,10 @@
  */
 namespace App\Console\Commands;
 
-use App\Models\User;
-use App\Models\Petsitter;
-use App\Models\Animal;
-use App\Models\Post;
-use App\Models\Booking;
-use App\Models\Review;
-use App\Models\AnimalBooking;
-use App\Models\PetsitterService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 
 class ExportDatabase extends Command
 {
@@ -33,116 +26,35 @@ class ExportDatabase extends Command
 
         $seederPath = database_path('seeders/ExportedDataSeeder.php');
 
-        // Export users
-        $users = User::with('petsitter')->get();
-        $usersArray = $users->map(fn($u) => [
-            'id' => $u->id,
-            'name' => $u->name,
-            'email' => $u->email,
-            'password' => $u->password,
-            'email_verified_at' => $u->email_verified_at,
-            'phone' => $u->phone,
-            // avatar fica de fora de propósito: é base64 e tornaria o seeder enorme
-            'location' => $u->location,
-            'about' => $u->about,
-            'is_admin' => $u->is_admin ?? false,
-            'is_petsitter' => $u->is_petsitter ?? false,
-            'created_at' => $u->created_at,
-            'updated_at' => $u->updated_at,
-        ])->toArray();
+        $usersArray = $this->exportTable('users');
+        foreach ($usersArray as &$userData) {
+            unset($userData['remember_token'], $userData['two_factor_secret'], $userData['two_factor_recovery_codes']);
+        }
+        unset($userData);
 
-        // Export petsitters com fotos em base64
-        $petsitters = Petsitter::all();
-        $petsittersArray = $petsitters->map(fn($p) => [
-            'id' => $p->id,
-            'user_id' => $p->user_id,
-            'biography' => $p->biography,
-            'short_bio' => $p->short_bio,
-            'experience' => $p->experience,
-            'service_location' => $p->service_location,
-            'city' => $p->city,
-            'postal_code' => $p->postal_code,
-            'age' => $p->age,
-            'price_per_day' => $p->price_per_day,
-            'average_rating' => $p->average_rating,
-            'accepted_sizes' => $p->accepted_sizes ?? [],
-            'sex' => $p->sex,
-            'accepted_animal_types' => $p->accepted_animal_types ?? [],
-            'identification_documents' => $p->identification_documents,
-            'approval_status' => $p->approval_status ?? 'pending',
-            'availability_days' => $p->availability_days ?? [],
-            'profile_photo' => $this->exportPhoto($p->profile_photo),
-            'created_at' => $p->created_at,
-            'updated_at' => $p->updated_at,
-        ])->toArray();
+        $petsittersArray = $this->exportTable('petsitters', 'profile_photo');
+        $animalsArray = $this->exportTable('animals', 'photo');
+        $postsArray = $this->exportTable('posts', 'photos');
+        $servicesArray = $this->exportTable('petsitter_services');
+        $bookingsArray = $this->exportTable('bookings');
+        $notificationsArray = $this->exportTable('notifications');
+        $reviewsArray = $this->exportTable('reviews');
+        $animalBookingsArray = $this->exportTable('animal_bookings');
 
-        // Export animals com fotos em base64
-        $animals = Animal::all();
-        $animalsArray = $animals->map(fn($a) => [
-            'user_id' => $a->user_id,
-            'name' => $a->name,
-            'species' => $a->species,
-            'breed' => $a->breed,
-            'size' => $a->size,
-            'sex' => $a->sex ?? null,
-            'weight' => $a->weight ?? null,
-            'photo' => $this->exportPhoto($a->photo),
-            'special_needs' => $a->special_needs ?? null,
-            'aggression' => $a->aggression ?? null,
-            'medication' => $a->medication ?? null,
-        ])->toArray();
-
-        // Export posts com fotos em base64
-        $posts = Post::all();
-        $postsArray = $posts->map(fn($p) => [
-            'petsitter_id' => $p->petsitter_id,
-            'title' => $p->title ?? null,
-            'description' => $p->description,
-            'photos' => $this->exportPhotos($p->photos),
-        ])->toArray();
-
-        // Export petsitter_services (com id, porque bookings.service_id aponta para ele)
-        $services = PetsitterService::orderBy('id')->get();
-        $servicesArray = $services->map(fn($s) => [
-            'id' => $s->id,
-            'petsitter_id' => $s->petsitter_id,
-            'type' => $s->type,
-            'price' => (float) $s->price,
-        ])->toArray();
-
-        // Export bookings
-        $bookings = Booking::all();
-        $bookingsArray = $bookings->map(fn($b) => [
-            'petsitter_id' => $b->petsitter_id,
-            'user_id' => $b->user_id,
-            'service_id' => $b->service_id,
-            'start_date' => $b->start_date,
-            'end_date' => $b->end_date,
-            'status' => $b->status ?? 'pending',
-            'total_price' => $b->total_price ?? 0,
-            // campos extra da reserva (PR booking-extra-fields)
-            'message' => $b->message,
-            'zone' => $b->zone,
-            'entrance_hour' => $b->entrance_hour,
-            'exit_hour' => $b->exit_hour,
-        ])->toArray();
-
-        // Export reviews
-        $reviews = Review::all();
-        $reviewsArray = $reviews->map(fn($r) => [
-            'booking_id' => $r->booking_id,
-            'petsitter_id' => $r->petsitter_id,
-            'star_rating' => $r->star_rating ?? $r->rating ?? 5,
-            'comment' => $r->comment ?? null,
-            'status' => $r->status ?? 'published',
-        ])->toArray();
-
-        // Export animal_bookings
-        $animalBookings = \App\Models\AnimalBooking::all();
-        $animalBookingsArray = $animalBookings->map(fn($ab) => [
-            'booking_id' => $ab->booking_id,
-            'animal_id' => $ab->animal_id,
-        ])->toArray();
+        // Exportar restantes tabelas de dados da aplicação sem incluir credenciais ou dados temporários
+        $additionalTables = [
+            'petsitter_availabilities',
+            'favourites',
+            'post_favourites',
+            'support_tickets',
+            'user_notes',
+        ];
+        $additionalTablesArray = [];
+        foreach ($additionalTables as $table) {
+            $additionalTablesArray[$table] = Schema::hasTable($table)
+                ? DB::table($table)->get()->map(fn($row) => (array) $row)->all()
+                : [];
+        }
 
         // Generate the seeder file
         $content = "<?php\n\n\n";
@@ -155,6 +67,7 @@ class ExportDatabase extends Command
         $content .= "use App\Models\Review;\n";
         $content .= "use App\Models\AnimalBooking;\n";
         $content .= "use App\Models\PetsitterService;\n";
+        $content .= "use App\Models\Notification;\n";
         $content .= "use Illuminate\Database\Seeder;\n";
         $content .= "use Illuminate\Support\Facades\Hash;\n\n";
         $content .= "/**\n";
@@ -168,23 +81,27 @@ class ExportDatabase extends Command
         $content .= "        // Desabilitar eventos durante o seed\n";
         $content .= "        \Illuminate\Support\Facades\Event::fake();\n\n";
 
+        $content .= "        // Limpar primeiro as relações dependentes para evitar erros de chaves estrangeiras\n";
+        $content .= "        \$additionalTables = " . var_export($additionalTablesArray, true) . ";\n";
+        $content .= "        foreach (['user_notes', 'support_tickets', 'post_favourites', 'favourites', 'petsitter_availabilities'] as \$table) {\n";
+        $content .= "            if (\\Illuminate\\Support\\Facades\\Schema::hasTable(\$table)) { \\Illuminate\\Support\\Facades\\DB::table(\$table)->delete(); }\n";
+        $content .= "        }\n\n";
+        $content .= "        if (\\Illuminate\\Support\\Facades\\Schema::hasTable('notifications')) { Notification::query()->delete(); }\n";
+        $content .= "        AnimalBooking::query()->delete();\n";
+        $content .= "        Review::query()->delete();\n";
+        $content .= "        Booking::query()->delete();\n";
+        $content .= "        PetsitterService::query()->delete();\n";
+        $content .= "        Animal::query()->delete();\n";
+        $content .= "        Post::query()->delete();\n\n";
+
         // Users
         $content .= "        // Export Users (" . count($usersArray) . " users)\n";
         $content .= "        \$users = " . var_export($usersArray, true) . ";\n";
+        $content .= "        \$userColumns = array_flip(\\Illuminate\\Support\\Facades\\Schema::getColumnListing('users'));\n";
         $content .= "        foreach (\$users as \$userData) {\n";
-        $content .= "            User::updateOrCreate(\n";
-        $content .= "                ['email' => \$userData['email']],\n";
-        $content .= "                [\n";
-        $content .= "                    'name' => \$userData['name'],\n";
-        $content .= "                    'password' => \$userData['password'],\n";
-        $content .= "                    'email_verified_at' => \$userData['email_verified_at'],\n";
-        $content .= "                    'phone' => \$userData['phone'],\n";
-        $content .= "                    'location' => \$userData['location'] ?? null,\n";
-        $content .= "                    'about' => \$userData['about'] ?? null,\n";
-        $content .= "                    'is_admin' => \$userData['is_admin'],\n";
-        $content .= "                    'is_petsitter' => \$userData['is_petsitter'],\n";
-        $content .= "                ]\n";
-        $content .= "            );\n";
+        $content .= "            \$userCreateData = array_intersect_key(\$userData, \$userColumns);\n";
+        $content .= "            \$user = User::firstOrNew(['email' => \$userData['email']]);\n";
+        $content .= "            \$user->forceFill(\$userCreateData)->save();\n";
         $content .= "        }\n\n";
 
         // Petsitters
@@ -194,36 +111,33 @@ class ExportDatabase extends Command
 
         // Animals (delete all first, then recreate)
         $content .= "        // Export Animals (" . count($animalsArray) . " animals)\n";
-        $content .= "        Animal::query()->delete();\n";
         $content .= "        \$animals = " . var_export($animalsArray, true) . ";\n";
+        $content .= "        \$animalColumns = array_flip(\\Illuminate\\Support\\Facades\\Schema::getColumnListing('animals'));\n";
         $content .= "        foreach (\$animals as \$aData) {\n";
-        $content .= "            \$animalData = \$aData;\n";
-        $content .= "            unset(\$animalData['id']);\n";
-        $content .= "            Animal::create(\$animalData);\n";
+        $content .= "            \$animalCreateData = array_intersect_key(\$aData, \$animalColumns);\n";
+        $content .= "            Animal::forceCreate(\$animalCreateData);\n";
         $content .= "        }\n\n";
 
         // Posts (delete all first, then recreate)
         $content .= "        // Export Posts (" . count($postsArray) . " posts)\n";
-        $content .= "        Post::query()->delete();\n";
         $content .= "        \$posts = " . var_export($postsArray, true) . ";\n";
+        $content .= "        \$postColumns = array_flip(\\Illuminate\\Support\\Facades\\Schema::getColumnListing('posts'));\n";
         $content .= "        foreach (\$posts as \$postData) {\n";
-        $content .= "            \$postCreateData = \$postData;\n";
-        $content .= "            unset(\$postCreateData['id']);\n";
-        $content .= "            Post::create(\$postCreateData);\n";
+        $content .= "            \$postCreateData = array_intersect_key(\$postData, \$postColumns);\n";
+        $content .= "            Post::forceCreate(\$postCreateData);\n";
         $content .= "        }\n\n";
 
         // Bookings (delete all first, then recreate)
         $content .= "        // Export Bookings (" . count($bookingsArray) . " bookings)\n";
-        $content .= "        Booking::query()->delete();\n\n";
 
         // Petsitter services: depois de apagar as bookings (FK restrictOnDelete) e antes de as recriar
         $content .= "        // Export Petsitter Services (" . count($servicesArray) . " services)\n";
-        $content .= "        PetsitterService::query()->delete();\n";
         $content .= "        \$services = " . var_export($servicesArray, true) . ";\n";
+        $content .= "        \$serviceColumns = array_flip(\\Illuminate\\Support\\Facades\\Schema::getColumnListing('petsitter_services'));\n";
         $content .= "        foreach (\$services as \$sData) {\n";
         $content .= "            // só cria se o petsitter existir (FK para petsitters.user_id)\n";
         $content .= "            if (Petsitter::where('user_id', \$sData['petsitter_id'])->exists()) {\n";
-        $content .= "                PetsitterService::forceCreate(\$sData); // mantém o id original\n";
+        $content .= "                PetsitterService::forceCreate(array_intersect_key(\$sData, \$serviceColumns)); // mantém o id original\n";
         $content .= "            }\n";
         $content .= "        }\n";
         $content .= "        \$serviceIds = PetsitterService::pluck('id')->all();\n\n";
@@ -233,40 +147,59 @@ class ExportDatabase extends Command
         $content .= "        \$bookingColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('bookings'));\n";
         $content .= "        foreach (\$bookings as \$bookingData) {\n";
         $content .= "            \$bookingCreateData = array_intersect_key(\$bookingData, \$bookingColumns);\n";
-        $content .= "            unset(\$bookingCreateData['id']);\n";
         $content .= "            // se o serviço não foi recriado, fica sem serviço em vez de falhar a FK\n";
-        $content .= "            if (!in_array(\$bookingCreateData['service_id'] ?? null, \$serviceIds)) {\n";
+        $content .= "            if (array_key_exists('service_id', \$bookingCreateData) && !in_array(\$bookingCreateData['service_id'], \$serviceIds)) {\n";
         $content .= "                \$bookingCreateData['service_id'] = null;\n";
         $content .= "            }\n";
-        $content .= "            Booking::create(\$bookingCreateData);\n";
+        $content .= "            Booking::forceCreate(\$bookingCreateData);\n";
         $content .= "        }\n\n";
 
         // Reviews (delete all first, then recreate)
         $content .= "        // Export Reviews (" . count($reviewsArray) . " reviews)\n";
-        $content .= "        Review::query()->delete();\n";
         $content .= "        \$reviews = " . var_export($reviewsArray, true) . ";\n";
+        $content .= "        \$reviewColumns = array_flip(\\Illuminate\\Support\\Facades\\Schema::getColumnListing('reviews'));\n";
         $content .= "        foreach (\$reviews as \$reviewData) {\n";
-        $content .= "            \$reviewCreateData = \$reviewData;\n";
-        $content .= "            unset(\$reviewCreateData['id']);\n";
-        // forceCreate: o status não está no $fillable do Review
+        $content .= "            \$reviewCreateData = array_intersect_key(\$reviewData, \$reviewColumns);\n";
         $content .= "            Review::forceCreate(\$reviewCreateData);\n";
         $content .= "        }\n\n";
 
         // Animal Bookings (delete all first, then recreate)
         $content .= "        // Export Animal Bookings (" . count($animalBookingsArray) . " animal bookings)\n";
-        $content .= "        AnimalBooking::query()->delete();\n";
         $content .= "        \$animalBookings = " . var_export($animalBookingsArray, true) . ";\n";
+        $content .= "        \$animalBookingColumns = array_flip(\\Illuminate\\Support\\Facades\\Schema::getColumnListing('animal_bookings'));\n";
         $content .= "        foreach (\$animalBookings as \$abData) {\n";
-        $content .= "            \$abCreateData = \$abData;\n";
-        $content .= "            unset(\$abCreateData['id']);\n";
-        $content .= "            AnimalBooking::create(\$abCreateData);\n";
+        $content .= "            \$abCreateData = array_intersect_key(\$abData, \$animalBookingColumns);\n";
+        $content .= "            AnimalBooking::forceCreate(\$abCreateData);\n";
+        $content .= "        }\n\n";
+
+        $content .= "        // Export Notifications (" . count($notificationsArray) . " notifications)\n";
+        $content .= "        if (\\Illuminate\\Support\\Facades\\Schema::hasTable('notifications')) {\n";
+        $content .= "            \$notificationColumns = array_flip(\\Illuminate\\Support\\Facades\\Schema::getColumnListing('notifications'));\n";
+        $content .= "            \$notifications = " . var_export($notificationsArray, true) . ";\n";
+        $content .= "            foreach (\$notifications as \$notificationData) {\n";
+        $content .= "                Notification::forceCreate(array_intersect_key(\$notificationData, \$notificationColumns));\n";
+        $content .= "            }\n";
+        $content .= "        }\n";
+        $content .= "        foreach (\$additionalTables as \$table => \$rows) {\n";
+        $content .= "            if (!\\Illuminate\\Support\\Facades\\Schema::hasTable(\$table)) { continue; }\n";
+        $content .= "            \$tableColumns = array_flip(\\Illuminate\\Support\\Facades\\Schema::getColumnListing(\$table));\n";
+        $content .= "            foreach (\$rows as \$row) {\n";
+        $content .= "                \$row = array_intersect_key(\$row, \$tableColumns);\n";
+        $content .= "                foreach (\$row as \$column => \$value) { if (is_array(\$value)) { \$row[\$column] = json_encode(\$value); } }\n";
+        $content .= "                \\Illuminate\\Support\\Facades\\DB::table(\$table)->insert(\$row);\n";
+        $content .= "            }\n";
         $content .= "        }\n\n";
 
         $content .= "        \Illuminate\Support\Facades\Event::dispatch(null);\n";
         $content .= "    }\n";
         $content .= "}\n";
 
-        File::put($seederPath, $content);
+        if (File::put($seederPath, $content) === false) {
+            $this->error("Não foi possível escrever o snapshot em {$seederPath}.");
+
+            return self::FAILURE;
+        }
+
         $this->info("Dados exportados para ExportedDataSeeder.php");
         $this->info("Users: " . count($usersArray));
         $this->info("Petsitters: " . count($petsittersArray));
@@ -276,8 +209,32 @@ class ExportDatabase extends Command
         $this->info("Bookings: " . count($bookingsArray));
         $this->info("Reviews: " . count($reviewsArray));
         $this->info("Animal Bookings: " . count($animalBookingsArray));
+        $this->info("Notifications: " . count($notificationsArray));
+        $this->info("Other domain records: " . array_sum(array_map('count', $additionalTablesArray)));
 
         return 0;
+    }
+
+    protected function exportTable(string $table, ?string $photoColumn = null): array
+    {
+        if (!Schema::hasTable($table)) {
+            return [];
+        }
+
+        return DB::table($table)->get()->map(function ($row) use ($photoColumn) {
+            $data = (array) $row;
+
+            if ($photoColumn && array_key_exists($photoColumn, $data)) {
+                if ($photoColumn === 'photos') {
+                    $photos = is_string($data[$photoColumn]) ? json_decode($data[$photoColumn], true) : $data[$photoColumn];
+                    $data[$photoColumn] = $this->exportPhotos(is_array($photos) ? $photos : null);
+                } else {
+                    $data[$photoColumn] = $this->exportPhoto($data[$photoColumn]);
+                }
+            }
+
+            return $data;
+        })->all();
     }
 
     /**
