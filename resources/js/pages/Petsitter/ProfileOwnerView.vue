@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { Bell, Check, Heart, LogOut, MessageCircle, Star, UserRound, X } from '@lucide/vue';
+import { Bell, Check, Heart, LogOut, MessageCircle, UserRound, X } from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
@@ -342,13 +342,15 @@ const displayMemberSince = computed(() =>
                                         {{ displayName }}
                                         <button
                                             type="button"
-                                            class="p-0 border-0 bg-transparent shadow-none d-flex"
-                                            aria-label="Favorito"
+                                            class="p-0 border-0 bg-transparent shadow-none d-flex text-primary"
+                                            :aria-label="isFavourite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
+                                            :aria-pressed="isFavourite"
                                             @click="toggleFavourite"
                                         >
-                                            <Star
+                                            <Heart
                                                 :size="20"
-                                                :fill="isFavourite ? '#f5b301' : 'none'"
+                                                :fill="isFavourite ? 'currentColor' : 'transparent'"
+                                                stroke-width="2.5"
                                             />
                                         </button>
                                     </h2>

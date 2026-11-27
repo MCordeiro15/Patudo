@@ -9,8 +9,9 @@ import { useNotifications } from '@/composables/useNotifications';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 // A página é partilhada: petsitters veem pedidos recebidos e donos veem os seus pedidos pendentes.
-const page = usePage<{ auth: { user: { is_petsitter?: boolean } | null } }>();
+const page = usePage<{ auth: { isAdmin: boolean; user: { is_petsitter?: boolean } | null } }>();
 const viewerIsPetsitter = computed(() => page.props.auth.user?.is_petsitter === true);
+const showOwnerNavigation = computed(() => !viewerIsPetsitter.value || page.props.auth.isAdmin);
 
 const showNotifications = ref(false);
 const { unreadCount, fetchNotifications } = useNotifications();
@@ -33,9 +34,9 @@ onMounted(() => {
                 </a>
 
                 <div class="nav nav-pills border rounded-pill p-1 mx-auto">
-                    <a class="nav-link text-dark rounded-pill px-4" href="/">Início</a>
+                    <a v-if="showOwnerNavigation" class="nav-link text-dark rounded-pill px-4" href="/">Início</a>
                     <a class="nav-link active rounded-pill px-4" href="/orders" aria-current="page">Pedidos</a>
-                    <a class="nav-link text-dark rounded-pill px-4" href="/favorites">Favoritos</a>
+                    <a v-if="showOwnerNavigation" class="nav-link text-dark rounded-pill px-4" href="/favorites">Favoritos</a>
                     <a class="nav-link text-dark rounded-pill px-4" href="/reservations">Reservas</a>
                     <AdminNavigationMenu />
                 </div>

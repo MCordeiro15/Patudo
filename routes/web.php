@@ -27,7 +27,7 @@ Route::get('/dashboard', function () {
     $user = auth()->user();
 
     if ($user->isAdmin()) {
-        return redirect()->route('admin.users');
+        return redirect()->route('petsitters.search');
     }
 
     if ($user->isPetsitter()) {

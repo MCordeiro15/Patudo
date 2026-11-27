@@ -111,8 +111,10 @@ function formatDay(day: string): string {
 }
 
 // Quem abre o detalhe pode ser o dono ou o petsitter da reserva (bookings.petsitter_id é o id do user)
-const page = usePage<{ auth: { user: { id: number; is_petsitter?: boolean } | null } }>();
-const viewerIsPetsitter = computed(() => !!booking.value && booking.value.petsitter_id === page.props.auth.user?.id);
+const page = usePage<{ auth: { isAdmin: boolean; user: { id: number; is_petsitter?: boolean } | null } }>();
+const viewerIsPetsitter = computed(() => page.props.auth.user?.is_petsitter === true);
+const showOwnerNavigation = computed(() => !viewerIsPetsitter.value || page.props.auth.isAdmin);
+const viewerIsBookingPetsitter = computed(() => !!booking.value && booking.value.petsitter_id === page.props.auth.user?.id);
 
 // O cartão do detalhe mostra a outra pessoa: o petsitter para o dono, o dono para o petsitter.
 // Vem da própria reserva (/api/petsitters/{id} com o id do user dava o petsitter errado)
@@ -212,9 +214,9 @@ onMounted(() => {
                 </a>
 
                 <div class="nav nav-pills border rounded-pill p-1 mx-auto">
-                    <a class="nav-link text-dark rounded-pill px-4" href="/">Início</a>
+                    <a v-if="showOwnerNavigation" class="nav-link text-dark rounded-pill px-4" href="/">Início</a>
                     <a class="nav-link text-dark rounded-pill px-4" href="/orders">Pedidos</a>
-                    <a class="nav-link text-dark rounded-pill px-4" href="/favorites">Favoritos</a>
+                    <a v-if="showOwnerNavigation" class="nav-link text-dark rounded-pill px-4" href="/favorites">Favoritos</a>
                     <a class="nav-link active rounded-pill px-4" href="/reservations" aria-current="page">Reservas</a>
                     <AdminNavigationMenu />
                 </div>
@@ -409,7 +411,7 @@ onMounted(() => {
 
                         <!-- Ações -->
                         <!-- Cancelar é do dono; o petsitter responde nos Pedidos -->
-                        <div v-if="booking.status === 'pending' && !viewerIsPetsitter" class="mt-3">
+                        <div v-if="booking.status === 'pending' && !viewerIsBookingPetsitter" class="mt-3">
                             <button
                                 type="button"
                                 class="btn btn-outline-danger w-100 rounded-pill py-2"

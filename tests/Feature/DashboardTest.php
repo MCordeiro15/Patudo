@@ -32,12 +32,12 @@ test('petsitters are redirected to their orders after login', function () {
         ->assertRedirect(route('bookings.orders'));
 });
 
-test('administrators are redirected to administration after login', function () {
+test('administrators are redirected to petsitter search after login', function () {
     $admin = User::factory()->admin()->create();
 
     $this->postJson('/api/login', ['email' => $admin->email, 'password' => 'password'])
         ->assertOk();
 
     $this->get(route('dashboard'))
-        ->assertRedirect(route('admin.users'));
+        ->assertRedirect(route('petsitters.search'));
 });

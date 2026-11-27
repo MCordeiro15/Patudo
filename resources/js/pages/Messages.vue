@@ -7,9 +7,9 @@
 // May God bless all the developers working on this project. Amen.
 import '@talkjs/web-components';
 import '@talkjs/web-components/default.css';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { Bell, LogOut, MessageCircle, UserRound } from '@lucide/vue';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
 import { useChat } from '@/composables/useChat';
@@ -19,6 +19,9 @@ import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 const showNotifications = ref(false);
 const { unreadCount, fetchNotifications } = useNotifications();
+const page = usePage<{ auth: { isAdmin: boolean; user: { is_petsitter?: boolean } | null } }>();
+const viewerIsPetsitter = computed(() => page.props.auth.user?.is_petsitter === true);
+const showOwnerNavigation = computed(() => !viewerIsPetsitter.value || page.props.auth.isAdmin);
 
 const {
     me,
@@ -91,9 +94,9 @@ onMounted(async () => {
                 </a>
 
                 <div class="nav nav-pills border rounded-pill p-1 mx-auto">
-                    <a class="nav-link text-dark rounded-pill px-4" href="/">Início</a>
+                    <a v-if="showOwnerNavigation" class="nav-link text-dark rounded-pill px-4" href="/">Início</a>
                     <a class="nav-link text-dark rounded-pill px-4" href="/orders">Pedidos</a>
-                    <a class="nav-link text-dark rounded-pill px-4" href="/favorites">Favoritos</a>
+                    <a v-if="showOwnerNavigation" class="nav-link text-dark rounded-pill px-4" href="/favorites">Favoritos</a>
                     <a class="nav-link text-dark rounded-pill px-4" href="/reservations">Reservas</a>
                     <AdminNavigationMenu />
                 </div>
