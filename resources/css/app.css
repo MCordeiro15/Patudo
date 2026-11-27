@@ -33,6 +33,9 @@
 .btn-primary {
     --bs-btn-bg: var(--patudo-terracota);
     --bs-btn-border-color: var(--patudo-terracota);
+    --bs-btn-disabled-bg: var(--patudo-terracota);
+    --bs-btn-disabled-border-color: var(--patudo-terracota);
+    --bs-btn-disabled-color: #ffffff;
     --bs-btn-hover-bg: var(--patudo-laranjaVivo);
     --bs-btn-hover-border-color: var(--patudo-laranjaVivo);
     --bs-btn-color: #ffffff;

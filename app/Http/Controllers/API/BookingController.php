@@ -4,10 +4,12 @@
  * Controlador API para gestão de reservas de petsitters. Permite criar reservas, listar reservas do utilizador, ver detalhes e alterar o estado (pending, approved, rejected, completed, cancelled).
  * API controller for petsitter booking management. Allows creating bookings, listing user's bookings, viewing details, and changing status (pending, approved, rejected, completed, cancelled).
  */
+
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BookingResource;
+use App\Models\Animal;
 use App\Models\Booking;
 use App\Models\Notification;
 use App\Models\Petsitter;
@@ -60,6 +62,45 @@ class BookingController extends Controller
         );
     }
 
+    /** Verifica se o período pedido está livre antes de iniciar o pagamento. */
+    public function availability(Request $request)
+    {
+        $data = $request->validate([
+            'petsitter_id' => [
+                'required', 'integer',
+                Rule::exists('petsitters', 'user_id')->where('approval_status', 'approved'),
+            ],
+            'start_date' => 'required|date_format:Y-m-d|after_or_equal:today',
+            'end_date' => 'required|date_format:Y-m-d|after_or_equal:start_date',
+            'entrance_hour' => ['nullable', 'date_format:H:i'],
+            'exit_hour' => ['nullable', 'date_format:H:i'],
+        ]);
+
+        if (
+            $data['start_date'] === $data['end_date'] &&
+            ! empty($data['entrance_hour']) &&
+            ! empty($data['exit_hour']) &&
+            $data['exit_hour'] <= $data['entrance_hour']
+        ) {
+            throw ValidationException::withMessages([
+                'exit_hour' => 'A hora de saída deve ser posterior à hora de entrada.',
+            ]);
+        }
+
+        $available = ! $this->hasOverlappingBooking(
+            (int) $data['petsitter_id'],
+            $data['start_date'],
+            $data['end_date'],
+            $data['entrance_hour'] ?? null,
+            $data['exit_hour'] ?? null,
+        );
+
+        return response()->json([
+            'available' => $available,
+            'message' => $available ? null : 'O petsitter já tem uma reserva que se sobrepõe a este período.',
+        ]);
+    }
+
     /**
      * Cria um novo registo após validação dos dados do pedido. Retorna o recurso criado com status 201.
      * Creates a new record after validating request data. Returns the created resource with status 201.
@@ -96,8 +137,8 @@ class BookingController extends Controller
 
         if (
             $data['start_date'] === $data['end_date'] &&
-            !empty($data['entrance_hour']) &&
-            !empty($data['exit_hour']) &&
+            ! empty($data['entrance_hour']) &&
+            ! empty($data['exit_hour']) &&
             $data['exit_hour'] <= $data['entrance_hour']
         ) {
             return response()->json([
@@ -112,6 +153,22 @@ class BookingController extends Controller
 
         $petsitter = Petsitter::findOrFail($data['petsitter_id']);
         $service = PetsitterService::findOrFail($data['service_id']);
+        $acceptedSizes = array_map(
+            fn ($size) => strtolower((string) $size),
+            $petsitter->accepted_sizes ?? [],
+        );
+
+        if ($acceptedSizes) {
+            $incompatibleAnimals = Animal::whereIn('id', $data['animal_ids'])
+                ->get(['name', 'size'])
+                ->filter(fn (Animal $animal) => ! in_array(strtolower($animal->size), $acceptedSizes, true));
+
+            if ($incompatibleAnimals->isNotEmpty()) {
+                throw ValidationException::withMessages([
+                    'animal_ids' => 'O petsitter não aceita animais deste porte: '.$incompatibleAnimals->pluck('name')->join(', ').'.',
+                ]);
+            }
+        }
 
         // o petsitter tem de trabalhar em todos os dias da semana do período
         $missingDays = $this->unavailableWeekdays($petsitter, $data['start_date'], $data['end_date']);
@@ -128,6 +185,21 @@ class BookingController extends Controller
 
         // transaction: ou grava a reserva E os animais E a notificação, ou não faz nada
         $booking = DB::transaction(function () use ($data, $user, $petsitter, $service, $total) {
+            // Serializa pedidos para este petsitter e evita que dois pedidos simultâneos ocupem o mesmo horário.
+            Petsitter::where('user_id', $petsitter->user_id)->lockForUpdate()->firstOrFail();
+
+            if ($this->hasOverlappingBooking(
+                $petsitter->user_id,
+                $data['start_date'],
+                $data['end_date'],
+                $data['entrance_hour'] ?? null,
+                $data['exit_hour'] ?? null,
+            )) {
+                throw ValidationException::withMessages([
+                    'start_date' => 'O petsitter já tem uma reserva que se sobrepõe a este período.',
+                ]);
+            }
+
             $booking = Booking::create([
                 'user_id' => $user->id,            // vem da sessão, não do pedido
                 'petsitter_id' => $petsitter->user_id,
@@ -156,6 +228,48 @@ class BookingController extends Controller
         });
 
         return (new BookingResource($booking->load('animals', 'service')))->response()->setStatusCode(201);
+    }
+
+    private function hasOverlappingBooking(
+        int $petsitterId,
+        string $startDate,
+        string $endDate,
+        ?string $entranceHour,
+        ?string $exitHour,
+    ): bool {
+        $requestedStart = $this->bookingStart($startDate, $entranceHour);
+        $requestedEnd = $this->bookingEnd($endDate, $exitHour);
+
+        return Booking::query()
+            ->where('petsitter_id', $petsitterId)
+            ->whereIn('status', ['pending', 'approved'])
+            ->where('start_date', '<=', $endDate)
+            ->where('end_date', '>=', $startDate)
+            ->get(['start_date', 'end_date', 'entrance_hour', 'exit_hour'])
+            ->contains(function (Booking $booking) use ($requestedStart, $requestedEnd) {
+                $existingStart = $this->bookingStart(
+                    (string) $booking->start_date,
+                    $booking->entrance_hour ? (string) $booking->entrance_hour : null,
+                );
+                $existingEnd = $this->bookingEnd(
+                    (string) $booking->end_date,
+                    $booking->exit_hour ? (string) $booking->exit_hour : null,
+                );
+
+                return $existingStart->lt($requestedEnd) && $existingEnd->gt($requestedStart);
+            });
+    }
+
+    private function bookingStart(string $date, ?string $hour): Carbon
+    {
+        return Carbon::parse($date.' '.($hour ?? '00:00:00'));
+    }
+
+    private function bookingEnd(string $date, ?string $hour): Carbon
+    {
+        return $hour
+            ? Carbon::parse($date.' '.$hour)
+            : Carbon::parse($date)->addDay()->startOfDay();
     }
 
     /** Nomes dos dias da semana em português, pela chave guardada em availability_days. */

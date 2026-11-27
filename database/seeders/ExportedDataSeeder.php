@@ -2121,7 +2121,6 @@ class ExportedDataSeeder extends Seeder
     array (
       0 => 'small',
       1 => 'medium',
-      2 => 'large',
     ),
     'sex' => 'male',
     'accepted_animal_types' => 

@@ -190,7 +190,7 @@ const tags = computed(() => {
     return [
         ...(petsitter.value.accepted_animal_types ?? []).map((t) => typeLabels[t] ?? t),
         ...(petsitter.value.accepted_sizes ?? []).map((s) => sizeLabels[s] ?? s),
-    ].slice(0, 3);
+    ];
 });
 
 const dayList = [

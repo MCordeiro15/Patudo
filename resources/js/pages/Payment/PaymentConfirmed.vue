@@ -158,12 +158,9 @@ onMounted(() => {
                             {{ unreadCount > 9 ? '9+' : unreadCount }}
                         </span>
                     </button>
-                    <button
-                        type="button"
-                        class="text-dark p-0 border-0 bg-none"
-                    >
+                    <a href="/profile" class="text-dark" aria-label="Perfil">
                         <UserRound :size="25" />
-                    </button>
+                    </a>
                     <Link
                         href="/logout"
                         method="post"

@@ -21,7 +21,7 @@ use App\Models\User;
 function bookingScenario(array $availability = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']): array
 {
     $owner = User::factory()->create();
-    $animal = Animal::factory()->create(['user_id' => $owner->id]);
+    $animal = Animal::factory()->create(['user_id' => $owner->id, 'size' => 'small']);
     $petsitter = Petsitter::factory()->approved()->create(['availability_days' => $availability]);
     $service = PetsitterService::create(['petsitter_id' => $petsitter->user_id, 'type' => 'pet-sitting', 'price' => 20]);
 
@@ -59,6 +59,29 @@ test('a booking is created as pending with the total from the service price', fu
 
     // 20 € x 3 dias = 60 €
     expect((float) Booking::first()->total_price)->toBe(60.0);
+});
+
+test('a petsitter cannot be booked with an animal size they do not accept', function () {
+    [$owner, $petsitter, $service, $animal] = bookingScenario();
+    $animal->update(['size' => 'Large']);
+
+    $this->actingAs($owner)
+        ->postJson('/api/bookings', bookingPayload($petsitter, $service, $animal))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('animal_ids');
+
+    expect(Booking::count())->toBe(0);
+});
+
+test('a petsitter accepts an animal whose size is listed regardless of case', function () {
+    [$owner, $petsitter, $service, $animal] = bookingScenario();
+    $animal->update(['size' => 'Medium']);
+
+    $this->actingAs($owner)
+        ->postJson('/api/bookings', bookingPayload($petsitter, $service, $animal))
+        ->assertCreated();
+
+    expect(Booking::count())->toBe(1);
 });
 
 test('creating a booking sends the petsitter an unread notification linked to the booking', function () {
@@ -200,4 +223,92 @@ test('a candidate still pending approval can book as an owner', function () {
     $this->actingAs($candidate)
         ->postJson('/api/bookings', bookingPayload($petsitter, $service, $animal))
         ->assertCreated();
+});
+
+test('a petsitter cannot receive overlapping bookings for different services', function () {
+    [$owner, $petsitter, $service, $animal] = bookingScenario();
+    $otherService = PetsitterService::create([
+        'petsitter_id' => $petsitter->user_id,
+        'type' => 'dog-walking',
+        'price' => 15,
+    ]);
+    $monday = now()->next('Monday')->toDateString();
+
+    $this->actingAs($owner)
+        ->postJson('/api/bookings', bookingPayload($petsitter, $service, $animal, [
+            'start_date' => $monday,
+            'end_date' => $monday,
+            'entrance_hour' => '12:00',
+            'exit_hour' => '13:00',
+        ]))
+        ->assertCreated();
+
+    $this->postJson('/api/bookings', bookingPayload($petsitter, $otherService, $animal, [
+        'start_date' => $monday,
+        'end_date' => $monday,
+        'entrance_hour' => '12:30',
+        'exit_hour' => '13:30',
+    ]))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('start_date');
+
+    expect(Booking::count())->toBe(1);
+});
+
+test('a booking can start exactly when the previous booking ends', function () {
+    [$owner, $petsitter, $service, $animal] = bookingScenario();
+    $monday = now()->next('Monday')->toDateString();
+
+    $this->actingAs($owner)
+        ->postJson('/api/bookings', bookingPayload($petsitter, $service, $animal, [
+            'start_date' => $monday,
+            'end_date' => $monday,
+            'entrance_hour' => '12:00',
+            'exit_hour' => '13:00',
+        ]))
+        ->assertCreated();
+
+    $this->postJson('/api/bookings', bookingPayload($petsitter, $service, $animal, [
+        'start_date' => $monday,
+        'end_date' => $monday,
+        'entrance_hour' => '13:00',
+        'exit_hour' => '14:00',
+    ]))
+        ->assertCreated();
+
+    expect(Booking::count())->toBe(2);
+});
+
+test('booking availability check reports overlapping and consecutive hours', function () {
+    [$owner, $petsitter, $service, $animal] = bookingScenario();
+    $monday = now()->next('Monday')->toDateString();
+
+    $this->actingAs($owner)
+        ->postJson('/api/bookings', bookingPayload($petsitter, $service, $animal, [
+            'start_date' => $monday,
+            'end_date' => $monday,
+            'entrance_hour' => '12:00',
+            'exit_hour' => '13:00',
+        ]))
+        ->assertCreated();
+
+    $this->getJson('/api/bookings/availability?'.http_build_query([
+        'petsitter_id' => $petsitter->user_id,
+        'start_date' => $monday,
+        'end_date' => $monday,
+        'entrance_hour' => '12:30',
+        'exit_hour' => '13:30',
+    ]))
+        ->assertOk()
+        ->assertJsonPath('available', false);
+
+    $this->getJson('/api/bookings/availability?'.http_build_query([
+        'petsitter_id' => $petsitter->user_id,
+        'start_date' => $monday,
+        'end_date' => $monday,
+        'entrance_hour' => '13:00',
+        'exit_hour' => '14:00',
+    ]))
+        ->assertOk()
+        ->assertJsonPath('available', true);
 });
