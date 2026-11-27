@@ -126,7 +126,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <Head title="Avaliações (admin)" />
+    <Head title="Avaliações" />
 
     <main class="patudo-page-shell">
         <div class="patudo-content container py-4">

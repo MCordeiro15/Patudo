@@ -230,10 +230,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.patudo-page {
-    background-color: #fffaf3;
-}
-
 .nav-pills .nav-link.active {
     background-color: var(--patudo-terracota, #c2410c) !important;
     color: #ffffff !important;

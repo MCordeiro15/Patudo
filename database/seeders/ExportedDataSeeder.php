@@ -872,7 +872,7 @@ class ExportedDataSeeder extends Seeder
             Post::forceCreate($postCreateData);
         }
 
-        // Export Bookings (22 bookings)
+        // Export Bookings (23 bookings)
         // Export Petsitter Services (4 services)
         $services = array (
   0 => 
@@ -1296,6 +1296,23 @@ class ExportedDataSeeder extends Seeder
     'entrance_hour' => '12:00',
     'exit_hour' => '13:00',
   ),
+  22 => 
+  array (
+    'id' => 23,
+    'user_id' => 9,
+    'petsitter_id' => 17,
+    'start_date' => '2027-01-06',
+    'end_date' => '2027-01-06',
+    'status' => 'pending',
+    'total_price' => 10,
+    'created_at' => '2026-11-27 16:25:59',
+    'updated_at' => '2026-11-27 16:25:59',
+    'service_id' => 4,
+    'message' => 'asda da',
+    'zone' => 'Ribeira Grande',
+    'entrance_hour' => '12:00',
+    'exit_hour' => '13:00',
+  ),
 );
         // só usa as colunas que existem na tabela (evita erro se uma migration ainda não estiver no branch)
         $bookingColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('bookings'));
@@ -1394,7 +1411,7 @@ class ExportedDataSeeder extends Seeder
             Review::forceCreate($reviewCreateData);
         }
 
-        // Export Animal Bookings (9 animal bookings)
+        // Export Animal Bookings (10 animal bookings)
         $animalBookings = array (
   0 => 
   array (
@@ -1468,6 +1485,14 @@ class ExportedDataSeeder extends Seeder
     'booking_id' => 22,
     'animal_id' => 21,
   ),
+  9 => 
+  array (
+    'id' => 10,
+    'created_at' => NULL,
+    'updated_at' => NULL,
+    'booking_id' => 23,
+    'animal_id' => 21,
+  ),
 );
         $animalBookingColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('animal_bookings'));
         foreach ($animalBookings as $abData) {
@@ -1475,7 +1500,7 @@ class ExportedDataSeeder extends Seeder
             AnimalBooking::forceCreate($abCreateData);
         }
 
-        // Export Notifications (9 notifications)
+        // Export Notifications (10 notifications)
         if (\Illuminate\Support\Facades\Schema::hasTable('notifications')) {
             $notificationColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('notifications'));
             $notifications = array (
@@ -1577,6 +1602,17 @@ class ExportedDataSeeder extends Seeder
     'created_at' => '2026-11-27 10:54:53',
     'updated_at' => '2026-11-27 10:54:53',
     'booking_id' => 22,
+  ),
+  9 => 
+  array (
+    'id' => 10,
+    'user_id' => 17,
+    'type' => 'booking',
+    'message' => 'Novo pedido de reserva',
+    'read_at' => NULL,
+    'created_at' => '2026-11-27 16:25:59',
+    'updated_at' => '2026-11-27 16:25:59',
+    'booking_id' => 23,
   ),
 );
             foreach ($notifications as $notificationData) {
