@@ -837,7 +837,7 @@ class ExportedDataSeeder extends Seeder
             Animal::forceCreate($animalCreateData);
         }
 
-        // Export Posts (2 posts)
+        // Export Posts (3 posts)
         $posts = array (
   0 => 
   array (
@@ -864,6 +864,16 @@ class ExportedDataSeeder extends Seeder
     'created_at' => '2026-11-27 10:23:42',
     'updated_at' => '2026-11-27 10:23:42',
     'title' => 'ok',
+  ),
+  2 => 
+  array (
+    'id' => 3,
+    'petsitter_id' => 17,
+    'description' => 'a',
+    'photos' => NULL,
+    'created_at' => '2026-11-27 17:07:23',
+    'updated_at' => '2026-11-27 17:07:23',
+    'title' => 'a',
   ),
 );
         $postColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('posts'));
@@ -1598,9 +1608,9 @@ class ExportedDataSeeder extends Seeder
     'user_id' => 9,
     'type' => 'booking',
     'message' => 'A reserva foi aceite.',
-    'read_at' => NULL,
+    'read_at' => '2026-11-27 16:56:55',
     'created_at' => '2026-11-27 10:54:53',
-    'updated_at' => '2026-11-27 10:54:53',
+    'updated_at' => '2026-11-27 16:56:55',
     'booking_id' => 22,
   ),
   9 => 
