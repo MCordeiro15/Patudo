@@ -4,6 +4,7 @@
  * Política de autorização para petsitters. Define quem pode visualizar, criar, atualizar, eliminar e aprovar perfis de petsitter.
  * Authorization policy for petsitters. Defines who can view, create, update, delete, and approve petsitter profiles.
  */
+
 namespace App\Policies;
 
 use App\Models\Petsitter;
@@ -24,9 +25,13 @@ class PetsitterPolicy
      */
     public function view(User $user, Petsitter $petsitter): bool
     {
+        if (in_array($petsitter->user?->account_status, ['suspended', 'banned'], true) && ! $user->isAdmin()) {
+            return false;
+        }
+
         return $user->isAdmin()
             || $user->id === $petsitter->user_id
-            || $petsitter->approval_status === 'approved';
+            || ($petsitter->approval_status === 'approved' && $petsitter->user?->isPetsitter());
     }
 
     /**

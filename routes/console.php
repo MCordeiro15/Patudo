@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('model:prune', ['--model' => [Notification::class]])->daily();
+Schedule::command('users:reactivate-suspended')->everyMinute();
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());

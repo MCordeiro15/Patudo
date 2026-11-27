@@ -5,6 +5,8 @@
  * PHP file: web.php
  */
 use App\Http\Controllers\PetsitterProfileController;
+use App\Http\Controllers\UserAvatarController;
+use App\Models\Petsitter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -23,6 +25,24 @@ Route::get('/', action: function () {
 })->name('home');
 Route::inertia('/login', 'auth/Login')->name('login');
 Route::inertia('/register', 'auth/Register')->name('register');
+Route::get('/support', function () {
+    $user = auth()->user();
+    $suspension = null;
+
+    if ($user && $user->account_status === 'suspended') {
+        $suspension = [
+            'status' => 'suspended',
+            'until' => $user->suspended_until?->toIso8601String(),
+            'reason' => $user->suspension_reason,
+            'notice' => $user->notifications()
+                ->where('type', 'account_suspended')
+                ->latest()
+                ->value('message'),
+        ];
+    }
+
+    return Inertia::render('Support', ['suspension' => $suspension]);
+})->middleware('auth')->name('support');
 Route::inertia('/petsitters', 'Petsitter/SearchPetsitter')->middleware('auth')->name('petsitters.search');
 Route::inertia('/find-petsitter', 'Petsitter/PublicSearchPetsitter')->name('petsitters.public');
 Route::inertia('/favorites', 'Petsitter/Favorites')->middleware('auth')->name('favorites');
@@ -31,7 +51,7 @@ Route::get('/petsitters/profile', [PetsitterProfileController::class, 'showOwn']
     ->name('petsitters.profile');
 Route::inertia('/messages', 'Messages')->middleware('auth')->name('messages');
 // Foto de perfil de um utilizador como imagem (usada pelo chat, que precisa de um URL e não de base64)
-Route::get('/users/{user}/avatar', \App\Http\Controllers\UserAvatarController::class)
+Route::get('/users/{user}/avatar', UserAvatarController::class)
     ->middleware('auth')
     ->whereNumber('user')
     ->name('users.avatar');
@@ -45,16 +65,21 @@ Route::get('/profile-owner-view', fn () => Inertia::render('Petsitter/ProfileOwn
 
 Route::get('/profile', function () {
     $user = auth()->user();
-    $petsitter = \App\Models\Petsitter::where('user_id', $user->id)->first();
+    $petsitter = Petsitter::where('user_id', $user->id)->first();
 
     // só vai para o perfil de petsitter depois de o admin aprovar
-    if ($petsitter && $petsitter->approval_status === 'approved') {
+    if ($user->isPetsitter()) {
         return redirect()->route('petsitters.profile');
+    }
+
+    $applicationStatus = $petsitter?->approval_status;
+    if ($applicationStatus === 'approved') {
+        $applicationStatus = 'inactive';
     }
 
     return Inertia::render('Owner/Profile', [
         // null (sem candidatura), 'pending' ou 'rejected' -> o perfil mostra o botão ou o estado
-        'petsitterApplicationStatus' => $petsitter?->approval_status,
+        'petsitterApplicationStatus' => $applicationStatus,
     ]);
 })->middleware('auth')->name('owner.profile');
 
@@ -105,4 +130,4 @@ Route::inertia('/payment-confirmed', 'Payment/PaymentConfirmed')
     ->name('payment.confirmed');
 
 Route::inertia('/dev/modals', 'Modals/ModalTests')->name('dev.modals');
-require __DIR__ . '/settings.php';
+require __DIR__.'/settings.php';

@@ -10,6 +10,7 @@ import {
     UserRound, LogOut,
 } from '@lucide/vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
+import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
 import { computed, onMounted, ref } from 'vue';
 import ModalDeletePost from '@/pages/Modals/ModalDeletePost.vue';
 import ModalEditPetsitterProfile from '@/pages/Modals/ModalEditPetsitterProfile.vue';
@@ -670,6 +671,7 @@ const saveAvailability = async () => {
                     >
                         Reservas
                     </a>
+                    <AdminNavigationMenu />
                 </div>
 
                 <div class="d-flex align-items-center gap-3">

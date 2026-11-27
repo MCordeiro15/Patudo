@@ -11,6 +11,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import { Bell, LogOut, MessageCircle, UserRound } from '@lucide/vue';
 import { onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
+import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
 import { useChat } from '@/composables/useChat';
 import { useInitials } from '@/composables/useInitials';
 import { useNotifications } from '@/composables/useNotifications';
@@ -94,6 +95,7 @@ onMounted(async () => {
                     <a class="nav-link text-dark rounded-pill px-4" href="/orders">Pedidos</a>
                     <a class="nav-link text-dark rounded-pill px-4" href="/favorites">Favoritos</a>
                     <a class="nav-link text-dark rounded-pill px-4" href="/reservations">Reservas</a>
+                    <AdminNavigationMenu />
                 </div>
 
                 <div class="d-flex align-items-center gap-3">

@@ -21,7 +21,7 @@ const location = ref('');
 const postcode = ref('');
 const sizes = ref<string[]>([]);
 const animalType = ref('');
-const price = ref('');
+const price = ref<string | number>('');
 const about = ref('');
 const documentFile = ref<File | null>(null);
 const documentInput = ref<HTMLInputElement | null>(null);
@@ -37,10 +37,35 @@ const sexOptions = [
     { value: 'other', label: 'Outro' },
 ];
 
-const serviceOptions = [
-    { value: 'pet-sitting', label: 'Pet sitting' },
-    { value: 'passeio', label: 'Passeio' },
-];
+// Nome: só letras (com acentos) e espaços; o resto nem chega a aparecer no campo (como no ModalEditPetsitterProfile)
+const sanitizeName = (value: string) => value.replace(/[^\p{L} ]/gu, '');
+const handleNameInput = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    name.value = sanitizeName(input.value);
+    input.value = name.value;
+};
+
+// Código postal: só algarismos, no formato 0000-000. O hífen aparece sozinho depois do 4.º algarismo
+// (menos ao apagar, senão não dava para apagar o hífen) e só deixa mais 3 algarismos a seguir.
+const handlePostcodeInput = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    const digits = input.value.replace(/\D/g, '').slice(0, 7);
+    const deleting = (event as InputEvent).inputType?.startsWith('delete');
+
+    if (digits.length > 4) {
+        postcode.value = `${digits.slice(0, 4)}-${digits.slice(4)}`;
+    } else if (digits.length === 4 && !deleting) {
+        postcode.value = `${digits}-`;
+    } else {
+        postcode.value = digits;
+    }
+
+    input.value = postcode.value;
+};
+
+// Limites do preço por dia: os mesmos do back-end (Petsitter::MIN_PRICE_PER_DAY / MAX_PRICE_PER_DAY)
+const MIN_PRICE = 5;
+const MAX_PRICE = 200;
 
 const sizeOptions = [
     { value: 'small', label: 'Porte Pequeno' },
@@ -61,7 +86,7 @@ const errorFieldMap: Record<string, string> = {
     postal_code: 'postcode',
     accepted_sizes: 'sizes',
     accepted_animal_types: 'animal_type',
-    price_per_day: 'price_per_hour',
+    price_per_day: 'price',
     experience: 'about',
     identification_documents: 'identity_document',
 };
@@ -78,11 +103,6 @@ const mapBackendErrors = (backendErrors: FormErrors): FormErrors => {
     return mapped;
 };
 
-const priceOptions = [
-    { value: '5', label: '5 €' },
-    { value: '10', label: '10 €' },
-    { value: '15', label: '15 €' },
-];
 
 const handleDocumentChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -174,13 +194,14 @@ const submit = async () => {
         const body = new FormData();
         body.append('name', name.value.trim());
         if (sex.value) body.append('sex', sex.value);
-        body.append('service', service.value);
+        body.append('service', service.value.trim());
         body.append('age', age.value);
         body.append('service_location', location.value.trim());
         body.append('postal_code', postcode.value.trim());
         sizes.value.forEach((s) => body.append('accepted_sizes[]', s));
         body.append('accepted_animal_types[]', animalType.value);
-        body.append('price_per_day', price.value);
+        // o v-model de um input type="number" dá um número, por isso passa por String()
+        body.append('price_per_day', String(price.value));
         body.append('experience', about.value.trim());
         body.append('identification_documents', documentFile.value as File);
 
@@ -282,7 +303,7 @@ const submit = async () => {
 
                             <input
                                 id="petsitter-name"
-                                v-model="name"
+                                :value="name"
                                 type="text"
                                 class="form-control patudo-field rounded-3"
                                 :class="{ 'is-invalid': errors.name }"
@@ -290,6 +311,7 @@ const submit = async () => {
                                 autocomplete="name"
                                 required
                                 aria-required="true"
+                                @input="handleNameInput"
                             />
 
                             <InputError :message="errors.name?.[0]" />
@@ -334,31 +356,21 @@ const submit = async () => {
                                 for="petsitter-service"
                                 class="form-label fw-bold small mb-1"
                             >
-                                Tipo de serviço *
+                                O teu primeiro serviço *
                             </label>
 
-                            <select
+                            <!-- texto livre: o candidato escreve o seu serviço; os outros criam-se depois no perfil -->
+                            <input
                                 id="petsitter-service"
                                 v-model="service"
-                                class="form-select patudo-field rounded-3"
-                                :class="[
-                                    { 'is-invalid': errors.service },
-                                    service ? 'text-body' : 'text-secondary',
-                                ]"
+                                type="text"
+                                maxlength="50"
+                                class="form-control patudo-field rounded-3"
+                                :class="{ 'is-invalid': errors.service }"
+                                placeholder="Ex.: Pet sitting em casa"
                                 required
                                 aria-required="true"
-                            >
-                                <option value="" disabled>Selecionar</option>
-
-                                <option
-                                    v-for="option in serviceOptions"
-                                    :key="option.value"
-                                    :value="option.value"
-                                    class="text-body"
-                                >
-                                    {{ option.label }}
-                                </option>
-                            </select>
+                            />
 
                             <InputError :message="errors.service?.[0]" />
                         </div>
@@ -423,7 +435,7 @@ const submit = async () => {
 
                             <input
                                 id="petsitter-postcode"
-                                v-model="postcode"
+                                :value="postcode"
                                 type="text"
                                 inputmode="numeric"
                                 pattern="\d{4}-\d{3}"
@@ -434,6 +446,7 @@ const submit = async () => {
                                 autocomplete="postal-code"
                                 required
                                 aria-required="true"
+                                @input="handlePostcodeInput"
                             />
 
                             <InputError :message="errors.postcode?.[0]" />
@@ -517,33 +530,25 @@ const submit = async () => {
                                 for="petsitter-price"
                                 class="form-label fw-bold small mb-1"
                             >
-                                Preço por hora (€) *
+                                Preço por dia (€) *
                             </label>
 
-                            <select
+                            <input
                                 id="petsitter-price"
                                 v-model="price"
-                                class="form-select patudo-field rounded-3"
-                                :class="[
-                                    { 'is-invalid': errors.price_per_hour },
-                                    price ? 'text-body' : 'text-secondary',
-                                ]"
+                                type="number"
+                                inputmode="decimal"
+                                :min="MIN_PRICE"
+                                :max="MAX_PRICE"
+                                step="0.01"
+                                class="form-control patudo-field rounded-3"
+                                :class="{ 'is-invalid': errors.price }"
+                                :placeholder="`${MIN_PRICE} a ${MAX_PRICE} €`"
                                 required
                                 aria-required="true"
-                            >
-                                <option value="" disabled>Selecionar</option>
+                            />
 
-                                <option
-                                    v-for="option in priceOptions"
-                                    :key="option.value"
-                                    :value="option.value"
-                                    class="text-body"
-                                >
-                                    {{ option.label }}
-                                </option>
-                            </select>
-
-                            <InputError :message="errors.price_per_hour?.[0]" />
+                            <InputError :message="errors.price?.[0]" />
                         </div>
                     </div>
 

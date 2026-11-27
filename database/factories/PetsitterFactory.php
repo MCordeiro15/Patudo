@@ -1,10 +1,10 @@
 <?php
 
-
 /**
  * Factory para gerar dados fictícios de petsitters nos testes. Cria perfis com biografia, experiência e preço aleatórios.
  * Factory to generate fake petsitter data in tests. Creates profiles with random biography, experience, and price.
  */
+
 namespace Database\Factories;
 
 use App\Models\Petsitter;
@@ -49,7 +49,9 @@ class PetsitterFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'approval_status' => 'approved',
-        ]);
+        ])->afterCreating(fn (Petsitter $petsitter) => $petsitter->user()->update([
+            'is_petsitter' => true,
+        ]));
     }
 
     /**

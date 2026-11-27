@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import { Bell, LogOut, MessageCircle, UserRound, ChevronLeft, CalendarDays, Dog, CheckCircle, Star } from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
+import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
 import type { Animal } from '@/types';
 import { useNotifications } from '@/composables/useNotifications';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
@@ -128,6 +129,7 @@ onMounted(() => {
                     <a class="nav-link rounded-pill px-4" href="/orders">Pedidos</a>
                     <a class="nav-link rounded-pill px-4" href="/favorites">Favoritos</a>
                     <a class="nav-link active rounded-pill px-4" href="/reservations">Reservas</a>
+                    <AdminNavigationMenu />
                 </div>
 
                 <div class="d-flex align-items-center gap-3">

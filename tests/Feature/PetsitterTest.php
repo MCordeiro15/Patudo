@@ -1,12 +1,13 @@
 <?php
 
-
 /**
  * Ficheiro PHP: PetsitterTest.php
  * PHP file: PetsitterTest.php
  */
 use App\Models\Petsitter;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 test('unauthenticated user cannot access petsitters endpoint', function () {
     $this->getJson('/api/petsitters')->assertUnauthorized();
@@ -25,6 +26,24 @@ test('regular user only sees approved petsitters in listing', function () {
         ->assertJsonCount(1, 'data')
         ->assertJsonFragment(['user_id' => $approvedPetsitter->user_id])
         ->assertJsonMissing(['user_id' => $pendingPetsitter->user_id]);
+});
+
+test('public and regular listings hide approved profiles when the user is no longer a petsitter', function () {
+    $user = User::factory()->create(['is_petsitter' => false]);
+    $petsitter = Petsitter::factory()->approved()->create(['user_id' => $user->id]);
+    $user->refresh()->forceFill(['is_petsitter' => false])->save();
+    $viewer = User::factory()->create();
+
+    $this->getJson('/api/petsitters/public')
+        ->assertOk()
+        ->assertJsonMissing(['user_id' => $petsitter->user_id]);
+
+    $this->actingAs($viewer)
+        ->getJson('/api/petsitters')
+        ->assertOk()
+        ->assertJsonMissing(['user_id' => $petsitter->user_id]);
+
+    $this->getJson('/api/petsitters/'.$petsitter->user_id)->assertForbidden();
 });
 
 test('admin user sees all petsitters regardless of approval status', function () {
@@ -73,7 +92,7 @@ test('pending petsitters page is only accessible to admins', function () {
 test('authenticated user can register as a petsitter', function () {
     $user = User::factory()->create();
 
-    \Illuminate\Support\Facades\Storage::fake('local');
+    Storage::fake('local');
 
     $data = [
         'experience' => '5 years caring for dogs and cats',
@@ -84,7 +103,7 @@ test('authenticated user can register as a petsitter', function () {
         'accepted_sizes' => ['small', 'medium'],
         'accepted_animal_types' => ['dog', 'cat'],
         'service' => 'pet-sitting',
-        'identification_documents' => \Illuminate\Http\UploadedFile::fake()->create('id_card.pdf', 100, 'application/pdf'),
+        'identification_documents' => UploadedFile::fake()->create('id_card.pdf', 100, 'application/pdf'),
     ];
 
     $response = $this->actingAs($user)->post('/api/petsitters', $data, ['Accept' => 'application/json']);

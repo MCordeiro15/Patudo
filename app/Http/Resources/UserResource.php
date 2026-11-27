@@ -25,7 +25,7 @@ class UserResource extends JsonResource
         $canSeePrivate = $viewer && ($viewer->isAdmin() || $viewer->id === $this->id);
 
         // 1) Por defeito: avatar gerado com as iniciais do nome
-        $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($this->name ?? 'U') . '&background=random';
+        $avatarUrl = 'https://ui-avatars.com/api/?name='.urlencode($this->name ?? 'U').'&background=random';
 
         // 2) Se o user carregou uma foto própria (guardada em base64), usa-a
         if ($this->avatar) {
@@ -51,6 +51,8 @@ class UserResource extends JsonResource
             'about' => $this->when($canSeePrivate, $this->about),
             'avatar_url' => $avatarUrl,
             'email_verified_at' => $this->email_verified_at,
+            'account_status' => $this->account_status,
+            'suspended_until' => $this->when($canSeePrivate, $this->suspended_until),
             'is_petsitter' => $this->isPetsitter(),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

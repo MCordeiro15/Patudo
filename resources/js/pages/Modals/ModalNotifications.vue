@@ -45,12 +45,14 @@ const typeLabels: Record<string, string> = {
     review: 'Avaliação',
     system: 'Sistema',
     message: 'Mensagem',
+    new_help_ticket: 'Ticket de ajuda',
 };
 
 const typeIcons: Record<string, string> = {
     review: '⭐',
     system: '⚙️',
     message: '💬',
+    new_help_ticket: '🆘',
 };
 
 const bookingDay = (date: string | null) => date?.slice(8, 10) ?? '';
