@@ -18,11 +18,24 @@ Route::get('/sanctum/csrf-cookie', function (Request $request) {
 
 Route::get('/', action: function () {
     if (auth()->check()) {
-        return redirect()->route('petsitters.search');
+        return redirect()->route('dashboard');
     }
 
     return Inertia::render('Homepage');
 })->name('home');
+Route::get('/dashboard', function () {
+    $user = auth()->user();
+
+    if ($user->isAdmin()) {
+        return redirect()->route('admin.users');
+    }
+
+    if ($user->isPetsitter()) {
+        return redirect()->route('bookings.orders');
+    }
+
+    return redirect()->route('petsitters.search');
+})->middleware('auth')->name('dashboard');
 Route::inertia('/login', 'auth/Login')->name('login');
 Route::inertia('/register', 'auth/Register')->name('register');
 Route::get('/support', function () {
@@ -106,9 +119,9 @@ Route::inertia('/reservations', 'Owner/ReservationNotificationToOwner')
     ->middleware('auth')
     ->name('bookings.reservations');
 
-// Páginas de administração: só para admins (403 para os outros, login para quem não tem sessão).
+// Páginas de administração: só para admins (redireciona os restantes para o seu dashboard).
 // Os dados de cada página são carregados pela API (/api/admin/*), que também exige admin.
-Route::middleware(['auth', 'can:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::inertia('/petsitters/pending', 'Admin/VerificationsView')->name('petsitters.pending');
     Route::inertia('/users', 'Admin/UsersView')->name('users');
     Route::get('/users/{user}', fn (string $user) => Inertia::render('Admin/UserDetailView', ['userId' => (int) $user]))

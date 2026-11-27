@@ -44,8 +44,10 @@ test('guest gets 401 on the admin pages when asking for json', function (string 
     $this->getJson($url)->assertUnauthorized();
 })->with('admin pages');
 
-test('non admin gets 403 on the admin pages', function (string $url) {
-    $this->actingAs(User::factory()->create())->get($url)->assertForbidden();
+test('non admin is redirected to their dashboard on the admin pages', function (string $url) {
+    $this->actingAs(User::factory()->create())
+        ->get($url)
+        ->assertRedirect(route('dashboard'));
 })->with('admin pages');
 
 test('admin sees the admin pages', function (string $url, string $component) {
