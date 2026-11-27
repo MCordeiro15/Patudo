@@ -3,6 +3,7 @@
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import {
+    CirclePlus,
     Pencil,
     Plus,
     Save,
@@ -1155,14 +1156,15 @@ const saveAvailability = async () => {
 
                             </article>
 
-                            <article
+                            <button
                                 v-if="canPost"
-                                class="add-post-card card bg-white border border-primary rounded-4 p-4 text-center d-flex flex-column align-items-center justify-content-center gap-2"
+                                type="button"
+                                class="add-post-card w-100 card bg-white border border-primary rounded-4 p-4 text-center d-flex flex-column align-items-center justify-content-center gap-2"
                                 @click="showNewPostModal = true"
                             >
-                                <div class="add-post-circle"></div>
-                                <span class="small">Adicionar nova publicação</span>
-                            </article>
+                                <CirclePlus :size="56" :stroke-width="1" class="text-primary" />
+                                <span class="small text-muted">Adicionar nova publicação</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1395,36 +1397,11 @@ const saveAvailability = async () => {
 .add-post-card {
     min-height: 320px;
     cursor: pointer;
+    font: inherit;
 }
 
-/* Círculo cor de pêssego com o sinal + (mockup). */
-/* Peach circle with the + sign (mockup). */
-.add-post-circle {
-    position: relative;
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    background-color: #f8d8a9;
-}
-
-.add-post-circle::before,
-.add-post-circle::after {
-    content: '';
-    position: absolute;
-    background-color: #fff;
-}
-
-.add-post-circle::before {
-    top: 50%;
-    left: 13%;
-    right: 13%;
-    height: 1px;
-}
-
-.add-post-circle::after {
-    left: 50%;
-    top: 13%;
-    bottom: 13%;
-    width: 1px;
+.add-post-card:hover,
+.add-post-card:focus-visible {
+    background-color: rgba(var(--bs-primary-rgb), 0.05) !important;
 }
 </style>

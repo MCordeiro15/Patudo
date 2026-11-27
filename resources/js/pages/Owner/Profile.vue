@@ -331,7 +331,7 @@ onMounted(() => {
                 <button
                     v-else
                     type="button"
-                    class="btn btn-outline-primary btn-sm rounded-pill px-4"
+                    class="btn btn-primary btn-sm rounded-pill px-4"
                     @click="showFormPetsitter = true"
                 >
                     Quero ser petsitter
