@@ -1317,9 +1317,9 @@ class ExportedDataSeeder extends Seeder
     'petsitter_id' => 1,
     'star_rating' => 5,
     'comment' => 'Excelente serviço! O meu animal foi muito bem cuidado. Recomendo!',
-    'visible' => 1,
     'created_at' => '2026-11-27 10:23:42',
     'updated_at' => '2026-11-27 10:23:42',
+    'status' => 'published',
   ),
   1 => 
   array (
@@ -1328,9 +1328,9 @@ class ExportedDataSeeder extends Seeder
     'petsitter_id' => 2,
     'star_rating' => 5,
     'comment' => 'Muito atencioso e responsável. O meu cão adorou!',
-    'visible' => 1,
     'created_at' => '2026-11-27 10:23:42',
     'updated_at' => '2026-11-27 10:23:42',
+    'status' => 'published',
   ),
   2 => 
   array (
@@ -1339,9 +1339,9 @@ class ExportedDataSeeder extends Seeder
     'petsitter_id' => 3,
     'star_rating' => 4,
     'comment' => 'Correu tudo bem, enviou fotos todos os dias.',
-    'visible' => 1,
     'created_at' => '2026-11-27 10:23:42',
     'updated_at' => '2026-11-27 10:23:42',
+    'status' => 'published',
   ),
   3 => 
   array (
@@ -1350,9 +1350,9 @@ class ExportedDataSeeder extends Seeder
     'petsitter_id' => 4,
     'star_rating' => 5,
     'comment' => 'Super simpática e pontual. Voltarei a reservar.',
-    'visible' => 1,
     'created_at' => '2026-11-27 10:23:42',
     'updated_at' => '2026-11-27 10:23:42',
+    'status' => 'published',
   ),
   4 => 
   array (
@@ -1361,9 +1361,9 @@ class ExportedDataSeeder extends Seeder
     'petsitter_id' => 5,
     'star_rating' => 4,
     'comment' => 'O meu gato foi muito bem cuidado. Muito obrigado!',
-    'visible' => 1,
     'created_at' => '2026-11-27 10:23:42',
     'updated_at' => '2026-11-27 10:23:42',
+    'status' => 'published',
   ),
   5 => 
   array (
@@ -1372,9 +1372,9 @@ class ExportedDataSeeder extends Seeder
     'petsitter_id' => 6,
     'star_rating' => 1,
     'comment' => 'Péssimo, não apareceu à hora combinada e não respondeu às mensagens.',
-    'visible' => 1,
     'created_at' => '2026-11-27 10:23:42',
     'updated_at' => '2026-11-27 10:23:42',
+    'status' => 'published',
   ),
   6 => 
   array (
@@ -1383,9 +1383,9 @@ class ExportedDataSeeder extends Seeder
     'petsitter_id' => 7,
     'star_rating' => 2,
     'comment' => 'Comentário ofensivo de teste para moderação.',
-    'visible' => 1,
     'created_at' => '2026-11-27 10:23:42',
     'updated_at' => '2026-11-27 10:23:42',
+    'status' => 'published',
   ),
 );
         $reviewColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('reviews'));
