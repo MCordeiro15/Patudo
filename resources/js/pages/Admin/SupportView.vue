@@ -234,10 +234,6 @@ const logout = () => router.post('/logout');
             </header>
 
             <div class="toolbar">
-                <label class="search">
-                    <Search :size="22" />
-                    <input v-model="search" type="text" placeholder="Pesquisar pedido" />
-                </label>
                 <div class="tabs">
                     <button
                         v-for="t in tabs"
@@ -250,6 +246,10 @@ const logout = () => router.post('/logout');
                         {{ t.label }}<template v-if="t.key === 'open'"> ({{ openCount }})</template>
                     </button>
                 </div>
+                <label class="search">
+                    <Search :size="22" />
+                    <input v-model="search" type="text" placeholder="Pesquisar pedido" />
+                </label>
             </div>
 
             <div class="content">
@@ -483,18 +483,14 @@ h1 {
 }
 
 .content {
-    display: flex;
-    gap: 14px;
-    align-items: stretch;
-    padding: 10px;
-    background-color: #fffaf5;
-    border: 1.5px solid #c2410c;
-    border-radius: 18px;
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.45fr);
+    gap: 28px;
+    align-items: start;
 }
 
 .list-col {
-    width: 34%;
-    flex-shrink: 0;
+    min-width: 0;
 }
 
 .list-item {
@@ -512,8 +508,8 @@ h1 {
 }
 
 .list-item.selected {
-    border: 1.5px solid #c2410c;
-    background-color: #fff1e3;
+    border-color: #5b4638;
+    background-color: #fff;
 }
 
 .list-text {
@@ -554,11 +550,11 @@ h1 {
 }
 
 .detail {
-    flex: 1;
     min-width: 0;
-    background-color: transparent;
-    border-left: 1px solid #f3b78a;
-    padding: 12px 14px;
+    background-color: #fff;
+    border: 1.5px solid #f97345;
+    border-radius: 18px;
+    padding: 18px 22px;
 }
 
 .detail-head {
@@ -764,7 +760,7 @@ textarea:focus-visible {
     }
 
     .content {
-        flex-direction: column;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .list-col {
@@ -772,9 +768,7 @@ textarea:focus-visible {
     }
 
     .detail {
-        border-left: 0;
-        border-top: 1px solid #f3b78a;
-        padding: 16px 4px 4px;
+        padding: 16px;
     }
 
     .admin-sidebar {
