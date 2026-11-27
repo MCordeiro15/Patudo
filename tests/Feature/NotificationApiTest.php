@@ -9,10 +9,39 @@ use App\Models\Notification;
 use App\Models\Petsitter;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Inertia\Testing\AssertableInertia as Assert;
 
 test('unauthenticated user cannot access notifications', function () {
     $this->getJson('/api/notifications')->assertUnauthorized();
     $this->postJson('/api/notifications', [])->assertUnauthorized();
+});
+
+test('authenticated pages share the current unread notification count', function () {
+    $user = User::factory()->create();
+
+    Notification::create([
+        'user_id' => $user->id,
+        'type' => 'booking',
+        'message' => 'Não lida recente',
+    ]);
+
+    Notification::create([
+        'user_id' => $user->id,
+        'type' => 'booking',
+        'message' => 'Lida recente',
+        'read_at' => now(),
+    ]);
+
+    $expiredUnread = Notification::create([
+        'user_id' => $user->id,
+        'type' => 'booking',
+        'message' => 'Não lida expirada',
+    ]);
+    $expiredUnread->forceFill(['created_at' => now()->subDays(31)])->save();
+
+    $this->actingAs($user)->get('/messages')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->where('unreadNotificationCount', 1));
 });
 
 test('user can list their own notifications', function () {

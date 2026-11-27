@@ -4,7 +4,8 @@
 // and the open-conversation action. Messages (send, edit, delete, react) are handled by the <t-chatbox> box.
 import { getTalkSession } from '@talkjs/core';
 import type { ConversationSnapshot, TalkSession } from '@talkjs/core';
-import { computed, onBeforeUnmount, ref, shallowRef } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue';
 
 export interface ChatPerson {
     id: string;
@@ -45,6 +46,36 @@ async function getJson<T>(url: string): Promise<T> {
 }
 
 export function useChat() {
+    const page = usePage<{ auth?: { user?: { id?: number } | null } }>();
+    const userId = page.props.auth?.user?.id;
+    const unreadStorageKey = userId ? `patudo:chat-unread:${userId}` : null;
+
+    function readCachedUnreadCount(): number {
+        if (!unreadStorageKey || typeof window === 'undefined') {
+            return 0;
+        }
+
+        try {
+            const count = Number(window.localStorage.getItem(unreadStorageKey));
+
+            return Number.isFinite(count) && count > 0 ? Math.floor(count) : 0;
+        } catch {
+            return 0;
+        }
+    }
+
+    function cacheUnreadCount(count: number): void {
+        if (!unreadStorageKey || typeof window === 'undefined') {
+            return;
+        }
+
+        try {
+            window.localStorage.setItem(unreadStorageKey, String(count));
+        } catch {
+            // O chat continua funcional quando o armazenamento local não está disponível.
+        }
+    }
+
     const me = ref<ChatPerson | null>(null);
     const contacts = ref<ChatPerson[]>([]);
     const conversations = shallowRef<ConversationSnapshot[]>([]);
@@ -52,6 +83,8 @@ export function useChat() {
     const activeOtherId = ref<string | null>(null);
     const activeOnline = ref(false);
     const ready = ref(false);
+    const conversationsLoaded = ref(false);
+    const cachedUnread = ref(readCachedUnreadCount());
     const error = ref<string | null>(null);
     const appId = ref<string | null>(null);
     // Só existe quando a autenticação do TalkJS está ligada; a caixa usa-o para pedir um token novo.
@@ -127,10 +160,8 @@ export function useChat() {
     async function start(): Promise<void> {
         try {
             const info = await getJson<SessionInfo>('/api/chat/session');
-            const list = await getJson<{ data: ChatPerson[] }>('/api/chat/contacts');
 
             me.value = info.user;
-            contacts.value = list.data;
             appId.value = info.app_id;
 
             if (info.token) {
@@ -141,37 +172,31 @@ export function useChat() {
                 };
             }
 
-            session = getTalkSession({
+            const chatSession = getTalkSession({
                 appId: info.app_id,
                 userId: info.user.id,
                 token: info.token ?? undefined,
             });
+            session = chatSession;
 
             // Só há renovação de token quando a autenticação do TalkJS está ligada.
             // Token renewal only applies when TalkJS authentication is enabled.
             if (info.token) {
-                session.onNeedToken = () => {
+                chatSession.onNeedToken = () => {
                     void refreshToken();
                 };
             }
 
-            await session.currentUser.createIfNotExists({
+            const currentUser = chatSession.currentUser;
+            await currentUser.createIfNotExists({
                 name: info.user.name,
                 custom: { papel: info.user.role },
                 photoUrl: info.user.photo_url ?? undefined,
             });
 
-            // createIfNotExists não altera quem já existe: atualiza o nome e a foto em cada entrada no chat
-            // createIfNotExists does not update existing users: refresh name and photo on every chat start
-            await session.currentUser.set({
-                name: info.user.name,
-                photoUrl: info.user.photo_url ?? null,
-                // textos do TalkJS em português ("Hoje", "Ontem"...); o TalkJS só tem pt-BR
-                locale: 'pt-BR',
-            });
-
-            conversationsSub = session.subscribeConversations((snapshots) => {
+            conversationsSub = chatSession.subscribeConversations((snapshots) => {
                 conversations.value = snapshots ?? [];
+                conversationsLoaded.value = true;
 
                 (snapshots ?? []).forEach((conversation) => {
                     const otherId = otherIdFrom(conversation.id);
@@ -181,6 +206,20 @@ export function useChat() {
                     }
                 });
             });
+
+            const contactsPromise = getJson<{ data: ChatPerson[] }>('/api/chat/contacts');
+
+            // createIfNotExists não altera quem já existe: atualiza o nome e a foto em cada entrada no chat
+            // createIfNotExists does not update existing users: refresh name and photo on every chat start
+            const currentUserPromise = currentUser.set({
+                name: info.user.name,
+                photoUrl: info.user.photo_url ?? null,
+                // textos do TalkJS em português ("Hoje", "Ontem"...); o TalkJS só tem pt-BR
+                locale: 'pt-BR',
+            });
+
+            const [list] = await Promise.all([contactsPromise, currentUserPromise]);
+            contacts.value = list.data;
 
             ready.value = true;
         } catch (e) {
@@ -245,7 +284,18 @@ export function useChat() {
         });
     });
 
-    const totalUnread = computed<number>(() => items.value.reduce((sum, item) => sum + item.unread, 0));
+    const totalUnread = computed<number>(() => conversationsLoaded.value
+        ? items.value.reduce((sum, item) => sum + item.unread, 0)
+        : cachedUnread.value);
+
+    watch([conversationsLoaded, totalUnread], ([loaded, count]) => {
+        if (!loaded) {
+            return;
+        }
+
+        cachedUnread.value = count;
+        cacheUnreadCount(count);
+    }, { flush: 'sync' });
 
     const activePerson = computed<ChatListItem | null>(
         () => items.value.find((item) => item.id === activeOtherId.value) ?? null,

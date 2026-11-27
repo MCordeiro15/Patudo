@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { CirclePlus, LogOut, UserRound, MessageCircle, Bell ,SquarePen } from '@lucide/vue';
+import { CirclePlus, LogOut, UserRound, SquarePen } from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 import type { Animal } from '@/types';
 import { useAuth } from '@/composables/useAuth';
-import { useNotifications } from '@/composables/useNotifications';
 import AnimalCard from '@/components/AnimalCard.vue';
 import ModalAddPet from '@/pages/Modals/ModalAddPet.vue';
 import ModalDeleteAnimal from '@/pages/Modals/ModalDeleteAnimal.vue';
 import ModalEditOwnerProfile from '@/pages/Modals/ModalEditOwnerProfile.vue';
 import ModalFormPetsitter from '@/pages/Modals/ModalFormPetsitter.vue';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 const { user, logout } = useAuth();
 
@@ -22,7 +21,6 @@ const loadError = ref('');
 const showAddModal = ref(false);
 const showEditAnimalModal = ref(false);
 const showDeleteModal = ref(false);
-const showNotifications = ref(false);
 
 // "Quero ser petsitter" — botão placeholder: no futuro passa para a navbar
 // O estado vem do servidor (rota /profile): candidatura, perfil desativado ou sem candidatura.
@@ -36,7 +34,6 @@ const petsitterApplicationStatus = ref(props.petsitterApplicationStatus ?? null)
 const handlePetsitterApplicationSaved = () => {
     petsitterApplicationStatus.value = 'pending';
 };
-const { unreadCount } = useNotifications();
 const deletingAnimal = ref<{ id: number; name: string } | null>(null);
 const deletingAnimalLoading = ref(false);
 const editingAnimal = ref<Animal | null>(null);
@@ -279,15 +276,7 @@ onMounted(() => {
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark"
-                        ><MessageCircle :size="25"
-                    /></a>
-                    <button type="button" class="text-dark bg-transparent border-0 p-0 position-relative" @click="showNotifications = true">
-                        <Bell :size="25" />
-                        <span v-if="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                            {{ unreadCount > 9 ? '9+' : unreadCount }}
-                        </span>
-                    </button>
+                    <HeaderNotificationsChat />
                     <button
                         type="button"
                         class="text-dark p-0 border-0 bg-transparent"
@@ -513,10 +502,6 @@ onMounted(() => {
             @saved="handlePetsitterApplicationSaved"
         />
 
-        <ModalNotifications
-            :show="showNotifications"
-            @close="showNotifications = false"
-        />
     </main>
 </template>
 

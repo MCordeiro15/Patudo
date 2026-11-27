@@ -33,6 +33,13 @@ class ExportedDataSeeder extends Seeder
   ),
   'favourites' => 
   array (
+    0 => 
+    array (
+      'created_at' => '2026-11-27 15:53:44',
+      'updated_at' => '2026-11-27 15:53:44',
+      'petsitter_id' => 17,
+      'user_id' => 9,
+    ),
   ),
   'post_favourites' => 
   array (
