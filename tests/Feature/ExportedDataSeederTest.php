@@ -198,3 +198,9 @@ test('database export includes other domain data and excludes deleted records fr
         ->not->toContain($note)
         ->toContain("foreach (['user_notes', 'support_tickets'");
 });
+
+test('database export fails when the exported snapshot cannot be written', function () {
+    File::shouldReceive('put')->once()->andReturn(false);
+
+    $this->artisan('db:export')->assertExitCode(1);
+});

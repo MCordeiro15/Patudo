@@ -15,8 +15,7 @@ npm install
 cp .env.example .env
 php artisan key:generate
 
-# 3. Configurar os git hooks (só uma vez!)
-# Este comando configura tudo automaticamente
+# 3. Configurar os git hooks neste clone (cada colega faz isto uma vez)
 bash scripts/setup-hooks.sh
 
 # 4. Rodar a aplicação
@@ -34,7 +33,7 @@ npm run dev
 php artisan serve
 ```
 
-O banco de dados é atualizado automaticamente a cada `git pull`. O storage link é criado sozinho. Zero comandos manuais.
+A configuração dos hooks é local ao clone: cada colega tem de executar `bash scripts/setup-hooks.sh` uma vez após clonar. Depois disso, os hooks atualizam a base de dados nos `git pull` em que o snapshot muda e aplicam migrations nos restantes.
 
 ## Como funciona o sistema automático
 
@@ -43,11 +42,12 @@ O banco de dados é atualizado automaticamente a cada `git pull`. O storage link
 - Antes da exportação, sincroniza `is_petsitter` com o perfil aprovado; uma candidatura pendente nunca é aprovada automaticamente
 - Os dados são guardados em `ExportedDataSeeder.php` e incluídos no push
 
-Se a exportação gerar alterações, o hook cria um commit e cancela esse primeiro push: o Git já tinha preparado o commit antigo antes de executar o hook. Repete o mesmo comando `git push` para enviar o novo commit. Se os dados não mudaram, o push continua normalmente.
+Se a exportação gerar alterações, o hook cria um commit e cancela esse primeiro push: o Git já tinha preparado o commit antigo antes de executar o hook. Repete o mesmo comando `git push` para enviar o novo commit; até o repetires, os colegas ainda não recebem esse snapshot. Se os dados não mudaram, o push continua normalmente.
 
 **Quando os colegas fazem `git pull`:**
-- Um git hook deteta que os dados mudaram
-- Roda automaticamente `migrate:fresh --seed` para atualizar o banco de dados
+- Se `ExportedDataSeeder.php` mudou, o git hook recria a base com `migrate:fresh --seed` para aplicar o snapshot completo, incluindo alterações e eliminações
+- Se só chegaram alterações de código/migrations, aplica `migrate` sem apagar os dados locais
+- Se a atualização falhar, o hook mostra o erro e termina com estado de falha em vez de anunciar sucesso
 - Restaura apenas o snapshot exportado, preservando IDs e relações; registos removidos não voltam a aparecer como dados de demonstração
 - Cria automaticamente o storage link para as fotos aparecerem
 - Os colegas recebem tudo sem rodar nenhum comando manual

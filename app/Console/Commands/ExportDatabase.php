@@ -199,7 +199,12 @@ class ExportDatabase extends Command
         $content .= "    }\n";
         $content .= "}\n";
 
-        File::put($seederPath, $content);
+        if (File::put($seederPath, $content) === false) {
+            $this->error("Não foi possível escrever o snapshot em {$seederPath}.");
+
+            return self::FAILURE;
+        }
+
         $this->info("Dados exportados para ExportedDataSeeder.php");
         $this->info("Users: " . count($usersArray));
         $this->info("Petsitters: " . count($petsittersArray));
