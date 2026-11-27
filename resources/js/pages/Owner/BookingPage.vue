@@ -473,9 +473,9 @@ onMounted(() => {
                 <div class="booking-actions d-flex align-items-center gap-3">
                     <HeaderNotificationsChat />
 
-                    <button type="button" class="text-dark p-0 border-0 bg-transparent">
+                    <Link href="/profile" class="text-dark p-0 border-0 bg-transparent" aria-label="Perfil" title="Perfil">
                         <UserRound :size="25" />
-                    </button>
+                    </Link>
 
                     <Link
                         href="/logout"
