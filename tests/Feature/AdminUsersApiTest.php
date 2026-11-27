@@ -82,7 +82,11 @@ test('admin can suspend a user and send a notification warning', function () {
     $user = User::factory()->create();
 
     $this->actingAs($admin)
-        ->postJson("/api/admin/users/{$user->id}/suspend")
+        ->postJson("/api/admin/users/{$user->id}/suspend", [
+            'duration_days' => 7,
+            'reason' => 'Violação das regras',
+            'message' => 'A sua conta foi temporariamente suspensa.',
+        ])
         ->assertOk()
         ->assertJsonPath('data.account_status', 'suspended');
 
@@ -92,7 +96,7 @@ test('admin can suspend a user and send a notification warning', function () {
         ->assertJsonPath('data.type', 'admin_warning')
         ->assertJsonPath('data.message', 'Por favor, reveja as regras da comunidade.');
 
-    expect(Notification::where('user_id', $user->id)->count())->toBe(1);
+    expect(Notification::where('user_id', $user->id)->count())->toBe(2);
 
     $this->getJson("/api/admin/users/{$user->id}")
         ->assertOk()

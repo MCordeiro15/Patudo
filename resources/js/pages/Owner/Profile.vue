@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import { CirclePlus, LogOut, UserRound, MessageCircle, Bell ,SquarePen } from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
+import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
 import type { Animal } from '@/types';
 import { useAuth } from '@/composables/useAuth';
 import { useNotifications } from '@/composables/useNotifications';
@@ -24,9 +25,9 @@ const showDeleteModal = ref(false);
 const showNotifications = ref(false);
 
 // "Quero ser petsitter" — botão placeholder: no futuro passa para a navbar
-// O estado vem do servidor (rota /profile): null = sem candidatura, 'pending' ou 'rejected'
+// O estado vem do servidor (rota /profile): candidatura, perfil desativado ou sem candidatura.
 const props = defineProps<{
-    petsitterApplicationStatus?: 'pending' | 'rejected' | null;
+    petsitterApplicationStatus?: 'pending' | 'rejected' | 'inactive' | null;
 }>();
 
 const showFormPetsitter = ref(false);
@@ -274,6 +275,7 @@ onMounted(() => {
                     >
                         Reservas
                     </a>
+                    <AdminNavigationMenu />
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
@@ -329,6 +331,13 @@ onMounted(() => {
                     role="status"
                 >
                     A tua candidatura a petsitter foi recusada.
+                </div>
+                <div
+                    v-else-if="petsitterApplicationStatus === 'inactive'"
+                    class="alert alert-secondary py-2 px-3 small mb-0"
+                    role="status"
+                >
+                    O teu perfil de petsitter está desativado.
                 </div>
                 <button
                     v-else

@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Ficheiro PHP: UserTest.php
  * PHP file: UserTest.php
@@ -45,6 +44,15 @@ test('user can view their own profile', function () {
 
     $response->assertOk()
         ->assertJsonPath('data.id', $user->id);
+});
+
+test('user with a petsitter flag but no approved profile is not reported as an active petsitter', function () {
+    $user = User::factory()->petsitter()->create();
+
+    $this->actingAs($user)
+        ->getJson('/api/me')
+        ->assertOk()
+        ->assertJsonPath('data.is_petsitter', false);
 });
 
 test('user cannot view another users profile', function () {
@@ -100,7 +108,11 @@ test('admin can suspend a user', function () {
     $admin = User::factory()->admin()->create();
     $targetUser = User::factory()->create();
 
-    $response = $this->actingAs($admin)->postJson("/api/users/{$targetUser->id}/suspend");
+    $response = $this->actingAs($admin)->postJson("/api/users/{$targetUser->id}/suspend", [
+        'duration_days' => 7,
+        'reason' => 'Violação das regras',
+        'message' => 'A sua conta foi temporariamente suspensa.',
+    ]);
 
     $response->assertOk();
     $this->assertDatabaseHas('users', [

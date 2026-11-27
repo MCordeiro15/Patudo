@@ -4,6 +4,7 @@
  * Controlador API para gestão de perfis de petsitter. Fornece endpoints CRUD, aprovação/rejeição por admin e atualização de dias de disponibilidade.
  * API controller for petsitter profile management. Provides CRUD endpoints, admin approval/rejection, and availability days update.
  */
+
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
@@ -40,7 +41,8 @@ class PetsitterController extends Controller
                 $query->where('approval_status', $filters['approval_status']);
             }
         } else {
-            $query->where('approval_status', 'approved');
+            $query->where('approval_status', 'approved')
+                ->whereHas('user', fn ($query) => $query->where('is_petsitter', true));
         }
 
         return PetsitterResource::collection($query->get());
@@ -51,7 +53,16 @@ class PetsitterController extends Controller
      */
     public function publicIndex()
     {
-        $query = Petsitter::with('user')->where('approval_status', 'approved');
+        $query = Petsitter::with('user')
+            ->where('approval_status', 'approved')
+            ->whereHas('user', fn ($query) => $query
+                ->where('is_petsitter', true)
+                ->where(function ($query) {
+                    $query
+                        ->where('account_status', 'active')
+                        ->orWhereNull('account_status');
+                })
+            );
 
         return PetsitterResource::collection($query->get());
     }
@@ -179,7 +190,7 @@ class PetsitterController extends Controller
         }
 
         // Atualizar o usuário se houver dados
-        if (!empty($userData)) {
+        if (! empty($userData)) {
             $petsitter->user->update($userData);
         }
 
@@ -192,14 +203,14 @@ class PetsitterController extends Controller
             $file = $request->file('avatar');
             $content = file_get_contents($file->getRealPath());
             $mimeType = $file->getMimeType();
-            $petsitterData['profile_photo'] = 'data:' . $mimeType . ';base64,' . base64_encode($content);
+            $petsitterData['profile_photo'] = 'data:'.$mimeType.';base64,'.base64_encode($content);
         }
 
         // Atualizar o petsitter com os dados restantes
         $petsitter->update($data);
 
         // Aplicar dados adicionais (profile_photo)
-        if (!empty($petsitterData)) {
+        if (! empty($petsitterData)) {
             $petsitter->update($petsitterData);
         }
 

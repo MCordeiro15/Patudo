@@ -94,6 +94,7 @@ test('admin receives the menu counters', function () {
     $this->actingAs(User::factory()->admin()->create())
         ->get('/admin/users')
         ->assertInertia(fn (Assert $page) => $page
+            ->where('auth.isAdmin', true)
             ->where('adminCounts.pending_petsitters', 2)
             ->where('adminCounts.open_reports', 3)
             ->where('adminCounts.open_support', 1));
@@ -105,7 +106,9 @@ test('non admin receives adminCounts as null', function () {
 
     $this->actingAs(User::factory()->create())
         ->get('/petsitters')
-        ->assertInertia(fn (Assert $page) => $page->where('adminCounts', null));
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('adminCounts', null)
+            ->where('auth.isAdmin', false));
 });
 
 test('guest receives adminCounts as null', function () {

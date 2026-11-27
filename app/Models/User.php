@@ -36,7 +36,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property bool $is_petsitter
  * @property-read Petsitter|null $petsitter
  */
-#[Fillable(['name', 'email', 'password', 'phone', 'location', 'about', 'avatar', 'is_admin', 'is_petsitter', 'account_status'])]
+#[Fillable(['name', 'email', 'password', 'phone', 'location', 'about', 'avatar', 'is_admin', 'is_petsitter', 'account_status', 'suspended_until', 'suspension_reason'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
@@ -56,6 +56,7 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'two_factor_confirmed_at' => 'datetime',
             'is_admin' => 'boolean',
             'is_petsitter' => 'boolean',
+            'suspended_until' => 'datetime',
         ];
     }
 
@@ -74,7 +75,15 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
      */
     public function isPetsitter(): bool
     {
-        return (bool) $this->is_petsitter;
+        if (! $this->is_petsitter) {
+            return false;
+        }
+
+        if ($this->relationLoaded('petsitter')) {
+            return $this->petsitter?->approval_status === 'approved';
+        }
+
+        return $this->petsitter()->where('approval_status', 'approved')->exists();
     }
 
     /**

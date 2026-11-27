@@ -14,6 +14,7 @@ import {
 } from '@lucide/vue';
 import { ref, onMounted } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
+import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import { useNotifications } from '@/composables/useNotifications';
 
@@ -255,6 +256,7 @@ onMounted(() => {
                         >
                             Reservas
                         </a>
+                        <AdminNavigationMenu />
                     </div>
 
                     <div class="d-flex align-items-center gap-3">

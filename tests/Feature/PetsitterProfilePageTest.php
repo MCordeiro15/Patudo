@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Ficheiro PHP: PetsitterProfilePageTest.php
  * PHP file: PetsitterProfilePageTest.php
@@ -10,9 +9,8 @@ use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('petsitter can view their own profile with its data', function () {
-    $petsitter = Petsitter::factory()->create([
+    $petsitter = Petsitter::factory()->approved()->create([
         'biography' => 'Cuido de cães há vários anos.',
-        'approval_status' => 'approved',
     ]);
 
     $this->actingAs($petsitter->user)
@@ -35,6 +33,35 @@ test('user without a petsitter profile is redirected to owner profile', function
         ->assertRedirect(route('owner.profile'));
 });
 
+test('user whose petsitter role is disabled sees the owner profile even if an old profile remains approved', function () {
+    $user = User::factory()->create(['is_petsitter' => false]);
+    Petsitter::factory()->approved()->create(['user_id' => $user->id]);
+    $user->forceFill(['is_petsitter' => false])->save();
+
+    $this->actingAs($user)
+        ->get('/petsitters/profile')
+        ->assertRedirect(route('owner.profile'));
+
+    $this->actingAs($user)
+        ->get('/profile')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Owner/Profile')
+            ->where('petsitterApplicationStatus', 'inactive'));
+});
+
+test('user with a flag but no approved profile has no active petsitter role in the page props', function () {
+    $user = User::factory()->petsitter()->create();
+
+    $this->actingAs($user)
+        ->get('/profile')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Owner/Profile')
+            ->where('auth.user.is_petsitter', false)
+            ->where('petsitterApplicationStatus', null));
+});
+
 test('user can view the selected approved petsitter profile without private data', function () {
     $viewer = User::factory()->create();
     $petsitter = Petsitter::factory()->approved()->create();
@@ -43,13 +70,22 @@ test('user can view the selected approved petsitter profile without private data
         ->get('/petsitters/'.$petsitter->user_id)
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('Petsitter/Profile')
-            ->where('isOwnProfile', false)
-            ->where('isAdmin', false)
-            ->where('petsitter.user_id', $petsitter->user_id)
-            ->where('petsitter.name', $petsitter->user->name)
-            ->missing('petsitter.identification_documents')
+            ->component('Petsitter/ProfileOwnerView')
+            ->where('petsitterId', $petsitter->user_id)
         );
+});
+
+test('users cannot view a suspended petsitter profile', function () {
+    $viewer = User::factory()->create();
+    $petsitter = Petsitter::factory()->approved()->create();
+    $petsitter->user->update([
+        'account_status' => 'suspended',
+        'suspended_until' => now()->addDays(7),
+    ]);
+
+    $this->actingAs($viewer)
+        ->get('/petsitters/'.$petsitter->user_id)
+        ->assertForbidden();
 });
 
 test('user cannot view another petsitter profile that is not approved', function () {

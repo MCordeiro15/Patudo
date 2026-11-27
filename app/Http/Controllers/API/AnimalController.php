@@ -19,20 +19,16 @@ use Illuminate\Support\Facades\Gate;
 class AnimalController extends Controller
 {
     /**
-     * Lista todos os registos com paginação. Admin vê todos, utilizador normal vê apenas os seus.
-     * Lists all records with pagination. Admin sees all, normal user sees only their own.
+     * Lista apenas os animais pertencentes ao utilizador autenticado.
+     * Lists only animals belonging to the authenticated user.
      */
     public function index(Request $request): Responsable
     {
         Gate::authorize('viewAny', Animal::class);
 
-        $query = Animal::with('user');
-
-        if ( ! $request->user()?->isAdmin()) {
-            $query->where('user_id', $request->user()?->id);
-        }
-
-        return AnimalResource::collection($query->get());
+        return AnimalResource::collection(
+            Animal::with('user')->where('user_id', $request->user()->id)->get(),
+        );
     }
 
     /**

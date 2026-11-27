@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Ficheiro PHP: SupportTicketTest.php
  * PHP file: SupportTicketTest.php
@@ -60,6 +59,45 @@ test('authenticated user can open a help ticket without reported user', function
         'reported_user_id' => null,
         'type' => 'help',
     ]);
+});
+
+test('opening a help ticket notifies every admin and no regular users', function () {
+    $user = User::factory()->create();
+    $admins = User::factory()->admin()->count(2)->create();
+    $regularUser = User::factory()->create();
+
+    $this->actingAs($user)->postJson('/api/support-tickets', [
+        'subject' => 'Ajuda com a conta',
+        'description' => 'Preciso de ajuda para atualizar os meus dados.',
+        'type' => 'help',
+    ])->assertCreated();
+
+    foreach ($admins as $admin) {
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $admin->id,
+            'type' => 'new_help_ticket',
+            'message' => 'Foi criado um novo ticket de ajuda: Ajuda com a conta',
+            'read_at' => null,
+        ]);
+    }
+
+    $this->assertDatabaseCount('notifications', 2);
+    $this->assertDatabaseMissing('notifications', ['user_id' => $regularUser->id]);
+});
+
+test('opening a complaint does not notify admins about a help ticket', function () {
+    $user = User::factory()->create();
+    $admin = User::factory()->admin()->create();
+    $reportedUser = User::factory()->create();
+
+    $this->actingAs($user)->postJson('/api/support-tickets', [
+        'reported_user_id' => $reportedUser->id,
+        'subject' => 'Denúncia',
+        'description' => 'Descrição da denúncia.',
+        'type' => 'complaint',
+    ])->assertCreated();
+
+    $this->assertDatabaseMissing('notifications', ['user_id' => $admin->id]);
 });
 
 test('opening a ticket requires valid fields', function () {
