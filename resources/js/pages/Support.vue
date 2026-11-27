@@ -91,7 +91,7 @@ async function submitSupportRequest() {
 <template>
     <Head :title="isSuspended ? 'Conta suspensa' : 'Suporte geral'" />
 
-    <main class="support-page">
+    <main class="support-page patudo-page-shell">
         <div class="support-shell">
             <header class="support-header">
                 <div class="support-brand">
@@ -100,7 +100,7 @@ async function submitSupportRequest() {
                 </div>
                 <div class="support-header-actions">
                     <span class="support-header-label">Ajuda e segurança</span>
-                    <button v-if="isSuspended" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2" type="button" @click="logout">
+                    <button v-if="isSuspended" class="btn btn-outline-danger d-inline-flex align-items-center gap-2" type="button" @click="logout">
                         <LogOut :size="16" aria-hidden="true" />
                         Terminar sessão
                     </button>
@@ -208,9 +208,6 @@ async function submitSupportRequest() {
 .support-page {
     min-height: 100vh;
     padding: 24px clamp(18px, 5vw, 72px);
-    background:
-        radial-gradient(circle at 6% 3%, rgba(194, 65, 12, 0.1), transparent 26rem),
-        #fffaf3;
     color: #2e1d14;
 }
 

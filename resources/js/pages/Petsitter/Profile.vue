@@ -3,6 +3,8 @@
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import {
+    Pencil,
+    Plus,
     Save,
     Trash2,
     UserRound, LogOut,
@@ -715,28 +717,12 @@ const saveAvailability = async () => {
                     <button
                         v-if="canEdit"
                         type="button"
-                        class="btn btn-primary btn-sm d-flex align-items-center gap-2 position-absolute top-0 end-0 mt-3 me-3 px-4"
+                        class="patudo-icon-action patudo-icon-action-edit position-absolute top-0 end-0 mt-3 me-3"
+                        aria-label="Editar perfil"
+                        title="Editar perfil"
                         @click="showEditProfileModal = true"
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <path
-                                d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                            />
-                            <path
-                                d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"
-                            />
-                        </svg>
-                        Editar
+                        <Pencil :size="16" aria-hidden="true" />
                     </button>
 
                     <div class="row g-4 align-items-center">
@@ -829,10 +815,12 @@ const saveAvailability = async () => {
                                 <button
                                     v-if="isOwnProfile && availableServiceTypes.length > 0"
                                     type="button"
-                                    class="btn btn-primary btn-sm"
+                                    class="patudo-icon-action patudo-icon-action-add"
+                                    aria-label="Adicionar serviço"
+                                    title="Adicionar serviço"
                                     @click="beginCreateService"
                                 >
-                                    Adicionar serviço
+                                    <Plus :size="16" aria-hidden="true" />
                                 </button>
                             </div>
 
@@ -854,18 +842,22 @@ const saveAvailability = async () => {
                                 <div v-if="isOwnProfile" class="d-flex justify-content-end gap-2 mt-2">
                                     <button
                                         type="button"
-                                        class="btn btn-outline-primary btn-sm"
+                                        class="patudo-icon-action patudo-icon-action-edit"
+                                        :aria-label="`Editar serviço ${serviceTypeLabel(service.type)}`"
+                                        :title="`Editar serviço ${serviceTypeLabel(service.type)}`"
                                         @click="beginEditService(service)"
                                     >
-                                        Editar
+                                        <Pencil :size="16" aria-hidden="true" />
                                     </button>
                                     <button
                                         type="button"
-                                        class="btn btn-outline-danger btn-sm"
+                                        class="patudo-icon-action patudo-icon-action-delete"
+                                        :aria-label="`Apagar serviço ${serviceTypeLabel(service.type)}`"
+                                        :title="`Apagar serviço ${serviceTypeLabel(service.type)}`"
                                         :disabled="deletingServiceId === service.id"
                                         @click="deleteService(service)"
                                     >
-                                        {{ deletingServiceId === service.id ? 'A apagar...' : 'Apagar' }}
+                                        <Trash2 :size="16" aria-hidden="true" />
                                     </button>
                                 </div>
                             </div>
@@ -938,28 +930,12 @@ const saveAvailability = async () => {
                                 <button
                                     v-if="canEdit && !isEditing"
                                     type="button"
-                                    class="btn btn-primary d-flex align-items-center gap-1"
+                                    class="patudo-icon-action patudo-icon-action-edit"
+                                    aria-label="Editar disponibilidade"
+                                    title="Editar disponibilidade"
                                     @click="startEditing"
                                 >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="14"
-                                        height="14"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    >
-                                        <path
-                                            d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                                        />
-                                        <path
-                                            d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"
-                                        />
-                                    </svg>
-                                    Editar
+                                    <Pencil :size="16" aria-hidden="true" />
                                 </button>
                             </div>
 
@@ -1158,35 +1134,22 @@ const saveAvailability = async () => {
                                     <button
                                         v-if="canEdit"
                                         type="button"
-                                        class="btn btn-link text-dark p-0"
+                                        class="patudo-icon-action patudo-icon-action-edit"
+                                        :aria-label="`Editar publicação ${post.title || ''}`"
+                                        :title="`Editar publicação ${post.title || ''}`"
                                         @click="editPost(post.id)"
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="40"
-                                            height="40"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="1.25"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        >
-                                            <path
-                                                d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                                            />
-                                            <path
-                                                d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"
-                                            />
-                                        </svg>
+                                        <Pencil :size="16" aria-hidden="true" />
                                     </button>
                                     <button
                                         v-if="canEdit"
                                         type="button"
-                                        class="btn btn-link text-dark p-0"
+                                        class="patudo-icon-action patudo-icon-action-delete"
+                                        :aria-label="`Apagar publicação ${post.title || ''}`"
+                                        :title="`Apagar publicação ${post.title || ''}`"
                                         @click="deletePost(post.id)"
                                     >
-                                        <Trash2 :size="40" :stroke-width="1.25" />
+                                        <Trash2 :size="16" aria-hidden="true" />
                                     </button>
                                 </div>
 
@@ -1359,7 +1322,7 @@ const saveAvailability = async () => {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    padding: 24px 140px 5px 0;
+    padding: 24px 96px 5px 0;
 }
 
 .post-body:first-child {
@@ -1390,10 +1353,10 @@ const saveAvailability = async () => {
 
 .post-actions {
     position: absolute;
-    top: 13px;
+    bottom: 10px;
     right: 20px;
     display: flex;
-    gap: 23px;
+    gap: 0.5rem;
 }
 
 .post-heart {
@@ -1420,11 +1383,12 @@ const saveAvailability = async () => {
     }
 
     .post-actions {
-        top: 18px;
-        right: 18px;
-        padding: 2px 8px;
-        border-radius: 0.75rem;
-        background-color: rgba(255, 255, 255, 0.9);
+        top: auto;
+        right: 8px;
+        bottom: 8px;
+        padding: 0;
+        border-radius: 0;
+        background-color: transparent;
     }
 }
 

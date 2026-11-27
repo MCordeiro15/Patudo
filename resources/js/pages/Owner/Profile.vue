@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { CirclePlus, LogOut, UserRound, SquarePen } from '@lucide/vue';
+import { CirclePlus, LogOut, Pencil, UserRound } from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
@@ -343,14 +343,12 @@ onMounted(() => {
             >
                 <button
                     type="button"
-                    class="btn btn-primary btn-sm d-flex align-items-center gap-2 position-absolute top-0 end-0 mt-3 me-3 px-4"
+                    class="patudo-icon-action patudo-icon-action-edit position-absolute top-0 end-0 mt-3 me-3"
+                    aria-label="Editar perfil"
+                    title="Editar perfil"
                     @click="showEditModal = true"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                        <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
-                    </svg>
-                    Editar
+                    <Pencil :size="16" aria-hidden="true" />
                 </button>
 
                 <div class="row g-4 align-items-center">

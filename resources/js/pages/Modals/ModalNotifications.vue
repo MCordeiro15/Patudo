@@ -372,7 +372,7 @@ const timeAgo = (dateString: string) => {
                     </span>
                     <button
                         type="button"
-                        class="btn btn-outline-primary"
+                        class="btn btn-primary"
                         @click="handleClose"
                     >
                         Fechar
