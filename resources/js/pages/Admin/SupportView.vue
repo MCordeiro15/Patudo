@@ -1,7 +1,7 @@
 <!-- Página do administrador para responder aos pedidos de ajuda (versão só front-end, dados falsos). -->
 <!-- Admin page to answer help requests (front-end only version, mock data). -->
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { ChevronRight, Search } from '@lucide/vue';
 import { computed, nextTick, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
@@ -121,13 +121,13 @@ const tickets = ref<Ticket[]>([
 // ---------------------------------------------------------------------------------
 
 const menu = [
-    { label: 'Utilizadores' },
-    { label: 'Verificações', badge: 5 },
-    { label: 'Reservas' },
-    { label: 'Avaliações' },
-    { label: 'Denúncias', badge: 3 },
-    { label: 'Suporte', active: true },
-    { label: 'Definições' },
+    { label: 'Utilizadores', href: '/admin/users' },
+    { label: 'Verificações', href: '/admin/petsitters/pending' },
+    { label: 'Reservas', href: '/admin/bookings' },
+    { label: 'Avaliações', href: '/admin/reviews' },
+    { label: 'Denúncias', href: '/admin/reports' },
+    { label: 'Suporte', href: '/admin/support', active: true },
+    { label: 'Definições', href: '/admin/settings' },
 ];
 
 const tabs: { key: Status; label: string }[] = [
@@ -210,11 +210,15 @@ const logout = () => router.post('/logout');
                 </div>
                 <p class="menu-label">ADMINISTRAÇÃO</p>
                 <nav class="menu">
-                    <div v-for="item in menu" :key="item.label" class="menu-item" :class="{ active: item.active }">
+                    <Link
+                        v-for="item in menu"
+                        :key="item.label"
+                        :href="item.href"
+                        class="menu-item"
+                        :aria-current="item.active ? 'page' : undefined"
+                    >
                         <span>{{ item.label }}</span>
-                        <span v-if="item.active && openCount" class="menu-badge">{{ openCount }}</span>
-                        <span v-else-if="!item.active && item.badge" class="menu-badge">{{ item.badge }}</span>
-                    </div>
+                    </Link>
                 </nav>
             </div>
             <button type="button" class="logout" @click="logout">Terminar sessão</button>
@@ -230,6 +234,10 @@ const logout = () => router.post('/logout');
             </header>
 
             <div class="toolbar">
+                <label class="search">
+                    <Search :size="22" />
+                    <input v-model="search" type="text" placeholder="Pesquisar pedido" />
+                </label>
                 <div class="tabs">
                     <button
                         v-for="t in tabs"
@@ -242,10 +250,6 @@ const logout = () => router.post('/logout');
                         {{ t.label }}<template v-if="t.key === 'open'"> ({{ openCount }})</template>
                     </button>
                 </div>
-                <label class="search">
-                    <Search :size="22" />
-                    <input v-model="search" type="text" placeholder="Pesquisar pedido" />
-                </label>
             </div>
 
             <div class="content">
@@ -328,16 +332,19 @@ const logout = () => router.post('/logout');
 .admin-shell {
     display: flex;
     min-height: 100vh;
-    background-color: #fffaf3;
+    background-color: rgba(var(--bs-light-rgb), 0.25);
+    background-image:
+        radial-gradient(circle at 0% 0%, rgba(194, 65, 12, 0.12) 0%, transparent 32%),
+        radial-gradient(circle at 100% 100%, rgba(249, 115, 22, 0.25) 0%, transparent 35%);
     color: #2e1d14;
 }
 
 .admin-sidebar {
-    width: 186px;
+    width: 176px;
     flex-shrink: 0;
-    background-color: #fff;
+    background-color: #fffaf5;
     border-right: 1px solid #f3b78a;
-    padding: 28px 12px 22px;
+    padding: 22px 8px 18px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -347,14 +354,14 @@ const logout = () => router.post('/logout');
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 1.3rem;
+    font-size: 1.15rem;
     font-weight: 600;
     padding: 0 4px;
 }
 
 .menu-label {
     font-size: 0.62rem;
-    margin: 26px 12px 12px;
+    margin: 24px 12px 12px;
     color: #5b4638;
 }
 
@@ -362,38 +369,21 @@ const logout = () => router.post('/logout');
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 16px;
-    font-size: 0.82rem;
+    padding: 9px 16px;
+    font-size: 0.75rem;
     font-weight: 700;
     border-radius: 999px;
-    margin-bottom: 6px;
-}
-
-.menu-item.active {
-    background-color: #2e1d14;
-    color: #fff;
-}
-
-.menu-badge {
-    background-color: #c2410c;
-    color: #fff;
-    font-size: 0.68rem;
-    font-weight: 700;
-    border-radius: 999px;
-    min-width: 22px;
-    height: 22px;
-    padding: 0 6px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    margin-bottom: 4px;
+    color: inherit;
+    text-decoration: none;
 }
 
 .logout {
     background: none;
     border: 0;
     border-top: 1px solid #f3b78a;
-    padding: 20px 16px 0;
-    font-size: 0.82rem;
+    padding: 18px 16px 0;
+    font-size: 0.75rem;
     font-weight: 700;
     text-align: left;
     color: inherit;
@@ -402,7 +392,7 @@ const logout = () => router.post('/logout');
 .admin-main {
     flex: 1;
     min-width: 0;
-    padding: 36px 26px 30px;
+    padding: 30px 28px 24px;
 }
 
 .main-header {
@@ -447,7 +437,8 @@ h1 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 26px 0 18px;
+    gap: 16px;
+    margin: 22px 0 16px;
 }
 
 .tabs {
@@ -457,12 +448,13 @@ h1 {
 
 .tab {
     border: 1.5px solid #c2410c;
-    background-color: #fff;
+    background-color: #fffaf5;
     color: #2e1d14;
     border-radius: 999px;
-    padding: 7px 22px;
+    padding: 7px 18px;
     font-size: 0.75rem;
     font-weight: 700;
+    white-space: nowrap;
 }
 
 .tab.active {
@@ -476,7 +468,7 @@ h1 {
     align-items: center;
     gap: 8px;
     border: 1.5px solid #c2410c;
-    background-color: #fff;
+    background-color: #fffaf5;
     border-radius: 999px;
     padding: 6px 16px;
     width: 300px;
@@ -492,12 +484,16 @@ h1 {
 
 .content {
     display: flex;
-    gap: 26px;
-    align-items: flex-start;
+    gap: 14px;
+    align-items: stretch;
+    padding: 10px;
+    background-color: #fffaf5;
+    border: 1.5px solid #c2410c;
+    border-radius: 18px;
 }
 
 .list-col {
-    width: 280px;
+    width: 34%;
     flex-shrink: 0;
 }
 
@@ -506,17 +502,18 @@ h1 {
     align-items: center;
     gap: 10px;
     width: 100%;
-    background-color: #fffaf3;
-    border: 1.5px solid #f3b78a;
+    background-color: #fffaf5;
+    border: 1.5px solid #f3d0b4;
     border-radius: 12px;
-    padding: 12px 16px;
-    margin-bottom: 10px;
+    padding: 11px 14px;
+    margin-bottom: 6px;
     text-align: left;
     color: inherit;
 }
 
 .list-item.selected {
-    border: 1.5px solid #2e1d14;
+    border: 1.5px solid #c2410c;
+    background-color: #fff1e3;
 }
 
 .list-text {
@@ -559,10 +556,9 @@ h1 {
 .detail {
     flex: 1;
     min-width: 0;
-    background-color: #fffaf3;
-    border: 1.5px solid #c2410c;
-    border-radius: 16px;
-    padding: 20px 22px;
+    background-color: transparent;
+    border-left: 1px solid #f3b78a;
+    padding: 12px 14px;
 }
 
 .detail-head {
@@ -665,8 +661,8 @@ h1 {
 
 .bubble {
     max-width: 75%;
-    background-color: #fffaf3;
-    border: 1.5px solid #f3b78a;
+    background-color: #fffaf5;
+    border: 1.5px solid #f3d0b4;
     border-radius: 12px;
     padding: 12px 16px;
     font-size: 0.75rem;
@@ -696,7 +692,7 @@ h1 {
 .reply-box {
     width: 100%;
     resize: none;
-    background-color: #fffaf3;
+    background-color: #fffaf5;
     border: 1.5px solid #c2410c;
     border-radius: 8px;
     padding: 10px 12px;
@@ -728,7 +724,7 @@ h1 {
 }
 
 .btn-outline {
-    background-color: #fffaf3;
+    background-color: #fffaf5;
     color: #c2410c;
 }
 
@@ -750,12 +746,35 @@ textarea:focus-visible {
 }
 
 @media (max-width: 900px) {
+    .admin-main {
+        padding: 24px 18px;
+    }
+
+    .toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .tabs {
+        flex-wrap: wrap;
+    }
+
+    .search {
+        width: 100%;
+    }
+
     .content {
         flex-direction: column;
     }
 
     .list-col {
         width: 100%;
+    }
+
+    .detail {
+        border-left: 0;
+        border-top: 1px solid #f3b78a;
+        padding: 16px 4px 4px;
     }
 
     .admin-sidebar {
