@@ -1,7 +1,7 @@
 <!-- Página de perfil do utilizador. Mostra e permite editar informações pessoais. -->
 <!-- User profile page. Shows and allows editing personal information. -->
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import {
     Bell,
     MessageCircle,
@@ -73,6 +73,9 @@ const props = defineProps<{
     isOwnProfile?: boolean;
     isAdmin?: boolean;
 }>();
+const page = usePage<{ auth: { isAdmin: boolean; user: { is_petsitter?: boolean } | null } }>();
+const viewerIsPetsitter = computed(() => page.props.auth.user?.is_petsitter === true);
+const showOwnerNavigation = computed(() => !viewerIsPetsitter.value || page.props.auth.isAdmin);
 
 // Reactive availability days for editing
 const editingDays = ref<string[]>([]);
@@ -651,7 +654,7 @@ const saveAvailability = async () => {
                 </a>
 
                 <div class="nav nav-pills border rounded-pill p-1 mx-auto">
-                    <a class="nav-link text-dark rounded-pill px-4" href="/"
+                    <a v-if="showOwnerNavigation" class="nav-link text-dark rounded-pill px-4" href="/"
                     >Início</a
                     >
                     <a
@@ -660,6 +663,7 @@ const saveAvailability = async () => {
                     >Pedidos</a
                     >
                     <a
+                        v-if="showOwnerNavigation"
                         class="nav-link text-dark rounded-pill px-4"
                         href="/favorites"
                     >
