@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
-import { Bell, Heart, LogOut, MessageCircle, Star, UserRound } from '@lucide/vue';
+import { Heart, LogOut, Star, UserRound } from '@lucide/vue';
 import { onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
-import { useNotifications } from '@/composables/useNotifications';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 
 function getXsrf(): string {
     const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
@@ -56,8 +55,6 @@ function formatAnimalTag(animal: string): string {
 
 const favourites = ref<FavoritePetsitter[]>([]);
 const feedback = ref('');
-const showNotifications = ref(false);
-const { unreadCount } = useNotifications();
 
 function navigateToMyProfile() {
     window.location.href = '/petsitters/profile';
@@ -125,15 +122,7 @@ onMounted(() => {
                     </div>
 
                     <div class="d-flex align-items-center gap-3 ms-auto">
-                        <a href="/messages" class="text-dark">
-                            <MessageCircle :size="25" />
-                        </a>
-                        <button type="button" class="text-dark bg-transparent border-0 p-0 position-relative" @click="showNotifications = true">
-                            <Bell :size="25" />
-                            <span v-if="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                                {{ unreadCount > 9 ? '9+' : unreadCount }}
-                            </span>
-                        </button>
+                        <HeaderNotificationsChat />
                         <button
                             type="button"
                             class="text-dark p-0 border-0 bg-transparent"
@@ -229,11 +218,6 @@ onMounted(() => {
                 </div>
             </div>
 
-            <!-- Modal de Notificações -->
-            <ModalNotifications
-                :show="showNotifications"
-                @close="showNotifications = false"
-            />
         </main>
 </template>
 

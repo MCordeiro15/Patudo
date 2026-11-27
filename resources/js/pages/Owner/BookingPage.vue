@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { Bell, CalendarDays, LogOut, MessageCircle, UserRound, ChevronLeft, Dog, Plus } from '@lucide/vue';
+import { CalendarDays, LogOut, UserRound, ChevronLeft, Dog, Plus } from '@lucide/vue';
 import { computed, onMounted, ref, watch } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 import type { Animal } from '@/types';
-import { useNotifications } from '@/composables/useNotifications';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import ModalBookingPageAddPet from '@/pages/Modals/ModalBookingPageAddPet.vue';
 import ModalPayment from '@/pages/Modals/ModalPayment.vue';
 
@@ -391,8 +390,6 @@ const submitBooking = async () => {
     }
 };
 
-const showNotifications = ref(false);
-const { unreadCount } = useNotifications();
 const showAddPetModal = ref(false);
 
 // Dias da semana das datas escolhidas em que o cuidador não trabalha (o servidor verifica o mesmo).
@@ -474,23 +471,7 @@ onMounted(() => {
                 </div>
 
                 <div class="booking-actions d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark">
-                        <MessageCircle :size="25" />
-                    </a>
-
-                    <button
-                        type="button"
-                        class="text-dark bg-transparent border-0 p-0 position-relative"
-                        @click="showNotifications = true"
-                    >
-                        <Bell :size="25" />
-                        <span
-                            v-if="unreadCount > 0"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge"
-                        >
-                            {{ unreadCount > 9 ? '9+' : unreadCount }}
-                        </span>
-                    </button>
+                    <HeaderNotificationsChat />
 
                     <button type="button" class="text-dark p-0 border-0 bg-transparent">
                         <UserRound :size="25" />
@@ -826,11 +807,6 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-
-        <ModalNotifications
-            :show="showNotifications"
-            @close="showNotifications = false"
-        />
 
         <!-- Pagamento (fictício): o "Pagar" cria a reserva -->
         <ModalPayment

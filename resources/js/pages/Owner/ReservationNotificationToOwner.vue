@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import {
-    Bell,
     LogOut,
-    MessageCircle,
     UserRound,
     ChevronLeft,
     CalendarDays,
@@ -14,10 +12,9 @@ import {
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 import BookingList from '@/components/BookingList.vue';
 import type { Animal } from '@/types';
-import { useNotifications } from '@/composables/useNotifications';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 // /reservations            -> lista de reservas (cartões, no BookingList com role="owner")
 // /reservations?booking=ID -> detalhe de uma reserva (abaixo)
@@ -74,9 +71,6 @@ const loading = ref(false);
 const processingId = ref<number | null>(null);
 const feedback = ref('');
 const feedbackType = ref<'success' | 'error'>('success');
-
-const showNotifications = ref(false);
-const { unreadCount, fetchNotifications } = useNotifications();
 
 function setFeedback(message: string, type: 'success' | 'error') {
     feedback.value = message;
@@ -192,8 +186,6 @@ const cancelBooking = async () => {
 };
 
 onMounted(() => {
-    void fetchNotifications();
-
     if (bookingId) {
         void loadBooking();
     }
@@ -222,25 +214,7 @@ onMounted(() => {
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark" aria-label="Mensagens">
-                        <MessageCircle :size="25" />
-                    </a>
-
-                    <button
-                        type="button"
-                        class="text-dark bg-transparent border-0 p-0 position-relative"
-                        aria-label="Notificações"
-                        @click="showNotifications = true"
-                    >
-                        <Bell :size="25" />
-                        <span
-                            v-if="unreadCount > 0"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            style="font-size: 0.6rem;"
-                        >
-                            {{ unreadCount > 9 ? '9+' : unreadCount }}
-                        </span>
-                    </button>
+                    <HeaderNotificationsChat />
 
                     <a href="/profile" class="text-dark" aria-label="Perfil">
                         <UserRound :size="25" />
@@ -430,10 +404,6 @@ onMounted(() => {
             </div>
         </div>
 
-        <ModalNotifications
-            :show="showNotifications"
-            @close="showNotifications = false"
-        />
     </main>
 </template>
 

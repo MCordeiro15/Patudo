@@ -1,24 +1,16 @@
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3';
-import { Bell, LogOut, MessageCircle, UserRound } from '@lucide/vue';
-import { computed, onMounted, ref } from 'vue';
+import { LogOut, UserRound } from '@lucide/vue';
+import { computed } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 import BookingList from '@/components/BookingList.vue';
-import { useNotifications } from '@/composables/useNotifications';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 // A página é partilhada: petsitters veem pedidos recebidos e donos veem os seus pedidos pendentes.
 const page = usePage<{ auth: { isAdmin: boolean; user: { is_petsitter?: boolean } | null } }>();
 const viewerIsPetsitter = computed(() => page.props.auth.user?.is_petsitter === true);
 const showOwnerNavigation = computed(() => !viewerIsPetsitter.value || page.props.auth.isAdmin);
-
-const showNotifications = ref(false);
-const { unreadCount, fetchNotifications } = useNotifications();
-
-onMounted(() => {
-    void fetchNotifications();
-});
 </script>
 
 <template>
@@ -42,24 +34,7 @@ onMounted(() => {
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark" aria-label="Mensagens">
-                        <MessageCircle :size="25" />
-                    </a>
-                    <button
-                        type="button"
-                        class="text-dark bg-transparent border-0 p-0 position-relative"
-                        aria-label="Notificações"
-                        @click="showNotifications = true"
-                    >
-                        <Bell :size="25" />
-                        <span
-                            v-if="unreadCount > 0"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            style="font-size: 0.6rem;"
-                        >
-                            {{ unreadCount > 9 ? '9+' : unreadCount }}
-                        </span>
-                    </button>
+                    <HeaderNotificationsChat />
                     <a href="/profile" class="text-dark" aria-label="Perfil">
                         <UserRound :size="25" />
                     </a>
@@ -84,10 +59,6 @@ onMounted(() => {
             />
         </div>
 
-        <ModalNotifications
-            :show="showNotifications"
-            @close="showNotifications = false"
-        />
     </main>
 </template>
 
