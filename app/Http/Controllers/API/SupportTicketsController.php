@@ -10,6 +10,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SupportTicketsResource;
 use App\Models\SupportTicket;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Gate;
@@ -52,6 +53,13 @@ class SupportTicketsController extends Controller
 
         $ticket = SupportTicket::create($data);
         $ticket->refresh();
+
+        if ($ticket->type === 'help') {
+            User::query()->where('is_admin', true)->each(fn (User $admin) => $admin->notifications()->create([
+                'type' => 'new_help_ticket',
+                'message' => "Foi criado um novo ticket de ajuda: {$ticket->subject}",
+            ]));
+        }
 
         return (new SupportTicketsResource($ticket->load(['creator', 'reportedUser'])))->response()->setStatusCode(201);
     }

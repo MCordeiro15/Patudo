@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
-import { CalendarDays, LifeBuoy, ShieldAlert } from '@lucide/vue';
+import { CalendarDays, LifeBuoy, LogOut, ShieldAlert } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
+import { logout } from '@/composables/useAuth';
 
 type Suspension = {
     status: 'suspended';
@@ -97,7 +98,13 @@ async function submitSupportRequest() {
                     <img :src="logoPatudo" alt="" width="42" height="42" />
                     <span>Patudo</span>
                 </div>
-                <span class="support-header-label">Ajuda e segurança</span>
+                <div class="support-header-actions">
+                    <span class="support-header-label">Ajuda e segurança</span>
+                    <button v-if="isSuspended" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2" type="button" @click="logout">
+                        <LogOut :size="16" aria-hidden="true" />
+                        Terminar sessão
+                    </button>
+                </div>
             </header>
 
             <div class="support-grid">
@@ -238,6 +245,12 @@ async function submitSupportRequest() {
     color: #7a6657;
     font-size: 0.9rem;
     font-weight: 600;
+}
+
+.support-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
 .support-grid {

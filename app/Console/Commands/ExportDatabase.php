@@ -29,6 +29,8 @@ class ExportDatabase extends Command
     {
         $this->info('Exportando dados do banco de dados...');
 
+        app(\App\Services\ImportExportedPetsitters::class)->synchronizeCurrentDatabase();
+
         $seederPath = database_path('seeders/ExportedDataSeeder.php');
 
         // Export users
@@ -188,31 +190,7 @@ class ExportDatabase extends Command
         // Petsitters
         $content .= "        // Export Petsitters (" . count($petsittersArray) . " petsitters)\n";
         $content .= "        \$petsitters = " . var_export($petsittersArray, true) . ";\n";
-        $content .= "        // só usa as colunas que existem na tabela (evita erro se uma migration ainda não estiver no branch)\n";
-        $content .= "        \$petsitterColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('petsitters'));\n";
-        $content .= "        foreach (\$petsitters as \$pData) {\n";
-        $content .= "            \$petsitter = Petsitter::where('user_id', \$pData['user_id'])->first();\n";
-        $content .= "            if (\$petsitter) {\n";
-        $content .= "                \$petsitter->update(array_intersect_key([\n";
-        $content .= "                    'biography' => \$pData['biography'],\n";
-        $content .= "                    'short_bio' => \$pData['short_bio'],\n";
-        $content .= "                    'experience' => \$pData['experience'],\n";
-        $content .= "                    'service_location' => \$pData['service_location'],\n";
-        $content .= "                    'city' => \$pData['city'],\n";
-        $content .= "                    'postal_code' => \$pData['postal_code'] ?? null,\n";
-        $content .= "                    'age' => \$pData['age'],\n";
-        $content .= "                    'price_per_day' => \$pData['price_per_day'],\n";
-        $content .= "                    'average_rating' => \$pData['average_rating'],\n";
-        $content .= "                    'accepted_sizes' => \$pData['accepted_sizes'],\n";
-        $content .= "                    'sex' => \$pData['sex'],\n";
-        $content .= "                    'accepted_animal_types' => \$pData['accepted_animal_types'],\n";
-        $content .= "                    'identification_documents' => \$pData['identification_documents'],\n";
-        $content .= "                    'approval_status' => \$pData['approval_status'],\n";
-        $content .= "                    'availability_days' => \$pData['availability_days'],\n";
-        $content .= "                    'profile_photo' => \$pData['profile_photo'],\n";
-        $content .= "                ], \$petsitterColumns));\n";
-        $content .= "            }\n";
-        $content .= "        }\n\n";
+        $content .= "        app(\\App\\Services\\ImportExportedPetsitters::class)->import(\$users, \$petsitters);\n\n";
 
         // Animals (delete all first, then recreate)
         $content .= "        // Export Animals (" . count($animalsArray) . " animals)\n";

@@ -115,6 +115,7 @@ test('a petsitter can message the owners of their bookings, and only them', func
 
 test('a petsitter session reports the Petsitter role', function () {
     $user = User::factory()->petsitter()->create();
+    Petsitter::factory()->approved()->create(['user_id' => $user->id]);
 
     $this->actingAs($user)->getJson('/api/chat/session')
         ->assertOk()

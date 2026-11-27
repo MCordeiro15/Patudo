@@ -31,7 +31,7 @@ class PetsitterPolicy
 
         return $user->isAdmin()
             || $user->id === $petsitter->user_id
-            || $petsitter->approval_status === 'approved';
+            || ($petsitter->approval_status === 'approved' && $petsitter->user?->isPetsitter());
     }
 
     /**

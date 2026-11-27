@@ -46,6 +46,15 @@ test('user can view their own profile', function () {
         ->assertJsonPath('data.id', $user->id);
 });
 
+test('user with a petsitter flag but no approved profile is not reported as an active petsitter', function () {
+    $user = User::factory()->petsitter()->create();
+
+    $this->actingAs($user)
+        ->getJson('/api/me')
+        ->assertOk()
+        ->assertJsonPath('data.is_petsitter', false);
+});
+
 test('user cannot view another users profile', function () {
     $user = User::factory()->create();
     $otherUser = User::factory()->create();

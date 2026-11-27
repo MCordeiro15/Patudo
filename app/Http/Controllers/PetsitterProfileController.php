@@ -23,10 +23,9 @@ class PetsitterProfileController extends Controller
 
         abort_if(in_array($user->account_status, ['suspended', 'banned'], true), 403);
 
-        // Se não tem perfil de petsitter, ou a candidatura ainda não foi aprovada,
-        // redireciona para o perfil de utilizador (owner)
+        // Só mostra o perfil de petsitter quando o papel e a aprovação estão ativos.
         $petsitter = Petsitter::where('user_id', $user->id)->first();
-        if (! $petsitter || $petsitter->approval_status !== 'approved') {
+        if (! $petsitter || ! $user->isPetsitter()) {
             return redirect()->route('owner.profile');
         }
 
@@ -50,13 +49,14 @@ class PetsitterProfileController extends Controller
 
         $isOwnProfile = $viewer->id === $petsitter->user_id;
 
-        // o próprio, com a candidatura pendente ou recusada, vê o perfil de owner
-        if ($isOwnProfile && $petsitter->approval_status !== 'approved' && ! $viewer->isAdmin()) {
+        // O próprio só vê o perfil de petsitter se tiver uma aprovação ativa.
+        if ($isOwnProfile && ! $viewer->isAdmin() && ! $viewer->isPetsitter()) {
             return redirect()->route('owner.profile');
         }
 
+        $isPublicPetsitter = $petsitter->approval_status === 'approved' && $petsitter->user?->isPetsitter();
         abort_unless(
-            $viewer->isAdmin() || $isOwnProfile || $petsitter->approval_status === 'approved',
+            $viewer->isAdmin() || $isOwnProfile || $isPublicPetsitter,
             404,
         );
 

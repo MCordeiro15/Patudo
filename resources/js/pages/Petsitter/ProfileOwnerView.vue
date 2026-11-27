@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import { Bell, Check, Heart, LogOut, MessageCircle, Star, UserRound, X } from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
+import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import ModalReportPetsitter from '@/pages/Modals/ModalReportPetsitter.vue';
 import { useNotifications } from '@/composables/useNotifications';
@@ -277,6 +278,7 @@ const displayMemberSince = computed(() =>
                         >
                             Reservas
                         </a>
+                        <AdminNavigationMenu />
                     </div>
 
                     <div class="d-flex align-items-center gap-3">

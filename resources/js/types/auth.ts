@@ -19,6 +19,7 @@ export type User = {
 
 export type Auth = {
     user: User | null;
+    isAdmin: boolean;
 };
 
 export type Passkey = {

@@ -42,7 +42,8 @@ class PetsitterController extends Controller
                 $query->where('approval_status', $filters['approval_status']);
             }
         } else {
-            $query->where('approval_status', 'approved');
+            $query->where('approval_status', 'approved')
+                ->whereHas('user', fn ($query) => $query->where('is_petsitter', true));
         }
 
         return PetsitterResource::collection($query->get());
@@ -56,8 +57,13 @@ class PetsitterController extends Controller
         $query = Petsitter::with('user')
             ->where('approval_status', 'approved')
             ->whereHas('user', fn ($query) => $query
-                ->where('account_status', 'active')
-                ->orWhereNull('account_status'));
+                ->where('is_petsitter', true)
+                ->where(function ($query) {
+                    $query
+                        ->where('account_status', 'active')
+                        ->orWhereNull('account_status');
+                })
+            );
 
         return PetsitterResource::collection($query->get());
     }

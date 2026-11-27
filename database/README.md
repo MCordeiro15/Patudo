@@ -40,6 +40,7 @@ O banco de dados é atualizado automaticamente a cada `git pull`. O storage link
 
 **Quando tu fazes `git push`:**
 - Um git hook exporta automaticamente todos os dados (users, petsitters, animais, posts, bookings, reviews, fotos)
+- Antes da exportação, sincroniza `is_petsitter` com o perfil aprovado; uma candidatura pendente nunca é aprovada automaticamente
 - Os dados são guardados em `ExportedDataSeeder.php` e incluídos no push
 
 Se a exportação gerar alterações, o hook cria um commit e cancela esse primeiro push: o Git já tinha preparado o commit antigo antes de executar o hook. Repete o mesmo comando `git push` para enviar o novo commit. Se os dados não mudaram, o push continua normalmente.
@@ -47,10 +48,13 @@ Se a exportação gerar alterações, o hook cria um commit e cancela esse prime
 **Quando os colegas fazem `git pull`:**
 - Um git hook deteta que os dados mudaram
 - Roda automaticamente `migrate:fresh --seed` para atualizar o banco de dados
+- Restaura perfis de petsitter que ainda não existam e aplica os papéis/estados exportados
 - Cria automaticamente o storage link para as fotos aparecerem
 - Os colegas recebem tudo sem rodar nenhum comando manual
 
 **Resumo:** Criaste uma conta, fizeste uma reserva, subiste uma foto? Faz `git push` e todos os colegas recebem tudo com `git pull`.
+
+Para uma conta ser petsitter, tem de existir um perfil aprovado. Marcar apenas `is_petsitter` como `true` não cria os dados do perfil nem aprova uma candidatura; o fluxo mantém a conta como não-petsitter até existir um perfil aprovado.
 
 ## O que é criado pelos seeders
 

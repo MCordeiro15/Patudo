@@ -2128,31 +2128,7 @@ class ExportedDataSeeder extends Seeder
     )),
   ),
 );
-        // só usa as colunas que existem na tabela (evita erro se uma migration ainda não estiver no branch)
-        $petsitterColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('petsitters'));
-        foreach ($petsitters as $pData) {
-            $petsitter = Petsitter::where('user_id', $pData['user_id'])->first();
-            if ($petsitter) {
-                $petsitter->update(array_intersect_key([
-                    'biography' => $pData['biography'],
-                    'short_bio' => $pData['short_bio'],
-                    'experience' => $pData['experience'],
-                    'service_location' => $pData['service_location'],
-                    'city' => $pData['city'],
-                    'postal_code' => $pData['postal_code'] ?? null,
-                    'age' => $pData['age'],
-                    'price_per_day' => $pData['price_per_day'],
-                    'average_rating' => $pData['average_rating'],
-                    'accepted_sizes' => $pData['accepted_sizes'],
-                    'sex' => $pData['sex'],
-                    'accepted_animal_types' => $pData['accepted_animal_types'],
-                    'identification_documents' => $pData['identification_documents'],
-                    'approval_status' => $pData['approval_status'],
-                    'availability_days' => $pData['availability_days'],
-                    'profile_photo' => $pData['profile_photo'],
-                ], $petsitterColumns));
-            }
-        }
+        app(\App\Services\ImportExportedPetsitters::class)->import($users, $petsitters);
 
         // Export Animals (14 animals)
         Animal::query()->delete();

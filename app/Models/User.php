@@ -75,7 +75,15 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
      */
     public function isPetsitter(): bool
     {
-        return (bool) $this->is_petsitter;
+        if (! $this->is_petsitter) {
+            return false;
+        }
+
+        if ($this->relationLoaded('petsitter')) {
+            return $this->petsitter?->approval_status === 'approved';
+        }
+
+        return $this->petsitter()->where('approval_status', 'approved')->exists();
     }
 
     /**

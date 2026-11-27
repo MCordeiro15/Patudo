@@ -122,7 +122,7 @@ test('the user id comes from the session, not from the request', function () {
         ->assertJsonPath('data.user_id', $owner->id);
 });
 
-test('animals of another user, a petsitter not approved and booking yourself return 422', function () {
+test('foreign animals and pending profiles are validation errors while approved sitters cannot book', function () {
     [$owner, $petsitter, $service, $animal] = bookingScenario();
 
     // animal de outra pessoa
@@ -142,8 +142,8 @@ test('animals of another user, a petsitter not approved and booking yourself ret
     // reservar a si próprio
     $this->actingAs($petsitter->user)
         ->postJson('/api/bookings', bookingPayload($petsitter, $service, $animal))
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('petsitter_id');
+        ->assertForbidden()
+        ->assertJsonPath('message', 'Um petsitter não pode fazer reservas.');
 
     expect(Booking::count())->toBe(0);
 });
@@ -179,6 +179,7 @@ test('a petsitter cannot create a booking (403)', function () {
 
     // outro petsitter, aprovado (is_petsitter = true), com um animal seu
     $otherPetsitter = User::factory()->petsitter()->create();
+    Petsitter::factory()->approved()->create(['user_id' => $otherPetsitter->id]);
     $ownAnimal = Animal::factory()->create(['user_id' => $otherPetsitter->id]);
 
     $this->actingAs($otherPetsitter)

@@ -68,13 +68,18 @@ Route::get('/profile', function () {
     $petsitter = Petsitter::where('user_id', $user->id)->first();
 
     // só vai para o perfil de petsitter depois de o admin aprovar
-    if ($petsitter && $petsitter->approval_status === 'approved') {
+    if ($user->isPetsitter()) {
         return redirect()->route('petsitters.profile');
+    }
+
+    $applicationStatus = $petsitter?->approval_status;
+    if ($applicationStatus === 'approved') {
+        $applicationStatus = 'inactive';
     }
 
     return Inertia::render('Owner/Profile', [
         // null (sem candidatura), 'pending' ou 'rejected' -> o perfil mostra o botão ou o estado
-        'petsitterApplicationStatus' => $petsitter?->approval_status,
+        'petsitterApplicationStatus' => $applicationStatus,
     ]);
 })->middleware('auth')->name('owner.profile');
 
