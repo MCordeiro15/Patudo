@@ -114,7 +114,8 @@ class Petsitter extends Model
 
     public function refreshAverageRating(): void
     {
-        $avg = $this->reviews()->where('visible', true)->avg('star_rating');
+        // as removidas pelo admin não contam para a média
+        $avg = $this->reviews()->visible()->avg('star_rating');
 
         $this->forceFill([
             'average_rating' => $avg !== null ? round((float) $avg, 2) : null,
