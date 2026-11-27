@@ -39,7 +39,7 @@ O banco de dados é atualizado automaticamente a cada `git pull`. O storage link
 ## Como funciona o sistema automático
 
 **Quando tu fazes `git push`:**
-- Um git hook exporta automaticamente todos os dados (users, petsitters, animais, posts, bookings, reviews, fotos)
+- Um git hook exporta automaticamente todos os dados (users, petsitters, animais, posts, bookings, reviews, notificações e fotos)
 - Antes da exportação, sincroniza `is_petsitter` com o perfil aprovado; uma candidatura pendente nunca é aprovada automaticamente
 - Os dados são guardados em `ExportedDataSeeder.php` e incluídos no push
 

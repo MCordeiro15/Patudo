@@ -1,8 +1,11 @@
 <?php
 
+use App\Models\Booking;
+use App\Models\Notification;
 use App\Models\Petsitter;
 use App\Models\User;
 use App\Services\ImportExportedPetsitters;
+use Illuminate\Support\Facades\File;
 
 test('database export import creates an approved petsitter profile and restores its role', function () {
     $user = User::factory()->create(['is_petsitter' => false]);
@@ -101,4 +104,40 @@ test('database export clears petsitter role without an approved profile', functi
     app(ImportExportedPetsitters::class)->synchronizeCurrentDatabase();
 
     expect($user->fresh()->is_petsitter)->toBeFalse();
+});
+
+test('database export includes notifications and preserves their user and booking references', function () {
+    $petsitter = Petsitter::factory()->create();
+    $user = User::factory()->create();
+    $booking = Booking::create([
+        'user_id' => $user->id,
+        'petsitter_id' => $petsitter->user_id,
+        'start_date' => now()->addDay()->toDateString(),
+        'end_date' => now()->addDays(2)->toDateString(),
+        'status' => 'pending',
+        'total_price' => 25,
+    ]);
+    $notification = Notification::create([
+        'user_id' => $user->id,
+        'booking_id' => $booking->id,
+        'type' => 'booking.created',
+        'message' => 'A tua reserva foi criada.',
+    ]);
+    $generatedSeeder = null;
+
+    File::shouldReceive('put')->once()->andReturnUsing(function ($path, $contents) use (&$generatedSeeder) {
+        $generatedSeeder = $contents;
+
+        return true;
+    });
+
+    $this->artisan('db:export')->assertSuccessful();
+
+    expect($generatedSeeder)
+        ->toContain("'user_email' => '{$user->email}'")
+        ->toContain("'booking_id' => {$booking->id}")
+        ->toContain("'message' => '{$notification->message}'")
+        ->toContain('Booking::forceCreate($bookingCreateData);')
+        ->toContain("User::where('email', \$notificationData['user_email'] ?? null)->value('id')")
+        ->toContain('Notification::forceCreate($notificationCreateData);');
 });

@@ -15,6 +15,7 @@ use App\Models\Booking;
 use App\Models\Review;
 use App\Models\AnimalBooking;
 use App\Models\PetsitterService;
+use App\Models\Notification;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -113,6 +114,7 @@ class ExportDatabase extends Command
         // Export bookings
         $bookings = Booking::all();
         $bookingsArray = $bookings->map(fn($b) => [
+            'id' => $b->id,
             'petsitter_id' => $b->petsitter_id,
             'user_id' => $b->user_id,
             'service_id' => $b->service_id,
@@ -126,6 +128,19 @@ class ExportDatabase extends Command
             'entrance_hour' => $b->entrance_hour,
             'exit_hour' => $b->exit_hour,
         ])->toArray();
+
+        // Export notifications with stable user and booking references
+        $notifications = Notification::with('user')->get();
+        $notificationsArray = $notifications->map(fn($n) => [
+            'id' => $n->id,
+            'user_email' => $n->user?->email,
+            'booking_id' => $n->booking_id,
+            'type' => $n->type,
+            'message' => $n->message,
+            'read_at' => $n->read_at,
+            'created_at' => $n->created_at,
+            'updated_at' => $n->updated_at,
+        ])->filter(fn($n) => $n['user_email'] !== null)->values()->all();
 
         // Export reviews
         $reviews = Review::all();
@@ -155,6 +170,7 @@ class ExportDatabase extends Command
         $content .= "use App\Models\Review;\n";
         $content .= "use App\Models\AnimalBooking;\n";
         $content .= "use App\Models\PetsitterService;\n";
+        $content .= "use App\Models\Notification;\n";
         $content .= "use Illuminate\Database\Seeder;\n";
         $content .= "use Illuminate\Support\Facades\Hash;\n\n";
         $content .= "/**\n";
@@ -214,6 +230,7 @@ class ExportDatabase extends Command
 
         // Bookings (delete all first, then recreate)
         $content .= "        // Export Bookings (" . count($bookingsArray) . " bookings)\n";
+        $content .= "        if (\\Illuminate\\Support\\Facades\\Schema::hasTable('notifications')) { Notification::query()->delete(); }\n";
         $content .= "        Booking::query()->delete();\n\n";
 
         // Petsitter services: depois de apagar as bookings (FK restrictOnDelete) e antes de as recriar
@@ -233,12 +250,11 @@ class ExportDatabase extends Command
         $content .= "        \$bookingColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('bookings'));\n";
         $content .= "        foreach (\$bookings as \$bookingData) {\n";
         $content .= "            \$bookingCreateData = array_intersect_key(\$bookingData, \$bookingColumns);\n";
-        $content .= "            unset(\$bookingCreateData['id']);\n";
         $content .= "            // se o serviço não foi recriado, fica sem serviço em vez de falhar a FK\n";
         $content .= "            if (!in_array(\$bookingCreateData['service_id'] ?? null, \$serviceIds)) {\n";
         $content .= "                \$bookingCreateData['service_id'] = null;\n";
         $content .= "            }\n";
-        $content .= "            Booking::create(\$bookingCreateData);\n";
+        $content .= "            Booking::forceCreate(\$bookingCreateData);\n";
         $content .= "        }\n\n";
 
         // Reviews (delete all first, then recreate)
@@ -261,6 +277,30 @@ class ExportDatabase extends Command
         $content .= "            AnimalBooking::create(\$abCreateData);\n";
         $content .= "        }\n\n";
 
+        $content .= "        // Export Notifications (" . count($notificationsArray) . " notifications)\n";
+        $content .= "        if (\\Illuminate\\Support\\Facades\\Schema::hasTable('notifications')) {\n";
+        $content .= "            \$notificationColumns = array_flip(\\Illuminate\\Support\\Facades\\Schema::getColumnListing('notifications'));\n";
+        $content .= "            \$notifications = " . var_export($notificationsArray, true) . ";\n";
+        $content .= "            foreach (\$notifications as \$notificationData) {\n";
+        $content .= "                \$userId = User::where('email', \$notificationData['user_email'] ?? null)->value('id');\n";
+        $content .= "                if (!\$userId) { continue; }\n";
+        $content .= "                \$notificationCreateData = array_intersect_key([\n";
+        $content .= "                    'id' => \$notificationData['id'],\n";
+        $content .= "                    'user_id' => \$userId,\n";
+        $content .= "                    'booking_id' => \$notificationData['booking_id'] ?? null,\n";
+        $content .= "                    'type' => \$notificationData['type'],\n";
+        $content .= "                    'message' => \$notificationData['message'],\n";
+        $content .= "                    'read_at' => \$notificationData['read_at'],\n";
+        $content .= "                    'created_at' => \$notificationData['created_at'],\n";
+        $content .= "                    'updated_at' => \$notificationData['updated_at'],\n";
+        $content .= "                ], \$notificationColumns);\n";
+        $content .= "                if (!empty(\$notificationCreateData['booking_id']) && !Booking::whereKey(\$notificationCreateData['booking_id'])->exists()) {\n";
+        $content .= "                    \$notificationCreateData['booking_id'] = null;\n";
+        $content .= "                }\n";
+        $content .= "                Notification::forceCreate(\$notificationCreateData);\n";
+        $content .= "            }\n";
+        $content .= "        }\n\n";
+
         $content .= "        \Illuminate\Support\Facades\Event::dispatch(null);\n";
         $content .= "    }\n";
         $content .= "}\n";
@@ -275,6 +315,7 @@ class ExportDatabase extends Command
         $this->info("Bookings: " . count($bookingsArray));
         $this->info("Reviews: " . count($reviewsArray));
         $this->info("Animal Bookings: " . count($animalBookingsArray));
+        $this->info("Notifications: " . count($notificationsArray));
 
         return 0;
     }
