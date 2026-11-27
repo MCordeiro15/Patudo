@@ -29,7 +29,7 @@ class ReviewFactory extends Factory
             'petsitter_id' => Petsitter::factory(),
             'star_rating' => fake()->numberBetween(1, 5),
             'comment' => fake()->optional()->paragraph(),
-            'visible' => true,
+            'status' => Review::PUBLISHED,
         ];
     }
 
@@ -44,12 +44,22 @@ class ReviewFactory extends Factory
     }
 
     /**
-     * Indicate that the review is hidden.
+     * Indicate that the review was removed by an admin (hidden).
      */
     public function hidden(): static
     {
         return $this->state(fn (array $attributes) => [
-            'visible' => false,
+            'status' => Review::REMOVED,
+        ]);
+    }
+
+    /**
+     * Indicate that the review was flagged by a user.
+     */
+    public function flagged(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => Review::FLAGGED,
         ]);
     }
 }

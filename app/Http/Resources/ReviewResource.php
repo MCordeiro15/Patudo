@@ -26,7 +26,9 @@ class ReviewResource extends JsonResource
             'petsitter_id' => $this->petsitter_id,
             'star_rating' => $this->star_rating,
             'comment' => $this->comment,
-            'visible' => $this->visible,
+            'status' => $this->status,
+            // mantido para o front-end que já o usava: false quando foi removida pelo admin
+            'visible' => $this->isVisible(),
             'created_at' => $this->created_at,
         ];
     }

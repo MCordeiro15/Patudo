@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\Admin\ReportsController as AdminReportsController;
+use App\Http\Controllers\API\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\API\Admin\UserController as AdminUserController;
 use App\Http\Controllers\API\AnimalController;
 use App\Http\Controllers\API\AuthController;
@@ -110,6 +111,7 @@ Route::middleware(['auth:sanctum', EnsureAccountActive::class])->group(function 
     Route::post('/bookings/{booking}/review', [ReviewController::class, 'store']);
     Route::get('/petsitters/{petsitter}/reviews', [ReviewController::class, 'byPetsitter']);
     Route::patch('/reviews/{review}/hide', [ReviewController::class, 'hide']);
+    Route::post('/reviews/{review}/flag', [ReviewController::class, 'flag']);
     Route::apiResource('reviews', ReviewController::class)->only(['show', 'update', 'destroy']);
 
     // Services
@@ -161,4 +163,9 @@ Route::middleware(['auth:sanctum', 'can:admin', EnsureAccountActive::class])->pr
     Route::post('/users/{user}/ban', [AdminUserController::class, 'ban'])->name('users.ban');
     Route::post('/users/{user}/warning', [AdminUserController::class, 'sendWarning'])->name('users.warning');
     Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+
+    // Avaliações: lista com filtros e pesquisa, publicar e remover
+    Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+    Route::post('/reviews/{review}/publish', [AdminReviewController::class, 'publish'])->name('reviews.publish');
+    Route::post('/reviews/{review}/remove', [AdminReviewController::class, 'remove'])->name('reviews.remove');
 });
