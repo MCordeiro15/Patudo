@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PetsitterService extends Model
 {
-    /** Tipos de serviço aceites. / Accepted service types. */
+    /** Tipos sugeridos na candidatura. Nos serviços do perfil o tipo é texto livre. / Types offered in the application form; profile services take free text. */
     public const TYPES = ['pet-sitting', 'passeio'];
 
     protected $fillable = ['petsitter_id', 'type', 'price'];

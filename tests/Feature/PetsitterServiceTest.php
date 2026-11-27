@@ -65,8 +65,9 @@ test('creating a service validates type and price', function () {
     $this->actingAs($petsitter->user)->postJson($url, [])
         ->assertUnprocessable()->assertJsonValidationErrors(['type', 'price']);
 
-    $this->actingAs($petsitter->user)->postJson($url, ['type' => 'banho', 'price' => 5])
-        ->assertUnprocessable()->assertJsonValidationErrors(['type']);
+    // nome com mais de 50 caracteres
+    $this->actingAs($petsitter->user)->postJson($url, ['type' => str_repeat('a', 51), 'price' => 5])
+        ->assertUnprocessable()->assertJsonValidationErrors(['type' => 'no máximo 50 caracteres']);
 
     $this->actingAs($petsitter->user)->postJson($url, ['type' => 'passeio', 'price' => -1])
         ->assertUnprocessable()->assertJsonValidationErrors(['price']);
@@ -145,4 +146,33 @@ test('petsitter can delete their service', function () {
     $this->actingAs($petsitter->user)->deleteJson("/api/services/{$service->id}")->assertNoContent();
 
     $this->assertDatabaseMissing('petsitter_services', ['id' => $service->id]);
+});
+
+test('the service type is free text written by the petsitter', function () {
+    $petsitter = Petsitter::factory()->approved()->create();
+
+    $this->actingAs($petsitter->user)->postJson(
+        "/api/petsitters/{$petsitter->user_id}/services",
+        ['type' => 'Banho e tosquia', 'price' => 15]
+    )->assertCreated()->assertJsonPath('data.type', 'Banho e tosquia');
+});
+
+test('a free text service can be edited, including only its price', function () {
+    $petsitter = Petsitter::factory()->approved()->create();
+    $service = PetsitterService::create(['petsitter_id' => $petsitter->user_id, 'type' => 'Banho e tosquia', 'price' => 15]);
+
+    $this->actingAs($petsitter->user)->putJson("/api/services/{$service->id}", ['type' => 'Banho e tosquia', 'price' => 18])
+        ->assertOk()->assertJsonPath('data.price', 18);
+
+    $this->actingAs($petsitter->user)->putJson("/api/services/{$service->id}", ['type' => 'Banho completo'])
+        ->assertOk()->assertJsonPath('data.type', 'Banho completo');
+});
+
+test('renaming a service to a name the petsitter already uses returns 422 in portuguese', function () {
+    $petsitter = Petsitter::factory()->approved()->create();
+    PetsitterService::create(['petsitter_id' => $petsitter->user_id, 'type' => 'Banho', 'price' => 15]);
+    $other = PetsitterService::create(['petsitter_id' => $petsitter->user_id, 'type' => 'Passeio longo', 'price' => 12]);
+
+    $this->actingAs($petsitter->user)->putJson("/api/services/{$other->id}", ['type' => 'Banho'])
+        ->assertUnprocessable()->assertJsonValidationErrors(['type' => 'Já tens um serviço com este nome.']);
 });

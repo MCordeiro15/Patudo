@@ -143,7 +143,7 @@ type PetsitterData = {
 
 type PetsitterService = {
     id: number;
-    type: 'pet-sitting' | 'passeio';
+    type: string; // texto livre (os dois tipos antigos têm nome bonito)
     price: number;
 };
 
@@ -177,7 +177,7 @@ const loadServices = async () => {
 };
 
 const serviceTypeLabel = (type: PetsitterService['type']) =>
-    type === 'passeio' ? 'Passeio' : 'Pet Sitting';
+    ({ passeio: 'Passeio', 'pet-sitting': 'Pet Sitting' } as Record<string, string>)[type] ?? type;
 const formatServicePrice = (price: number) =>
     `${Number(price).toLocaleString('pt-PT', { maximumFractionDigits: 2 })} €`;
 
