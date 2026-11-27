@@ -549,7 +549,7 @@ class ExportedDataSeeder extends Seeder
     'age' => 25,
     'price_per_day' => 15,
     'accepted_sizes' => '["small","medium","large"]',
-    'accepted_animal_types' => '["dog","cat","bird","rabbit"]',
+    'accepted_animal_types' => '["dog","cat"]',
     'sex' => 'male',
     'approval_status' => 'rejected',
     'identification_documents' => 'document_admin.pdf',
