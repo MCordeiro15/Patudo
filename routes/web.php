@@ -7,6 +7,7 @@
 use App\Http\Controllers\PetsitterProfileController;
 use App\Http\Controllers\UserAvatarController;
 use App\Models\Petsitter;
+use App\Models\PetsitterApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -93,6 +94,11 @@ Route::get('/profile', function () {
     return Inertia::render('Owner/Profile', [
         // null (sem candidatura), 'pending' ou 'rejected' -> o perfil mostra o botão ou o estado
         'petsitterApplicationStatus' => $applicationStatus,
+        // quantas candidaturas ainda pode fazer (um recusado pode voltar a candidatar-se)
+        'petsitterApplicationsRemaining' => max(
+            0,
+            PetsitterApplication::MAX_PER_USER - PetsitterApplication::where('user_id', $user->id)->count(),
+        ),
     ]);
 })->middleware('auth')->name('owner.profile');
 

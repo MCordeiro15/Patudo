@@ -46,6 +46,9 @@ const typeLabels: Record<string, string> = {
     system: 'Sistema',
     message: 'Mensagem',
     new_help_ticket: 'Ticket de ajuda',
+    verification_approved: 'Candidatura aprovada',
+    verification_rejected: 'Candidatura recusada',
+    verification_info_requested: 'Pedido de informação',
 };
 
 const typeIcons: Record<string, string> = {
@@ -53,6 +56,9 @@ const typeIcons: Record<string, string> = {
     system: '⚙️',
     message: '💬',
     new_help_ticket: '🆘',
+    verification_approved: '✅',
+    verification_rejected: '❌',
+    verification_info_requested: '📝',
 };
 
 const bookingDay = (date: string | null) => date?.slice(8, 10) ?? '';

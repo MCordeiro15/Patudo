@@ -154,4 +154,13 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     {
         return $this->hasMany(UserNote::class);
     }
+
+    /**
+     * Candidaturas a petsitter deste utilizador (máximo de PetsitterApplication::MAX_PER_USER).
+     * This user's petsitter applications.
+     */
+    public function petsitterApplications(): HasMany
+    {
+        return $this->hasMany(PetsitterApplication::class);
+    }
 }

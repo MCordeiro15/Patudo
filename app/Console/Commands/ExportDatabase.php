@@ -48,6 +48,7 @@ class ExportDatabase extends Command
             'post_favourites',
             'support_tickets',
             'user_notes',
+            'petsitter_applications',
         ];
         $additionalTablesArray = [];
         foreach ($additionalTables as $table) {

@@ -26,6 +26,8 @@ const showDeleteModal = ref(false);
 // O estado vem do servidor (rota /profile): candidatura, perfil desativado ou sem candidatura.
 const props = defineProps<{
     petsitterApplicationStatus?: 'pending' | 'rejected' | 'inactive' | null;
+    // candidaturas que ainda pode fazer (máximo 3); um recusado pode voltar a candidatar-se
+    petsitterApplicationsRemaining?: number;
 }>();
 
 const showFormPetsitter = ref(false);
@@ -316,10 +318,24 @@ onMounted(() => {
                 </div>
                 <div
                     v-else-if="petsitterApplicationStatus === 'rejected'"
-                    class="alert alert-danger py-2 px-3 small mb-0"
-                    role="status"
+                    class="d-flex flex-wrap align-items-center justify-content-end gap-2"
                 >
-                    A tua candidatura a petsitter foi recusada.
+                    <div class="alert alert-danger py-2 px-3 small mb-0" role="status">
+                        A tua candidatura a petsitter foi recusada.
+                        <template v-if="(props.petsitterApplicationsRemaining ?? 0) > 0">
+                            Podes candidatar-te mais {{ props.petsitterApplicationsRemaining }}
+                            {{ props.petsitterApplicationsRemaining === 1 ? 'vez' : 'vezes' }}.
+                        </template>
+                        <template v-else>Atingiste o limite de 3 candidaturas.</template>
+                    </div>
+                    <button
+                        v-if="(props.petsitterApplicationsRemaining ?? 0) > 0"
+                        type="button"
+                        class="btn btn-primary btn-sm rounded-pill px-4"
+                        @click="showFormPetsitter = true"
+                    >
+                        Candidatar novamente
+                    </button>
                 </div>
                 <div
                     v-else-if="petsitterApplicationStatus === 'inactive'"
