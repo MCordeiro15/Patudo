@@ -121,7 +121,7 @@ const servicesError = ref('');
 
 type PetsitterServiceData = {
     id: number;
-    type: 'pet-sitting' | 'passeio';
+    type: string;
     price: number;
 };
 
@@ -183,10 +183,13 @@ const selectedService = computed(() =>
 
 const selectedServicePrice = computed(() => selectedService.value?.price ?? 0);
 
+const serviceTypeLabel = (type: string) => ({
+    passeio: 'Passeios',
+    'pet-sitting': 'Pet sitting',
+}[type] ?? type);
+
 const selectedServiceLabel = computed(() => {
-    if (selectedService.value?.type === 'passeio') return 'Passeios';
-    if (selectedService.value?.type === 'pet-sitting') return 'Pet sitting';
-    return '—';
+    return selectedService.value ? serviceTypeLabel(selectedService.value.type) : '—';
 });
 
 const selectedAnimalNames = computed(() => {
@@ -532,12 +535,10 @@ onMounted(() => {
                                     @click="selectedServiceId = service.id"
                                 >
                                     <strong>
-                                        {{ service.type === 'passeio' ? 'Passeios' : 'Pet sitting' }}
+                                        {{ serviceTypeLabel(service.type) }}
                                     </strong>
 
-                                    <small>
-                                        € {{ service.price }} / {{ service.type === 'passeio' ? 'passeio' : 'dia' }}
-                                    </small>
+                                    <small>€ {{ service.price }} / {{ service.type === 'passeio' ? 'passeio' : 'dia' }}</small>
 
                                     <span
                                         class="service-radio"
