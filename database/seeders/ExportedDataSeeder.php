@@ -191,6 +191,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   1 => 
   array (
@@ -211,6 +212,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   2 => 
   array (
@@ -231,6 +233,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   3 => 
   array (
@@ -251,6 +254,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   4 => 
   array (
@@ -271,6 +275,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   5 => 
   array (
@@ -291,6 +296,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   6 => 
   array (
@@ -311,6 +317,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   7 => 
   array (
@@ -331,6 +338,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   8 => 
   array (
@@ -351,6 +359,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   9 => 
   array (
@@ -371,6 +380,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   10 => 
   array (
@@ -391,6 +401,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   11 => 
   array (
@@ -411,6 +422,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   12 => 
   array (
@@ -431,6 +443,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   13 => 
   array (
@@ -451,6 +464,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   14 => 
   array (
@@ -471,6 +485,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   15 => 
   array (
@@ -491,6 +506,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   16 => 
   array (
@@ -511,6 +527,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
 );
         $userColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('users'));
@@ -980,7 +997,7 @@ class ExportedDataSeeder extends Seeder
     'photos' => NULL,
     'created_at' => '2026-11-27 17:20:06',
     'updated_at' => '2026-11-27 17:20:06',
-    'title' => 'a',
+    'title' => 'Teste',
   ),
 );
         $postColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('posts'));
