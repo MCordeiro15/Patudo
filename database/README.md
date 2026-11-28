@@ -15,8 +15,7 @@ npm install
 cp .env.example .env
 php artisan key:generate
 
-# 3. Configurar os git hooks (só uma vez!)
-# Este comando configura tudo automaticamente
+# 3. Configurar os git hooks neste clone (cada colega faz isto uma vez)
 bash scripts/setup-hooks.sh
 
 # 4. Rodar a aplicação
@@ -34,27 +33,34 @@ npm run dev
 php artisan serve
 ```
 
-O banco de dados é atualizado automaticamente a cada `git pull`. O storage link é criado sozinho. Zero comandos manuais.
+A configuração dos hooks é local ao clone: cada colega tem de executar `bash scripts/setup-hooks.sh` uma vez após clonar. Depois disso, os hooks atualizam a base de dados nos `git pull` em que o snapshot muda e aplicam migrations nos restantes.
 
 ## Como funciona o sistema automático
 
 **Quando tu fazes `git push`:**
-
-- Um git hook exporta automaticamente todos os dados (users, petsitters, animais, posts, bookings, reviews, fotos)
+- Um git hook exporta um snapshot dos dados de negócio (users, petsitters, animais, posts, serviços, reservas, avaliações, notificações, disponibilidades, favoritos, tickets de suporte, notas e fotos)
+- Antes da exportação, sincroniza `is_petsitter` com o perfil aprovado; uma candidatura pendente nunca é aprovada automaticamente
 - Os dados são guardados em `ExportedDataSeeder.php` e incluídos no push
 
-Se a exportação gerar alterações, o hook cria um commit e cancela esse primeiro push: o Git já tinha preparado o commit antigo antes de executar o hook. Repete o mesmo comando `git push` para enviar o novo commit. Se os dados não mudaram, o push continua normalmente.
+Se a exportação gerar alterações, o hook cria um commit e cancela esse primeiro push: o Git já tinha preparado o commit antigo antes de executar o hook. Repete o mesmo comando `git push` para enviar o novo commit; até o repetires, os colegas ainda não recebem esse snapshot. Se os dados não mudaram, o push continua normalmente.
 
 **Quando os colegas fazem `git pull`:**
-
-- Um git hook deteta que os dados mudaram
-- Roda automaticamente `migrate:fresh --seed` para atualizar o banco de dados
+- Se `ExportedDataSeeder.php` mudou, o git hook recria a base com `migrate:fresh --seed` para aplicar o snapshot completo, incluindo alterações e eliminações
+- Se só chegaram alterações de código/migrations, aplica `migrate` sem apagar os dados locais
+- Se a atualização falhar, o hook mostra o erro e termina com estado de falha em vez de anunciar sucesso
+- Restaura apenas o snapshot exportado, preservando IDs e relações; registos removidos não voltam a aparecer como dados de demonstração
 - Cria automaticamente o storage link para as fotos aparecerem
 - Os colegas recebem tudo sem rodar nenhum comando manual
 
+O export não inclui tabelas temporárias ou credenciais de autenticação, como sessões, tokens de acesso/reset e passkeys.
+
 **Resumo:** Criaste uma conta, fizeste uma reserva, subiste uma foto? Faz `git push` e todos os colegas recebem tudo com `git pull`.
 
-## O que é criado pelos seeders
+Para uma conta ser petsitter, tem de existir um perfil aprovado. Marcar apenas `is_petsitter` como `true` não cria os dados do perfil nem aprova uma candidatura; o fluxo mantém a conta como não-petsitter até existir um perfil aprovado.
+
+## Dados de demonstração padrão
+
+Estes dados só são criados quando ainda não existe `ExportedDataSeeder.php`. Quando existe um snapshot, o `DatabaseSeeder` usa apenas esse snapshot e não volta a criar os dados de demonstração apagados.
 
 - **12 Users**: Admin, Test User, Miguel, 6 Petsitters (Sofia, Tiago, João, Inês, Maria, Rui) e 3 Clientes (Ana, Pedro, Carla)
 - **7 Petsitters**: Perfis completos com biografia, experiência, preço, localização e avaliações
@@ -65,20 +71,20 @@ Se a exportação gerar alterações, o hook cria um commit e cancela esse prime
 
 ## Credenciais de Teste
 
-| Tipo              | Email                 | Password    |
-| ----------------- | --------------------- | ----------- |
-| **Admin**         | `admin@admin.com`     | `admin1234` |
-| Teste             | `test@example.com`    | `password`  |
-| Sofia (Petsitter) | `sofia@patudo.test`   | `password`  |
-| Tiago (Petsitter) | `tiago@patudo.test`   | `password`  |
-| João (Petsitter)  | `joao@patudo.test`    | `password`  |
-| Inês (Petsitter)  | `ines@patudo.test`    | `password`  |
-| Maria (Petsitter) | `maria@patudo.test`   | `password`  |
-| Rui (Petsitter)   | `rui@patudo.test`     | `password`  |
-| Miguel            | `miguel@gmail.com`    | `password`  |
-| Ana (Cliente)     | `client1@patudo.test` | `password`  |
-| Pedro (Cliente)   | `client2@patudo.test` | `password`  |
-| Carla (Cliente)   | `client3@patudo.test` | `password`  |
+| Tipo | Email | Password |
+|------|-------|----------|
+| **Admin** | `admin@admin.com` | `admin1234` |
+| Teste | `test@example.com` | `password` |
+| Sofia (Petsitter) | `sofia@patudo.test` | `password` |
+| Tiago (Petsitter) | `tiago@patudo.test` | `password` |
+| João (Petsitter) | `joao@patudo.test` | `password` |
+| Inês (Petsitter) | `ines@patudo.test` | `password` |
+| Maria (Petsitter) | `maria@patudo.test` | `password` |
+| Rui (Petsitter) | `rui@patudo.test` | `password` |
+| Miguel | `miguel@gmail.com` | `password` |
+| Ana (Cliente) | `client1@patudo.test` | `password` |
+| Pedro (Cliente) | `client2@patudo.test` | `password` |
+| Carla (Cliente) | `client3@patudo.test` | `password` |
 
 ## Comandos úteis
 

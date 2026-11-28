@@ -1,20 +1,33 @@
+<!--
+    PLACEHOLDER PARA TESTES: este front-end é só para testar no browser o backend das verificações
+    (candidaturas, motivos de recusa e avisos). Segue o mockup por alto, sem o layout de administração
+    (barra lateral). A página a sério fica para o ticket de front-end.
+    PLACEHOLDER FOR TESTING: this front-end only exists to test the verifications backend in the browser.
+-->
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
-import {
-    ChevronRight,
-    CircleCheck,
-    CircleX,
-    Clock,
-    FileText,
-    Search,
-} from '@lucide/vue';
+import { Head } from '@inertiajs/vue3';
+import { ChevronRight, FileText, Search } from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
-import logoPatudo from '@/../../assets/logoPatudo.svg';
 import ModalRejectVerification from '@/pages/Modals/ModalRejectVerification.vue';
 
 type Status = 'pending' | 'approved' | 'rejected';
 
-interface Candidate {
+// Candidatura (tabela petsitter_applications), como vem do PetsitterApplicationResource
+type ApplicationDocument = { index: number; name: string; type: string; url: string };
+
+type Application = {
+    id: number;
+    status: Status;
+    documents: ApplicationDocument[];
+    reasons: string[];
+    reason_labels: string[];
+    message: string | null;
+    decided_by?: { id: number; name: string } | null;
+    decided_at: string | null;
+    created_at: string;
+};
+
+type Candidate = {
     user_id: number;
     avatar_url?: string | null;
     city?: string | null;
@@ -25,7 +38,10 @@ interface Candidate {
     services?: { id: number; type: string }[];
     user?: { name?: string; email?: string; phone?: string | null };
     identification_documents?: string | null;
-}
+    application?: Application | null;
+    applications?: Application[];
+    applications_remaining?: number;
+};
 
 function getXsrf(): string {
     const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
@@ -46,36 +62,21 @@ function apiFetch(url: string, options: RequestInit = {}) {
     });
 }
 
-const navItems = computed(() => [
-    { label: 'Utilizadores', href: '/admin/users' },
-    {
-        label: 'Verificações',
-        href: '/admin/petsitters/pending',
-        active: true,
-        badge: pendingCount.value,
-    },
-    { label: 'Reservas', href: '/admin/bookings' },
-    { label: 'Avaliações', href: '/admin/reviews' },
-    { label: 'Denúncias', href: '/admin/reports', badge: 3 },
-    { label: 'Suporte', href: '/admin/support', badge: 2 },
-    { label: 'Definições', href: '/admin/settings' },
-]);
-
 const tabs: { key: Status; label: string }[] = [
     { key: 'pending', label: 'Pendentes' },
     { key: 'approved', label: 'Aprovadas' },
     { key: 'rejected', label: 'Recusadas' },
 ];
 
-const statusLabels: Record<Status, string> = {
-    pending: 'Pendente',
-    approved: 'Aprovado',
-    rejected: 'Recusado',
-};
-const statusIcons = {
-    pending: Clock,
-    approved: CircleCheck,
-    rejected: CircleX,
+const statusLabels: Record<Status, string> = { pending: 'Pendente', approved: 'Aprovada', rejected: 'Recusada' };
+
+// O modal de recusa devolve os textos; a API recebe estes códigos
+const reasonCodes: Record<string, string> = {
+    'Documento ilegível': 'illegible_document',
+    'A identidade não confere': 'identity_mismatch',
+    'Fotografias inadequadas': 'inappropriate_photos',
+    'Contactos externos na descrição': 'external_contacts',
+    'Outro motivo': 'other',
 };
 
 const tab = ref<Status>('pending');
@@ -83,15 +84,22 @@ const candidates = ref<Candidate[]>([]);
 const pendingCount = ref(0);
 const selectedId = ref<number | null>(null);
 const search = ref('');
-const loading = ref(true);
+const loading = ref(false);
 const loadError = ref('');
 const busy = ref(false);
+const feedback = ref('');
 const actionError = ref('');
+const docError = ref('');
+const openingDoc = ref<string | null>(null);
 const showReject = ref(false);
+const showInfo = ref(false);
+const infoMessage = ref('');
+const infoSubmitted = ref(false);
 
+// Só no browser: o ticket não pede para guardar a lista de verificação
 const checklist = ref([
-    { label: 'A identidade confere com o nome do perfil', checked: true },
-    { label: 'O documento é legível e está válido', checked: true },
+    { label: 'A identidade confere com o nome do perfil', checked: false },
+    { label: 'O documento é legível e está válido', checked: false },
     { label: 'As fotografias do perfil são adequadas', checked: false },
     { label: 'A descrição não tem contactos externos', checked: false },
 ]);
@@ -99,67 +107,39 @@ const checklist = ref([
 const filtered = computed(() => {
     const term = search.value.trim().toLowerCase();
     return term
-        ? candidates.value.filter((c) =>
-              (c.user?.name ?? '').toLowerCase().includes(term),
-          )
+        ? candidates.value.filter((c) => (c.user?.name ?? '').toLowerCase().includes(term))
         : candidates.value;
 });
 
-const selected = computed(
-    () => candidates.value.find((c) => c.user_id === selectedId.value) ?? null,
+const selected = computed(() => candidates.value.find((c) => c.user_id === selectedId.value) ?? null);
+
+// Candidaturas anteriores (as que não são a atual)
+const history = computed(() =>
+    (selected.value?.applications ?? []).filter((a) => a.id !== selected.value?.application?.id),
 );
 
-const subtitle = computed(() => {
-    const n = pendingCount.value;
-    return `${n} ${n === 1 ? 'cuidador' : 'cuidadores'} à espera de aprovação`;
-});
-
-function parseDate(iso?: string): Date | null {
-    if (!iso) return null;
-    let date: Date;
-    if (iso.includes('T')) {
-        date = new Date(iso);
-    } else if (iso.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)) {
-        date = new Date(iso.replace(' ', 'T') + 'Z');
-    } else if (iso.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        date = new Date(iso + 'T00:00:00Z');
-    } else {
-        date = new Date(iso);
-    }
-    return isNaN(date.getTime()) ? null : date;
-}
-
-const formatDate = (iso?: string) => {
-    const date = parseDate(iso);
-    return date ? date.toLocaleDateString('pt-PT') : '';
+const daysAgo = (iso?: string) => {
+    if (!iso) return '';
+    const days = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86400000));
+    return days === 0 ? 'Pedido hoje' : `Pedido há ${days} ${days === 1 ? 'dia' : 'dias'}`;
 };
 
-function statusPillClass(status: Status) {
-    switch (status) {
-        case 'approved':
-            return 'status-pill--approved';
-        case 'rejected':
-            return 'status-pill--rejected';
-        default:
-            return 'status-pill--pending';
-    }
-}
+const formatDate = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString('pt-PT') : '—');
 
 const load = async () => {
     loading.value = true;
     loadError.value = '';
     try {
-        const res = await apiFetch(
-            `/api/petsitters?approval_status=${tab.value}`,
-        );
-        if (!res.ok) throw new Error();
+        const res = await apiFetch(`/api/petsitters?approval_status=${tab.value}`);
+        if (!res.ok) throw new Error(`erro ${res.status}`);
         const data = await res.json();
         candidates.value = data.data ?? data;
-        if (tab.value === 'pending')
-            pendingCount.value = candidates.value.length;
-        selectedId.value = candidates.value[0]?.user_id ?? null;
-    } catch {
-        loadError.value = 'Não foi possível carregar os cuidadores.';
+        if (tab.value === 'pending') pendingCount.value = candidates.value.length;
+        if (!candidates.value.some((c) => c.user_id === selectedId.value)) {
+            selectedId.value = candidates.value[0]?.user_id ?? null;
+        }
+    } catch (e) {
+        loadError.value = `Não foi possível carregar as candidaturas (${(e as Error).message}).`;
         candidates.value = [];
         selectedId.value = null;
     } finally {
@@ -170,95 +150,112 @@ const load = async () => {
 const setTab = (key: Status) => {
     if (tab.value === key) return;
     tab.value = key;
+    selectedId.value = null;
+    feedback.value = '';
     actionError.value = '';
     void load();
 };
 
 const select = (c: Candidate) => {
     selectedId.value = c.user_id;
+    feedback.value = '';
     actionError.value = '';
     docError.value = '';
+    checklist.value.forEach((item) => (item.checked = false));
 };
 
-const docError = ref('');
-const openingDoc = ref(false);
+// Documentos da candidatura atual; sem candidatura, usa o documento antigo do perfil
+const documents = computed<ApplicationDocument[]>(() => {
+    const current = selected.value;
+    if (!current) return [];
+    if (current.application) return current.application.documents;
+    return current.identification_documents
+        ? [{ index: 0, name: 'Documento', type: 'Ficheiro', url: `/api/petsitters/${current.user_id}/identification-document` }]
+        : [];
+});
 
-const docType = (path: string) =>
-    path.split('.').pop()?.toUpperCase() ?? 'Ficheiro';
-
-const openDocument = async (c: Candidate) => {
+// Abre o documento num separador novo (o ficheiro vem pela API, só o admin tem acesso)
+const openDocument = async (doc: ApplicationDocument) => {
+    if (!selected.value) return;
     docError.value = '';
-    openingDoc.value = true;
-    const newTab = window.open('', '_blank');
+    openingDoc.value = doc.url;
+    const win = window.open('', '_blank');
 
     try {
-        const res = await apiFetch(
-            `/api/petsitters/${c.user_id}/identification-document`,
-            {
-                headers: { Accept: '*/*' },
-            },
-        );
-
+        const res = await apiFetch(doc.url, { headers: { Accept: '*/*' } });
         if (!res.ok) {
-            newTab?.close();
-            docError.value =
-                res.status === 404
-                    ? 'O ficheiro do documento não foi encontrado.'
-                    : 'Não foi possível abrir o documento.';
+            win?.close();
+            docError.value = res.status === 404 ? 'O documento não foi encontrado.' : `Não foi possível abrir o documento (erro ${res.status}).`;
             return;
         }
-
         const url = URL.createObjectURL(await res.blob());
-        if (newTab) newTab.location.href = url;
+        if (win) win.location.href = url;
         else window.open(url, '_blank');
     } catch {
-        newTab?.close();
+        win?.close();
         docError.value = 'Não foi possível abrir o documento.';
     } finally {
-        openingDoc.value = false;
+        openingDoc.value = null;
     }
 };
 
-const act = async (action: 'approve' | 'reject') => {
+// Aprovar, recusar ou pedir informação; mostra o erro da API (ex.: 422) se falhar
+const act = async (action: 'approve' | 'reject' | 'request-info', body?: object) => {
     const current = selected.value;
-    if (!current || busy.value) return;
+    if (!current || busy.value) return false;
     busy.value = true;
     actionError.value = '';
+    feedback.value = '';
 
     try {
-        const res = await apiFetch(
-            `/api/petsitters/${current.user_id}/${action}`,
-            { method: 'POST' },
-        );
-        if (res.ok) {
-            candidates.value = candidates.value.filter(
-                (c) => c.user_id !== current.user_id,
-            );
-            selectedId.value = candidates.value[0]?.user_id ?? null;
-            if (tab.value === 'pending')
-                pendingCount.value = candidates.value.length;
-            showReject.value = false;
-        } else {
-            const body = await res.json().catch(() => null);
-            actionError.value =
-                body?.message ?? 'Não foi possível concluir a ação.';
+        await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
+        const res = await apiFetch(`/api/petsitters/${current.user_id}/${action}`, {
+            method: 'POST',
+            body: body ? JSON.stringify(body) : undefined,
+        });
+        const json = await res.json().catch(() => null);
+
+        if (!res.ok) {
+            const firstError = json?.errors ? Object.values(json.errors as Record<string, string[]>)[0]?.[0] : null;
+            actionError.value = `Erro ${res.status}: ${firstError ?? json?.message ?? 'não foi possível concluir a ação.'}`;
+            return false;
         }
+
+        const name = current.user?.name ?? 'O cuidador';
+        feedback.value = {
+            approve: `${name} foi aprovado.`,
+            reject: `${name} foi recusado.`,
+            'request-info': `Pedido de informação enviado a ${name}. A candidatura continua pendente.`,
+        }[action];
+        await load();
+        return true;
     } catch {
         actionError.value = 'Não foi possível concluir a ação.';
+        return false;
     } finally {
         busy.value = false;
     }
 };
 
-const openReject = () => {
-    actionError.value = '';
-    showReject.value = true;
+const confirmReject = async (payload: { reasons: string[]; message: string }) => {
+    const ok = await act('reject', {
+        reasons: payload.reasons.map((r) => reasonCodes[r] ?? r),
+        message: payload.message,
+    });
+    if (ok) showReject.value = false;
 };
 
-const confirmReject = () => act('reject');
+const openInfo = () => {
+    infoMessage.value = '';
+    infoSubmitted.value = false;
+    actionError.value = '';
+    showInfo.value = true;
+};
 
-const logout = () => {
-    router.post('/logout');
+const confirmInfo = async () => {
+    infoSubmitted.value = true;
+    if (!infoMessage.value.trim()) return;
+    if (await act('request-info', { message: infoMessage.value.trim() })) showInfo.value = false;
 };
 
 onMounted(() => {
@@ -267,548 +264,361 @@ onMounted(() => {
 </script>
 
 <template>
-    <Head title="Verificações — Administração" />
+    <Head title="Verificações" />
 
-    <div class="patudo-page-shell patudo-admin-shell">
-        <aside class="patudo-navbar" aria-label="Menu de administração">
-            <a
-                class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2"
-                href="/"
-            >
-                <img :src="logoPatudo" alt="Patudo" width="70" height="70" />
-                <span>Patudo</span>
-            </a>
-
-            <div class="navbar-section-title">Administração</div>
-
-            <nav class="navbar-nav">
-                <a
-                    v-for="item in navItems"
-                    :key="item.label"
-                    :href="item.href"
-                    class="navbar-link"
-                    :class="{ active: item.active }"
-                >
-                    <span>{{ item.label }}</span>
-                    <span v-if="item.badge" class="navbar-badge">{{
-                        item.badge
-                    }}</span>
-                </a>
-            </nav>
-
-            <div class="navbar-footer">
-                <button
-                    type="button"
-                    class="navbar-link logout w-100 border-0 bg-transparent text-start"
-                    @click="logout"
-                >
-                    Terminar sessão
-                </button>
+    <main class="patudo-page-shell">
+        <div class="patudo-content container py-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1">
+                <h1 class="h3 fw-bold mb-0">Verificações</h1>
+                <span class="badge text-bg-warning">Placeholder para testes</span>
             </div>
-        </aside>
+            <p class="text-muted small mb-4">
+                {{ pendingCount }} {{ pendingCount === 1 ? 'cuidador' : 'cuidadores' }} à espera de aprovação
+            </p>
 
-        <main
-            class="patudo-content verifications-container flex-grow-1 py-4 px-4 px-lg-5"
-        >
-            <header
-                class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4"
-            >
-                <div>
-                    <h1 class="fw-bold mb-1">Verificações</h1>
-                    <p class="text-secondary mb-0">{{ subtitle }}</p>
-                </div>
-
-                <div class="d-flex align-items-center gap-2">
-                    <span class="fw-semibold small">Administrador</span>
-                    <span class="admin-avatar"></span>
-                </div>
-            </header>
-
-            <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
-                <div class="d-flex flex-wrap gap-2">
+            <!-- Separadores e pesquisa -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                <div class="d-flex flex-wrap gap-2" role="group" aria-label="Filtrar candidaturas">
                     <button
                         v-for="t in tabs"
                         :key="t.key"
                         type="button"
                         class="btn"
-                        :class="
-                            tab === t.key
-                                ? 'btn-primary'
-                                : 'btn-outline-primary'
-                        "
+                        :class="tab === t.key ? 'btn-primary' : 'btn-outline-primary'"
+                        :aria-pressed="tab === t.key"
                         @click="setTab(t.key)"
                     >
-                        {{ t.label
-                        }}<template v-if="t.key === 'pending'">
-                            ({{ pendingCount }})</template
-                        >
+                        {{ t.label }}<template v-if="t.key === 'pending'"> ({{ pendingCount }})</template>
                     </button>
                 </div>
-
-                <div class="search-wrapper ms-auto">
-                    <span class="search-icon" aria-hidden="true">
-                        <Search :size="16" />
-                    </span>
+                <label class="verif-search d-flex align-items-center gap-2 px-3">
+                    <Search :size="18" />
                     <input
                         v-model="search"
                         type="search"
-                        class="form-control bookings-search"
+                        class="border-0 bg-transparent flex-grow-1"
                         placeholder="Pesquisar cuidador"
+                        aria-label="Pesquisar cuidador"
                     />
-                </div>
+                </label>
             </div>
 
-            <div class="card verifications-shell p-3 p-md-4">
-                <div class="content d-flex gap-4">
-                    <div class="list-col" style="width: 280px; flex-shrink: 0">
-                        <p
-                            v-if="loading"
-                            class="state text-center py-4 text-secondary"
-                        >
-                            A carregar...
-                        </p>
-                        <div
-                            v-else-if="loadError"
-                            class="state state-error text-center py-4 text-danger"
-                        >
-                            {{ loadError }}
-                            <button
-                                type="button"
-                                class="btn btn-outline-danger btn-sm mt-2"
-                                @click="load"
-                            >
-                                Tentar novamente
-                            </button>
-                        </div>
-                        <p
-                            v-else-if="filtered.length === 0"
-                            class="state text-center py-4 text-secondary"
-                        >
-                            Não existem cuidadores nesta lista.
-                        </p>
-                        <template v-else>
-                            <button
-                                v-for="c in filtered"
-                                :key="c.user_id"
-                                type="button"
-                                class="list-item w-100 text-start"
-                                :class="{
-                                    'list-item-selected':
-                                        c.user_id === selectedId,
-                                }"
-                                @click="select(c)"
-                            >
-                                <div class="d-flex align-items-center gap-3">
-                                    <img
-                                        v-if="c.avatar_url"
-                                        :src="c.avatar_url"
-                                        alt=""
-                                        class="person-avatar"
-                                    />
-                                    <span v-else class="person-avatar"></span>
-                                    <div class="list-text flex-grow-1 min-w-0">
-                                        <strong class="d-block text-truncate">{{
-                                            c.user?.name ?? 'Cuidador'
-                                        }}</strong>
-                                        <small class="text-secondary"
-                                            >Cuidador</small
-                                        >
-                                    </div>
-                                </div>
-                            </button>
-                        </template>
+            <div v-if="feedback" class="alert alert-success py-2 small">{{ feedback }}</div>
+            <div v-if="loadError" class="alert alert-danger py-2 small">{{ loadError }}</div>
 
-                        <div
-                            class="deadline mt-4 p-3 rounded-3 border"
-                            style="
-                                border-color: var(--patudo-terracota);
-                                background-image: url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27100%25%27 height=%27100%25%27%3e%3crect width=%27100%25%27 height=%27100%25%27 fill=%27none%27 rx=%2712%27 ry=%2712%27 stroke=%27%23c2410c%27 stroke-width=%273%27 stroke-dasharray=%278%2c 10%27 stroke-linecap=%27butt%27/%3e%3c/svg%3e');
-                            "
-                        >
-                            <strong class="d-block">Prazo de resposta</strong>
-                            <p class="mb-0 small text-secondary">
-                                Os pedidos devem ser respondidos em até 3 dias
-                                úteis.
-                            </p>
-                        </div>
+            <div class="row g-3">
+                <!-- Lista de candidatos -->
+                <div class="col-lg-4">
+                    <p v-if="loading" class="text-muted small">A carregar...</p>
+                    <p v-else-if="!filtered.length" class="text-muted small">Não existem cuidadores nesta lista.</p>
+
+                    <button
+                        v-for="c in loading ? [] : filtered"
+                        :key="c.user_id"
+                        type="button"
+                        class="verif-item d-flex align-items-center gap-3 w-100 mb-2"
+                        :class="{ selected: c.user_id === selectedId }"
+                        @click="select(c)"
+                    >
+                        <img v-if="c.avatar_url" :src="c.avatar_url" alt="" class="verif-avatar sm" />
+                        <span v-else class="verif-avatar sm"></span>
+                        <span class="flex-grow-1 text-start min-w-0">
+                            <strong class="d-block text-truncate">{{ c.user?.name ?? 'Cuidador' }}</strong>
+                            <small class="text-muted">{{ daysAgo(c.application?.created_at ?? c.created_at) }} · Cuidador</small>
+                        </span>
+                        <ChevronRight :size="20" />
+                    </button>
+
+                    <div class="verif-deadline mt-3">
+                        <strong>Prazo de resposta</strong>
+                        <p class="mb-0">Os pedidos devem ser respondidos em até 3 dias úteis.</p>
                     </div>
+                </div>
 
-                    <section class="detail flex-grow-1 min-w-0">
-                        <template v-if="selected">
-                            <div
-                                class="detail-head d-flex align-items-center gap-3 pb-3 mb-3"
-                                style="
-                                    border-bottom: 1px solid
-                                        var(--patudo-terracota);
-                                "
-                            >
-                                <img
-                                    v-if="selected.avatar_url"
-                                    :src="selected.avatar_url"
-                                    alt=""
-                                    class="person-avatar-lg"
-                                />
-                                <span v-else class="person-avatar-lg"></span>
-                                <div class="detail-title flex-grow-1 min-w-0">
-                                    <h2 class="fw-bold mb-1">
-                                        {{ selected.user?.name ?? 'Cuidador' }}
-                                    </h2>
-                                    <small class="text-secondary">
-                                        {{
-                                            selected.city ??
-                                            selected.service_location ??
-                                            'Localização'
-                                        }}
-                                        · Registo
+                <!-- Detalhe -->
+                <div class="col-lg-8">
+                    <section class="verif-detail">
+                        <p v-if="!selected" class="text-muted mb-0">Seleciona um cuidador para ver os detalhes.</p>
+
+                        <template v-else>
+                            <div class="d-flex flex-wrap align-items-center gap-3 pb-3 mb-3 verif-divider">
+                                <img v-if="selected.avatar_url" :src="selected.avatar_url" alt="" class="verif-avatar lg" />
+                                <span v-else class="verif-avatar lg"></span>
+                                <div class="flex-grow-1 min-w-0">
+                                    <h2 class="h5 fw-bold mb-0">{{ selected.user?.name ?? 'Cuidador' }}</h2>
+                                    <small class="text-muted">
+                                        {{ selected.city ?? selected.service_location ?? 'Localização' }} · Registo
                                         {{ formatDate(selected.created_at) }}
                                     </small>
                                 </div>
-                                <span
-                                    class="status-pill"
-                                    :class="
-                                        statusPillClass(
-                                            selected.approval_status ??
-                                                'pending',
-                                        )
-                                    "
-                                >
-                                    <component
-                                        :is="
-                                            statusIcons[
-                                                selected.approval_status ??
-                                                    'pending'
-                                            ]
-                                        "
-                                        :size="14"
-                                        :stroke-width="2.5"
-                                        class="me-1"
-                                    />
-                                    <strong>{{
-                                        statusLabels[
-                                            selected.approval_status ??
-                                                'pending'
-                                        ]
-                                    }}</strong>
+                                <span class="verif-status" :class="`st-${selected.application?.status ?? selected.approval_status ?? 'pending'}`">
+                                    {{ statusLabels[selected.application?.status ?? selected.approval_status ?? 'pending'] }}
                                 </span>
                             </div>
 
-                            <h3 class="fw-bold mb-3">Dados do perfil</h3>
-                            <div class="data-grid row g-3 mb-4">
-                                <div class="col-12 col-md-6">
-                                    <small class="text-secondary d-block"
-                                        >Email</small
-                                    >
-                                    <strong>{{
-                                        selected.user?.email ?? '—'
-                                    }}</strong>
+                            <h3 class="verif-h3">Dados do perfil</h3>
+                            <div class="row g-2 mb-3 small">
+                                <div class="col-sm-6">
+                                    <span class="text-muted d-block">Email</span>
+                                    <strong>{{ selected.user?.email ?? '—' }}</strong>
                                 </div>
-                                <div class="col-12 col-md-6">
-                                    <small class="text-secondary d-block"
-                                        >Telemóvel</small
-                                    >
-                                    <strong>{{
-                                        selected.user?.phone ?? '—'
-                                    }}</strong>
+                                <div class="col-sm-6">
+                                    <span class="text-muted d-block">Telemóvel</span>
+                                    <strong>{{ selected.user?.phone ?? '—' }}</strong>
                                 </div>
-                                <div class="col-12 col-md-6">
-                                    <small class="text-secondary d-block"
-                                        >Serviços</small
-                                    >
-                                    <strong>{{
-                                        selected.services
-                                            ?.map((s) => s.type)
-                                            .join(', ') || '—'
-                                    }}</strong>
+                                <div class="col-sm-6">
+                                    <span class="text-muted d-block">Serviços</span>
+                                    <strong>{{ selected.services?.map((s) => s.type).join(', ') || '—' }}</strong>
                                 </div>
-                                <div class="col-12 col-md-6">
-                                    <small class="text-secondary d-block"
-                                        >Experiência</small
-                                    >
-                                    <strong>{{
-                                        selected.experience ?? '—'
-                                    }}</strong>
+                                <div class="col-sm-6">
+                                    <span class="text-muted d-block">Experiência</span>
+                                    <strong>{{ selected.experience ?? '—' }}</strong>
                                 </div>
                             </div>
 
-                            <h3 class="fw-bold mb-3">Documentos enviados</h3>
-                            <div class="docs d-flex gap-3 mb-3">
-                                <div
-                                    v-if="selected.identification_documents"
-                                    class="doc flex-grow-1 d-flex align-items-center gap-2 p-3 rounded-3"
-                                    style="
-                                        border: 1px solid
-                                            var(--patudo-terracota);
-                                        background: #fff5ea;
-                                        color: var(--patudo-terracota);
-                                    "
-                                >
-                                    <FileText :size="28" stroke-width="1.5" />
-                                    <div class="doc-text flex-grow-1">
-                                        <strong class="d-block small"
-                                            >Identificação</strong
+                            <h3 class="verif-h3">Documentos enviados ({{ documents.length }})</h3>
+                            <p v-if="!documents.length" class="text-muted small">Este cuidador não enviou documentos.</p>
+                            <div class="row g-2 mb-2">
+                                <div v-for="doc in documents" :key="doc.url" class="col-sm-6">
+                                    <div class="verif-doc d-flex align-items-center gap-2">
+                                        <FileText :size="30" :stroke-width="1.5" />
+                                        <span class="flex-grow-1 min-w-0">
+                                            <strong class="d-block small">Identificação {{ documents.length > 1 ? doc.index + 1 : '' }}</strong>
+                                            <small class="text-muted d-block text-truncate">{{ doc.type }} · {{ doc.name }}</small>
+                                        </span>
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-primary btn-sm"
+                                            :disabled="openingDoc !== null"
+                                            @click="openDocument(doc)"
                                         >
-                                        <small class="text-secondary">{{
-                                            docType(
-                                                selected.identification_documents,
-                                            )
-                                        }}</small>
+                                            {{ openingDoc === doc.url ? 'A abrir...' : 'Abrir' }}
+                                        </button>
                                     </div>
-                                    <button
-                                        type="button"
-                                        class="btn btn-outline-primary btn-sm"
-                                        :disabled="openingDoc"
-                                        @click="openDocument(selected)"
-                                    >
-                                        {{
-                                            openingDoc ? 'A abrir...' : 'Abrir'
-                                        }}
-                                    </button>
                                 </div>
-                                <p
-                                    v-else
-                                    class="state text-secondary text-center py-4 w-100"
-                                >
-                                    Este cuidador não enviou documento de
-                                    identificação.
-                                </p>
                             </div>
-                            <p
-                                v-if="docError"
-                                class="action-error text-danger small mb-3"
-                            >
-                                {{ docError }}
-                            </p>
+                            <p v-if="docError" class="text-danger small">{{ docError }}</p>
 
-                            <h3 class="fw-bold mb-3">Lista de verificação</h3>
-                            <label
-                                v-for="item in checklist"
-                                :key="item.label"
-                                class="check d-flex align-items-center gap-2 mb-2 small"
-                            >
-                                <input
-                                    v-model="item.checked"
-                                    type="checkbox"
-                                    class="form-check-input"
-                                    style="
-                                        accent-color: var(--patudo-terracota);
-                                        width: 16px;
-                                        height: 16px;
-                                    "
-                                />
-                                <span>{{ item.label }}</span>
-                            </label>
+                            <h3 class="verif-h3 mt-3">Lista de verificação</h3>
+                            <div class="mb-3">
+                                <label v-for="item in checklist" :key="item.label" class="d-flex align-items-center gap-2 small mb-1">
+                                    <input v-model="item.checked" type="checkbox" class="form-check-input mt-0" />
+                                    <span>{{ item.label }}</span>
+                                </label>
+                            </div>
 
-                            <p
-                                v-if="actionError"
-                                class="action-error text-danger small mb-3"
+                            <!-- Candidatura atual: motivos da recusa ou último pedido de informação -->
+                            <div v-if="selected.application?.reason_labels.length" class="verif-box mb-3 small">
+                                <strong class="d-block mb-1">Motivos da recusa</strong>
+                                <ul class="mb-1">
+                                    <li v-for="label in selected.application.reason_labels" :key="label">{{ label }}</li>
+                                </ul>
+                                <p v-if="selected.application.message" class="mb-1">"{{ selected.application.message }}"</p>
+                                <span class="text-muted">
+                                    {{ selected.application.decided_by?.name ?? 'Admin' }} · {{ formatDate(selected.application.decided_at) }}
+                                </span>
+                            </div>
+                            <div
+                                v-else-if="selected.application?.status === 'pending' && selected.application.message"
+                                class="verif-box mb-3 small"
                             >
-                                {{ actionError }}
-                            </p>
+                                <strong class="d-block mb-1">Último pedido de informação</strong>
+                                <p class="mb-0">"{{ selected.application.message }}"</p>
+                            </div>
+
+                            <!-- Candidaturas anteriores: ficam guardadas quando o candidato volta a candidatar-se -->
+                            <div v-if="selected.applications" class="verif-box mb-3 small">
+                                <strong class="d-block mb-1">
+                                    Candidaturas: {{ selected.applications.length }} de 3
+                                    <span class="text-muted fw-normal">· pode fazer mais {{ selected.applications_remaining ?? 0 }}</span>
+                                </strong>
+                                <div v-for="a in history" :key="a.id" class="mb-1">
+                                    {{ formatDate(a.created_at) }} · {{ statusLabels[a.status] }}
+                                    <template v-if="a.reason_labels.length"> — {{ a.reason_labels.join(', ') }}</template>
+                                    <template v-if="a.message"> · "{{ a.message }}"</template>
+                                </div>
+                                <span v-if="!history.length" class="text-muted">Sem candidaturas anteriores.</span>
+                            </div>
+
+                            <p v-if="actionError && !showReject && !showInfo" class="text-danger small">{{ actionError }}</p>
 
                             <div
-                                v-if="
-                                    (selected.approval_status ?? 'pending') ===
-                                    'pending'
-                                "
-                                class="actions d-flex gap-2 mt-3"
+                                v-if="(selected.application?.status ?? selected.approval_status ?? 'pending') === 'pending'"
+                                class="d-flex flex-wrap justify-content-end gap-2"
                             >
-                                <button
-                                    type="button"
-                                    class="btn btn-outline-danger"
-                                    :disabled="busy"
-                                    @click="openReject"
-                                >
+                                <button type="button" class="btn btn-outline-danger" :disabled="busy" @click="showReject = true">
                                     Recusar
                                 </button>
-                                <button
-                                    type="button"
-                                    class="btn btn-outline-primary"
-                                    :disabled="busy"
-                                >
+                                <button type="button" class="btn btn-outline-primary" :disabled="busy" @click="openInfo">
                                     Pedir mais informação
                                 </button>
-                                <button
-                                    type="button"
-                                    class="btn btn-primary ms-auto"
-                                    :disabled="busy"
-                                    @click="act('approve')"
-                                >
-                                    Aprovar cuidador
+                                <button type="button" class="btn btn-primary" :disabled="busy" @click="act('approve')">
+                                    {{ busy ? 'A guardar...' : 'Aprovar cuidador' }}
                                 </button>
                             </div>
                         </template>
-                        <p v-else class="state text-center py-5 text-secondary">
-                            Seleciona um cuidador para ver os detalhes.
-                        </p>
                     </section>
                 </div>
             </div>
-        </main>
-    </div>
+        </div>
 
-    <ModalRejectVerification
-        :show="showReject"
-        :name="selected?.user?.name"
-        :avatar-url="selected?.avatar_url"
-        :processing="busy"
-        :error="actionError"
-        @close="showReject = false"
-        @confirm="confirmReject"
-    />
+        <!-- Recusa: modal do colega, já com os motivos e a mensagem do mockup -->
+        <ModalRejectVerification
+            :show="showReject"
+            :name="selected?.user?.name"
+            :requested-label="daysAgo(selected?.application?.created_at ?? selected?.created_at)"
+            :avatar-url="selected?.avatar_url"
+            :processing="busy"
+            :error="actionError"
+            @close="showReject = false"
+            @confirm="confirmReject"
+        />
+
+        <!-- Pedir mais informação: mensagem obrigatória -->
+        <div v-if="showInfo" class="verif-backdrop" @click.self="showInfo = false">
+            <div class="verif-modal" role="dialog" aria-modal="true" aria-labelledby="info-title">
+                <h2 id="info-title" class="h5 fw-bold pb-2 mb-3 verif-divider">Pedir mais informação</h2>
+                <label for="info-message" class="small fw-semibold mb-1">Mensagem para o cuidador (obrigatório)</label>
+                <textarea
+                    id="info-message"
+                    v-model="infoMessage"
+                    class="form-control"
+                    rows="4"
+                    placeholder="Indica o que falta ou o que deve corrigir..."
+                ></textarea>
+                <p v-if="infoSubmitted && !infoMessage.trim()" class="text-danger small mt-1 mb-0">Escreve uma mensagem.</p>
+                <p class="text-muted small mt-2 mb-0">O cuidador recebe uma notificação e a candidatura continua pendente.</p>
+                <p v-if="actionError" class="text-danger small mt-2 mb-0">{{ actionError }}</p>
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <button type="button" class="btn btn-outline-primary" :disabled="busy" @click="showInfo = false">Cancelar</button>
+                    <button type="button" class="btn btn-primary" :disabled="busy" @click="confirmInfo">
+                        {{ busy ? 'A enviar...' : 'Enviar pedido' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
 </template>
 
 <style scoped>
-.verifications-container {
-    max-width: 1400px;
+.min-w-0 {
+    min-width: 0;
 }
 
-.verifications-shell {
-    background-color: rgba(255, 255, 255, 0.78);
-    border-color: var(--patudo-terracota);
+.verif-search {
+    min-width: 16rem;
+    height: 2.5rem;
+    border: 1.5px solid #2e1d14;
+    border-radius: 999px;
 }
 
-.list-item {
-    padding: 0.75rem 1rem;
-    border-radius: 12px;
-    background-color: #ffffff;
-    border: 1.5px solid rgba(194, 65, 12, 0.25);
-    transition:
-        border-color 0.2s ease,
-        background-color 0.2s ease;
+.verif-search input:focus {
+    outline: none;
 }
 
-.list-item:hover {
-    background-color: rgba(194, 65, 12, 0.04);
+.verif-item {
+    background-color: #fffaf3;
+    border: 1.5px solid #f3b78a;
+    border-radius: 0.75rem;
+    padding: 0.6rem 0.9rem;
+    color: #2e1d14;
 }
 
-.list-item-selected {
-    border-color: var(--patudo-castanhoDark);
-    background-color: rgba(46, 29, 20, 0.03);
+.verif-item.selected {
+    border-color: #2e1d14;
+    border-width: 2px;
 }
 
-.list-text strong {
+.verif-avatar {
+    display: inline-block;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background-color: #fdd9a8;
+    object-fit: cover;
+}
+
+.verif-avatar.sm {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.verif-avatar.lg {
+    width: 3.5rem;
+    height: 3.5rem;
+}
+
+.verif-deadline {
+    border: 1.5px dashed #f3b78a;
+    border-radius: 0.75rem;
+    padding: 0.9rem;
     font-size: 0.85rem;
 }
 
-.list-text small {
-    font-size: 0.75rem;
+.verif-detail {
+    background-color: #fffaf3;
+    border: 1.5px solid #c2410c;
+    border-radius: 1rem;
+    padding: 1.25rem;
 }
 
-.admin-avatar,
-.person-avatar {
-    border-radius: 50%;
-    background-color: var(--patudo-bege);
-    border: 1px solid rgba(var(--bs-primary-rgb), 0.55);
-    flex-shrink: 0;
+.verif-divider {
+    border-bottom: 1.5px solid #f3b78a;
 }
 
-.admin-avatar {
-    width: 38px;
-    height: 38px;
+.verif-h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
 }
 
-.person-avatar {
-    width: 38px;
-    height: 38px;
-    object-fit: cover;
+.verif-doc {
+    border: 1.5px solid #f3b78a;
+    border-radius: 0.75rem;
+    padding: 0.5rem 0.75rem;
 }
 
-.person-avatar-lg {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--patudo-terracota);
-    flex-shrink: 0;
-    display: inline-flex;
+.verif-box {
+    border: 1.5px solid #f3b78a;
+    border-radius: 0.75rem;
+    padding: 0.75rem;
+}
+
+.verif-status {
+    border: 1.5px solid #c2410c;
+    border-radius: 999px;
+    padding: 0.2rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.st-approved {
+    border-color: #166534;
+    color: #166534;
+}
+
+.st-rejected {
+    border-color: #991b1b;
+    color: #991b1b;
+}
+
+.verif-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10000000;
+    display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--patudo-terracota);
-    background-color: var(--patudo-bege);
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.45);
 }
 
-.status-pill {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.75rem;
-    border-radius: 25px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border: 1.5px solid var(--patudo-terracota);
-}
-
-.data-grid small {
-    font-size: 0.7rem;
-}
-
-.data-grid strong {
-    font-size: 0.85rem;
-}
-
-.doc-text strong {
-    font-size: 0.75rem;
-}
-
-.doc-text small {
-    font-size: 0.65rem;
-}
-
-.check input {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--patudo-terracota);
-}
-
-.action-error {
-    font-size: 0.75rem;
-}
-
-.search-wrapper {
-    position: relative;
+.verif-modal {
     width: 100%;
-    max-width: 290px;
-}
-
-.search-icon {
-    position: absolute;
-    left: 0.85rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--patudo-castanhoMid);
-    display: flex;
-    pointer-events: none;
-}
-
-.bookings-search {
-    padding-left: 2.35rem;
-    border-radius: 25px;
-    border-color: var(--patudo-terracota);
-    background-color: #ffffff;
-    font-size: 0.85rem;
-}
-
-.bookings-search:focus {
-    border-color: var(--patudo-laranjaVivo);
-    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.15);
-}
-
-@media (max-width: 991.98px) {
-    .verifications-container {
-        padding: 1rem !important;
-    }
-
-    .content {
-        flex-direction: column;
-    }
-
-    .list-col {
-        width: 100% !important;
-    }
-
-    .deadline {
-        display: none;
-    }
+    max-width: 440px;
+    padding: 1.25rem 1.5rem;
+    background-color: #fffaf3;
+    border: 1.5px solid #f3b78a;
+    border-radius: 1rem;
+    color: #2e1d14;
 }
 </style>

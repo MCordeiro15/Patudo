@@ -30,6 +30,7 @@ cd <pasta-do-projeto>
 composer install
 ```
 
+
 ## Problemas comuns
 
 | Erro                                                       | Causa                                                         | Solução                                                                                                                                                                  |

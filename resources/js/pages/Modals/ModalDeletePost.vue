@@ -1,6 +1,7 @@
 <!-- Página Vue: ModalDeletePost.vue -->
 <!-- Vue page: ModalDeletePost.vue -->
 <script setup lang="ts">
+
 const emit = defineEmits<{
     (e: 'close'): void;
     (e: 'confirmed'): void;
@@ -39,9 +40,7 @@ const confirm = () => {
                 class="modal-dialog modal-dialog-centered modal-sm"
                 role="document"
             >
-                <div
-                    class="modal-content bg-white rounded-4 border border-primary"
-                >
+                <div class="modal-content bg-white rounded-4 border border-primary">
                     <!-- Header -->
                     <div class="modal-header border-bottom border-primary">
                         <h5 class="modal-title fw-bold text-primary">

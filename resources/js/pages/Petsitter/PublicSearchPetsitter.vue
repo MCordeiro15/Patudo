@@ -3,19 +3,17 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 import {
-    Bell,
     ChevronRight,
     Heart,
     MapPin,
-    MessageCircle,
     SlidersHorizontal,
     Star,
     UserRound,
 } from '@lucide/vue';
 import { ref, onMounted } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
-import { useNotifications } from '@/composables/useNotifications';
+import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 
 interface Auth {
     user: {
@@ -46,8 +44,6 @@ const petsitters = ref<PetsitterApiData[]>([]);
 const favourites = ref<number[]>([]);
 const error = ref<string | null>(null);
 const loading = ref(true);
-const showNotifications = ref(false);
-const { unreadCount } = useNotifications();
 
 function navigateToProfile(userId: number) {
     window.location.href = `/petsitters/${userId}`;
@@ -217,393 +213,358 @@ onMounted(() => {
 
 <template>
     <Head title="Procurar Petsitter" />
-    <main
-        v-if="auth.user"
-        class="patudo-content patudo-page-shell flex-column flex-grow-1 py-4"
-    >
-        <div class="container">
-            <nav
-                class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
-            >
-                <a
-                    href="/"
-                    class="navbar-brand fw-bolder fs-2 text-decoration-none text-body d-flex align-items-center gap-2 m-0"
+        <main v-if="auth.user" class="patudo-content patudo-page-shell flex-column flex-grow-1 py-4">
+            <div class="container">
+                <nav
+                    class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
                 >
-                    <img
-                        :src="logoPatudo"
-                        alt="Patudo"
-                        width="70"
-                        height="70"
-                    />
-                    <span>Patudo</span>
-                </a>
-                <div class="nav nav-pills border rounded-pill p-1 mx-auto">
-                    <a class="nav-link active rounded-pill px-4" href="/"
+                    <a
+                        href="/"
+                        class="navbar-brand fw-bolder fs-2 text-decoration-none text-body d-flex align-items-center gap-2 m-0"
+                    >
+                        <img
+                            :src="logoPatudo"
+                            alt="Patudo"
+                            width="70"
+                            height="70"
+                        />
+                        <span>Patudo</span>
+                    </a>
+                    <div class="nav nav-pills border rounded-pill p-1 mx-auto">
+                        <a class="nav-link active rounded-pill px-4" href="/"
                         >Início</a
-                    >
-                    <a
-                        class="nav-link text-dark rounded-pill px-4"
-                        href="/orders"
+                        >
+                        <a
+                            class="nav-link text-dark rounded-pill px-4"
+                            href="/orders"
                         >Pedidos</a
-                    >
-                    <a
-                        class="nav-link text-dark rounded-pill px-4"
-                        href="/favorites"
-                    >
-                        Favoritos
-                    </a>
-                    <a
-                        class="nav-link text-dark rounded-pill px-4"
-                        href="/reservations"
-                    >
-                        Reservas
-                    </a>
-                </div>
-
-                <div class="d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark"
-                        ><MessageCircle :size="25"
-                    /></a>
-                    <button
-                        type="button"
-                        class="text-dark bg-transparent border-0 p-0 position-relative"
-                        @click="showNotifications = true"
-                    >
-                        <Bell :size="25" />
-                        <span
-                            v-if="unreadCount > 0"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            style="font-size: 0.6rem"
                         >
-                            {{ unreadCount > 9 ? '9+' : unreadCount }}
-                        </span>
-                    </button>
-                    <button
-                        type="button"
-                        class="text-dark p-0 border-0 bg-transparent"
-                        @click="navigateToMyProfile()"
-                    >
-                        <UserRound :size="25" />
-                    </button>
-                </div>
-            </nav>
+                        <a
+                            class="nav-link text-dark rounded-pill px-4"
+                            href="/favorites"
+                        >
+                            Favoritos
+                        </a>
+                        <a
+                            class="nav-link text-dark rounded-pill px-4"
+                            href="/reservations"
+                        >
+                            Reservas
+                        </a>
+                        <AdminNavigationMenu />
+                    </div>
 
-            <div
-                class="d-flex align-items-center justify-content-between gap-3 m-5"
-            >
-                <h1 class="h2 mb-0 text-nowrap">
-                    Encontra o cuidador ideal para o teu animal
-                </h1>
+                    <div class="d-flex align-items-center gap-3">
+                        <HeaderNotificationsChat />
+                        <button
+                            type="button"
+                            class="text-dark p-0 border-0 bg-transparent"
+                            @click="navigateToMyProfile()"
+                        >
+                            <UserRound :size="25" />
+                        </button>
+                    </div>
+                </nav>
 
-                <button
-                    class="btn btn-outline-secondary rounded-pill text-nowrap"
-                >
-                    <SlidersHorizontal :size="18" class="me-2" />
-                    Filtros (X)
-                </button>
-            </div>
-
-            <!-- Error message -->
-            <div
-                v-if="error"
-                class="alert alert-danger alert-dismissible fade show mb-4"
-                role="alert"
-            >
-                {{ error }}
-                <button
-                    type="button"
-                    class="btn-close"
-                    @click="error = null"
-                ></button>
-            </div>
-
-            <!-- Loading state -->
-            <div v-if="loading" class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">A carregar...</span>
-                </div>
-            </div>
-
-            <!-- Empty state -->
-            <div v-else-if="petsitters.length === 0" class="text-center py-5">
-                <p class="text-muted">
-                    Nenhum petsitter disponível no momento.
-                </p>
-            </div>
-
-            <!-- Petsitters list -->
-            <div v-else class="row g-3">
                 <div
-                    v-for="petsitter in petsitters"
-                    :key="petsitter.user_id"
-                    class="col-12 col-md-6 col-lg-4"
+                    class="d-flex align-items-center justify-content-between gap-3 m-5"
                 >
-                    <article
-                        class="card petsitter-card h-100 overflow-hidden border border-primary rounded-5"
-                    >
-                        <div
-                            class="position-relative d-flex justify-content-center align-items-center border-bottom border-primary py-4"
-                        >
-                            <img
-                                v-if="petsitter.avatar_url"
-                                :src="petsitter.avatar_url"
-                                :alt="petsitter.user.name"
-                                class="patudo-petsitter-avatar"
-                                style="
-                                    width: 80px;
-                                    height: 80px;
-                                    object-fit: cover;
-                                    border-radius: 50%;
-                                "
-                            />
-                            <div v-else class="display-2">🐾</div>
+                    <h1 class="h2 mb-0 text-nowrap">
+                        Encontra o cuidador ideal para o teu animal
+                    </h1>
 
-                            <button
-                                type="button"
-                                class="btn position-absolute top-0 end-0 m-3 p-0 text-primary"
-                                :aria-label="`Adicionar ${petsitter.user.name} aos favoritos`"
-                                @click="toggleFavourite(petsitter.user_id)"
+                    <button
+                        class="btn btn-outline-secondary rounded-pill text-nowrap"
+                    >
+                        <SlidersHorizontal :size="18" class="me-2" />
+                        Filtros (X)
+                    </button>
+                </div>
+
+                <!-- Error message -->
+                <div
+                    v-if="error"
+                    class="alert alert-danger alert-dismissible fade show mb-4"
+                    role="alert"
+                >
+                    {{ error }}
+                    <button
+                        type="button"
+                        class="btn-close"
+                        @click="error = null"
+                    ></button>
+                </div>
+
+                <!-- Loading state -->
+                <div v-if="loading" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">A carregar...</span>
+                    </div>
+                </div>
+
+                <!-- Empty state -->
+                <div v-else-if="petsitters.length === 0" class="text-center py-5">
+                    <p class="text-muted">
+                        Nenhum petsitter disponível no momento.
+                    </p>
+                </div>
+
+                <!-- Petsitters list -->
+                <div v-else class="row g-3">
+                    <div
+                        v-for="petsitter in petsitters"
+                        :key="petsitter.user_id"
+                        class="col-12 col-md-6 col-lg-4"
+                    >
+                        <article
+                            class="card petsitter-card h-100 overflow-hidden border border-primary rounded-5"
+                        >
+                            <div
+                                class="position-relative d-flex justify-content-center align-items-center border-bottom border-primary py-4"
                             >
-                                <Heart
-                                    :size="32"
-                                    :fill="
-                                        isFavourite(petsitter.user_id)
-                                            ? 'currentColor'
-                                            : 'transparent'
-                                    "
-                                    stroke-width="2.5"
+                                <img
+                                    v-if="petsitter.avatar_url"
+                                    :src="petsitter.avatar_url"
+                                    :alt="petsitter.user.name"
+                                    class="patudo-petsitter-avatar"
+                                    style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%"
                                 />
-                            </button>
-                        </div>
+                                <div v-else class="display-2">🐾</div>
 
-                        <div class="p-4 border-bottom border-primary">
-                            <div
-                                class="d-flex justify-content-between align-items-start gap-2"
-                            >
-                                <h2 class="h3 mb-1">
-                                    {{ petsitter.user.name }}
-                                </h2>
+                                <button
+                                    type="button"
+                                    class="btn position-absolute top-0 end-0 m-3 p-0 text-primary"
+                                    :aria-label="`Adicionar ${petsitter.user.name} aos favoritos`"
+                                    @click="toggleFavourite(petsitter.user_id)"
+                                >
+                                    <Heart
+                                        :size="32"
+                                        :fill="
+                                            isFavourite(petsitter.user_id)
+                                                ? 'currentColor'
+                                                : 'transparent'
+                                        "
+                                        stroke-width="2.5"
+                                    />
+                                </button>
+                            </div>
+
+                            <div class="p-4 border-bottom border-primary">
+                                <div
+                                    class="d-flex justify-content-between align-items-start gap-2"
+                                >
+                                    <h2 class="h3 mb-1">
+                                        {{ petsitter.user.name }}
+                                    </h2>
+
+                                    <div
+                                        class="d-flex align-items-center gap-1 text-dark text-nowrap"
+                                    >
+                                        <Star
+                                            :size="24"
+                                            class="text-warning"
+                                            fill="currentColor"
+                                        />
+                                        <span>{{ formatRating(petsitter) }}</span>
+                                    </div>
+                                </div>
 
                                 <div
-                                    class="d-flex align-items-center gap-1 text-dark text-nowrap"
+                                    class="d-flex align-items-center gap-1 text-muted mb-2"
                                 >
-                                    <Star
-                                        :size="24"
-                                        class="text-warning"
-                                        fill="currentColor"
-                                    />
-                                    <span>{{ formatRating(petsitter) }}</span>
+                                    <MapPin :size="17" />
+                                    <span>{{ petsitter.service_location }}</span>
+                                </div>
+
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span
+                                        class="badge rounded-pill text-bg-success px-3 py-2"
+                                    >
+                                        Passeios
+                                    </span>
+                                    <span
+                                        class="badge rounded-pill text-bg-success px-3 py-2"
+                                    >
+                                        Hospedagem
+                                    </span>
                                 </div>
                             </div>
 
                             <div
-                                class="d-flex align-items-center gap-1 text-muted mb-2"
+                                class="d-flex justify-content-between align-items-end p-4"
                             >
-                                <MapPin :size="17" />
-                                <span>{{ petsitter.service_location }}</span>
-                            </div>
+                                <div>
+                                    <p class="mb-0 small">A partir de</p>
+                                    <p class="h3 mb-0">
+                                        {{ petsitter.price_per_day }} €
+                                    </p>
+                                </div>
 
-                            <div class="d-flex flex-wrap gap-2">
-                                <span
-                                    class="badge rounded-pill text-bg-success px-3 py-2"
+                                <button
+                                    type="button"
+                                    class="btn btn-link text-dark fs-5 p-0 cursor-pointer"
+                                    @click="navigateToProfile(petsitter.user_id)"
                                 >
-                                    Passeios
-                                </span>
-                                <span
-                                    class="badge rounded-pill text-bg-success px-3 py-2"
-                                >
-                                    Hospedagem
-                                </span>
+                                    Ver perfil
+                                    <ChevronRight :size="24" />
+                                </button>
                             </div>
-                        </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </main>
 
-                        <div
-                            class="d-flex justify-content-between align-items-end p-4"
+        <!-- Para visitante não logado -->
+        <main v-else class="patudo-content patudo-page-shell flex-column flex-grow-1 py-4">
+            <div class="container">
+                <div class="d-flex align-items-center justify-content-between">
+                    <a
+                        class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2 mb-0"
+                        href="/"
+                    >
+                        <img
+                            :src="logoPatudo"
+                            alt="Patudo"
+                            width="70"
+                            height="70"
+                        />
+                        <span>Patudo</span>
+                    </a>
+                    <div class="d-flex gap-2 col-6 col-md-4 col-lg-3">
+                        <a
+                            href="/login"
+                            class="btn btn-primary rounded-pill w-50 py-2 fw-bold"
                         >
-                            <div>
-                                <p class="mb-0 small">A partir de</p>
-                                <p class="h3 mb-0">
-                                    {{ petsitter.price_per_day }} €
-                                </p>
-                            </div>
+                            Login
+                        </a>
 
-                            <button
-                                type="button"
-                                class="btn btn-link text-dark fs-5 p-0 cursor-pointer"
-                                @click="navigateToProfile(petsitter.user_id)"
-                            >
-                                Ver perfil
-                                <ChevronRight :size="24" />
-                            </button>
-                        </div>
-                    </article>
+                        <a
+                            href="/register"
+                            class="btn btn-outline-primary rounded-pill w-50 py-2 fw-bold"
+                        >
+                            Registar
+                        </a>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Para visitante não logado -->
-    <main
-        v-else
-        class="patudo-content patudo-page-shell flex-column flex-grow-1 py-4"
-    >
-        <div class="container">
-            <div class="d-flex align-items-center justify-content-between">
-                <a
-                    class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2 mb-0"
-                    href="/"
-                >
-                    <img
-                        :src="logoPatudo"
-                        alt="Patudo"
-                        width="70"
-                        height="70"
-                    />
-                    <span>Patudo</span>
-                </a>
-                <div class="d-flex gap-2 col-6 col-md-4 col-lg-3">
-                    <a
-                        href="/login"
-                        class="btn btn-primary rounded-pill w-50 py-2 fw-bold"
-                    >
-                        Login
-                    </a>
-
-                    <a
-                        href="/register"
-                        class="btn btn-outline-primary rounded-pill w-50 py-2 fw-bold"
-                    >
-                        Registar
-                    </a>
-                </div>
-            </div>
-            <div
-                class="d-flex align-items-center justify-content-between gap-3 m-5"
-            >
-                <h1 class="h2 mb-0 text-nowrap">
-                    Encontra o cuidador ideal para o teu animal
-                </h1>
-
-                <button
-                    class="btn btn-outline-secondary rounded-pill text-nowrap"
-                >
-                    <SlidersHorizontal :size="18" class="me-2" />
-                    Filtros (X)
-                </button>
-            </div>
-
-            <!-- Loading state -->
-            <div v-if="loading" class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">A carregar...</span>
-                </div>
-            </div>
-
-            <!-- Empty state -->
-            <div v-else-if="petsitters.length === 0" class="text-center py-5">
-                <p class="text-muted">
-                    Nenhum petsitter disponível no momento.
-                </p>
-            </div>
-
-            <!-- Petsitters list -->
-            <div v-else class="row g-3">
                 <div
-                    v-for="petsitter in petsitters"
-                    :key="petsitter.user_id"
-                    class="col-12 col-md-6 col-lg-4"
+                    class="d-flex align-items-center justify-content-between gap-3 m-5"
                 >
-                    <article
-                        class="card petsitter-card h-100 overflow-hidden border border-primary rounded-5"
-                    >
-                        <div
-                            class="position-relative d-flex justify-content-center align-items-center border-bottom border-primary py-4"
-                        >
-                            <img
-                                v-if="petsitter.avatar_url"
-                                :src="petsitter.avatar_url"
-                                :alt="petsitter.user.name"
-                                class="patudo-petsitter-avatar"
-                                style="
-                                    width: 80px;
-                                    height: 80px;
-                                    object-fit: cover;
-                                    border-radius: 50%;
-                                "
-                            />
-                            <div v-else class="display-2">🐾</div>
-                        </div>
+                    <h1 class="h2 mb-0 text-nowrap">
+                        Encontra o cuidador ideal para o teu animal
+                    </h1>
 
-                        <div class="p-4 border-bottom border-primary">
+                    <button
+                        class="btn btn-outline-secondary rounded-pill text-nowrap"
+                    >
+                        <SlidersHorizontal :size="18" class="me-2" />
+                        Filtros (X)
+                    </button>
+                </div>
+
+                <!-- Loading state -->
+                <div v-if="loading" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">A carregar...</span>
+                    </div>
+                </div>
+
+                <!-- Empty state -->
+                <div v-else-if="petsitters.length === 0" class="text-center py-5">
+                    <p class="text-muted">
+                        Nenhum petsitter disponível no momento.
+                    </p>
+                </div>
+
+                <!-- Petsitters list -->
+                <div v-else class="row g-3">
+                    <div
+                        v-for="petsitter in petsitters"
+                        :key="petsitter.user_id"
+                        class="col-12 col-md-6 col-lg-4"
+                    >
+                        <article
+                            class="card petsitter-card h-100 overflow-hidden border border-primary rounded-5"
+                        >
                             <div
-                                class="d-flex justify-content-between align-items-start gap-2"
+                                class="position-relative d-flex justify-content-center align-items-center border-bottom border-primary py-4"
                             >
-                                <h2 class="h3 mb-1">
-                                    {{ petsitter.user.name }}
-                                </h2>
+                                <img
+                                    v-if="petsitter.avatar_url"
+                                    :src="petsitter.avatar_url"
+                                    :alt="petsitter.user.name"
+                                    class="patudo-petsitter-avatar"
+                                    style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%"
+                                />
+                                <div v-else class="display-2">🐾</div>
+                            </div>
+
+                            <div class="p-4 border-bottom border-primary">
+                                <div
+                                    class="d-flex justify-content-between align-items-start gap-2"
+                                >
+                                    <h2 class="h3 mb-1">
+                                        {{ petsitter.user.name }}
+                                    </h2>
+
+                                    <div
+                                        class="d-flex align-items-center gap-1 text-dark text-nowrap"
+                                    >
+                                        <Star
+                                            :size="24"
+                                            class="text-warning"
+                                            fill="currentColor"
+                                        />
+                                        <span>{{ formatRating(petsitter) }}</span>
+                                    </div>
+                                </div>
 
                                 <div
-                                    class="d-flex align-items-center gap-1 text-dark text-nowrap"
+                                    class="d-flex align-items-center gap-1 text-muted mb-2"
                                 >
-                                    <Star
-                                        :size="24"
-                                        class="text-warning"
-                                        fill="currentColor"
-                                    />
-                                    <span>{{ formatRating(petsitter) }}</span>
+                                    <MapPin :size="17" />
+                                    <span>{{ petsitter.service_location }}</span>
+                                </div>
+
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span
+                                        class="badge rounded-pill text-bg-success px-3 py-2"
+                                    >
+                                        Passeios
+                                    </span>
+                                    <span
+                                        class="badge rounded-pill text-bg-success px-3 py-2"
+                                    >
+                                        Hospedagem
+                                    </span>
                                 </div>
                             </div>
 
                             <div
-                                class="d-flex align-items-center gap-1 text-muted mb-2"
+                                class="d-flex justify-content-between align-items-end p-4"
                             >
-                                <MapPin :size="17" />
-                                <span>{{ petsitter.service_location }}</span>
-                            </div>
+                                <div>
+                                    <p class="mb-0 small">A partir de</p>
+                                    <p class="h3 mb-0">
+                                        {{ petsitter.price_per_day }} €
+                                    </p>
+                                </div>
 
-                            <div class="d-flex flex-wrap gap-2">
-                                <span
-                                    class="badge rounded-pill text-bg-success px-3 py-2"
+                                <button
+                                    type="button"
+                                    class="btn btn-link text-dark fs-5 p-0 cursor-pointer"
+                                    @click="navigateToProfile(petsitter.user_id)"
                                 >
-                                    Passeios
-                                </span>
-                                <span
-                                    class="badge rounded-pill text-bg-success px-3 py-2"
-                                >
-                                    Hospedagem
-                                </span>
+                                    Ver perfil
+                                    <ChevronRight :size="24" />
+                                </button>
                             </div>
-                        </div>
-
-                        <div
-                            class="d-flex justify-content-between align-items-end p-4"
-                        >
-                            <div>
-                                <p class="mb-0 small">A partir de</p>
-                                <p class="h3 mb-0">
-                                    {{ petsitter.price_per_day }} €
-                                </p>
-                            </div>
-
-                            <button
-                                type="button"
-                                class="btn btn-link text-dark fs-5 p-0 cursor-pointer"
-                                @click="navigateToProfile(petsitter.user_id)"
-                            >
-                                Ver perfil
-                                <ChevronRight :size="24" />
-                            </button>
-                        </div>
-                    </article>
+                        </article>
+                    </div>
                 </div>
             </div>
-        </div>
-    </main>
+        </main>
 
-    <ModalNotifications
-        :show="showNotifications"
-        @close="showNotifications = false"
-    />
 </template>
 
 <style scoped>

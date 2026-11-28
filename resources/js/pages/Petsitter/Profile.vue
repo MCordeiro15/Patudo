@@ -1,23 +1,23 @@
 <!-- Página de perfil do utilizador. Mostra e permite editar informações pessoais. -->
 <!-- User profile page. Shows and allows editing personal information. -->
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import {
-    Bell,
-    MessageCircle,
+    CirclePlus,
+    Pencil,
+    Plus,
     Save,
     Trash2,
-    UserRound,
-    LogOut,
+    UserRound, LogOut,
 } from '@lucide/vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
+import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 import { computed, onMounted, ref } from 'vue';
 import ModalDeletePost from '@/pages/Modals/ModalDeletePost.vue';
 import ModalEditPetsitterProfile from '@/pages/Modals/ModalEditPetsitterProfile.vue';
 import ModalEditPost from '@/pages/Modals/ModalEditPost.vue';
 import ModalNewPost from '@/pages/Modals/ModalNewPost.vue';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
-import { useNotifications } from '@/composables/useNotifications';
 import type { PetsitterProfile as PetsitterProfileType, Post } from '@/types';
 
 // Tipo TypeScript para PetsitterProfile.
@@ -39,18 +39,20 @@ type PetsitterProfile = {
     approval_status: string;
     identification_documents?: string | null;
     availability_days: string[] | null;
+    average_rating: number | string | null;
+    reviews_count: number;
     created_at: string;
     updated_at: string;
 };
 
-const SERVICE_OPTIONS = [
-    { value: 'pet-sitting', label: 'Pet Sitting' },
-    { value: 'passeio', label: 'Passeio' },
-] as const;
+const LEGACY_SERVICE_LABELS: Record<string, string> = {
+    'pet-sitting': 'Pet Sitting',
+    passeio: 'Passeio',
+};
 
 type PetsitterService = {
     id: number;
-    type: (typeof SERVICE_OPTIONS)[number]['value'];
+    type: string;
     price: number;
 };
 
@@ -73,6 +75,9 @@ const props = defineProps<{
     isOwnProfile?: boolean;
     isAdmin?: boolean;
 }>();
+const page = usePage<{ auth: { isAdmin: boolean; user: { is_petsitter?: boolean } | null } }>();
+const viewerIsPetsitter = computed(() => page.props.auth.user?.is_petsitter === true);
+const showOwnerNavigation = computed(() => !viewerIsPetsitter.value || page.props.auth.isAdmin);
 
 // Reactive availability days for editing
 const editingDays = ref<string[]>([]);
@@ -83,8 +88,6 @@ const saveSuccess = ref(false);
 
 // Edit profile modal state
 const showEditProfileModal = ref(false);
-const showNotifications = ref(false);
-const { unreadCount } = useNotifications();
 
 // Propriedade computada que retorna os dados do petsitter a partir das props.
 // Computed property that returns petsitter data from props.
@@ -98,16 +101,6 @@ const isAdmin = computed(() => props.isAdmin ?? false);
 // Propriedade computada que determina se o utilizador pode editar o perfil.
 // Computed property that determines if the user can edit the profile.
 const canEdit = computed(() => isOwnProfile.value || isAdmin.value);
-const availableServiceTypes = computed(() =>
-    SERVICE_OPTIONS.filter(
-        (option) =>
-            !services.value.some(
-                (service) =>
-                    service.type === option.value &&
-                    service.id !== editingServiceId.value,
-            ),
-    ),
-);
 
 // Propriedade computada que retorna os dias de disponibilidade atuais.
 // Computed property that returns the current availability days.
@@ -146,7 +139,7 @@ const formatServicePrice = (price: number) =>
     `${Number(price).toLocaleString('pt-PT', { maximumFractionDigits: 2 })} €`;
 
 const serviceTypeLabel = (type: PetsitterService['type']) =>
-    SERVICE_OPTIONS.find((option) => option.value === type)?.label ?? type;
+    LEGACY_SERVICE_LABELS[type] ?? type;
 
 // Formata uma classificação numérica para exibição.
 // Formats a numeric rating for display.
@@ -154,7 +147,7 @@ const formatRating = (rating: number | null) => {
     if (rating === null) {
         return 'Sem avaliações';
     }
-    return rating.toString().replace('.', ',');
+    return rating.toFixed(1);
 };
 
 // Formata uma data/hora para exibição no formato pt-PT.
@@ -230,13 +223,14 @@ const displayExperience = computed(() => {
 // Propriedade computada que retorna a classificação média.
 // Computed property that returns the average rating.
 const displayRating = computed(() => {
-    return null;
+    const rating = petsitter.value?.average_rating;
+    return rating === null || rating === undefined ? null : Number(rating);
 });
 
 // Propriedade computada que retorna o número de avaliações.
 // Computed property that returns the number of reviews.
 const displayReviewsCount = computed(() => {
-    return 0;
+    return petsitter.value?.reviews_count ?? 0;
 });
 
 // --- Publicações: carregadas da API (GET /api/petsitters/{id}/posts) ---
@@ -259,10 +253,7 @@ const servicesLoading = ref(false);
 const servicesError = ref('');
 const serviceFormOpen = ref(false);
 const editingServiceId = ref<number | null>(null);
-const serviceForm = ref({
-    type: '' as PetsitterService['type'] | '',
-    price: '',
-});
+const serviceForm = ref({ type: '', price: '' });
 const serviceFieldErrors = ref<{ type?: string; price?: string }>({});
 const serviceFormError = ref('');
 const savingService = ref(false);
@@ -352,9 +343,7 @@ const confirmDeletePost = async () => {
 
         if (response.ok || response.status === 204) {
             // Remove o post da lista local
-            posts.value = posts.value.filter(
-                (post) => post.id !== deletingPostId.value,
-            );
+            posts.value = posts.value.filter((post) => post.id !== deletingPostId.value);
             showDeletePostModal.value = false;
             deletingPostId.value = null;
         } else {
@@ -408,23 +397,16 @@ const loadServices = async () => {
     servicesError.value = '';
 
     try {
-        const response = await fetch(
-            `/api/petsitters/${petsitter.value.user_id}/services`,
-            {
-                credentials: 'same-origin',
-                headers: {
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-            },
-        );
+        const response = await fetch(`/api/petsitters/${petsitter.value.user_id}/services`, {
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        });
         const data = await response.json().catch(() => ({}));
 
         if (response.ok) {
             services.value = data.data ?? [];
         } else {
-            servicesError.value =
-                data.message ?? 'Não foi possível carregar os serviços.';
+            servicesError.value = data.message ?? 'Não foi possível carregar os serviços.';
         }
     } catch {
         servicesError.value = 'Erro de rede ao carregar os serviços.';
@@ -434,19 +416,16 @@ const loadServices = async () => {
 };
 
 function beginCreateService() {
-    if (!isOwnProfile.value || !availableServiceTypes.value.length) return;
+    if (!canEdit.value) return;
     editingServiceId.value = null;
-    serviceForm.value = {
-        type: availableServiceTypes.value[0]!.value,
-        price: '',
-    };
+    serviceForm.value = { type: '', price: '' };
     serviceFieldErrors.value = {};
     serviceFormError.value = '';
     serviceFormOpen.value = true;
 }
 
 function beginEditService(service: PetsitterService) {
-    if (!isOwnProfile.value) return;
+    if (!canEdit.value) return;
     editingServiceId.value = service.id;
     serviceForm.value = { type: service.type, price: String(service.price) };
     serviceFieldErrors.value = {};
@@ -462,7 +441,7 @@ function cancelServiceForm() {
 }
 
 async function saveService() {
-    if (!isOwnProfile.value || !petsitter.value?.user_id) return;
+    if (!canEdit.value || !petsitter.value?.user_id) return;
 
     savingService.value = true;
     serviceFieldErrors.value = {};
@@ -493,24 +472,18 @@ async function saveService() {
 
         if (response.ok) {
             const savedService = data.data as PetsitterService;
-            const index = services.value.findIndex(
-                (service) => service.id === savedService.id,
-            );
+            const index = services.value.findIndex((service) => service.id === savedService.id);
             if (index === -1) services.value.push(savedService);
             else services.value[index] = savedService;
             services.value.sort((a, b) => a.type.localeCompare(b.type));
             cancelServiceForm();
         } else if (data.errors) {
             serviceFieldErrors.value = Object.fromEntries(
-                Object.entries(data.errors).map(([field, messages]) => [
-                    field,
-                    (messages as string[])[0],
-                ]),
+                Object.entries(data.errors).map(([field, messages]) => [field, (messages as string[])[0]]),
             );
             serviceFormError.value = data.message ?? '';
         } else {
-            serviceFormError.value =
-                data.message ?? 'Não foi possível guardar o serviço.';
+            serviceFormError.value = data.message ?? 'Não foi possível guardar o serviço.';
         }
     } catch {
         serviceFormError.value = 'Erro de rede ao guardar o serviço.';
@@ -520,13 +493,7 @@ async function saveService() {
 }
 
 async function deleteService(service: PetsitterService) {
-    if (
-        !isOwnProfile.value ||
-        !window.confirm(
-            `Tem a certeza que quer apagar o serviço ${serviceTypeLabel(service.type)}?`,
-        )
-    )
-        return;
+    if (!canEdit.value || !window.confirm(`Tem a certeza que quer apagar o serviço ${serviceTypeLabel(service.type)}?`)) return;
 
     deletingServiceId.value = service.id;
     servicesError.value = '';
@@ -546,14 +513,11 @@ async function deleteService(service: PetsitterService) {
         });
 
         if (response.ok || response.status === 204) {
-            services.value = services.value.filter(
-                (item) => item.id !== service.id,
-            );
+            services.value = services.value.filter((item) => item.id !== service.id);
             if (editingServiceId.value === service.id) cancelServiceForm();
         } else {
             const data = await response.json().catch(() => ({}));
-            servicesError.value =
-                data.message ?? 'Não foi possível apagar o serviço.';
+            servicesError.value = data.message ?? 'Não foi possível apagar o serviço.';
         }
     } catch {
         servicesError.value = 'Erro de rede ao apagar o serviço.';
@@ -684,15 +648,16 @@ const saveAvailability = async () => {
                 </a>
 
                 <div class="nav nav-pills border rounded-pill p-1 mx-auto">
-                    <a class="nav-link text-dark rounded-pill px-4" href="/"
-                        >Início</a
+                    <a v-if="showOwnerNavigation" class="nav-link text-dark rounded-pill px-4" href="/"
+                    >Início</a
                     >
                     <a
                         class="nav-link text-dark rounded-pill px-4"
                         href="/orders"
-                        >Pedidos</a
+                    >Pedidos</a
                     >
                     <a
+                        v-if="showOwnerNavigation"
                         class="nav-link text-dark rounded-pill px-4"
                         href="/favorites"
                     >
@@ -704,26 +669,11 @@ const saveAvailability = async () => {
                     >
                         Reservas
                     </a>
+                    <AdminNavigationMenu />
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark"
-                        ><MessageCircle :size="25"
-                    /></a>
-                    <button
-                        type="button"
-                        class="text-dark bg-transparent border-0 p-0 position-relative"
-                        @click="showNotifications = true"
-                    >
-                        <Bell :size="25" />
-                        <span
-                            v-if="unreadCount > 0"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            style="font-size: 0.6rem"
-                        >
-                            {{ unreadCount > 9 ? '9+' : unreadCount }}
-                        </span>
-                    </button>
+                    <HeaderNotificationsChat />
                     <button
                         type="button"
                         class="text-dark p-0 border-0 bg-transparent"
@@ -764,28 +714,12 @@ const saveAvailability = async () => {
                     <button
                         v-if="canEdit"
                         type="button"
-                        class="btn btn-primary btn-sm d-flex align-items-center gap-2 position-absolute top-0 end-0 mt-3 me-3 px-4"
+                        class="patudo-icon-action patudo-icon-action-edit position-absolute top-0 end-0 mt-3 me-3"
+                        aria-label="Editar perfil"
+                        title="Editar perfil"
                         @click="showEditProfileModal = true"
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <path
-                                d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                            />
-                            <path
-                                d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"
-                            />
-                        </svg>
-                        Editar
+                        <Pencil :size="16" aria-hidden="true" />
                     </button>
 
                     <div class="row g-4 align-items-center">
@@ -839,9 +773,7 @@ const saveAvailability = async () => {
                         </div>
 
                         <div class="col-12 col-md-4">
-                            <div
-                                class="border-start border-secondary ps-4 py-2"
-                            >
+                            <div class="border-start border-secondary ps-4 py-2">
                                 <p class="fs-5 text-muted mb-1">
                                     Rating {{ formatRating(displayRating) }}
                                 </p>
@@ -863,7 +795,7 @@ const saveAvailability = async () => {
                     class="card bg-white border border-primary rounded-4 p-3 px-md-4 mb-3 about-card"
                 >
                     <h2 class="h5 fw-semibold mb-3">Sobre mim</h2>
-                    <p class="text-muted fs-6 mb-0 ps-md-2">
+                    <p class="text-muted fs-5 mb-0 ps-md-2">
                         {{ displayBiography }}
                     </p>
                 </section>
@@ -875,151 +807,79 @@ const saveAvailability = async () => {
                         <section
                             class="card bg-white border border-primary rounded-4 p-3 px-md-4 info-card"
                         >
-                            <div
-                                class="d-flex align-items-center justify-content-between gap-2 mb-3"
-                            >
-                                <h2 class="h5 fw-semibold mb-0">
-                                    Serviços e preços
-                                </h2>
+                            <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                                <h2 class="h5 fw-semibold mb-0">Serviços e preços</h2>
                                 <button
-                                    v-if="
-                                        isOwnProfile &&
-                                        availableServiceTypes.length > 0
-                                    "
+                                    v-if="canEdit"
                                     type="button"
-                                    class="btn btn-primary btn-sm"
+                                    class="patudo-icon-action patudo-icon-action-add"
+                                    aria-label="Adicionar serviço"
+                                    title="Adicionar serviço"
                                     @click="beginCreateService"
                                 >
-                                    Adicionar serviço
+                                    <Plus :size="16" aria-hidden="true" />
                                 </button>
                             </div>
 
-                            <p v-if="servicesLoading" class="small text-muted">
-                                A carregar serviços...
-                            </p>
-                            <p
-                                v-if="servicesError"
-                                class="small text-danger"
-                                role="alert"
-                            >
-                                {{ servicesError }}
-                            </p>
-                            <p
-                                v-if="
-                                    isOwnProfile &&
-                                    !availableServiceTypes.length
-                                "
-                                class="small text-muted"
-                            >
-                                Já estão configurados todos os tipos de serviço
-                                disponíveis.
-                            </p>
-
+                            <p v-if="servicesLoading" class="small text-muted">A carregar serviços...</p>
+                            <p v-if="servicesError" class="small text-danger" role="alert">{{ servicesError }}</p>
                             <div
                                 v-for="service in services"
                                 :key="service.id"
                                 class="border-bottom pb-2 mb-2 small text-muted"
                             >
-                                <div
-                                    class="d-flex align-items-center justify-content-between gap-2"
-                                >
-                                    <span>{{
-                                        serviceTypeLabel(service.type)
-                                    }}</span>
-                                    <span class="fw-semibold">{{
-                                        formatServicePrice(service.price)
-                                    }}</span>
+                                <div class="d-flex align-items-center justify-content-between gap-2">
+                                    <span>{{ serviceTypeLabel(service.type) }}</span>
+                                    <span class="fw-semibold">{{ formatServicePrice(service.price) }}</span>
                                 </div>
-                                <div
-                                    v-if="isOwnProfile"
-                                    class="d-flex justify-content-end gap-2 mt-2"
-                                >
+                                <div v-if="canEdit" class="d-flex justify-content-end gap-2 mt-2">
                                     <button
                                         type="button"
-                                        class="btn btn-outline-primary btn-sm"
+                                        class="patudo-icon-action patudo-icon-action-edit"
+                                        :aria-label="`Editar serviço ${serviceTypeLabel(service.type)}`"
+                                        :title="`Editar serviço ${serviceTypeLabel(service.type)}`"
                                         @click="beginEditService(service)"
                                     >
-                                        Editar
+                                        <Pencil :size="16" aria-hidden="true" />
                                     </button>
                                     <button
                                         type="button"
-                                        class="btn btn-outline-danger btn-sm"
-                                        :disabled="
-                                            deletingServiceId === service.id
-                                        "
+                                        class="patudo-icon-action patudo-icon-action-delete"
+                                        :aria-label="`Apagar serviço ${serviceTypeLabel(service.type)}`"
+                                        :title="`Apagar serviço ${serviceTypeLabel(service.type)}`"
+                                        :disabled="deletingServiceId === service.id"
                                         @click="deleteService(service)"
                                     >
-                                        {{
-                                            deletingServiceId === service.id
-                                                ? 'A apagar...'
-                                                : 'Apagar'
-                                        }}
+                                        <Trash2 :size="16" aria-hidden="true" />
                                     </button>
                                 </div>
                             </div>
 
-                            <p
-                                v-if="!servicesLoading && !services.length"
-                                class="small text-muted mb-0"
-                            >
+                            <p v-if="!servicesLoading && !services.length" class="small text-muted mb-0">
                                 Ainda não foram adicionados serviços.
                             </p>
 
-                            <form
-                                v-if="serviceFormOpen"
-                                class="border-top pt-3 mt-3"
-                                @submit.prevent="saveService"
-                            >
-                                <h3 class="h6 fw-semibold">
-                                    {{
-                                        editingServiceId === null
-                                            ? 'Novo serviço'
-                                            : 'Editar serviço'
-                                    }}
-                                </h3>
+                            <form v-if="serviceFormOpen && canEdit" class="border-top pt-3 mt-3" @submit.prevent="saveService">
+                                <h3 class="h6 fw-semibold">{{ editingServiceId === null ? 'Novo serviço' : 'Editar serviço' }}</h3>
                                 <div class="mb-2">
-                                    <label
-                                        for="service-type"
-                                        class="form-label small"
-                                        >Tipo</label
-                                    >
-                                    <select
+                                    <label for="service-type" class="form-label small">Nome do serviço</label>
+                                    <input
                                         id="service-type"
                                         v-model="serviceForm.type"
-                                        class="form-select form-select-sm"
-                                        :class="{
-                                            'is-invalid':
-                                                serviceFieldErrors.type,
-                                        }"
-                                        :aria-invalid="
-                                            !!serviceFieldErrors.type
-                                        "
-                                    >
-                                        <option value="" disabled>
-                                            Selecione um serviço
-                                        </option>
-                                        <option
-                                            v-for="option in availableServiceTypes"
-                                            :key="option.value"
-                                            :value="option.value"
-                                        >
-                                            {{ option.label }}
-                                        </option>
-                                    </select>
-                                    <div
-                                        v-if="serviceFieldErrors.type"
-                                        class="invalid-feedback d-block"
-                                        role="alert"
-                                    >
+                                        type="text"
+                                        maxlength="255"
+                                        placeholder="Ex.: Passeio, Pet Sitting, Banho..."
+                                        required
+                                        class="form-control form-control-sm"
+                                        :class="{ 'is-invalid': serviceFieldErrors.type }"
+                                        :aria-invalid="!!serviceFieldErrors.type"
+                                    />
+                                    <div v-if="serviceFieldErrors.type" class="invalid-feedback d-block" role="alert">
                                         {{ serviceFieldErrors.type }}
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label
-                                        for="service-price"
-                                        class="form-label small"
-                                        >Preço (€)</label
-                                    >
+                                    <label for="service-price" class="form-label small">Preço (€)</label>
                                     <input
                                         id="service-price"
                                         v-model="serviceForm.price"
@@ -1027,48 +887,20 @@ const saveAvailability = async () => {
                                         min="0"
                                         step="0.01"
                                         class="form-control form-control-sm"
-                                        :class="{
-                                            'is-invalid':
-                                                serviceFieldErrors.price,
-                                        }"
-                                        :aria-invalid="
-                                            !!serviceFieldErrors.price
-                                        "
+                                        :class="{ 'is-invalid': serviceFieldErrors.price }"
+                                        :aria-invalid="!!serviceFieldErrors.price"
                                     />
-                                    <div
-                                        v-if="serviceFieldErrors.price"
-                                        class="invalid-feedback d-block"
-                                        role="alert"
-                                    >
+                                    <div v-if="serviceFieldErrors.price" class="invalid-feedback d-block" role="alert">
                                         {{ serviceFieldErrors.price }}
                                     </div>
                                 </div>
-                                <p
-                                    v-if="serviceFormError"
-                                    class="small text-danger"
-                                    role="alert"
-                                >
-                                    {{ serviceFormError }}
-                                </p>
+                                <p v-if="serviceFormError" class="small text-danger" role="alert">{{ serviceFormError }}</p>
                                 <div class="d-flex justify-content-end gap-2">
-                                    <button
-                                        type="button"
-                                        class="btn btn-outline-secondary btn-sm"
-                                        :disabled="savingService"
-                                        @click="cancelServiceForm"
-                                    >
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" :disabled="savingService" @click="cancelServiceForm">
                                         Cancelar
                                     </button>
-                                    <button
-                                        type="submit"
-                                        class="btn btn-primary btn-sm"
-                                        :disabled="savingService"
-                                    >
-                                        {{
-                                            savingService
-                                                ? 'A guardar...'
-                                                : 'Guardar'
-                                        }}
+                                    <button type="submit" class="btn btn-primary btn-sm" :disabled="savingService">
+                                        {{ savingService ? 'A guardar...' : 'Guardar' }}
                                     </button>
                                 </div>
                             </form>
@@ -1090,28 +922,12 @@ const saveAvailability = async () => {
                                 <button
                                     v-if="canEdit && !isEditing"
                                     type="button"
-                                    class="btn btn-primary d-flex align-items-center gap-1"
+                                    class="patudo-icon-action patudo-icon-action-edit"
+                                    aria-label="Editar disponibilidade"
+                                    title="Editar disponibilidade"
                                     @click="startEditing"
                                 >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="14"
-                                        height="14"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    >
-                                        <path
-                                            d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                                        />
-                                        <path
-                                            d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"
-                                        />
-                                    </svg>
-                                    Editar
+                                    <Pencil :size="16" aria-hidden="true" />
                                 </button>
                             </div>
 
@@ -1182,9 +998,7 @@ const saveAvailability = async () => {
                                     >
                                         <span>{{ day.label.slice(0, 3) }}</span>
                                         <svg
-                                            v-if="
-                                                editingDays.includes(day.value)
-                                            "
+                                            v-if="editingDays.includes(day.value)"
                                             xmlns="http://www.w3.org/2000/svg"
                                             width="18"
                                             height="18"
@@ -1214,26 +1028,28 @@ const saveAvailability = async () => {
                                     </button>
                                 </div>
 
-                                <div class="d-flex gap-2 mt-3">
-                                    <button
-                                        type="button"
-                                        class="btn btn-aceitar btn-sm rounded-pill"
-                                        :disabled="saving"
-                                        @click="saveAvailability"
-                                    >
-                                        {{
-                                            saving ? 'A guardar...' : 'Guardar'
-                                        }}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        class="btn btn-outline-danger btn-sm rounded-pill"
-                                        :disabled="saving"
-                                        @click="cancelEditing"
-                                    >
-                                        Cancelar
-                                    </button>
-                                </div>
+                                        <div class="d-flex gap-2 mt-3">
+                                            <button
+                                                type="button"
+                                                class="btn btn-aceitar btn-sm rounded-pill"
+                                                :disabled="saving"
+                                                @click="saveAvailability"
+                                            >
+                                                {{
+                                                    saving
+                                                        ? 'A guardar...'
+                                                        : 'Guardar'
+                                                }}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="btn btn-outline-danger btn-sm rounded-pill"
+                                                :disabled="saving"
+                                                @click="cancelEditing"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </div>
 
                                 <div
                                     v-if="saveError"
@@ -1302,60 +1118,44 @@ const saveAvailability = async () => {
                                         {{ post.description }}
                                     </p>
                                     <small class="post-date">{{
-                                        formatDateTime(post.created_at)
-                                    }}</small>
+                                            formatDateTime(post.created_at)
+                                        }}</small>
                                 </div>
 
                                 <div class="post-actions">
                                     <button
                                         v-if="canEdit"
                                         type="button"
-                                        class="btn btn-link text-dark p-0"
+                                        class="patudo-icon-action patudo-icon-action-edit"
+                                        :aria-label="`Editar publicação ${post.title || ''}`"
+                                        :title="`Editar publicação ${post.title || ''}`"
                                         @click="editPost(post.id)"
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="40"
-                                            height="40"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="1.25"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        >
-                                            <path
-                                                d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-                                            />
-                                            <path
-                                                d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"
-                                            />
-                                        </svg>
+                                        <Pencil :size="16" aria-hidden="true" />
                                     </button>
                                     <button
                                         v-if="canEdit"
                                         type="button"
-                                        class="btn btn-link text-dark p-0"
+                                        class="patudo-icon-action patudo-icon-action-delete"
+                                        :aria-label="`Apagar publicação ${post.title || ''}`"
+                                        :title="`Apagar publicação ${post.title || ''}`"
                                         @click="deletePost(post.id)"
                                     >
-                                        <Trash2
-                                            :size="40"
-                                            :stroke-width="1.25"
-                                        />
+                                        <Trash2 :size="16" aria-hidden="true" />
                                     </button>
                                 </div>
+
                             </article>
 
-                            <article
+                            <button
                                 v-if="canPost"
-                                class="add-post-card card bg-white border border-primary rounded-4 p-4 text-center d-flex flex-column align-items-center justify-content-center gap-2"
+                                type="button"
+                                class="add-post-card w-100 card bg-white border border-primary rounded-4 p-4 text-center d-flex flex-column align-items-center justify-content-center gap-2"
                                 @click="showNewPostModal = true"
                             >
-                                <div class="add-post-circle"></div>
-                                <span class="small"
-                                    >Adicionar nova publicação</span
-                                >
-                            </article>
+                                <CirclePlus :size="56" :stroke-width="1" class="text-primary" />
+                                <span class="small text-muted">Adicionar nova publicação</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1378,20 +1178,10 @@ const saveAvailability = async () => {
             @created="onPostCreated"
         />
 
-        <!-- Notifications Modal -->
-        <ModalNotifications
-            :show="showNotifications"
-            @close="showNotifications = false"
-        />
-
         <!-- Delete Post Modal -->
         <ModalDeletePost
             :show="showDeletePostModal"
-            :post-title="
-                deletingPostId !== null
-                    ? posts.find((p) => p.id === deletingPostId)?.title
-                    : undefined
-            "
+            :post-title="deletingPostId !== null ? posts.find(p => p.id === deletingPostId)?.title : undefined"
             :deleting="deletingPost"
             @close="cancelDeletePost"
             @confirmed="confirmDeletePost"
@@ -1400,11 +1190,7 @@ const saveAvailability = async () => {
         <!-- Edit Post Modal -->
         <ModalEditPost
             :show="showEditPostModal"
-            :post="
-                editingPostId !== null
-                    ? (posts.find((p) => p.id === editingPostId) ?? null)
-                    : null
-            "
+            :post="editingPostId !== null ? posts.find(p => p.id === editingPostId) ?? null : null"
             @close="cancelEditPost"
             @updated="onPostUpdated"
         />
@@ -1412,10 +1198,6 @@ const saveAvailability = async () => {
 </template>
 
 <style scoped>
-.patudo-page {
-    background-color: #fffaf3;
-}
-
 .profile-avatar {
     width: 140px;
     height: 140px;
@@ -1533,7 +1315,7 @@ const saveAvailability = async () => {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    padding: 24px 140px 5px 0;
+    padding: 24px 96px 5px 0;
 }
 
 .post-body:first-child {
@@ -1564,10 +1346,10 @@ const saveAvailability = async () => {
 
 .post-actions {
     position: absolute;
-    top: 13px;
+    bottom: 10px;
     right: 20px;
     display: flex;
-    gap: 23px;
+    gap: 0.5rem;
 }
 
 .post-heart {
@@ -1594,47 +1376,23 @@ const saveAvailability = async () => {
     }
 
     .post-actions {
-        top: 18px;
-        right: 18px;
-        padding: 2px 8px;
-        border-radius: 0.75rem;
-        background-color: rgba(255, 255, 255, 0.9);
+        top: auto;
+        right: 8px;
+        bottom: 8px;
+        padding: 0;
+        border-radius: 0;
+        background-color: transparent;
     }
 }
 
 .add-post-card {
     min-height: 320px;
     cursor: pointer;
+    font: inherit;
 }
 
-/* Círculo cor de pêssego com o sinal + (mockup). */
-/* Peach circle with the + sign (mockup). */
-.add-post-circle {
-    position: relative;
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    background-color: #f8d8a9;
-}
-
-.add-post-circle::before,
-.add-post-circle::after {
-    content: '';
-    position: absolute;
-    background-color: #fff;
-}
-
-.add-post-circle::before {
-    top: 50%;
-    left: 13%;
-    right: 13%;
-    height: 1px;
-}
-
-.add-post-circle::after {
-    left: 50%;
-    top: 13%;
-    bottom: 13%;
-    width: 1px;
+.add-post-card:hover,
+.add-post-card:focus-visible {
+    background-color: rgba(var(--bs-primary-rgb), 0.05) !important;
 }
 </style>

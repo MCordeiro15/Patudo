@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import {
-    useNotifications,
-    type NotificationItem,
-} from '@/composables/useNotifications';
+import { useNotifications, type NotificationItem } from '@/composables/useNotifications';
 
 const props = defineProps<{
     show: boolean;
@@ -48,12 +45,20 @@ const typeLabels: Record<string, string> = {
     review: 'Avaliação',
     system: 'Sistema',
     message: 'Mensagem',
+    new_help_ticket: 'Ticket de ajuda',
+    verification_approved: 'Candidatura aprovada',
+    verification_rejected: 'Candidatura recusada',
+    verification_info_requested: 'Pedido de informação',
 };
 
 const typeIcons: Record<string, string> = {
     review: '⭐',
     system: '⚙️',
     message: '💬',
+    new_help_ticket: '🆘',
+    verification_approved: '✅',
+    verification_rejected: '❌',
+    verification_info_requested: '📝',
 };
 
 const bookingDay = (date: string | null) => date?.slice(8, 10) ?? '';
@@ -68,7 +73,7 @@ watch(
             filterType.value = 'all';
             successMessage.value = '';
         }
-    },
+    }
 );
 
 const handleClose = () => {
@@ -153,351 +158,232 @@ const timeAgo = (dateString: string) => {
         @click.self="handleClose"
         @keydown.escape="handleClose"
     >
-        <div
-            class="patudo-modal-card patudo-modal-wide"
-            role="dialog"
-            aria-modal="true"
-        >
-            <!-- Cabeçalho -->
-            <div class="patudo-modal-header">
-                <div class="patudo-header-left">
-                    <button
-                        v-if="activeTab === 'detail'"
-                        type="button"
-                        class="patudo-back-btn"
-                        aria-label="Voltar"
-                        @click="handleBack"
-                    >
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+            <div class="patudo-modal-card patudo-modal-wide" role="dialog" aria-modal="true">
+                <!-- Cabeçalho -->
+                <div class="patudo-modal-header">
+                    <div class="patudo-header-left">
+                        <button
+                            v-if="activeTab === 'detail'"
+                            type="button"
+                            class="patudo-back-btn"
+                            aria-label="Voltar"
+                            @click="handleBack"
                         >
-                            <path d="M19 12H5M12 19l-7-7 7-7" />
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 12H5M12 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <div class="patudo-header-title-group">
+                            <h2 class="patudo-modal-title">
+                                {{ activeTab === 'detail' ? 'Detalhes da Notificação' : 'Notificações' }}
+                            </h2>
+                            <span v-if="activeTab === 'list'" class="patudo-unread-badge">
+                                {{ unreadCount }} não lidas
+                            </span>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        class="patudo-close-btn"
+                        aria-label="Fechar"
+                        @click="handleClose"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                            <path d="M18 6L6 18M6 6l12 12" />
                         </svg>
                     </button>
-                    <div class="patudo-header-title-group">
-                        <h2 class="patudo-modal-title">
-                            {{
-                                activeTab === 'detail'
-                                    ? 'Detalhes da Notificação'
-                                    : 'Notificações'
-                            }}
-                        </h2>
-                        <span
-                            v-if="activeTab === 'list'"
-                            class="patudo-unread-badge"
-                        >
-                            {{ unreadCount }} não lidas
-                        </span>
-                    </div>
                 </div>
-                <button
-                    type="button"
-                    class="patudo-close-btn"
-                    aria-label="Fechar"
-                    @click="handleClose"
-                >
-                    <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                    >
-                        <path d="M18 6L6 18M6 6l12 12" />
+
+                <!-- Mensagem de sucesso -->
+                <div v-if="successMessage" class="patudo-success-banner">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M20 6L9 17l-5-5" />
                     </svg>
-                </button>
-            </div>
+                    {{ successMessage }}
+                </div>
 
-            <!-- Mensagem de sucesso -->
-            <div v-if="successMessage" class="patudo-success-banner">
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                >
-                    <path d="M20 6L9 17l-5-5" />
-                </svg>
-                {{ successMessage }}
-            </div>
+                <!-- Mensagem de erro -->
+                <div v-if="errorMessage" class="patudo-error-banner">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M15 9l-6 6M9 9l6 6" />
+                    </svg>
+                    {{ errorMessage }}
+                </div>
 
-            <!-- Mensagem de erro -->
-            <div v-if="errorMessage" class="patudo-error-banner">
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                >
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M15 9l-6 6M9 9l6 6" />
-                </svg>
-                {{ errorMessage }}
-            </div>
+                <!-- Corpo -->
+                <div class="patudo-modal-body">
+                    <!-- ABA: LISTA -->
+                    <div v-if="activeTab === 'list'">
+                        <!-- Filtros -->
+                        <div class="patudo-filter-tabs">
+                            <button
+                                type="button"
+                                class="patudo-filter-tab"
+                                :class="{ 'is-active': filterType === 'all' }"
+                                @click="filterType = 'all'"
+                            >
+                                Todas ({{ notifications.length }})
+                            </button>
+                            <button
+                                type="button"
+                                class="patudo-filter-tab"
+                                :class="{ 'is-active': filterType === 'unread' }"
+                                @click="filterType = 'unread'"
+                            >
+                                Não lidas ({{ unreadCount }})
+                            </button>
+                            <button
+                                type="button"
+                                class="patudo-filter-tab"
+                                :class="{ 'is-active': filterType === 'read' }"
+                                @click="filterType = 'read'"
+                            >
+                                Lidas ({{ notifications.length - unreadCount }})
+                            </button>
+                        </div>
 
-            <!-- Corpo -->
-            <div class="patudo-modal-body">
-                <!-- ABA: LISTA -->
-                <div v-if="activeTab === 'list'">
-                    <!-- Filtros -->
-                    <div class="patudo-filter-tabs">
-                        <button
-                            type="button"
-                            class="patudo-filter-tab"
-                            :class="{ 'is-active': filterType === 'all' }"
-                            @click="filterType = 'all'"
-                        >
-                            Todas ({{ notifications.length }})
-                        </button>
-                        <button
-                            type="button"
-                            class="patudo-filter-tab"
-                            :class="{ 'is-active': filterType === 'unread' }"
-                            @click="filterType = 'unread'"
-                        >
-                            Não lidas ({{ unreadCount }})
-                        </button>
-                        <button
-                            type="button"
-                            class="patudo-filter-tab"
-                            :class="{ 'is-active': filterType === 'read' }"
-                            @click="filterType = 'read'"
-                        >
-                            Lidas ({{ notifications.length - unreadCount }})
-                        </button>
+                        <!-- Lista de notificações -->
+                        <div class="patudo-notification-list">
+                            <!-- Loading state -->
+                            <div v-if="isLoading" class="patudo-loading-state">
+                                <div class="patudo-spinner"></div>
+                                <p class="patudo-empty-text">A carregar notificações...</p>
+                            </div>
+                            <!-- Empty state -->
+                            <div v-else-if="filteredNotifications.length === 0" class="patudo-empty-state">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c4450c" stroke-width="1.2" stroke-linecap="round">
+                                    <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
+                                </svg>
+                                <p class="patudo-empty-text">Nenhuma notificação encontrada.</p>
+                            </div>
+
+                            <div
+                                v-for="notification in filteredNotifications"
+                                :key="notification.id"
+                                class="patudo-notification-item"
+                                :class="{ 'is-unread': !notification.read }"
+                                @click="handleSelect(notification)"
+                            >
+                                <div class="patudo-notification-icon">
+                                    <span
+                                        v-if="notification.type === 'booking' && notification.booking_start_date"
+                                        class="patudo-booking-calendar"
+                                        :aria-label="`Dia da reserva: ${notification.booking_start_date}`"
+                                    >
+                                        {{ bookingDay(notification.booking_start_date) }}
+                                    </span>
+                                    <template v-else>{{ typeIcons[notification.type] || '🔔' }}</template>
+                                </div>
+                                <div class="patudo-notification-content">
+                                    <div class="patudo-notification-top-row">
+                                        <span class="patudo-notification-type">
+                                            {{ typeLabels[notification.type] || notification.type }}
+                                        </span>
+                                        <span class="patudo-notification-time">
+                                            {{ timeAgo(notification.created_at) }}
+                                        </span>
+                                    </div>
+                                    <p class="patudo-notification-message">
+                                        {{ notification.message }}
+                                    </p>
+                                </div>
+                                <div v-if="!notification.read" class="patudo-unread-dot"></div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Lista de notificações -->
-                    <div class="patudo-notification-list">
-                        <!-- Loading state -->
-                        <div v-if="isLoading" class="patudo-loading-state">
-                            <div class="patudo-spinner"></div>
-                            <p class="patudo-empty-text">
-                                A carregar notificações...
-                            </p>
-                        </div>
-                        <!-- Empty state -->
-                        <div
-                            v-else-if="filteredNotifications.length === 0"
-                            class="patudo-empty-state"
-                        >
-                            <svg
-                                width="48"
-                                height="48"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="#c4450c"
-                                stroke-width="1.2"
-                                stroke-linecap="round"
-                            >
-                                <path
-                                    d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"
-                                />
-                            </svg>
-                            <p class="patudo-empty-text">
-                                Nenhuma notificação encontrada.
-                            </p>
-                        </div>
-
-                        <div
-                            v-for="notification in filteredNotifications"
-                            :key="notification.id"
-                            class="patudo-notification-item"
-                            :class="{ 'is-unread': !notification.read }"
-                            @click="handleSelect(notification)"
-                        >
-                            <div class="patudo-notification-icon">
-                                <span
-                                    v-if="
-                                        notification.type === 'booking' &&
-                                        notification.booking_start_date
-                                    "
-                                    class="patudo-booking-calendar"
-                                    :aria-label="`Dia da reserva: ${notification.booking_start_date}`"
-                                >
-                                    {{
-                                        bookingDay(
-                                            notification.booking_start_date,
-                                        )
-                                    }}
-                                </span>
-                                <template v-else>{{
-                                    typeIcons[notification.type] || '🔔'
-                                }}</template>
-                            </div>
-                            <div class="patudo-notification-content">
-                                <div class="patudo-notification-top-row">
-                                    <span class="patudo-notification-type">
-                                        {{
-                                            typeLabels[notification.type] ||
-                                            notification.type
-                                        }}
+                    <!-- ABA: DETALHE -->
+                    <div v-else-if="activeTab === 'detail' && selectedNotification">
+                        <div class="patudo-detail-card">
+                            <div class="patudo-detail-icon-row">
+                                <div class="patudo-detail-icon">
+                                    <span
+                                        v-if="selectedNotification.type === 'booking' && selectedNotification.booking_start_date"
+                                        class="patudo-booking-calendar"
+                                        :aria-label="`Dia da reserva: ${selectedNotification.booking_start_date}`"
+                                    >
+                                        {{ bookingDay(selectedNotification.booking_start_date) }}
                                     </span>
-                                    <span class="patudo-notification-time">
-                                        {{ timeAgo(notification.created_at) }}
+                                    <template v-else>{{ typeIcons[selectedNotification.type] || '🔔' }}</template>
+                                </div>
+                                <div class="patudo-detail-meta">
+                                    <span class="patudo-detail-type">
+                                        {{ typeLabels[selectedNotification.type] || selectedNotification.type }}
+                                    </span>
+                                    <span class="patudo-detail-status" :class="{ 'is-read': selectedNotification.read }">
+                                        {{ selectedNotification.read ? 'Lida' : 'Não lida' }}
                                     </span>
                                 </div>
-                                <p class="patudo-notification-message">
-                                    {{ notification.message }}
-                                </p>
                             </div>
-                            <div
-                                v-if="!notification.read"
-                                class="patudo-unread-dot"
-                            ></div>
+
+                            <p class="patudo-detail-message">
+                                {{ selectedNotification.message }}
+                            </p>
+
+                            <div class="patudo-detail-timestamps">
+                                <div class="patudo-timestamp-item">
+                                    <span class="patudo-timestamp-label">Criada em</span>
+                                    <span class="patudo-timestamp-value">
+                                        {{ formatDate(selectedNotification.created_at) }}
+                                    </span>
+                                </div>
+                                <div v-if="selectedNotification.read_at" class="patudo-timestamp-item">
+                                    <span class="patudo-timestamp-label">Lida em</span>
+                                    <span class="patudo-timestamp-value">
+                                        {{ formatDate(selectedNotification.read_at) }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="patudo-detail-actions">
+                                <a
+                                    v-if="selectedNotification.booking_url"
+                                    :href="selectedNotification.booking_url"
+                                    class="btn-patudo-solid-pill text-decoration-none"
+                                >
+                                    Ver reserva
+                                </a>
+                                <button
+                                    type="button"
+                                    class="btn-patudo-solid-pill"
+                                    :disabled="isLoading"
+                                    @click="handleToggleRead(selectedNotification)"
+                                >
+                                    {{
+                                        isLoading
+                                            ? 'A processar...'
+                                            : selectedNotification.read
+                                              ? 'Marcar como não lida'
+                                              : 'Marcar como lida'
+                                    }}
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn-patudo-danger-pill"
+                                    :disabled="isLoading"
+                                    @click="handleDelete(selectedNotification.id)"
+                                >
+                                    {{ isLoading ? 'A processar...' : 'Apagar notificação' }}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ABA: DETALHE -->
-                <div v-else-if="activeTab === 'detail' && selectedNotification">
-                    <div class="patudo-detail-card">
-                        <div class="patudo-detail-icon-row">
-                            <div class="patudo-detail-icon">
-                                <span
-                                    v-if="
-                                        selectedNotification.type ===
-                                            'booking' &&
-                                        selectedNotification.booking_start_date
-                                    "
-                                    class="patudo-booking-calendar"
-                                    :aria-label="`Dia da reserva: ${selectedNotification.booking_start_date}`"
-                                >
-                                    {{
-                                        bookingDay(
-                                            selectedNotification.booking_start_date,
-                                        )
-                                    }}
-                                </span>
-                                <template v-else>{{
-                                    typeIcons[selectedNotification.type] || '🔔'
-                                }}</template>
-                            </div>
-                            <div class="patudo-detail-meta">
-                                <span class="patudo-detail-type">
-                                    {{
-                                        typeLabels[selectedNotification.type] ||
-                                        selectedNotification.type
-                                    }}
-                                </span>
-                                <span
-                                    class="patudo-detail-status"
-                                    :class="{
-                                        'is-read': selectedNotification.read,
-                                    }"
-                                >
-                                    {{
-                                        selectedNotification.read
-                                            ? 'Lida'
-                                            : 'Não lida'
-                                    }}
-                                </span>
-                            </div>
-                        </div>
-
-                        <p class="patudo-detail-message">
-                            {{ selectedNotification.message }}
-                        </p>
-
-                        <div class="patudo-detail-timestamps">
-                            <div class="patudo-timestamp-item">
-                                <span class="patudo-timestamp-label"
-                                    >Criada em</span
-                                >
-                                <span class="patudo-timestamp-value">
-                                    {{
-                                        formatDate(
-                                            selectedNotification.created_at,
-                                        )
-                                    }}
-                                </span>
-                            </div>
-                            <div
-                                v-if="selectedNotification.read_at"
-                                class="patudo-timestamp-item"
-                            >
-                                <span class="patudo-timestamp-label"
-                                    >Lida em</span
-                                >
-                                <span class="patudo-timestamp-value">
-                                    {{
-                                        formatDate(selectedNotification.read_at)
-                                    }}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="patudo-detail-actions">
-                            <a
-                                v-if="selectedNotification.booking_url"
-                                :href="selectedNotification.booking_url"
-                                class="btn-patudo-solid-pill text-decoration-none"
-                            >
-                                Ver reserva
-                            </a>
-                            <button
-                                type="button"
-                                class="btn-patudo-solid-pill"
-                                :disabled="isLoading"
-                                @click="handleToggleRead(selectedNotification)"
-                            >
-                                {{
-                                    isLoading
-                                        ? 'A processar...'
-                                        : selectedNotification.read
-                                          ? 'Marcar como não lida'
-                                          : 'Marcar como lida'
-                                }}
-                            </button>
-                            <button
-                                type="button"
-                                class="btn-patudo-danger-pill"
-                                :disabled="isLoading"
-                                @click="handleDelete(selectedNotification.id)"
-                            >
-                                {{
-                                    isLoading
-                                        ? 'A processar...'
-                                        : 'Apagar notificação'
-                                }}
-                            </button>
-                        </div>
-                    </div>
+                <!-- Rodapé -->
+                <div class="patudo-modal-footer">
+                    <span class="patudo-footer-note">
+                        {{ activeTab === 'list' ? `${filteredNotifications.length} notificações` : 'ID: ' + selectedNotification?.id }}
+                    </span>
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        @click="handleClose"
+                    >
+                        Fechar
+                    </button>
                 </div>
-            </div>
-
-            <!-- Rodapé -->
-            <div class="patudo-modal-footer">
-                <span class="patudo-footer-note">
-                    {{
-                        activeTab === 'list'
-                            ? `${filteredNotifications.length} notificações`
-                            : 'ID: ' + selectedNotification?.id
-                    }}
-                </span>
-                <button
-                    type="button"
-                    class="btn btn-outline-primary"
-                    @click="handleClose"
-                >
-                    Fechar
-                </button>
-            </div>
         </div>
     </div>
 </template>
@@ -696,9 +582,7 @@ const timeAgo = (dateString: string) => {
 }
 
 @keyframes patudo-spin {
-    to {
-        transform: rotate(360deg);
-    }
+    to { transform: rotate(360deg); }
 }
 
 .patudo-empty-text {

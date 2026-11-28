@@ -147,10 +147,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::patch('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
 });
 
-Route::inertia('/admin/bookings', 'Admin/BookingsView')
-    ->middleware(['auth', 'can:admin'])
-    ->name('admin.bookings');
-
 // Pagamento confirmado (dono)
 Route::inertia('/payment-confirmed', 'Payment/PaymentConfirmed')
     ->middleware('auth')

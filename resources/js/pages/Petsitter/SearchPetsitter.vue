@@ -4,19 +4,16 @@
 import { ref, onMounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import {
-    Bell,
     ChevronRight,
     Heart,
     LogOut,
     MapPin,
-    MessageCircle,
     Star,
     UserRound,
 } from '@lucide/vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
-import { useChat } from '@/composables/useChat';
-import { useNotifications } from '@/composables/useNotifications';
+import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 
 //defineOptions({ layout: null });
 
@@ -37,13 +34,11 @@ const petsitters = ref<PetsitterApiData[]>([]);
 const favourites = ref<number[]>([]);
 const error = ref<string | null>(null);
 const loading = ref(true);
-const showNotifications = ref(false);
-const { unreadCount, fetchNotifications } = useNotifications();
-const { totalUnread, start: startChat } = useChat();
 
 function isFavourite(petsitterId: number): boolean {
     return favourites.value.includes(petsitterId);
 }
+
 
 // Generate a fake rating for display
 function formatRating(p: PetsitterApiData): string {
@@ -204,8 +199,6 @@ async function toggleFavourite(petsitterId: number) {
 onMounted(() => {
     fetchPetsitters();
     fetchFavourites();
-    fetchNotifications();
-    void startChat();
 });
 </script>
 
@@ -256,41 +249,11 @@ onMounted(() => {
                     >
                         Reservas
                     </a>
+                    <AdminNavigationMenu />
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a
-                        href="/messages"
-                        class="text-dark position-relative"
-                        :aria-label="
-                            totalUnread > 0
-                                ? `Mensagens, ${totalUnread} por ler`
-                                : 'Mensagens'
-                        "
-                    >
-                        <MessageCircle :size="25" />
-                        <span
-                            v-if="totalUnread > 0"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            style="font-size: 0.6rem"
-                        >
-                            {{ totalUnread > 9 ? '9+' : totalUnread }}
-                        </span>
-                    </a>
-                    <button
-                        type="button"
-                        class="text-dark bg-transparent border-0 p-0 position-relative"
-                        @click="showNotifications = true"
-                    >
-                        <Bell :size="25" />
-                        <span
-                            v-if="unreadCount > 0"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            style="font-size: 0.6rem"
-                        >
-                            {{ unreadCount > 9 ? '9+' : unreadCount }}
-                        </span>
-                    </button>
+                    <HeaderNotificationsChat />
                     <button
                         type="button"
                         class="text-dark p-0 border-0 bg-transparent"
@@ -311,7 +274,9 @@ onMounted(() => {
                 </div>
             </nav>
 
-            <div class="d-flex align-items-center gap-3 m-5">
+            <div
+                class="d-flex align-items-center gap-3 m-5"
+            >
                 <h1 class="h2 mb-0 text-nowrap">
                     Encontra o cuidador ideal para o teu animal
                 </h1>
@@ -362,12 +327,7 @@ onMounted(() => {
                                 v-if="petsitter.avatar_url"
                                 :src="petsitter.avatar_url"
                                 :alt="petsitter.user.name"
-                                style="
-                                    width: 80px;
-                                    height: 80px;
-                                    object-fit: cover;
-                                    border-radius: 50%;
-                                "
+                                style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%"
                             />
                             <div v-else class="display-2">🐾</div>
 
@@ -455,10 +415,6 @@ onMounted(() => {
         </div>
     </main>
 
-    <ModalNotifications
-        :show="showNotifications"
-        @close="showNotifications = false"
-    />
 </template>
 
 <style scoped>

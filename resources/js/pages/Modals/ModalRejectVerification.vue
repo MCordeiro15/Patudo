@@ -58,29 +58,16 @@ const close = () => {
 const confirm = () => {
     submitted.value = true;
     if (reasons.value.length === 0) return;
-    emit('confirm', {
-        reasons: [...reasons.value],
-        message: message.value.trim(),
-    });
+    emit('confirm', { reasons: [...reasons.value], message: message.value.trim() });
 };
 </script>
 
 <template>
-    <div
-        v-if="show"
-        class="patudo-modal-backdrop"
-        @click.self="close"
-        @keydown.escape="close"
-    >
+    <div v-if="show" class="patudo-modal-backdrop" @click.self="close" @keydown.escape="close">
         <div class="reject-modal" role="dialog" aria-modal="true">
             <div class="modal-head">
                 <h2>Recusar verificação</h2>
-                <button
-                    type="button"
-                    class="close-btn"
-                    aria-label="Fechar"
-                    @click="close"
-                >
+                <button type="button" class="close-btn" aria-label="Fechar" @click="close">
                     <X :size="26" />
                 </button>
             </div>
@@ -99,13 +86,9 @@ const confirm = () => {
                 <input v-model="reasons" type="checkbox" :value="reason" />
                 <span>{{ reason }}</span>
             </label>
-            <p v-if="submitted && reasons.length === 0" class="field-error">
-                Seleciona pelo menos um motivo.
-            </p>
+            <p v-if="submitted && reasons.length === 0" class="field-error">Seleciona pelo menos um motivo.</p>
 
-            <label class="msg-label" for="reject-message"
-                >Mensagem para o cuidador (opcional)</label
-            >
+            <label class="msg-label" for="reject-message">Mensagem para o cuidador (opcional)</label>
             <textarea
                 id="reject-message"
                 v-model="message"
@@ -113,28 +96,13 @@ const confirm = () => {
                 rows="3"
                 placeholder="Explica o que deve corrigir..."
             ></textarea>
-            <p class="hint">
-                O cuidador recebe esta mensagem e pode voltar a enviar
-                documentos.
-            </p>
+            <p class="hint">O cuidador recebe esta mensagem e pode voltar a enviar documentos.</p>
 
             <p v-if="error" class="field-error">{{ error }}</p>
 
             <div class="actions">
-                <button
-                    type="button"
-                    class="btn btn-outline-primary"
-                    :disabled="processing"
-                    @click="close"
-                >
-                    Cancelar
-                </button>
-                <button
-                    type="button"
-                    class="btn btn-outline-danger"
-                    :disabled="processing"
-                    @click="confirm"
-                >
+                <button type="button" class="btn btn-outline-primary" :disabled="processing" @click="close">Cancelar</button>
+                <button type="button" class="btn btn-outline-danger" :disabled="processing" @click="confirm">
                     {{ processing ? 'A recusar...' : 'Recusar verificação' }}
                 </button>
             </div>

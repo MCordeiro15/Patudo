@@ -1,27 +1,16 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import {
-    Bell,
-    CalendarDays,
-    LogOut,
-    MessageCircle,
-    UserRound,
-    ChevronLeft,
-    Dog,
-    Plus,
-} from '@lucide/vue';
+import { CalendarDays, LogOut, UserRound, ChevronLeft, Dog, Plus } from '@lucide/vue';
 import { computed, onMounted, ref, watch } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
+import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 import type { Animal } from '@/types';
-import { useNotifications } from '@/composables/useNotifications';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import ModalBookingPageAddPet from '@/pages/Modals/ModalBookingPageAddPet.vue';
 import ModalPayment from '@/pages/Modals/ModalPayment.vue';
 
 // O id do petsitter vem do URL: /booking?petsitter=ID
-const petsitterId = new URLSearchParams(window.location.search).get(
-    'petsitter',
-);
+const petsitterId = new URLSearchParams(window.location.search).get('petsitter');
 
 function getXsrf(): string {
     const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
@@ -59,14 +48,66 @@ const entranceHour = ref('');
 const exitHour = ref('');
 const zone = ref('');
 const feedback = ref('');
+const bookingConflict = ref(false);
+const availabilityCheckError = ref('');
+const checkingAvailability = ref(false);
+let availabilityCheckSequence = 0;
 
 // No mesmo dia, a hora de saída tem de ser depois da de entrada (a API também o exige).
 // Se ficar igual ou antes, é removida. As horas vêm em "HH:MM", por isso comparar as strings chega.
-const sameDay = computed(
-    () => !!startDate.value && startDate.value === endDate.value,
-);
+const sameDay = computed(() => !!startDate.value && startDate.value === endDate.value);
 watch([sameDay, entranceHour, exitHour], ([same, entrance, exit]) => {
     if (same && entrance && exit && exit <= entrance) exitHour.value = '';
+});
+
+const checkBookingAvailability = async (): Promise<boolean> => {
+    const sequence = ++availabilityCheckSequence;
+    bookingConflict.value = false;
+    availabilityCheckError.value = '';
+
+    if (!petsitterId || !startDate.value || !endDate.value || !entranceHour.value || !exitHour.value) return true;
+
+    checkingAvailability.value = true;
+
+    try {
+        const params = new URLSearchParams({
+            petsitter_id: petsitterId,
+            start_date: startDate.value,
+            end_date: endDate.value,
+        });
+        if (entranceHour.value) params.set('entrance_hour', entranceHour.value);
+        if (exitHour.value) params.set('exit_hour', exitHour.value);
+
+        const response = await apiFetch(`/api/bookings/availability?${params}`);
+        if (!response.ok) throw new Error('Não foi possível verificar a disponibilidade.');
+
+        const result = await response.json();
+        if (sequence !== availabilityCheckSequence) return false;
+
+        bookingConflict.value = !result.available;
+        return result.available;
+    } catch {
+        if (sequence === availabilityCheckSequence) {
+            availabilityCheckError.value = 'Não foi possível verificar a disponibilidade. Tenta novamente antes de continuar.';
+        }
+        return false;
+    } finally {
+        if (sequence === availabilityCheckSequence) checkingAvailability.value = false;
+    }
+};
+
+watch([startDate, endDate, entranceHour, exitHour], ([start, end, entrance, exit]) => {
+    feedback.value = '';
+
+    if (!start || !end || end < start || !entrance || !exit) {
+        availabilityCheckSequence++;
+        bookingConflict.value = false;
+        availabilityCheckError.value = '';
+        checkingAvailability.value = false;
+        return;
+    }
+
+    void checkBookingAvailability();
 });
 const submitting = ref(false);
 
@@ -80,7 +121,7 @@ const servicesError = ref('');
 
 type PetsitterServiceData = {
     id: number;
-    type: 'pet-sitting' | 'passeio';
+    type: string;
     price: number;
 };
 
@@ -96,35 +137,59 @@ type PetsitterData = {
     avatar_url: string | null;
     average_rating: number | null;
     reviews_count: number;
+    accepted_sizes: string[] | null;
     availability_days: string[] | null;
 };
 
 const petsitter = ref<PetsitterData | null>(null);
 
+const acceptedSizes = computed(() =>
+    (petsitter.value?.accepted_sizes ?? []).map((size) => size.toLowerCase()),
+);
+
+const isAnimalAccepted = (animal: Animal) =>
+    acceptedSizes.value.length === 0 || acceptedSizes.value.includes(String(animal.size).toLowerCase());
+
+const incompatibleAnimals = computed(() => animals.value.filter((animal) => !isAnimalAccepted(animal)));
+
+const incompatibleAnimalMessage = computed(() => {
+    if (incompatibleAnimals.value.length === 0) return '';
+
+    const sizeLabels: Record<string, string> = {
+        small: 'pequeno',
+        medium: 'médio',
+        large: 'grande',
+    };
+    const sizes = [...new Set(incompatibleAnimals.value.map((animal) =>
+        sizeLabels[String(animal.size).toLowerCase()] ?? animal.size.toLowerCase(),
+    ))];
+
+    return `Este petsitter não aceita animais de porte ${sizes.join(' e ')}. Os animais incompatíveis estão desativados.`;
+});
+
+const animalSizeLabel = (size: string) => {
+    const labels: Record<string, string> = { small: 'Pequeno', medium: 'Médio', large: 'Grande' };
+    return labels[String(size).toLowerCase()] ?? size;
+};
+
 // Computed
-const displayName = computed(() =>
-    petsitter.value ? (petsitter.value.user?.name ?? 'Petsitter') : 'Petsitter',
-);
+const displayName = computed(() => (petsitter.value ? (petsitter.value.user?.name ?? 'Petsitter') : 'Petsitter'));
 
-const displayLocation = computed(() =>
-    petsitter.value
-        ? (petsitter.value.service_location ?? petsitter.value.city ?? '--')
-        : '--',
-);
+const displayLocation = computed(() => (petsitter.value ? (petsitter.value.service_location ?? petsitter.value.city ?? '--') : '--'));
 
-const selectedService = computed(
-    () =>
-        services.value.find(
-            (service) => service.id === selectedServiceId.value,
-        ) ?? null,
+const selectedService = computed(() =>
+    services.value.find((service) => service.id === selectedServiceId.value) ?? null,
 );
 
 const selectedServicePrice = computed(() => selectedService.value?.price ?? 0);
 
+const serviceTypeLabel = (type: string) => ({
+    passeio: 'Passeios',
+    'pet-sitting': 'Pet sitting',
+}[type] ?? type);
+
 const selectedServiceLabel = computed(() => {
-    if (selectedService.value?.type === 'passeio') return 'Passeios';
-    if (selectedService.value?.type === 'pet-sitting') return 'Pet sitting';
-    return '—';
+    return selectedService.value ? serviceTypeLabel(selectedService.value.type) : '—';
 });
 
 const selectedAnimalNames = computed(() => {
@@ -161,24 +226,15 @@ const numberOfDays = computed(() => {
     const start = new Date(startDate.value);
     const end = new Date(endDate.value);
 
-    const diff =
-        Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) +
-        1;
+    const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
     return diff > 0 ? diff : 0;
 });
 
-const totalPrice = computed(
-    () => numberOfDays.value * selectedServicePrice.value,
-);
+const totalPrice = computed(() => numberOfDays.value * selectedServicePrice.value);
 
 const isFormValid = computed(() =>
-    Boolean(
-        selectedServiceId.value &&
-        startDate.value &&
-        endDate.value &&
-        selectedAnimals.value.length > 0,
-    ),
+    Boolean(selectedServiceId.value && startDate.value && endDate.value && selectedAnimals.value.length > 0),
 );
 
 // Data mínima para seleção (hoje)
@@ -190,8 +246,13 @@ const loadPetsitter = async () => {
 
     const res = await apiFetch(`/api/petsitters/${petsitterId}`);
 
-    if (res.ok) petsitter.value = (await res.json()).data;
-    else feedback.value = 'Não foi possível carregar o petsitter.';
+    if (res.ok) {
+        petsitter.value = (await res.json()).data;
+        selectedAnimals.value = selectedAnimals.value.filter((id) => {
+            const animal = animals.value.find((item) => item.id === id);
+            return animal !== undefined && isAnimalAccepted(animal);
+        });
+    } else feedback.value = 'Não foi possível carregar o petsitter.';
 };
 
 const loadAnimals = async () => {
@@ -225,16 +286,13 @@ const loadServices = async () => {
     if (!petsitterId) return;
 
     try {
-        const response = await fetch(
-            `/api/petsitters/${petsitterId}/services`,
-            {
-                credentials: 'same-origin',
-                headers: {
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
+        const response = await fetch(`/api/petsitters/${petsitterId}/services`, {
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
             },
-        );
+        });
 
         if (response.ok) {
             const data = await response.json();
@@ -248,13 +306,15 @@ const loadServices = async () => {
 };
 
 // Toggle seleção de animal
-const toggleAnimal = (id: number) => {
-    const index = selectedAnimals.value.indexOf(id);
+const toggleAnimal = (animal: Animal) => {
+    if (!isAnimalAccepted(animal)) return;
+
+    const index = selectedAnimals.value.indexOf(animal.id);
 
     if (index > -1) {
         selectedAnimals.value.splice(index, 1);
     } else {
-        selectedAnimals.value.push(id);
+        selectedAnimals.value.push(animal.id);
     }
 };
 
@@ -267,6 +327,8 @@ const handleAnimalCreated = (animal: Animal) => {
     if (!alreadyInList) {
         animals.value.push(animal);
     }
+
+    if (!isAnimalAccepted(animal)) return;
 
     if (!selectedAnimals.value.includes(animal.id)) {
         selectedAnimals.value.push(animal.id);
@@ -304,8 +366,7 @@ const submitBooking = async () => {
             // reserva paga e criada: vai para a página "Pagamento Confirmado" com o id da nova reserva
             const created = (await res.json()).data;
             router.visit(`/payment-confirmed?booking=${created.id}`);
-            feedback.value =
-                'Pagamento feito e reserva criada com sucesso! Aguarda a confirmação do petsitter.';
+            feedback.value = 'Pagamento feito e reserva criada com sucesso! Aguarda a confirmação do petsitter.';
             startDate.value = '';
             endDate.value = '';
             selectedAnimals.value = [];
@@ -318,10 +379,11 @@ const submitBooking = async () => {
             const err = await res.json().catch(() => ({}));
 
             if (err.errors) {
-                feedback.value = Object.values(err.errors).flat().join(' ');
+                const errorMessage = Object.values(err.errors).flat().join(' ');
+                if (errorMessage.includes('sobrepõe')) bookingConflict.value = true;
+                else feedback.value = errorMessage;
             } else {
-                feedback.value =
-                    err.message ?? 'Não foi possível criar a reserva.';
+                feedback.value = err.message ?? 'Não foi possível criar a reserva.';
             }
         }
     } catch {
@@ -331,29 +393,19 @@ const submitBooking = async () => {
     }
 };
 
-const showNotifications = ref(false);
-const { unreadCount } = useNotifications();
 const showAddPetModal = ref(false);
 
 // Dias da semana das datas escolhidas em que o cuidador não trabalha (o servidor verifica o mesmo).
 // Bastam os primeiros 7 dias: a partir daí os dias da semana repetem-se.
-const weekdayKeys = [
-    'sunday',
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-];
+const weekdayKeys = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 const weekdayLabels: Record<string, string> = {
-    monday: 'segunda-feira',
-    tuesday: 'terça-feira',
-    wednesday: 'quarta-feira',
-    thursday: 'quinta-feira',
-    friday: 'sexta-feira',
-    saturday: 'sábado',
-    sunday: 'domingo',
+    monday: 'à segunda-feira',
+    tuesday: 'à terça-feira',
+    wednesday: 'à quarta-feira',
+    thursday: 'à quinta-feira',
+    friday: 'à sexta-feira',
+    saturday: 'ao sábado',
+    sunday: 'ao domingo',
 };
 
 const unavailableDays = computed(() => {
@@ -364,8 +416,7 @@ const unavailableDays = computed(() => {
 
     for (let i = 0; i < Math.min(numberOfDays.value, 7); i++) {
         const key = weekdayKeys[day.getDay()];
-        if (!available.includes(key) && !missing.includes(key))
-            missing.push(key);
+        if (!available.includes(key) && !missing.includes(key)) missing.push(key);
         day.setDate(day.getDate() + 1);
     }
 
@@ -373,14 +424,22 @@ const unavailableDays = computed(() => {
 });
 
 // Só deixa pagar com o formulário completo e dias disponíveis
-const canPay = computed(
-    () => isFormValid.value && unavailableDays.value.length === 0,
+const canPay = computed(() =>
+    isFormValid.value &&
+    !!petsitter.value &&
+    selectedAnimals.value.every((id) => {
+        const animal = animals.value.find((item) => item.id === id);
+        return animal !== undefined && isAnimalAccepted(animal);
+    }) &&
+    unavailableDays.value.length === 0,
 );
 
-const serviceLabelForPayment = computed(
-    () =>
-        `Serviço de ${selectedServiceLabel.value} - Petsitter ${displayName.value}`,
-);
+const serviceLabelForPayment = computed(() => `Serviço de ${selectedServiceLabel.value} - Petsitter ${displayName.value}`);
+
+const openPayment = async () => {
+    if (!canPay.value || checkingAvailability.value) return;
+    if (await checkBookingAvailability()) showPayment.value = true;
+};
 
 // "Pagar" no modal: cria a reserva e fecha o modal
 const payAndBook = async () => {
@@ -400,68 +459,26 @@ onMounted(() => {
 
     <main class="booking-page min-vh-100 py-4">
         <div class="container booking-container">
-            <nav
-                class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4 booking-nav gap-3 gap-lg-4"
-            >
-                <a
-                    class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2 booking-brand"
-                    href="/"
-                >
-                    <img
-                        :src="logoPatudo"
-                        alt="Patudo"
-                        width="58"
-                        height="58"
-                    />
+            <nav class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4 booking-nav gap-3 gap-lg-4">
+                <a class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2 booking-brand" href="/">
+                    <img :src="logoPatudo" alt="Patudo" width="58" height="58" />
                     <span>Patudo</span>
                 </a>
 
-                <div
-                    class="booking-links nav nav-pills border rounded-pill p-1 mx-auto"
-                >
-                    <a class="nav-link rounded-pill px-3 px-lg-4" href="/"
-                        >Início</a
-                    >
-                    <a class="nav-link rounded-pill px-3 px-lg-4" href="/orders"
-                        >Pedidos</a
-                    >
-                    <a
-                        class="nav-link rounded-pill px-3 px-lg-4"
-                        href="/favorites"
-                        >Favoritos</a
-                    >
-                    <a
-                        class="nav-link active rounded-pill px-3 px-lg-4"
-                        href="/reservations"
-                        >Reservas</a
-                    >
+                <div class="booking-links nav nav-pills border rounded-pill p-1 mx-auto">
+                    <a class="nav-link rounded-pill px-3 px-lg-4" href="/">Início</a>
+                    <a class="nav-link rounded-pill px-3 px-lg-4" href="/orders">Pedidos</a>
+                    <a class="nav-link rounded-pill px-3 px-lg-4" href="/favorites">Favoritos</a>
+                    <a class="nav-link active rounded-pill px-3 px-lg-4" href="/reservations">Reservas</a>
+                    <AdminNavigationMenu />
                 </div>
 
                 <div class="booking-actions d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark">
-                        <MessageCircle :size="25" />
-                    </a>
+                    <HeaderNotificationsChat />
 
-                    <button
-                        type="button"
-                        class="text-dark bg-transparent border-0 p-0 position-relative"
-                        @click="showNotifications = true"
-                    >
-                        <Bell :size="25" />
-                        <span
-                            v-if="unreadCount > 0"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge"
-                        >
-                            {{ unreadCount > 9 ? '9+' : unreadCount }}
-                        </span>
-                    </button>
-
-                    <button
-                        type="button"
-                        class="text-dark p-0 border-0 bg-transparent"
-                    >
+                    <Link href="/profile" class="text-dark p-0 border-0 bg-transparent" aria-label="Perfil" title="Perfil">
                         <UserRound :size="25" />
-                    </button>
+                    </Link>
 
                     <Link
                         href="/logout"
@@ -476,9 +493,7 @@ onMounted(() => {
             </nav>
 
             <a
-                :href="
-                    petsitterId ? `/petsitters/${petsitterId}` : '/petsitters'
-                "
+                :href="petsitterId ? `/petsitters/${petsitterId}` : '/petsitters'"
                 class="back-link d-inline-flex align-items-center gap-1 mt-5"
             >
                 <ChevronLeft :size="24" />
@@ -490,11 +505,7 @@ onMounted(() => {
             <div
                 v-if="feedback"
                 class="alert py-2 small booking-feedback"
-                :class="
-                    feedback.includes('sucesso')
-                        ? 'alert-success'
-                        : 'alert-danger'
-                "
+                :class="feedback.includes('sucesso') ? 'alert-success' : 'alert-danger'"
                 role="alert"
             >
                 {{ feedback }}
@@ -506,20 +517,12 @@ onMounted(() => {
                         <div class="booking-section">
                             <h2>1. Escolhe o serviço</h2>
 
-                            <div
-                                v-if="servicesError"
-                                class="alert alert-danger py-2 small mb-0"
-                                role="alert"
-                            >
+                            <div v-if="servicesError" class="alert alert-danger py-2 small mb-0" role="alert">
                                 {{ servicesError }}
                             </div>
 
-                            <div
-                                v-else-if="services.length === 0"
-                                class="booking-empty"
-                            >
-                                Este cuidador ainda não tem serviços
-                                disponíveis.
+                            <div v-else-if="services.length === 0" class="booking-empty">
+                                Este cuidador ainda não tem serviços disponíveis.
                             </div>
 
                             <div v-else class="service-grid">
@@ -528,36 +531,18 @@ onMounted(() => {
                                     :key="service.id"
                                     type="button"
                                     class="service-option text-start"
-                                    :class="{
-                                        selected:
-                                            selectedServiceId === service.id,
-                                    }"
+                                    :class="{ selected: selectedServiceId === service.id }"
                                     @click="selectedServiceId = service.id"
                                 >
                                     <strong>
-                                        {{
-                                            service.type === 'passeio'
-                                                ? 'Passeios'
-                                                : 'Pet sitting'
-                                        }}
+                                        {{ serviceTypeLabel(service.type) }}
                                     </strong>
 
-                                    <small>
-                                        € {{ service.price }} /
-                                        {{
-                                            service.type === 'passeio'
-                                                ? 'passeio'
-                                                : 'dia'
-                                        }}
-                                    </small>
+                                    <small>€ {{ service.price }} / {{ service.type === 'passeio' ? 'passeio' : 'dia' }}</small>
 
                                     <span
                                         class="service-radio"
-                                        :class="{
-                                            selected:
-                                                selectedServiceId ===
-                                                service.id,
-                                        }"
+                                        :class="{ selected: selectedServiceId === service.id }"
                                     ></span>
                                 </button>
                             </div>
@@ -566,18 +551,11 @@ onMounted(() => {
                         <div class="booking-section">
                             <h2>2. Escolhe o animal</h2>
 
-                            <div
-                                v-if="loadError"
-                                class="alert alert-danger py-2 small mb-0"
-                                role="alert"
-                            >
+                            <div v-if="loadError" class="alert alert-danger py-2 small mb-0" role="alert">
                                 {{ loadError }}
                             </div>
 
-                            <div
-                                v-else-if="animals.length === 0"
-                                class="booking-empty text-center"
-                            >
+                            <div v-else-if="animals.length === 0" class="booking-empty text-center">
                                 <Dog :size="38" class="mb-1" />
                                 <p class="mb-2">Não tens animais registados.</p>
                                 <button
@@ -596,14 +574,13 @@ onMounted(() => {
                                     type="button"
                                     class="animal-option"
                                     :class="{
-                                        'animal-selected':
-                                            selectedAnimals.includes(animal.id),
+                                        'animal-selected': selectedAnimals.includes(animal.id),
+                                        'animal-unavailable': !isAnimalAccepted(animal),
                                     }"
-                                    @click="toggleAnimal(animal.id)"
+                                    :disabled="!petsitter || !isAnimalAccepted(animal)"
+                                    @click="toggleAnimal(animal)"
                                 >
-                                    <span
-                                        class="animal-avatar d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden"
-                                    >
+                                    <span class="animal-avatar d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden">
                                         <img
                                             v-if="animal.photo"
                                             :src="animal.photo"
@@ -614,35 +591,26 @@ onMounted(() => {
                                     </span>
 
                                     <span class="text-start flex-grow-1">
-                                        <strong class="d-block">{{
-                                            animal.name
-                                        }}</strong>
+                                        <strong class="d-block">{{ animal.name }}</strong>
                                         <small>
-                                            {{ animal.species
-                                            }}{{
-                                                animal.breed
-                                                    ? ' · ' + animal.breed
-                                                    : ''
-                                            }}{{
-                                                animal.age != null
-                                                    ? ` · ${animal.age} ${animal.age === 1 ? 'ano' : 'anos'}`
-                                                    : ''
-                                            }}
+                                            {{ animal.species }}{{ animal.breed ? ' · ' + animal.breed : '' }}{{
+                                                animal.age != null ? ` · ${animal.age} ${animal.age === 1 ? 'ano' : 'anos'}` : ''
+                                            }} · Porte {{ animalSizeLabel(animal.size) }}
                                         </small>
                                     </span>
 
                                     <span
                                         class="animal-check"
-                                        :class="{
-                                            checked: selectedAnimals.includes(
-                                                animal.id,
-                                            ),
-                                        }"
+                                        :class="{ checked: selectedAnimals.includes(animal.id) }"
                                     >
                                         ✓
                                     </span>
                                 </button>
                             </div>
+
+                            <p v-if="incompatibleAnimalMessage" class="booking-help text-danger mb-0" role="status">
+                                {{ incompatibleAnimalMessage }}
+                            </p>
 
                             <button
                                 v-if="!loadError && animals.length > 0"
@@ -660,9 +628,7 @@ onMounted(() => {
 
                             <div class="row g-2">
                                 <div class="col-12 col-sm-6 col-lg-3">
-                                    <label for="start-date" class="form-label"
-                                        >Data de entrada</label
-                                    >
+                                    <label for="start-date" class="form-label">Data de entrada</label>
                                     <input
                                         id="start-date"
                                         v-model="startDate"
@@ -673,9 +639,7 @@ onMounted(() => {
                                 </div>
 
                                 <div class="col-12 col-sm-6 col-lg-3">
-                                    <label for="end-date" class="form-label"
-                                        >Data de saída</label
-                                    >
+                                    <label for="end-date" class="form-label">Data de saída</label>
                                     <input
                                         id="end-date"
                                         v-model="endDate"
@@ -686,11 +650,7 @@ onMounted(() => {
                                 </div>
 
                                 <div class="col-12 col-sm-6 col-lg-3">
-                                    <label
-                                        for="entrance-hour"
-                                        class="form-label"
-                                        >Hora de entrada</label
-                                    >
+                                    <label for="entrance-hour" class="form-label">Hora de entrada</label>
                                     <input
                                         id="entrance-hour"
                                         v-model="entranceHour"
@@ -700,19 +660,13 @@ onMounted(() => {
                                 </div>
 
                                 <div class="col-12 col-sm-6 col-lg-3">
-                                    <label for="exit-hour" class="form-label"
-                                        >Hora de saída</label
-                                    >
+                                    <label for="exit-hour" class="form-label">Hora de saída</label>
                                     <input
                                         id="exit-hour"
                                         v-model="exitHour"
                                         type="time"
                                         class="form-control booking-input"
-                                        :min="
-                                            sameDay
-                                                ? entranceHour || undefined
-                                                : undefined
-                                        "
+                                        :min="sameDay ? entranceHour || undefined : undefined"
                                     />
                                 </div>
                             </div>
@@ -723,33 +677,29 @@ onMounted(() => {
                             </p>
 
                             <!-- datas com dias em que o cuidador não trabalha -->
-                            <p
-                                v-if="unavailableDays.length > 0"
-                                class="booking-help text-danger mb-0"
-                            >
-                                O cuidador não está disponível à
-                                {{ unavailableDays.join(', ') }}. Escolhe outras
-                                datas.
+                            <p v-if="unavailableDays.length > 0" class="booking-help text-danger mb-0">
+                                O cuidador não está disponível {{ unavailableDays.join(', ') }}. Escolhe outras datas.
                             </p>
 
-                            <p
-                                v-if="numberOfDays > 0"
-                                class="booking-help mb-0"
-                            >
+                            <p v-if="bookingConflict" class="booking-help text-danger mb-0" role="alert">
+                                O petsitter já tem uma reserva que se sobrepõe a este período. Escolhe outras horas.
+                            </p>
+                            <p v-else-if="availabilityCheckError" class="booking-help text-danger mb-0" role="alert">
+                                {{ availabilityCheckError }}
+                            </p>
+                            <p v-else-if="checkingAvailability" class="booking-help mb-0" aria-live="polite">
+                                A verificar disponibilidade...
+                            </p>
+
+                            <p v-if="numberOfDays > 0" class="booking-help mb-0">
                                 {{ numberOfDays }}
-                                {{
-                                    numberOfDays === 1
-                                        ? 'dia de cuidado'
-                                        : 'dias de cuidado'
-                                }}
+                                {{ numberOfDays === 1 ? 'dia de cuidado' : 'dias de cuidado' }}
                             </p>
                         </div>
 
                         <div class="booking-section">
                             <h2>4. Onde é o serviço?</h2>
-                            <label for="booking-zone" class="form-label"
-                                >Zona</label
-                            >
+                            <label for="booking-zone" class="form-label">Zona</label>
                             <input
                                 id="booking-zone"
                                 v-model="zone"
@@ -761,10 +711,7 @@ onMounted(() => {
                         </div>
 
                         <div class="booking-section mb-0">
-                            <h2>
-                                5. Mensagem para o cuidador
-                                <span>(opcional)</span>
-                            </h2>
+                            <h2>5. Mensagem para o cuidador <span>(opcional)</span></h2>
                             <textarea
                                 v-model="notes"
                                 class="form-control booking-input booking-notes"
@@ -772,9 +719,7 @@ onMounted(() => {
                                 maxlength="500"
                                 placeholder="Fala-lhe do teu animal, rotinas, horários de entrega..."
                             />
-                            <div class="notes-count">
-                                {{ notes.length }}/500
-                            </div>
+                            <div class="notes-count">{{ notes.length }}/500</div>
                         </div>
                     </section>
                 </div>
@@ -783,12 +728,8 @@ onMounted(() => {
                     <aside class="booking-summary sticky-lg-top">
                         <h2>Resumo</h2>
 
-                        <div
-                            class="summary-profile d-flex align-items-center gap-2"
-                        >
-                            <div
-                                class="petsitter-avatar d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden"
-                            >
+                        <div class="summary-profile d-flex align-items-center gap-2">
+                            <div class="petsitter-avatar d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden">
                                 <img
                                     v-if="petsitter?.avatar_url"
                                     :src="petsitter.avatar_url"
@@ -803,8 +744,7 @@ onMounted(() => {
                                 <small class="summary-rating">
                                     <span class="rating-star">★</span>
                                     {{ petsitter?.average_rating ?? '—' }} ·
-                                    {{ petsitter?.reviews_count ?? 0 }}
-                                    avaliações
+                                    {{ petsitter?.reviews_count ?? 0 }} avaliações
                                 </small>
                             </div>
                         </div>
@@ -842,9 +782,7 @@ onMounted(() => {
                             </div>
                         </div>
 
-                        <div
-                            class="summary-total d-flex align-items-center justify-content-between"
-                        >
+                        <div class="summary-total d-flex align-items-center justify-content-between">
                             <strong>Total</strong>
                             <span>€ {{ totalPrice.toFixed(2) }}</span>
                         </div>
@@ -852,7 +790,8 @@ onMounted(() => {
                         <button
                             type="button"
                             class="btn btn-primary w-100"
-                            @click="showPayment = true"
+                            :disabled="!canPay || bookingConflict || checkingAvailability || Boolean(availabilityCheckError)"
+                            @click="openPayment"
                         >
                             <span
                                 v-if="submitting"
@@ -863,18 +802,12 @@ onMounted(() => {
                         </button>
 
                         <p class="summary-note">
-                            O pedido só fica confirmado quando o cuidador
-                            aceitar.
+                            O pedido só fica confirmado quando o cuidador aceitar.
                         </p>
                     </aside>
                 </div>
             </div>
         </div>
-
-        <ModalNotifications
-            :show="showNotifications"
-            @close="showNotifications = false"
-        />
 
         <!-- Pagamento (fictício): o "Pagar" cria a reserva -->
         <ModalPayment
@@ -906,7 +839,7 @@ onMounted(() => {
 
 .booking-nav {
     min-height: 76px;
-    padding: 0.45rem 1.35rem;
+    padding: .45rem 1.35rem;
     background: #fff;
     border: 1px solid #e4571c;
     border-radius: 1.25rem;
@@ -933,13 +866,14 @@ onMounted(() => {
     background: var(--patudo-terracota, #c2410c) !important;
 }
 
+
 .notification-badge {
-    font-size: 0.6rem;
+    font-size: .6rem;
 }
 
 .back-link {
     color: #2e1d14;
-    font-size: 0.95rem;
+    font-size: .95rem;
     font-weight: 700;
     text-decoration: none;
 }
@@ -972,7 +906,7 @@ onMounted(() => {
 }
 
 .booking-section h2 {
-    margin: 0 0 0.65rem;
+    margin: 0 0 .65rem;
     font-size: 1rem;
     font-weight: 800;
 }
@@ -984,25 +918,23 @@ onMounted(() => {
 .service-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
-    gap: 0.55rem;
+    gap: .55rem;
 }
 
 .service-option {
     position: relative;
     min-height: 68px;
-    padding: 0.65rem 2rem 0.65rem 0.75rem;
+    padding: .65rem 2rem .65rem .75rem;
     color: #2e1d14;
     background: #fff;
     border: 1.5px solid #d64b16;
-    border-radius: 0.75rem;
-    transition:
-        box-shadow 0.15s,
-        transform 0.15s;
+    border-radius: .75rem;
+    transition: box-shadow .15s, transform .15s;
 }
 
 .service-option:hover {
     transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(96, 45, 17, 0.12);
+    box-shadow: 0 3px 10px rgba(96, 45, 17, .12);
 }
 
 .service-option.selected {
@@ -1015,19 +947,19 @@ onMounted(() => {
 }
 
 .service-option strong {
-    font-size: 0.84rem;
+    font-size: .84rem;
 }
 
 .service-option small {
-    margin-top: 0.2rem;
-    font-size: 0.72rem;
+    margin-top: .2rem;
+    font-size: .72rem;
     color: #725b4c;
 }
 
 .service-radio {
     position: absolute;
-    top: 0.7rem;
-    right: 0.7rem;
+    top: .7rem;
+    right: .7rem;
     width: 16px;
     height: 16px;
     border: 1.5px solid #c2410c;
@@ -1050,35 +982,43 @@ onMounted(() => {
     background: transparent;
     border: 0;
     border-bottom: 1px solid currentColor;
-    font-size: 0.82rem;
+    font-size: .82rem;
     font-weight: 700;
 }
 
 .animal-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.55rem;
+    gap: .55rem;
 }
 
 .animal-option {
     display: flex;
     align-items: center;
-    gap: 0.55rem;
+    gap: .55rem;
     width: 100%;
-    padding: 0.55rem 0.65rem;
+    padding: .55rem .65rem;
     color: #2e1d14;
     background: #fff;
     border: 1.5px solid #d64b16;
-    border-radius: 0.8rem;
+    border-radius: .8rem;
     cursor: pointer;
-    transition:
-        transform 0.15s,
-        box-shadow 0.15s;
+    transition: transform .15s, box-shadow .15s;
 }
 
 .animal-option:hover {
     transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(96, 45, 17, 0.12);
+    box-shadow: 0 3px 10px rgba(96, 45, 17, .12);
+}
+
+.animal-option:disabled {
+    opacity: .62;
+    cursor: not-allowed;
+}
+
+.animal-option:disabled:hover {
+    transform: none;
+    box-shadow: none;
 }
 
 .animal-option.animal-selected {
@@ -1095,11 +1035,11 @@ onMounted(() => {
 }
 
 .animal-option strong {
-    font-size: 0.86rem;
+    font-size: .86rem;
 }
 
 .animal-option small {
-    font-size: 0.72rem;
+    font-size: .72rem;
 }
 
 .animal-check {
@@ -1110,8 +1050,8 @@ onMounted(() => {
     margin-left: auto;
     color: transparent;
     border: 1.5px solid #c2410c;
-    border-radius: 0.3rem;
-    font-size: 0.75rem;
+    border-radius: .3rem;
+    font-size: .75rem;
 }
 
 .animal-check.checked {
@@ -1122,13 +1062,13 @@ onMounted(() => {
 .booking-empty {
     padding: 1.25rem;
     color: #725b4c;
-    background: rgba(255, 255, 255, 0.55);
-    border-radius: 0.8rem;
+    background: rgba(255, 255, 255, .55);
+    border-radius: .8rem;
 }
 
 .form-label {
-    margin-bottom: 0.25rem;
-    font-size: 0.78rem;
+    margin-bottom: .25rem;
+    font-size: .78rem;
     font-weight: 700;
 }
 
@@ -1139,22 +1079,22 @@ onMounted(() => {
 .booking-input {
     min-height: 42px;
     border: 1.5px solid #d64b16;
-    border-radius: 0.55rem;
+    border-radius: .55rem;
     background: #fffdf9;
-    font-size: 0.88rem;
+    font-size: .88rem;
 }
 
 .booking-input:focus {
     border-color: #c2410c;
-    box-shadow: 0 0 0 0.16rem rgba(194, 65, 12, 0.16);
+    box-shadow: 0 0 0 .16rem rgba(194, 65, 12, .16);
 }
 
 .booking-help {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
-    margin-top: 0.55rem;
-    font-size: 0.76rem;
+    gap: .35rem;
+    margin-top: .55rem;
+    font-size: .76rem;
 }
 
 .booking-notes {
@@ -1162,8 +1102,8 @@ onMounted(() => {
 }
 
 .notes-count {
-    margin-top: 0.2rem;
-    font-size: 0.7rem;
+    margin-top: .2rem;
+    font-size: .7rem;
     text-align: right;
 }
 
@@ -1176,7 +1116,7 @@ onMounted(() => {
 }
 
 .booking-summary h2 {
-    margin: 0 0 0.9rem;
+    margin: 0 0 .9rem;
     font-size: 1.2rem;
     font-weight: 800;
 }
@@ -1190,7 +1130,7 @@ onMounted(() => {
 }
 
 .summary-profile {
-    padding-bottom: 0.85rem;
+    padding-bottom: .85rem;
     border-bottom: 2px solid #d64b16;
     align-items: center !important;
 }
@@ -1205,19 +1145,19 @@ onMounted(() => {
 
 .summary-profile strong {
     display: block;
-    font-size: 0.9rem;
+    font-size: .9rem;
     line-height: 1.2;
 }
 
 .summary-profile small {
-    margin-top: 0.18rem;
-    font-size: 0.74rem;
+    margin-top: .18rem;
+    font-size: .74rem;
     line-height: 1.25;
     color: #725b4c;
 }
 
 .summary-profile .summary-rating {
-    margin-top: 0.2rem;
+    margin-top: .2rem;
     color: #2e1b12;
 }
 
@@ -1226,7 +1166,7 @@ onMounted(() => {
 }
 
 .summary-lines {
-    padding: 0.65rem 0;
+    padding: .65rem 0;
     border-bottom: 2px solid #d64b16;
 }
 
@@ -1234,8 +1174,8 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.18rem 0;
-    font-size: 0.78rem;
+    padding: .18rem 0;
+    font-size: .78rem;
 }
 
 .summary-lines strong {
@@ -1243,7 +1183,7 @@ onMounted(() => {
 }
 
 .summary-total {
-    padding: 0.75rem 0;
+    padding: .75rem 0;
 }
 
 .summary-total span {
@@ -1252,12 +1192,12 @@ onMounted(() => {
 }
 
 .booking-submit {
-    padding: 0.75rem 1rem;
+    padding: .75rem 1rem;
     color: #fff;
     background: #c9450b;
     border: 0;
     border-radius: 999px;
-    font-size: 0.88rem;
+    font-size: .88rem;
     font-weight: 800;
 }
 
@@ -1266,15 +1206,15 @@ onMounted(() => {
 }
 
 .booking-submit:disabled {
-    opacity: 0.5;
+    opacity: .5;
     cursor: not-allowed;
 }
 
 .summary-note {
     max-width: 220px;
-    margin: 0.8rem auto 0;
+    margin: .8rem auto 0;
     color: #725b4c;
-    font-size: 0.72rem;
+    font-size: .72rem;
     text-align: center;
 }
 
@@ -1300,7 +1240,7 @@ onMounted(() => {
 
 @media (max-width: 575.98px) {
     .booking-nav {
-        padding: 0.55rem 0.75rem;
+        padding: .55rem .75rem;
     }
 
     .booking-brand {
@@ -1313,12 +1253,12 @@ onMounted(() => {
     }
 
     .booking-actions {
-        gap: 0.7rem !important;
+        gap: .7rem !important;
     }
 
     .booking-links .nav-link {
-        padding: 0.35rem 0.7rem !important;
-        font-size: 0.83rem;
+        padding: .35rem .7rem !important;
+        font-size: .83rem;
     }
 
     .animal-grid {
@@ -1326,7 +1266,8 @@ onMounted(() => {
     }
 
     .booking-form-card {
-        padding: 0.9rem;
+        padding: .9rem;
     }
 }
 </style>
+

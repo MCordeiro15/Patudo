@@ -1,13 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
-import {
-    CalendarDays,
-    Dog,
-    UserRound,
-    CheckCircle,
-    XCircle,
-    Clock,
-} from '@lucide/vue';
+import { CalendarDays, Dog, UserRound, CheckCircle, XCircle, Clock } from '@lucide/vue';
 import type { Animal } from '@/types';
 
 const props = defineProps<{
@@ -67,19 +60,13 @@ const numberOfDays = computed(() => {
     if (!booking.value) return 0;
     const start = new Date(booking.value.start_date);
     const end = new Date(booking.value.end_date);
-    const diff =
-        Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) +
-        1;
+    const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     return diff > 0 ? diff : 0;
 });
 
 const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString('pt-PT', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-    });
+    return date.toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' });
 };
 
 const loadBooking = async () => {
@@ -119,10 +106,9 @@ const updateStatus = async (newStatus: 'approved' | 'rejected') => {
             body: JSON.stringify({ status: newStatus }),
         });
         if (res.ok) {
-            feedback.value =
-                newStatus === 'approved'
-                    ? 'Reserva confirmada com sucesso!'
-                    : 'Reserva rejeitada.';
+            feedback.value = newStatus === 'approved'
+                ? 'Reserva confirmada com sucesso!'
+                : 'Reserva rejeitada.';
             if (booking.value) booking.value.status = newStatus;
             setTimeout(() => {
                 if (newStatus === 'approved') emit('accepted');
@@ -172,7 +158,9 @@ onMounted(() => {
             <div class="patudo-modal-header">
                 <div class="patudo-header-left">
                     <Clock :size="20" class="text-primary" />
-                    <h2 class="patudo-modal-title">Confirmação de Pagamento</h2>
+                    <h2 class="patudo-modal-title">
+                        Confirmação de Pagamento
+                    </h2>
                 </div>
                 <button
                     type="button"
@@ -180,53 +168,23 @@ onMounted(() => {
                     aria-label="Fechar"
                     @click="handleClose"
                 >
-                    <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                    >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
                         <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
                 </button>
             </div>
 
             <!-- Mensagem de sucesso -->
-            <div
-                v-if="feedback.includes('sucesso')"
-                class="patudo-success-banner"
-            >
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                >
+            <div v-if="feedback.includes('sucesso')" class="patudo-success-banner">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <path d="M20 6L9 17l-5-5" />
                 </svg>
                 {{ feedback }}
             </div>
 
             <!-- Mensagem de erro -->
-            <div
-                v-if="feedback && !feedback.includes('sucesso')"
-                class="patudo-error-banner"
-            >
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                >
+            <div v-if="feedback && !feedback.includes('sucesso')" class="patudo-error-banner">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <circle cx="12" cy="12" r="10" />
                     <path d="M15 9l-6 6M9 9l6 6" />
                 </svg>
@@ -238,9 +196,7 @@ onMounted(() => {
                 <!-- Loading -->
                 <div v-if="loading && !booking" class="patudo-loading-state">
                     <div class="patudo-spinner"></div>
-                    <p class="patudo-empty-text">
-                        A carregar detalhes da reserva...
-                    </p>
+                    <p class="patudo-empty-text">A carregar detalhes da reserva...</p>
                 </div>
 
                 <template v-else-if="booking">
@@ -255,16 +211,10 @@ onMounted(() => {
                                     :alt="owner?.name"
                                     class="w-100 h-100 object-fit-cover"
                                 />
-                                <UserRound
-                                    v-else
-                                    :size="24"
-                                    class="text-primary"
-                                />
+                                <UserRound v-else :size="24" class="text-primary" />
                             </div>
                             <div>
-                                <p class="fw-semibold mb-0">
-                                    {{ owner?.name ?? 'Proprietário' }}
-                                </p>
+                                <p class="fw-semibold mb-0">{{ owner?.name ?? 'Proprietário' }}</p>
                             </div>
                         </div>
                     </div>
@@ -280,8 +230,7 @@ onMounted(() => {
                                 {{ formatDate(booking.end_date) }}
                             </span>
                             <span class="patudo-badge">
-                                {{ numberOfDays }}
-                                {{ numberOfDays === 1 ? 'dia' : 'dias' }}
+                                {{ numberOfDays }} {{ numberOfDays === 1 ? 'dia' : 'dias' }}
                             </span>
                         </div>
                     </div>
@@ -302,23 +251,12 @@ onMounted(() => {
                                         :alt="animal.name"
                                         class="w-100 h-100 object-fit-cover"
                                     />
-                                    <Dog
-                                        v-else
-                                        :size="20"
-                                        class="text-primary"
-                                    />
+                                    <Dog v-else :size="20" class="text-primary" />
                                 </div>
                                 <div class="patudo-animal-details">
-                                    <p class="fw-semibold mb-0">
-                                        {{ animal.name }}
-                                    </p>
+                                    <p class="fw-semibold mb-0">{{ animal.name }}</p>
                                     <small class="text-muted">
-                                        {{ animal.species }}
-                                        {{
-                                            animal.breed
-                                                ? '• ' + animal.breed
-                                                : ''
-                                        }}
+                                        {{ animal.species }} {{ animal.breed ? '• ' + animal.breed : '' }}
                                     </small>
                                 </div>
                             </div>
@@ -333,17 +271,13 @@ onMounted(() => {
                                 {{ booking.total_price }}€
                             </span>
                             <span class="patudo-price-note">
-                                ({{ numberOfDays }}
-                                {{ numberOfDays === 1 ? 'dia' : 'dias' }})
+                                ({{ numberOfDays }} {{ numberOfDays === 1 ? 'dia' : 'dias' }})
                             </span>
                         </div>
                     </div>
 
                     <!-- Estado -->
-                    <div
-                        v-if="booking.status === 'pending'"
-                        class="patudo-status-pending"
-                    >
+                    <div v-if="booking.status === 'pending'" class="patudo-status-pending">
                         <Clock :size="14" />
                         <span>Aguardando resposta</span>
                     </div>
@@ -351,17 +285,12 @@ onMounted(() => {
 
                 <!-- Erro ao carregar -->
                 <div v-else class="patudo-empty-state">
-                    <p class="patudo-empty-text">
-                        Não foi possível carregar a reserva.
-                    </p>
+                    <p class="patudo-empty-text">Não foi possível carregar a reserva.</p>
                 </div>
             </div>
 
             <!-- Rodapé com ações -->
-            <div
-                v-if="booking?.status === 'pending'"
-                class="patudo-modal-footer"
-            >
+            <div v-if="booking?.status === 'pending'" class="patudo-modal-footer">
                 <button
                     type="button"
                     class="btn-patudo-reject"
@@ -383,13 +312,7 @@ onMounted(() => {
             </div>
             <div v-else class="patudo-modal-footer patudo-footer-disabled">
                 <span class="patudo-footer-note">
-                    {{
-                        booking?.status === 'approved'
-                            ? 'Reserva já confirmada'
-                            : booking?.status === 'rejected'
-                              ? 'Reserva já rejeitada'
-                              : 'Reserva finalizada'
-                    }}
+                    {{ booking?.status === 'approved' ? 'Reserva já confirmada' : booking?.status === 'rejected' ? 'Reserva já rejeitada' : 'Reserva finalizada' }}
                 </span>
                 <button
                     type="button"
@@ -658,9 +581,7 @@ onMounted(() => {
 }
 
 @keyframes patudo-spin {
-    to {
-        transform: rotate(360deg);
-    }
+    to { transform: rotate(360deg); }
 }
 
 .patudo-empty-text {

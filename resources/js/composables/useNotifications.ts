@@ -60,11 +60,11 @@ function getXsrfToken(): string {
     return match ? decodeURIComponent(match[1]) : '';
 }
 
-async function apiRequest(
-    url: string,
-    options: RequestInit = {},
-): Promise<any> {
-    await fetchCsrfToken();
+async function apiRequest(url: string, options: RequestInit = {}): Promise<any> {
+    const method = (options.method ?? 'GET').toUpperCase();
+    if (method !== 'GET' && method !== 'HEAD' && !getXsrfToken()) {
+        await fetchCsrfToken();
+    }
     const response = await fetch(url, {
         credentials: 'same-origin',
         headers: {
@@ -93,20 +93,13 @@ export const useNotifications = (): UseNotificationsReturn => {
         try {
             const data = await apiRequest('/api/notifications');
 
-            if (
-                requestSequence === fetchSequence &&
-                revisionAtStart === stateRevision
-            ) {
+            if (requestSequence === fetchSequence && revisionAtStart === stateRevision) {
                 notifications.value = data.data ?? [];
-                unreadCount.value =
-                    data.unread_count ??
-                    notifications.value.filter((n) => !n.read).length;
+                unreadCount.value = data.unread_count ?? notifications.value.filter((n) => !n.read).length;
             }
         } catch (error: any) {
             if (requestSequence === fetchSequence) {
-                errors.value.push(
-                    error.message ?? 'Falha ao carregar notificações',
-                );
+                errors.value.push(error.message ?? 'Falha ao carregar notificações');
             }
         } finally {
             endRequest();
@@ -117,9 +110,7 @@ export const useNotifications = (): UseNotificationsReturn => {
         beginRequest();
         errors.value = [];
         try {
-            await apiRequest(`/api/notifications/${id}/read`, {
-                method: 'PATCH',
-            });
+            await apiRequest(`/api/notifications/${id}/read`, { method: 'PATCH' });
 
             const notification = notifications.value.find((n) => n.id === id);
             if (notification && !notification.read) {
@@ -141,9 +132,7 @@ export const useNotifications = (): UseNotificationsReturn => {
         beginRequest();
         errors.value = [];
         try {
-            await apiRequest(`/api/notifications/${id}/unread`, {
-                method: 'PATCH',
-            });
+            await apiRequest(`/api/notifications/${id}/unread`, { method: 'PATCH' });
 
             const notification = notifications.value.find((n) => n.id === id);
             if (notification && notification.read) {
@@ -171,9 +160,7 @@ export const useNotifications = (): UseNotificationsReturn => {
             if (notification && !notification.read) {
                 unreadCount.value = Math.max(0, unreadCount.value - 1);
             }
-            notifications.value = notifications.value.filter(
-                (n) => n.id !== id,
-            );
+            notifications.value = notifications.value.filter((n) => n.id !== id);
             stateRevision += 1;
             return true;
         } catch (error: any) {

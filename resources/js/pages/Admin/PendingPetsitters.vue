@@ -2,14 +2,7 @@
 <!-- Admin page to verify (approve/reject) petsitter applications. -->
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
-import {
-    ChevronRight,
-    CircleCheck,
-    CircleX,
-    Clock,
-    FileText,
-    Search,
-} from '@lucide/vue';
+import { ChevronRight, CircleCheck, CircleX, Clock, FileText, Search } from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '../../../../assets/logoPatudo.svg';
 import ModalRejectVerification from '@/pages/Modals/ModalRejectVerification.vue';
@@ -51,6 +44,7 @@ function apiFetch(url: string, options: RequestInit = {}) {
 
 // Itens da sidebar sem página ainda: ficam em mock (sem ligação).
 const menu = [
+    { label: 'Painel' },
     { label: 'Utilizadores' },
     { label: 'Verificações', active: true },
     { label: 'Reservas' },
@@ -67,16 +61,8 @@ const tabs: { key: Status; label: string }[] = [
     { key: 'rejected', label: 'Recusadas' },
 ];
 
-const statusLabels: Record<Status, string> = {
-    pending: 'Pendente',
-    approved: 'Aprovado',
-    rejected: 'Recusado',
-};
-const statusIcons = {
-    pending: Clock,
-    approved: CircleCheck,
-    rejected: CircleX,
-};
+const statusLabels: Record<Status, string> = { pending: 'Pendente', approved: 'Aprovado', rejected: 'Recusado' };
+const statusIcons = { pending: Clock, approved: CircleCheck, rejected: CircleX };
 
 const tab = ref<Status>('pending');
 const candidates = ref<Candidate[]>([]);
@@ -99,16 +85,10 @@ const checklist = ref([
 
 const filtered = computed(() => {
     const term = search.value.trim().toLowerCase();
-    return term
-        ? candidates.value.filter((c) =>
-              (c.user?.name ?? '').toLowerCase().includes(term),
-          )
-        : candidates.value;
+    return term ? candidates.value.filter((c) => (c.user?.name ?? '').toLowerCase().includes(term)) : candidates.value;
 });
 
-const selected = computed(
-    () => candidates.value.find((c) => c.user_id === selectedId.value) ?? null,
-);
+const selected = computed(() => candidates.value.find((c) => c.user_id === selectedId.value) ?? null);
 
 const subtitle = computed(() => {
     const n = pendingCount.value;
@@ -117,58 +97,21 @@ const subtitle = computed(() => {
 
 const daysAgo = (iso?: string) => {
     if (!iso) return '';
-    let date: Date;
-    if (iso.includes('T')) {
-        date = new Date(iso);
-    } else if (iso.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)) {
-        date = new Date(iso.replace(' ', 'T') + 'Z');
-    } else if (iso.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        date = new Date(iso + 'T00:00:00Z');
-    } else {
-        date = new Date(iso);
-    }
-    if (isNaN(date.getTime())) return '';
-    const days = Math.max(
-        0,
-        Math.floor((Date.now() - date.getTime()) / 86400000),
-    );
-    return days === 0
-        ? 'Pedido hoje'
-        : `Pedido há ${days} ${days === 1 ? 'dia' : 'dias'}`;
+    const days = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86400000));
+    return days === 0 ? 'Pedido hoje' : `Pedido há ${days} ${days === 1 ? 'dia' : 'dias'}`;
 };
 
-function parseDate(iso?: string): Date | null {
-    if (!iso) return null;
-    let date: Date;
-    if (iso.includes('T')) {
-        date = new Date(iso);
-    } else if (iso.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)) {
-        date = new Date(iso.replace(' ', 'T') + 'Z');
-    } else if (iso.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        date = new Date(iso + 'T00:00:00Z');
-    } else {
-        date = new Date(iso);
-    }
-    return isNaN(date.getTime()) ? null : date;
-}
-
-const formatDate = (iso?: string) => {
-    const date = parseDate(iso);
-    return date ? date.toLocaleDateString('pt-PT') : '';
-};
+const formatDate = (iso?: string) => (iso ? new Date(iso).toLocaleDateString('pt-PT') : '');
 
 const load = async () => {
     loading.value = true;
     loadError.value = '';
     try {
-        const res = await apiFetch(
-            `/api/petsitters?approval_status=${tab.value}`,
-        );
+        const res = await apiFetch(`/api/petsitters?approval_status=${tab.value}`);
         if (!res.ok) throw new Error();
         const data = await res.json();
         candidates.value = data.data ?? data;
-        if (tab.value === 'pending')
-            pendingCount.value = candidates.value.length;
+        if (tab.value === 'pending') pendingCount.value = candidates.value.length;
         selectedId.value = candidates.value[0]?.user_id ?? null;
     } catch {
         loadError.value = 'Não foi possível carregar os cuidadores.';
@@ -179,7 +122,7 @@ const load = async () => {
     }
 };
 
-const setTab = (key: Status) => {
+const setTab =  (key: Status) => {
     if (tab.value === key) return;
     tab.value = key;
     actionError.value = '';
@@ -196,8 +139,7 @@ const select = (c: Candidate) => {
 const docError = ref('');
 const openingDoc = ref(false);
 
-const docType = (path: string) =>
-    path.split('.').pop()?.toUpperCase() ?? 'Ficheiro';
+const docType = (path: string) => path.split('.').pop()?.toUpperCase() ?? 'Ficheiro';
 
 // Abre o documento num separador novo. Vai buscar o ficheiro pela API (só o admin tem acesso)
 // e mostra-o a partir do browser. O separador abre logo no clique para não ser bloqueado.
@@ -207,19 +149,15 @@ const openDocument = async (c: Candidate) => {
     const tab = window.open('', '_blank');
 
     try {
-        const res = await apiFetch(
-            `/api/petsitters/${c.user_id}/identification-document`,
-            {
-                headers: { Accept: '*/*' },
-            },
-        );
+        const res = await apiFetch(`/api/petsitters/${c.user_id}/identification-document`, {
+            headers: { Accept: '*/*' },
+        });
 
         if (!res.ok) {
             tab?.close();
-            docError.value =
-                res.status === 404
-                    ? 'O ficheiro do documento não foi encontrado.'
-                    : 'Não foi possível abrir o documento.';
+            docError.value = res.status === 404
+                ? 'O ficheiro do documento não foi encontrado.'
+                : 'Não foi possível abrir o documento.';
             return;
         }
 
@@ -241,22 +179,15 @@ const act = async (action: 'approve' | 'reject') => {
     actionError.value = '';
 
     try {
-        const res = await apiFetch(
-            `/api/petsitters/${current.user_id}/${action}`,
-            { method: 'POST' },
-        );
+        const res = await apiFetch(`/api/petsitters/${current.user_id}/${action}`, { method: 'POST' });
         if (res.ok) {
-            candidates.value = candidates.value.filter(
-                (c) => c.user_id !== current.user_id,
-            );
+            candidates.value = candidates.value.filter((c) => c.user_id !== current.user_id);
             selectedId.value = candidates.value[0]?.user_id ?? null;
-            if (tab.value === 'pending')
-                pendingCount.value = candidates.value.length;
+            if (tab.value === 'pending') pendingCount.value = candidates.value.length;
             showReject.value = false;
         } else {
             const body = await res.json().catch(() => null);
-            actionError.value =
-                body?.message ?? 'Não foi possível concluir a ação.';
+            actionError.value = body?.message ?? 'Não foi possível concluir a ação.';
         }
     } catch {
         actionError.value = 'Não foi possível concluir a ação.';
@@ -289,35 +220,19 @@ onMounted(() => {
         <aside class="admin-sidebar">
             <div>
                 <div class="brand">
-                    <img
-                        :src="logoPatudo"
-                        alt="Patudo"
-                        width="34"
-                        height="34"
-                    />
+                    <img :src="logoPatudo" alt="Patudo" width="34" height="34" />
                     <span>Patudo</span>
                 </div>
                 <p class="menu-label">ADMINISTRAÇÃO</p>
                 <nav class="menu">
-                    <div
-                        v-for="item in menu"
-                        :key="item.label"
-                        class="menu-item"
-                        :class="{ active: item.active }"
-                    >
+                    <div v-for="item in menu" :key="item.label" class="menu-item" :class="{ active: item.active }">
                         <span>{{ item.label }}</span>
-                        <span v-if="item.active" class="menu-badge">{{
-                            pendingCount
-                        }}</span>
-                        <span v-else-if="item.badge" class="menu-badge">{{
-                            item.badge
-                        }}</span>
+                        <span v-if="item.active" class="menu-badge">{{ pendingCount }}</span>
+                        <span v-else-if="item.badge" class="menu-badge">{{ item.badge }}</span>
                     </div>
                 </nav>
             </div>
-            <button type="button" class="logout" @click="logout">
-                Terminar sessão
-            </button>
+            <button type="button" class="logout" @click="logout">Terminar sessão</button>
         </aside>
 
         <main class="admin-main">
@@ -328,7 +243,7 @@ onMounted(() => {
                 </div>
                 <div class="admin-user">
                     <span>Administrador</span>
-                    <span class="admin-avatar"></span>
+                    <div class="avatar avatar-md"></div>
                 </div>
             </header>
 
@@ -342,19 +257,12 @@ onMounted(() => {
                         :class="{ active: tab === t.key }"
                         @click="setTab(t.key)"
                     >
-                        {{ t.label
-                        }}<template v-if="t.key === 'pending'">
-                            ({{ pendingCount }})</template
-                        >
+                        {{ t.label }}<template v-if="t.key === 'pending'"> ({{ pendingCount }})</template>
                     </button>
                 </div>
                 <label class="search">
                     <Search :size="20" />
-                    <input
-                        v-model="search"
-                        type="text"
-                        placeholder="Pesquisar cuidador"
-                    />
+                    <input v-model="search" type="text" placeholder="Pesquisar cuidador" />
                 </label>
             </div>
 
@@ -363,13 +271,9 @@ onMounted(() => {
                     <p v-if="loading" class="state">A carregar...</p>
                     <div v-else-if="loadError" class="state state-error">
                         {{ loadError }}
-                        <button type="button" class="retry" @click="load">
-                            Tentar novamente
-                        </button>
+                        <button type="button" class="retry" @click="load">Tentar novamente</button>
                     </div>
-                    <p v-else-if="filtered.length === 0" class="state">
-                        Não existem cuidadores nesta lista.
-                    </p>
+                    <p v-else-if="filtered.length === 0" class="state">Não existem cuidadores nesta lista.</p>
                     <template v-else>
                         <button
                             v-for="c in filtered"
@@ -379,21 +283,11 @@ onMounted(() => {
                             :class="{ selected: c.user_id === selectedId }"
                             @click="select(c)"
                         >
-                            <img
-                                v-if="c.avatar_url"
-                                :src="c.avatar_url"
-                                alt=""
-                                class="person-avatar"
-                            />
-                            <span v-else class="person-avatar"></span>
+                            <img v-if="c.avatar_url" :src="c.avatar_url" alt="" class="avatar avatar-sm" />
+                            <div v-else class="avatar avatar-sm"></div>
                             <div class="list-text">
-                                <strong>{{
-                                    c.user?.name ?? 'Cuidador'
-                                }}</strong>
-                                <small
-                                    >{{ daysAgo(c.created_at) }} ·
-                                    Cuidador</small
-                                >
+                                <strong>{{ c.user?.name ?? 'Cuidador' }}</strong>
+                                <small>{{ daysAgo(c.created_at) }} · Cuidador</small>
                             </div>
                             <ChevronRight :size="22" />
                         </button>
@@ -401,51 +295,29 @@ onMounted(() => {
 
                     <div class="deadline">
                         <strong>Prazo de resposta</strong>
-                        <p>
-                            Os pedidos devem ser respondidos em até 3 dias
-                            úteis.
-                        </p>
+                        <p>Os pedidos devem ser respondidos em até 3 dias úteis.</p>
                     </div>
                 </div>
 
                 <section class="detail">
                     <template v-if="selected">
                         <div class="detail-head">
-                            <img
-                                v-if="selected.avatar_url"
-                                :src="selected.avatar_url"
-                                alt=""
-                                class="person-avatar-lg"
-                            />
-                            <span v-else class="person-avatar-lg"></span>
+                            <img v-if="selected.avatar_url" :src="selected.avatar_url" alt="" class="avatar avatar-lg" />
+                            <div v-else class="avatar avatar-lg"></div>
                             <div class="detail-title">
                                 <h2>{{ selected.user?.name ?? 'Cuidador' }}</h2>
                                 <small>
-                                    {{
-                                        selected.city ??
-                                        selected.service_location ??
-                                        'Localização'
-                                    }}
-                                    · Registo
+                                    {{ selected.city ?? selected.service_location ?? 'Localização' }} · Registo
                                     {{ formatDate(selected.created_at) }}
                                 </small>
                             </div>
                             <span class="status-pill">
                                 <component
-                                    :is="
-                                        statusIcons[
-                                            selected.approval_status ??
-                                                'pending'
-                                        ]
-                                    "
+                                    :is="statusIcons[selected.approval_status ?? 'pending']"
                                     :size="16"
                                     :stroke-width="3"
                                 />
-                                <strong>{{
-                                    statusLabels[
-                                        selected.approval_status ?? 'pending'
-                                    ]
-                                }}</strong>
+                                <strong>{{ statusLabels[selected.approval_status ?? 'pending'] }}</strong>
                             </span>
                         </div>
 
@@ -453,46 +325,29 @@ onMounted(() => {
                         <div class="data-grid">
                             <div>
                                 <small>Email</small>
-                                <strong>{{
-                                    selected.user?.email ?? '—'
-                                }}</strong>
+                                <strong>{{ selected.user?.email ?? '—' }}</strong>
                             </div>
                             <div>
                                 <small>Telemóvel</small>
-                                <strong>{{
-                                    selected.user?.phone ?? '—'
-                                }}</strong>
+                                <strong>{{ selected.user?.phone ?? '—' }}</strong>
                             </div>
                             <div>
                                 <small>Serviços</small>
-                                <strong>{{
-                                    selected.services
-                                        ?.map((s) => s.type)
-                                        .join(', ') || '—'
-                                }}</strong>
+                                <strong>{{ selected.services?.map((s) => s.type).join(', ') || '—' }}</strong>
                             </div>
                             <div>
                                 <small>Experiência</small>
-                                <strong>{{
-                                    selected.experience ?? '—'
-                                }}</strong>
+                                <strong>{{ selected.experience ?? '—' }}</strong>
                             </div>
                         </div>
 
                         <h3>Documentos enviados</h3>
                         <div class="docs">
-                            <div
-                                v-if="selected.identification_documents"
-                                class="doc"
-                            >
+                            <div v-if="selected.identification_documents" class="doc">
                                 <FileText :size="34" stroke-width="1.5" />
                                 <div class="doc-text">
                                     <strong>Identificação</strong>
-                                    <small>{{
-                                        docType(
-                                            selected.identification_documents,
-                                        )
-                                    }}</small>
+                                    <small>{{ docType(selected.identification_documents) }}</small>
                                 </div>
                                 <button
                                     type="button"
@@ -503,64 +358,27 @@ onMounted(() => {
                                     {{ openingDoc ? 'A abrir...' : 'Abrir' }}
                                 </button>
                             </div>
-                            <p v-else class="state">
-                                Este cuidador não enviou documento de
-                                identificação.
-                            </p>
+                            <p v-else class="state">Este cuidador não enviou documento de identificação.</p>
                         </div>
-                        <p v-if="docError" class="action-error">
-                            {{ docError }}
-                        </p>
+                        <p v-if="docError" class="action-error">{{ docError }}</p>
 
                         <h3>Lista de verificação</h3>
-                        <label
-                            v-for="item in checklist"
-                            :key="item.label"
-                            class="check"
-                        >
+                        <label v-for="item in checklist" :key="item.label" class="check">
                             <input v-model="item.checked" type="checkbox" />
                             <span>{{ item.label }}</span>
                         </label>
 
-                        <p v-if="actionError" class="action-error">
-                            {{ actionError }}
-                        </p>
+                        <p v-if="actionError" class="action-error">{{ actionError }}</p>
 
-                        <div
-                            v-if="
-                                (selected.approval_status ?? 'pending') ===
-                                'pending'
-                            "
-                            class="actions"
-                        >
-                            <button
-                                type="button"
-                                class="btn-reject"
-                                :disabled="busy"
-                                @click="openReject"
-                            >
-                                Recusar
-                            </button>
-                            <button
-                                type="button"
-                                class="btn-info"
-                                :disabled="busy"
-                            >
-                                Pedir mais informação
-                            </button>
-                            <button
-                                type="button"
-                                class="btn-approve"
-                                :disabled="busy"
-                                @click="act('approve')"
-                            >
+                        <div v-if="(selected.approval_status ?? 'pending') === 'pending'" class="actions">
+                            <button type="button" class="btn-reject" :disabled="busy" @click="openReject">Recusar</button>
+                            <button type="button" class="btn-info" :disabled="busy">Pedir mais informação</button>
+                            <button type="button" class="btn-approve" :disabled="busy" @click="act('approve')">
                                 Aprovar cuidador
                             </button>
                         </div>
                     </template>
-                    <p v-else class="state">
-                        Seleciona um cuidador para ver os detalhes.
-                    </p>
+                    <p v-else class="state">Seleciona um cuidador para ver os detalhes.</p>
                 </section>
             </div>
         </main>
@@ -685,39 +503,28 @@ h1 {
     font-weight: 700;
 }
 
-.admin-avatar,
-.person-avatar {
+.avatar {
     border-radius: 50%;
-    background-color: var(--patudo-bege);
-    border: 1px solid var(--patudo-terracota);
+    background-color: #fed7aa;
+    border: 1.5px solid #2e1d14;
+    object-fit: cover;
     flex-shrink: 0;
 }
 
-.admin-avatar {
-    width: 38px;
-    height: 38px;
+.avatar-sm {
+    width: 34px;
+    height: 34px;
 }
 
-.person-avatar {
-    width: 38px;
-    height: 38px;
-    object-fit: cover;
+.avatar-md {
+    width: 32px;
+    height: 32px;
+    border-color: #c2410c;
 }
 
-.person-avatar-lg {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--patudo-terracota);
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--patudo-terracota);
-    background-color: var(--patudo-bege);
+.avatar-lg {
+    width: 58px;
+    height: 58px;
 }
 
 .toolbar {

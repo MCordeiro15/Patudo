@@ -52,9 +52,7 @@ const register = async () => {
 </script>
 
 <template>
-    <div
-        class="register-wrapper patudo-page-shell d-flex align-items-center justify-content-center p-3"
-    >
+    <div class="register-wrapper patudo-page-shell d-flex align-items-center justify-content-center p-3">
         <div class="auth-card d-flex flex-column-reverse flex-md-row">
             <div
                 class="form-panel d-flex flex-column justify-content-center align-items-center"

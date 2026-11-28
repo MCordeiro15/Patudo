@@ -84,32 +84,16 @@ const mockPet = {
             <button type="button" class="btn-pill" @click="showAddPet = true">
                 1. Adicionar Animal
             </button>
-            <button
-                type="button"
-                class="btn-pill"
-                @click="showPetDetails = true"
-            >
+            <button type="button" class="btn-pill" @click="showPetDetails = true">
                 2. Ficha do Animal
             </button>
-            <button
-                type="button"
-                class="btn-pill"
-                @click="showEditOwner = true"
-            >
+            <button type="button" class="btn-pill" @click="showEditOwner = true">
                 3. Editar Perfil Tutor
             </button>
-            <button
-                type="button"
-                class="btn-pill"
-                @click="showEditPetsitter = true"
-            >
+            <button type="button" class="btn-pill" @click="showEditPetsitter = true">
                 4. Editar Perfil Petsitter
             </button>
-            <button
-                type="button"
-                class="btn-pill"
-                @click="showFormPetsitter = true"
-            >
+            <button type="button" class="btn-pill" @click="showFormPetsitter = true">
                 5. Formulário Petsitter
             </button>
             <button type="button" class="btn-pill" @click="showNewPost = true">
@@ -121,42 +105,22 @@ const mockPet = {
             <button type="button" class="btn-pill" @click="showReport = true">
                 8. Denunciar Petsitter
             </button>
-            <button
-                type="button"
-                class="btn-pill"
-                @click="showNotifications = true"
-            >
+            <button type="button" class="btn-pill" @click="showNotifications = true">
                 9. Notificações
             </button>
-            <button
-                type="button"
-                class="btn-pill"
-                @click="showAcceptBooking = true"
-            >
+            <button type="button" class="btn-pill" @click="showAcceptBooking = true">
                 10. Aceitar Pedido de Pagamento
             </button>
-            <button
-                type="button"
-                class="btn-pill"
-                @click="showAddPetToBooking = true"
-            >
+            <button type="button" class="btn-pill" @click="showAddPetToBooking = true">
                 11. Adicionar Animal à Reserva
             </button>
             <button type="button" class="btn-pill" @click="showPayment = true">
                 12. Pagamento da Reserva
             </button>
-            <button
-                type="button"
-                class="btn-pill"
-                @click="showDeleteAnimal = true"
-            >
+            <button type="button" class="btn-pill" @click="showDeleteAnimal = true">
                 13. Eliminar Animal
             </button>
-            <button
-                type="button"
-                class="btn-pill"
-                @click="showDeletePost = true"
-            >
+            <button type="button" class="btn-pill" @click="showDeletePost = true">
                 14. Eliminar Post
             </button>
             <button type="button" class="btn-pill" @click="showEditPost = true">
@@ -192,12 +156,7 @@ const mockPet = {
 
         <ModalReviewPetsitter
             :show="showReview"
-            :petsitter="{
-                id: 1,
-                name: 'João Silva',
-                avatar_url: null,
-                service_summary: 'Cuidado de cães · 12/11 – 15/11/2026',
-            }"
+            :petsitter="{ id: 1, name: 'João Silva', avatar_url: null, service_summary: 'Cuidado de cães · 12/11 – 15/11/2026' }"
             @close="showReview = false"
         />
 
