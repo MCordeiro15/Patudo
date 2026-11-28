@@ -390,13 +390,13 @@ class ExportedDataSeeder extends Seeder
     'id' => 17,
     'name' => 'Joaquim',
     'email' => 'petssiter@patudo.com',
-    'phone' => NULL,
+    'phone' => '918218371',
     'email_verified_at' => NULL,
     'password' => '$2y$12$vCZiHGeM7GiWPDHIthzinuNoPpnOuVxnfl.3PIwtCPNRbj5StIwKu',
     'is_admin' => 0,
     'account_status' => 'active',
     'created_at' => '2026-11-27 10:23:42',
-    'updated_at' => '2026-11-27 10:23:42',
+    'updated_at' => '2026-11-28 11:08:24',
     'two_factor_confirmed_at' => NULL,
     'is_petsitter' => 1,
     'location' => NULL,
@@ -583,11 +583,11 @@ class ExportedDataSeeder extends Seeder
     'approval_status' => 'approved',
     'identification_documents' => 'identification-documents/17/Siqq79TYP7PrxYRjynQxTGR2Bh5ljYDdmQkNB9QM.jpg',
     'created_at' => '2026-11-26 19:36:02',
-    'updated_at' => '2026-11-27 10:43:51',
+    'updated_at' => '2026-11-28 11:09:41',
     'availability_days' => '["monday","tuesday","wednesday","thursday","friday"]',
     'profile_photo' => NULL,
     'city' => NULL,
-    'average_rating' => NULL,
+    'average_rating' => 5,
     'short_bio' => NULL,
     'postal_code' => '9600-580',
   ),
@@ -1305,10 +1305,10 @@ class ExportedDataSeeder extends Seeder
     'petsitter_id' => 17,
     'start_date' => '2026-12-03',
     'end_date' => '2026-12-03',
-    'status' => 'approved',
+    'status' => 'completed',
     'total_price' => 10,
     'created_at' => '2026-11-27 10:53:00',
-    'updated_at' => '2026-11-27 10:54:53',
+    'updated_at' => '2026-11-28 11:09:12',
     'service_id' => 4,
     'message' => NULL,
     'zone' => 'Ribeira Grande',
@@ -1344,7 +1344,7 @@ class ExportedDataSeeder extends Seeder
             Booking::forceCreate($bookingCreateData);
         }
 
-        // Export Reviews (7 reviews)
+        // Export Reviews (8 reviews)
         $reviews = array (
   0 => 
   array (
@@ -1421,6 +1421,17 @@ class ExportedDataSeeder extends Seeder
     'comment' => 'Comentário ofensivo de teste para moderação.',
     'created_at' => '2026-11-27 10:23:42',
     'updated_at' => '2026-11-27 10:23:42',
+    'status' => 'published',
+  ),
+  7 => 
+  array (
+    'id' => 8,
+    'booking_id' => 22,
+    'petsitter_id' => 17,
+    'star_rating' => 5,
+    'comment' => NULL,
+    'created_at' => '2026-11-28 11:09:41',
+    'updated_at' => '2026-11-28 11:09:41',
     'status' => 'published',
   ),
 );
@@ -1519,7 +1530,7 @@ class ExportedDataSeeder extends Seeder
             AnimalBooking::forceCreate($abCreateData);
         }
 
-        // Export Notifications (11 notifications)
+        // Export Notifications (12 notifications)
         if (\Illuminate\Support\Facades\Schema::hasTable('notifications')) {
             $notificationColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('notifications'));
             $notifications = array (
@@ -1643,6 +1654,17 @@ class ExportedDataSeeder extends Seeder
     'created_at' => '2026-11-27 17:39:51',
     'updated_at' => '2026-11-27 17:39:51',
     'booking_id' => 23,
+  ),
+  11 => 
+  array (
+    'id' => 12,
+    'user_id' => 9,
+    'type' => 'booking',
+    'message' => 'A reserva foi concluída.',
+    'read_at' => '2026-11-28 11:09:21',
+    'created_at' => '2026-11-28 11:09:12',
+    'updated_at' => '2026-11-28 11:09:21',
+    'booking_id' => 22,
   ),
 );
             foreach ($notifications as $notificationData) {
