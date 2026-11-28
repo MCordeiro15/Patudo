@@ -8,6 +8,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Petsitter;
+use App\Models\PetsitterApplication;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -58,6 +59,19 @@ class PetsitterResource extends JsonResource
             'sex' => $this->sex,
             'approval_status' => $this->approval_status,
             'identification_documents' => $this->when($canSeePrivate, $this->identification_documents),
+            // candidaturas (só o admin e o próprio): a atual, as anteriores e quantas ainda pode fazer
+            'application' => $this->when(
+                $canSeePrivate && $this->relationLoaded('applications'),
+                fn () => $this->applications->first() ? new PetsitterApplicationResource($this->applications->first()) : null,
+            ),
+            'applications' => $this->when(
+                $canSeePrivate && $this->relationLoaded('applications'),
+                fn () => PetsitterApplicationResource::collection($this->applications),
+            ),
+            'applications_remaining' => $this->when(
+                $canSeePrivate && $this->relationLoaded('applications'),
+                fn () => max(0, PetsitterApplication::MAX_PER_USER - $this->applications->count()),
+            ),
             'availability_days' => $this->availability_days,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

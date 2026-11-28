@@ -50,6 +50,113 @@ class ExportedDataSeeder extends Seeder
   'user_notes' => 
   array (
   ),
+  'petsitter_applications' => 
+  array (
+    0 => 
+    array (
+      'id' => 1,
+      'user_id' => 1,
+      'status' => 'approved',
+      'identification_documents' => '["document_1.pdf"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-26 13:45:08',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+    1 => 
+    array (
+      'id' => 2,
+      'user_id' => 2,
+      'status' => 'approved',
+      'identification_documents' => '["document_2.pdf"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-26 13:45:08',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+    2 => 
+    array (
+      'id' => 3,
+      'user_id' => 3,
+      'status' => 'approved',
+      'identification_documents' => '["document_3.pdf"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-26 13:45:08',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+    3 => 
+    array (
+      'id' => 4,
+      'user_id' => 4,
+      'status' => 'approved',
+      'identification_documents' => '["document_4.pdf"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-26 13:45:08',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+    4 => 
+    array (
+      'id' => 5,
+      'user_id' => 5,
+      'status' => 'approved',
+      'identification_documents' => '["document_5.pdf"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-26 13:45:08',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+    5 => 
+    array (
+      'id' => 6,
+      'user_id' => 6,
+      'status' => 'approved',
+      'identification_documents' => '["document_6.pdf"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-26 13:45:08',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+    6 => 
+    array (
+      'id' => 7,
+      'user_id' => 7,
+      'status' => 'rejected',
+      'identification_documents' => '["document_admin.pdf"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-27 10:23:42',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+    7 => 
+    array (
+      'id' => 8,
+      'user_id' => 17,
+      'status' => 'approved',
+      'identification_documents' => '["identification-documents\\/17\\/Siqq79TYP7PrxYRjynQxTGR2Bh5ljYDdmQkNB9QM.jpg"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-28 11:09:41',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+  ),
 );
         foreach (['user_notes', 'support_tickets', 'post_favourites', 'favourites', 'petsitter_availabilities'] as $table) {
             if (\Illuminate\Support\Facades\Schema::hasTable($table)) { \Illuminate\Support\Facades\DB::table($table)->delete(); }
@@ -869,7 +976,7 @@ class ExportedDataSeeder extends Seeder
   array (
     'id' => 4,
     'petsitter_id' => 17,
-    'description' => 'a',
+    'description' => 'aaaaaaaa',
     'photos' => NULL,
     'created_at' => '2026-11-27 17:20:06',
     'updated_at' => '2026-11-27 17:20:06',

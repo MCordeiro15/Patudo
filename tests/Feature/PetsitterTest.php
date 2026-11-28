@@ -283,7 +283,7 @@ test('admin can reject a petsitter', function () {
     $admin = User::factory()->admin()->create();
     $petsitter = Petsitter::factory()->create(['approval_status' => 'pending']);
 
-    $response = $this->actingAs($admin)->postJson('/api/petsitters/'.$petsitter->user_id.'/reject');
+    $response = $this->actingAs($admin)->postJson('/api/petsitters/'.$petsitter->user_id.'/reject', ['reasons' => ['illegible_document']]);
 
     $response->assertOk()
         ->assertJsonFragment(['approval_status' => 'rejected']);

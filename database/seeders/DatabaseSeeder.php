@@ -24,6 +24,8 @@ class DatabaseSeeder extends Seeder
     {
         if (file_exists(database_path('seeders/ExportedDataSeeder.php'))) {
             $this->call(ExportedDataSeeder::class);
+            // petsitters que não trouxeram candidatura no export ficam com uma
+            $this->call(PetsitterApplicationSeeder::class);
 
             return;
         }
@@ -141,5 +143,8 @@ class DatabaseSeeder extends Seeder
                 ['type' => 'passeio', 'price' => 10],
             ]);
         }
+
+        // 8. Uma candidatura para cada petsitter criado acima
+        $this->call(PetsitterApplicationSeeder::class);
     }
 }
