@@ -883,7 +883,7 @@ class ExportedDataSeeder extends Seeder
         }
 
         // Export Bookings (23 bookings)
-        // Export Petsitter Services (4 services)
+        // Export Petsitter Services (5 services)
         $services = array (
   0 => 
   array (
@@ -920,6 +920,15 @@ class ExportedDataSeeder extends Seeder
     'price' => 10,
     'created_at' => '2026-11-27 10:23:42',
     'updated_at' => '2026-11-27 10:23:42',
+  ),
+  4 => 
+  array (
+    'id' => 5,
+    'petsitter_id' => 17,
+    'type' => 'Banho',
+    'price' => 10,
+    'created_at' => '2026-11-28 11:03:24',
+    'updated_at' => '2026-11-28 11:03:24',
   ),
 );
         $serviceColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('petsitter_services'));
@@ -1313,10 +1322,10 @@ class ExportedDataSeeder extends Seeder
     'petsitter_id' => 17,
     'start_date' => '2027-01-06',
     'end_date' => '2027-01-06',
-    'status' => 'pending',
+    'status' => 'rejected',
     'total_price' => 10,
     'created_at' => '2026-11-27 16:25:59',
-    'updated_at' => '2026-11-27 16:25:59',
+    'updated_at' => '2026-11-27 17:39:51',
     'service_id' => 4,
     'message' => 'asda da',
     'zone' => 'Ribeira Grande',
@@ -1510,7 +1519,7 @@ class ExportedDataSeeder extends Seeder
             AnimalBooking::forceCreate($abCreateData);
         }
 
-        // Export Notifications (10 notifications)
+        // Export Notifications (11 notifications)
         if (\Illuminate\Support\Facades\Schema::hasTable('notifications')) {
             $notificationColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('notifications'));
             $notifications = array (
@@ -1622,6 +1631,17 @@ class ExportedDataSeeder extends Seeder
     'read_at' => NULL,
     'created_at' => '2026-11-27 16:25:59',
     'updated_at' => '2026-11-27 16:25:59',
+    'booking_id' => 23,
+  ),
+  10 => 
+  array (
+    'id' => 11,
+    'user_id' => 9,
+    'type' => 'booking',
+    'message' => 'A reserva foi recusada.',
+    'read_at' => NULL,
+    'created_at' => '2026-11-27 17:39:51',
+    'updated_at' => '2026-11-27 17:39:51',
     'booking_id' => 23,
   ),
 );
