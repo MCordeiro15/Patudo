@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Modelo Eloquent para os serviços de um petsitter. Cada serviço tem um tipo (pet-sitting ou passeio) e um preço.
- * Eloquent model for a petsitter's services. Each service has a type (pet-sitting or passeio) and a price.
+ * Modelo Eloquent para os serviços de um petsitter. Cada serviço tem um nome e um preço.
+ * Eloquent model for a petsitter's services. Each service has a name and a price.
  */
 namespace App\Models;
 
@@ -12,9 +12,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PetsitterService extends Model
 {
-    /** Tipos de serviço aceites. / Accepted service types. */
-    public const TYPES = ['pet-sitting', 'passeio'];
-
     protected $fillable = ['petsitter_id', 'type', 'price'];
 
     protected function casts(): array

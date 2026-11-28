@@ -223,7 +223,7 @@ test('approving sets is_petsitter and rejecting clears it', function () {
     $this->actingAs($admin)->postJson('/api/petsitters/'.$petsitter->user_id.'/approve')->assertOk();
     expect($petsitter->user->fresh()->is_petsitter)->toBeTrue();
 
-    $this->actingAs($admin)->postJson('/api/petsitters/'.$petsitter->user_id.'/reject')->assertOk();
+    $this->actingAs($admin)->postJson('/api/petsitters/'.$petsitter->user_id.'/reject', ['reasons' => ['illegible_document']])->assertOk();
     expect($petsitter->user->fresh()->is_petsitter)->toBeFalse();
 });
 

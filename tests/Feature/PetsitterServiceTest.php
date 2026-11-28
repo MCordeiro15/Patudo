@@ -36,6 +36,21 @@ test('petsitter can create a service for themselves', function () {
     ]);
 });
 
+test('petsitter can create a service with a custom name', function () {
+    $petsitter = Petsitter::factory()->approved()->create();
+
+    $this->actingAs($petsitter->user)->postJson(
+        "/api/petsitters/{$petsitter->user_id}/services",
+        ['type' => 'Banho e tosquia', 'price' => 20]
+    )->assertCreated()
+        ->assertJsonPath('data.type', 'Banho e tosquia');
+
+    $this->assertDatabaseHas('petsitter_services', [
+        'petsitter_id' => $petsitter->user_id,
+        'type' => 'Banho e tosquia',
+    ]);
+});
+
 test('a petsitter cannot have the same service type twice', function () {
     $petsitter = Petsitter::factory()->approved()->create();
     PetsitterService::create(['petsitter_id' => $petsitter->user_id, 'type' => 'passeio', 'price' => 10]);
@@ -65,7 +80,7 @@ test('creating a service validates type and price', function () {
     $this->actingAs($petsitter->user)->postJson($url, [])
         ->assertUnprocessable()->assertJsonValidationErrors(['type', 'price']);
 
-    $this->actingAs($petsitter->user)->postJson($url, ['type' => 'banho', 'price' => 5])
+    $this->actingAs($petsitter->user)->postJson($url, ['type' => str_repeat('a', 256), 'price' => 5])
         ->assertUnprocessable()->assertJsonValidationErrors(['type']);
 
     $this->actingAs($petsitter->user)->postJson($url, ['type' => 'passeio', 'price' => -1])
@@ -116,6 +131,22 @@ test('petsitter can update the price of their service', function () {
 
     $this->actingAs($petsitter->user)->putJson("/api/services/{$service->id}", ['type' => 'passeio', 'price' => 13])
         ->assertOk();
+});
+
+test('admin can update a service for any petsitter', function () {
+    $petsitter = Petsitter::factory()->approved()->create();
+    $service = PetsitterService::create(['petsitter_id' => $petsitter->user_id, 'type' => 'passeio', 'price' => 10]);
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)->putJson("/api/services/{$service->id}", ['price' => 15])
+        ->assertOk()
+        ->assertJsonPath('data.price', 15)
+        ->assertJsonPath('data.petsitter_id', $petsitter->user_id);
+
+    $this->assertDatabaseHas('petsitter_services', [
+        'id' => $service->id,
+        'price' => 15,
+    ]);
 });
 
 test('updating a service cannot create a duplicate type', function () {

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -85,6 +86,24 @@ class Petsitter extends Model
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class, 'petsitter_id', 'user_id');    // Petsitter 1 — 0..* Post
+    }
+
+    /**
+     * Candidaturas deste petsitter (as antigas ficam guardadas), da mais recente para a mais antiga.
+     * Applications of this petsitter (old ones are kept), newest first.
+     */
+    public function applications(): HasMany
+    {
+        return $this->hasMany(PetsitterApplication::class, 'user_id', 'user_id')->latest('id');
+    }
+
+    /**
+     * A candidatura mais recente (a que o admin está a analisar).
+     * The most recent application (the one the admin is reviewing).
+     */
+    public function latestApplication(): HasOne
+    {
+        return $this->hasOne(PetsitterApplication::class, 'user_id', 'user_id')->latestOfMany();
     }
 
     public function favouritedByUsers(): BelongsToMany

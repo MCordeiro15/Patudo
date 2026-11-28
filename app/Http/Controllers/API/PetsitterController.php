@@ -10,9 +10,11 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PetsitterResource;
 use App\Models\Petsitter;
+use App\Models\PetsitterApplication;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -39,7 +41,9 @@ class PetsitterController extends Controller
             ]);
 
             if (isset($filters['approval_status'])) {
-                $query->where('approval_status', $filters['approval_status']);
+                // a página de verificações precisa das candidaturas (atual e anteriores)
+                $query->where('approval_status', $filters['approval_status'])
+                    ->with('applications.decidedBy');
             } else {
                 $query->where('approval_status', 'approved')
                     ->whereHas('user', fn ($query) => $query->where('is_petsitter', true));
@@ -80,6 +84,12 @@ class PetsitterController extends Controller
     {
         Gate::authorize('create', Petsitter::class);
 
+        // aceita um ficheiro (o formulário atual) ou vários (ex.: frente e verso do Cartão de Cidadão)
+        $rawDocuments = $request->files->get('identification_documents');
+        if ($rawDocuments !== null && ! is_array($rawDocuments)) {
+            $request->files->set('identification_documents', [$rawDocuments]);
+        }
+
         $data = $request->validate([
             'user_id' => 'sometimes|exists:users,id|unique:petsitters,user_id',
             'name' => ['sometimes', 'string', 'max:255', 'regex:/^[\p{L} ]+$/u'],
@@ -97,50 +107,76 @@ class PetsitterController extends Controller
             // o primeiro serviço, escrito pelo candidato (ex.: "Passeios ao fim de semana"); é criado logo,
             // ligado ao novo petsitter, com o preço de price_per_day. Os outros serviços criam-se no perfil.
             'service' => ['required', 'string', 'max:50'],
-            // Cartão de Cidadão: JPG, PNG ou PDF até 10 MB
-            'identification_documents' => 'required|file|mimes:jpg,jpeg,png,pdf|max:10240',
+            // Cartão de Cidadão (um ou mais ficheiros): JPG, PNG ou PDF até 10 MB cada
+            'identification_documents' => ['required', 'array', 'min:1', 'max:'.PetsitterApplication::MAX_DOCUMENTS, $this->identificationFilesRule()],
         ], $this->pricePerDayMessages());
 
         if (! $request->user()?->isAdmin() || empty($data['user_id'])) {
             $data['user_id'] = $request->user()->id;
         }
 
-        // sem isto, um segundo pedido do mesmo utilizador dava erro 500 (user_id é a chave primária)
-        if (Petsitter::where('user_id', $data['user_id'])->exists()) {
+        // só quem foi recusado pode voltar a candidatar-se (user_id é a chave primária de petsitters)
+        $existing = Petsitter::find($data['user_id']);
+        if ($existing && $existing->approval_status !== 'rejected') {
             return response()->json(['message' => 'Este utilizador já tem um perfil de petsitter.'], 409);
         }
 
-        // guarda o documento no disco privado (storage/app/private), nunca no público
-        $documentPath = $request->file('identification_documents')
-            ->store('identification-documents/'.$data['user_id'], 'local');
+        if (PetsitterApplication::where('user_id', $data['user_id'])->count() >= PetsitterApplication::MAX_PER_USER) {
+            return response()->json([
+                'message' => 'Atingiste o limite de '.PetsitterApplication::MAX_PER_USER.' candidaturas a petsitter.',
+            ], 422);
+        }
+
+        // guarda os documentos no disco privado (storage/app/private), nunca no público
+        $documentPaths = array_map(
+            fn ($file) => $file->store('identification-documents/'.$data['user_id'], 'local'),
+            $request->file('identification_documents'),
+        );
 
         try {
-            $petsitter = DB::transaction(function () use ($data, $documentPath) {
+            $petsitter = DB::transaction(function () use ($data, $documentPaths, $existing) {
                 if (isset($data['name'])) {
                     User::whereKey($data['user_id'])->update(['name' => $data['name']]);
                 }
 
-                $petsitter = Petsitter::create([
-                    ...Arr::except($data, ['name', 'service']),
-                    'identification_documents' => $documentPath,
-                ]);
+                $profile = [
+                    ...Arr::except($data, ['name', 'service', 'identification_documents']),
+                    // compatibilidade: o perfil guarda o primeiro documento (usado ao aprovar)
+                    'identification_documents' => $documentPaths[0],
+                ];
 
-                $petsitter->services()->create([
-                    'type' => $data['service'],
-                    'price' => $data['price_per_day'],
+                if ($existing) {
+                    // nova candidatura depois de uma recusa: o perfil volta a pendente
+                    $petsitter = $existing;
+                    $petsitter->fill($profile);
+                    $petsitter->approval_status = 'pending';
+                    $petsitter->save();
+                } else {
+                    $petsitter = Petsitter::create($profile);
+                }
+
+                $petsitter->services()->firstOrCreate(
+                    ['type' => $data['service']],
+                    ['price' => $data['price_per_day']],
+                );
+
+                // cada candidatura fica num registo próprio; as antigas não são apagadas
+                PetsitterApplication::create([
+                    'user_id' => $petsitter->user_id,
+                    'identification_documents' => $documentPaths,
                 ]);
 
                 return $petsitter;
             });
         } catch (\Throwable $e) {
-            // se a base de dados falhar, não deixa o ficheiro perdido no disco
-            Storage::disk('local')->delete($documentPath);
+            // se a base de dados falhar, não deixa ficheiros perdidos no disco
+            Storage::disk('local')->delete($documentPaths);
             throw $e;
         }
 
         $petsitter->refresh();
 
-        return (new PetsitterResource($petsitter->load(['user', 'services'])))->response()->setStatusCode(201);
+        return (new PetsitterResource($petsitter->load(['user', 'services', 'applications'])))->response()->setStatusCode(201);
     }
 
     /**
@@ -150,6 +186,12 @@ class PetsitterController extends Controller
     public function show(Petsitter $petsitter)
     {
         Gate::authorize('view', $petsitter);
+
+        // o admin e o próprio candidato veem as candidaturas (estado, motivos, mensagem)
+        $viewer = request()->user();
+        if ($viewer && ($viewer->isAdmin() || $viewer->id === $petsitter->user_id)) {
+            $petsitter->load('applications.decidedBy');
+        }
 
         return new PetsitterResource($petsitter->load('user'));
     }
@@ -324,7 +366,7 @@ class PetsitterController extends Controller
      * Aprova o perfil de um petsitter (apenas admin). Altera o status para 'approved'.
      * Approves a petsitter's profile (admin only). Changes status to 'approved'.
      */
-    public function approve(Petsitter $petsitter)
+    public function approve(Request $request, Petsitter $petsitter)
     {
         Gate::authorize('approve', $petsitter);
 
@@ -334,22 +376,172 @@ class PetsitterController extends Controller
             ], 422);
         }
 
-        $petsitter->approve();
+        DB::transaction(function () use ($request, $petsitter) {
+            $petsitter->approve();
 
-        return new PetsitterResource($petsitter->load('user'));
+            $this->currentApplication($petsitter)->forceFill([
+                'status' => PetsitterApplication::APPROVED,
+                'reasons' => null,
+                'decided_by' => $request->user()->id,
+                'decided_at' => now(),
+            ])->save();
+
+            $petsitter->user->notifications()->create([
+                'type' => 'verification_approved',
+                'message' => 'A tua candidatura a petsitter foi aprovada. Já podes receber pedidos de reserva.',
+            ]);
+        });
+
+        return new PetsitterResource($this->loadForAdmin($petsitter));
     }
 
     /**
-     * Rejeita o perfil de um petsitter (apenas admin). Altera o status para 'rejected'.
-     * Rejects a petsitter's profile (admin only). Changes status to 'rejected'.
+     * Rejeita o perfil de um petsitter (apenas admin), com pelo menos um motivo. Com o motivo "Outro"
+     * a mensagem é obrigatória. Guarda os motivos na candidatura e avisa o candidato.
+     * Rejects a petsitter's profile (admin only) with at least one reason; "other" requires a message.
      */
-    public function reject(Petsitter $petsitter)
+    public function reject(Request $request, Petsitter $petsitter)
     {
         Gate::authorize('approve', $petsitter);
 
-        $petsitter->reject();
+        $data = $request->validate([
+            'reasons' => ['required', 'array', 'min:1'],
+            'reasons.*' => ['string', 'distinct', Rule::in(PetsitterApplication::REASONS)],
+            // com o motivo "Outro" a mensagem é obrigatória
+            'message' => [
+                Rule::requiredIf(fn () => in_array('other', (array) $request->input('reasons', []), true)),
+                'nullable', 'string', 'max:2000',
+            ],
+        ], [
+            'reasons.required' => 'Escolhe pelo menos um motivo.',
+            'reasons.min' => 'Escolhe pelo menos um motivo.',
+            'reasons.*.in' => 'Motivo inválido.',
+            'message.required' => 'Com o motivo "Outro" tens de escrever uma mensagem.',
+        ]);
 
-        return new PetsitterResource($petsitter->load('user'));
+        DB::transaction(function () use ($request, $petsitter, $data) {
+            $petsitter->reject();
+
+            $this->currentApplication($petsitter)->forceFill([
+                'status' => PetsitterApplication::REJECTED,
+                'reasons' => $data['reasons'],
+                'message' => $data['message'] ?? null,
+                'decided_by' => $request->user()->id,
+                'decided_at' => now(),
+            ])->save();
+
+            $labels = array_map(fn ($code) => PetsitterApplication::REASON_LABELS[$code], $data['reasons']);
+            $text = 'A tua candidatura a petsitter foi recusada. Motivo: '.implode(', ', $labels).'.';
+            if (! empty($data['message'])) {
+                $text .= ' Mensagem do administrador: '.$data['message'];
+            }
+
+            $petsitter->user->notifications()->create([
+                'type' => 'verification_rejected',
+                'message' => $text,
+            ]);
+        });
+
+        return new PetsitterResource($this->loadForAdmin($petsitter));
+    }
+
+    /**
+     * Pede mais informação ao candidato (apenas admin): envia-lhe uma notificação com a mensagem e a
+     * candidatura continua pendente.
+     * Asks the applicant for more information (admin only): notifies them; the application stays pending.
+     */
+    public function requestInfo(Request $request, Petsitter $petsitter)
+    {
+        Gate::authorize('approve', $petsitter);
+
+        $data = $request->validate([
+            'message' => ['required', 'string', 'max:2000'],
+        ], [
+            'message.required' => 'Escreve a mensagem para o candidato.',
+        ]);
+
+        $application = $this->currentApplication($petsitter);
+
+        if (! $application->isPending()) {
+            return response()->json(['message' => 'Só se pode pedir informação a uma candidatura pendente.'], 422);
+        }
+
+        DB::transaction(function () use ($petsitter, $application, $data) {
+            // guarda o último pedido na candidatura, para o admin ver o que já pediu
+            $application->forceFill(['message' => $data['message']])->save();
+
+            $petsitter->user->notifications()->create([
+                'type' => 'verification_info_requested',
+                'message' => 'O administrador pediu mais informação sobre a tua candidatura a petsitter: '.$data['message'],
+            ]);
+        });
+
+        return new PetsitterResource($this->loadForAdmin($petsitter));
+    }
+
+    /**
+     * Abre um dos documentos de identificação de uma candidatura (apenas admin), pela posição na lista.
+     * Opens one of an application's identification documents (admin only), by its position in the list.
+     */
+    public function applicationDocument(PetsitterApplication $application, int $index)
+    {
+        Gate::authorize('approve', Petsitter::findOrFail($application->user_id));
+
+        $path = $application->identification_documents[$index] ?? null;
+
+        if (! $path || ! Storage::disk('local')->exists($path)) {
+            return response()->json(['message' => 'Documento de identificação não encontrado.'], 404);
+        }
+
+        return Storage::disk('local')->response($path);
+    }
+
+    /**
+     * A candidatura mais recente; os petsitters antigos sem candidatura ficam com uma, feita a partir do perfil.
+     * The most recent application; older petsitters without one get one built from their profile.
+     */
+    private function currentApplication(Petsitter $petsitter): PetsitterApplication
+    {
+        $application = $petsitter->latestApplication()->first();
+
+        if ($application) {
+            return $application;
+        }
+
+        $application = new PetsitterApplication([
+            'user_id' => $petsitter->user_id,
+            'identification_documents' => $petsitter->identification_documents ? [$petsitter->identification_documents] : [],
+        ]);
+        // fica com o estado que o perfil já tem (um petsitter aprovado não volta a pendente)
+        $application->forceFill(['status' => $petsitter->approval_status ?: PetsitterApplication::PENDING])->save();
+
+        return $application;
+    }
+
+    /** Petsitter com o que a página de verificações precisa. / Petsitter with what the verifications page needs. */
+    private function loadForAdmin(Petsitter $petsitter): Petsitter
+    {
+        return $petsitter->fresh()->load(['user', 'services', 'applications.decidedBy']);
+    }
+
+    /** Valida cada ficheiro de identificação (o erro fica no campo identification_documents). */
+    private function identificationFilesRule(): \Closure
+    {
+        return function (string $attribute, mixed $files, \Closure $fail) {
+            foreach ((array) $files as $file) {
+                $valid = $file instanceof UploadedFile
+                    && $file->isValid()
+                    && in_array(strtolower($file->getClientOriginalExtension()), ['jpg', 'jpeg', 'png', 'pdf'], true)
+                    && in_array($file->getMimeType(), ['image/jpeg', 'image/png', 'application/pdf'], true)
+                    && $file->getSize() <= 10240 * 1024;
+
+                if (! $valid) {
+                    $fail('Cada documento tem de ser JPG, PNG ou PDF, até 10 MB.');
+
+                    return;
+                }
+            }
+        };
     }
 
     /**

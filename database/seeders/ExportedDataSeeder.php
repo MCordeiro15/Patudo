@@ -50,6 +50,113 @@ class ExportedDataSeeder extends Seeder
   'user_notes' => 
   array (
   ),
+  'petsitter_applications' => 
+  array (
+    0 => 
+    array (
+      'id' => 1,
+      'user_id' => 1,
+      'status' => 'approved',
+      'identification_documents' => '["document_1.pdf"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-26 13:45:08',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+    1 => 
+    array (
+      'id' => 2,
+      'user_id' => 2,
+      'status' => 'approved',
+      'identification_documents' => '["document_2.pdf"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-26 13:45:08',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+    2 => 
+    array (
+      'id' => 3,
+      'user_id' => 3,
+      'status' => 'approved',
+      'identification_documents' => '["document_3.pdf"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-26 13:45:08',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+    3 => 
+    array (
+      'id' => 4,
+      'user_id' => 4,
+      'status' => 'approved',
+      'identification_documents' => '["document_4.pdf"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-26 13:45:08',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+    4 => 
+    array (
+      'id' => 5,
+      'user_id' => 5,
+      'status' => 'approved',
+      'identification_documents' => '["document_5.pdf"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-26 13:45:08',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+    5 => 
+    array (
+      'id' => 6,
+      'user_id' => 6,
+      'status' => 'approved',
+      'identification_documents' => '["document_6.pdf"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-26 13:45:08',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+    6 => 
+    array (
+      'id' => 7,
+      'user_id' => 7,
+      'status' => 'rejected',
+      'identification_documents' => '["document_admin.pdf"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-27 10:23:42',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+    7 => 
+    array (
+      'id' => 8,
+      'user_id' => 17,
+      'status' => 'approved',
+      'identification_documents' => '["identification-documents\\/17\\/Siqq79TYP7PrxYRjynQxTGR2Bh5ljYDdmQkNB9QM.jpg"]',
+      'reasons' => NULL,
+      'message' => NULL,
+      'decided_by' => NULL,
+      'decided_at' => '2026-11-28 11:09:41',
+      'created_at' => '2026-11-28 12:03:51',
+      'updated_at' => '2026-11-28 12:03:51',
+    ),
+  ),
 );
         foreach (['user_notes', 'support_tickets', 'post_favourites', 'favourites', 'petsitter_availabilities'] as $table) {
             if (\Illuminate\Support\Facades\Schema::hasTable($table)) { \Illuminate\Support\Facades\DB::table($table)->delete(); }
@@ -84,6 +191,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   1 => 
   array (
@@ -104,6 +212,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   2 => 
   array (
@@ -124,6 +233,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   3 => 
   array (
@@ -144,6 +254,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   4 => 
   array (
@@ -164,6 +275,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   5 => 
   array (
@@ -184,6 +296,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   6 => 
   array (
@@ -204,6 +317,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   7 => 
   array (
@@ -224,6 +338,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   8 => 
   array (
@@ -244,6 +359,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   9 => 
   array (
@@ -264,6 +380,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   10 => 
   array (
@@ -284,6 +401,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   11 => 
   array (
@@ -304,6 +422,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   12 => 
   array (
@@ -324,6 +443,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   13 => 
   array (
@@ -344,6 +464,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   14 => 
   array (
@@ -364,6 +485,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   15 => 
   array (
@@ -384,19 +506,20 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
   16 => 
   array (
     'id' => 17,
     'name' => 'Joaquim',
     'email' => 'petssiter@patudo.com',
-    'phone' => NULL,
+    'phone' => '918218371',
     'email_verified_at' => NULL,
     'password' => '$2y$12$vCZiHGeM7GiWPDHIthzinuNoPpnOuVxnfl.3PIwtCPNRbj5StIwKu',
     'is_admin' => 0,
     'account_status' => 'active',
     'created_at' => '2026-11-27 10:23:42',
-    'updated_at' => '2026-11-27 10:23:42',
+    'updated_at' => '2026-11-28 11:08:24',
     'two_factor_confirmed_at' => NULL,
     'is_petsitter' => 1,
     'location' => NULL,
@@ -404,6 +527,7 @@ class ExportedDataSeeder extends Seeder
     'avatar' => NULL,
     'suspended_until' => NULL,
     'suspension_reason' => NULL,
+    'weekly_summary_enabled' => 1,
   ),
 );
         $userColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('users'));
@@ -573,7 +697,7 @@ class ExportedDataSeeder extends Seeder
   array (
     'user_id' => 17,
     'biography' => NULL,
-    'experience' => 'Teste aaaaaaa',
+    'experience' => 'Teste',
     'service_location' => 'Ribeira Grande',
     'age' => 20,
     'price_per_day' => 10,
@@ -583,11 +707,11 @@ class ExportedDataSeeder extends Seeder
     'approval_status' => 'approved',
     'identification_documents' => 'identification-documents/17/Siqq79TYP7PrxYRjynQxTGR2Bh5ljYDdmQkNB9QM.jpg',
     'created_at' => '2026-11-26 19:36:02',
-    'updated_at' => '2026-11-27 10:43:51',
+    'updated_at' => '2026-11-28 11:09:41',
     'availability_days' => '["monday","tuesday","wednesday","thursday","friday"]',
     'profile_photo' => NULL,
     'city' => NULL,
-    'average_rating' => NULL,
+    'average_rating' => 5,
     'short_bio' => NULL,
     'postal_code' => '9600-580',
   ),
@@ -869,11 +993,11 @@ class ExportedDataSeeder extends Seeder
   array (
     'id' => 4,
     'petsitter_id' => 17,
-    'description' => 'a',
+    'description' => 'aaaaaaaa',
     'photos' => NULL,
     'created_at' => '2026-11-27 17:20:06',
     'updated_at' => '2026-11-27 17:20:06',
-    'title' => 'a',
+    'title' => 'Teste',
   ),
 );
         $postColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('posts'));
@@ -883,7 +1007,7 @@ class ExportedDataSeeder extends Seeder
         }
 
         // Export Bookings (23 bookings)
-        // Export Petsitter Services (4 services)
+        // Export Petsitter Services (5 services)
         $services = array (
   0 => 
   array (
@@ -920,6 +1044,15 @@ class ExportedDataSeeder extends Seeder
     'price' => 10,
     'created_at' => '2026-11-27 10:23:42',
     'updated_at' => '2026-11-27 10:23:42',
+  ),
+  4 => 
+  array (
+    'id' => 5,
+    'petsitter_id' => 17,
+    'type' => 'Banho',
+    'price' => 10,
+    'created_at' => '2026-11-28 11:03:24',
+    'updated_at' => '2026-11-28 11:03:24',
   ),
 );
         $serviceColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('petsitter_services'));
@@ -1279,10 +1412,10 @@ class ExportedDataSeeder extends Seeder
     'petsitter_id' => 17,
     'start_date' => '2026-12-16',
     'end_date' => '2026-12-16',
-    'status' => 'approved',
+    'status' => 'completed',
     'total_price' => 10,
     'created_at' => '2026-11-27 10:46:27',
-    'updated_at' => '2026-11-27 10:48:25',
+    'updated_at' => '2026-11-28 12:39:22',
     'service_id' => 4,
     'message' => NULL,
     'zone' => 'Ribreira Grande',
@@ -1296,10 +1429,10 @@ class ExportedDataSeeder extends Seeder
     'petsitter_id' => 17,
     'start_date' => '2026-12-03',
     'end_date' => '2026-12-03',
-    'status' => 'approved',
+    'status' => 'completed',
     'total_price' => 10,
     'created_at' => '2026-11-27 10:53:00',
-    'updated_at' => '2026-11-27 10:54:53',
+    'updated_at' => '2026-11-28 11:09:12',
     'service_id' => 4,
     'message' => NULL,
     'zone' => 'Ribeira Grande',
@@ -1313,10 +1446,10 @@ class ExportedDataSeeder extends Seeder
     'petsitter_id' => 17,
     'start_date' => '2027-01-06',
     'end_date' => '2027-01-06',
-    'status' => 'pending',
+    'status' => 'rejected',
     'total_price' => 10,
     'created_at' => '2026-11-27 16:25:59',
-    'updated_at' => '2026-11-27 16:25:59',
+    'updated_at' => '2026-11-27 17:39:51',
     'service_id' => 4,
     'message' => 'asda da',
     'zone' => 'Ribeira Grande',
@@ -1335,7 +1468,7 @@ class ExportedDataSeeder extends Seeder
             Booking::forceCreate($bookingCreateData);
         }
 
-        // Export Reviews (7 reviews)
+        // Export Reviews (9 reviews)
         $reviews = array (
   0 => 
   array (
@@ -1412,6 +1545,28 @@ class ExportedDataSeeder extends Seeder
     'comment' => 'Comentário ofensivo de teste para moderação.',
     'created_at' => '2026-11-27 10:23:42',
     'updated_at' => '2026-11-27 10:23:42',
+    'status' => 'published',
+  ),
+  7 => 
+  array (
+    'id' => 8,
+    'booking_id' => 22,
+    'petsitter_id' => 17,
+    'star_rating' => 5,
+    'comment' => NULL,
+    'created_at' => '2026-11-28 11:09:41',
+    'updated_at' => '2026-11-28 11:09:41',
+    'status' => 'published',
+  ),
+  8 => 
+  array (
+    'id' => 9,
+    'booking_id' => 21,
+    'petsitter_id' => 17,
+    'star_rating' => 5,
+    'comment' => NULL,
+    'created_at' => '2026-11-28 12:39:35',
+    'updated_at' => '2026-11-28 12:39:35',
     'status' => 'published',
   ),
 );
@@ -1510,7 +1665,7 @@ class ExportedDataSeeder extends Seeder
             AnimalBooking::forceCreate($abCreateData);
         }
 
-        // Export Notifications (10 notifications)
+        // Export Notifications (13 notifications)
         if (\Illuminate\Support\Facades\Schema::hasTable('notifications')) {
             $notificationColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('notifications'));
             $notifications = array (
@@ -1623,6 +1778,39 @@ class ExportedDataSeeder extends Seeder
     'created_at' => '2026-11-27 16:25:59',
     'updated_at' => '2026-11-27 16:25:59',
     'booking_id' => 23,
+  ),
+  10 => 
+  array (
+    'id' => 11,
+    'user_id' => 9,
+    'type' => 'booking',
+    'message' => 'A reserva foi recusada.',
+    'read_at' => NULL,
+    'created_at' => '2026-11-27 17:39:51',
+    'updated_at' => '2026-11-27 17:39:51',
+    'booking_id' => 23,
+  ),
+  11 => 
+  array (
+    'id' => 12,
+    'user_id' => 9,
+    'type' => 'booking',
+    'message' => 'A reserva foi concluída.',
+    'read_at' => '2026-11-28 11:09:21',
+    'created_at' => '2026-11-28 11:09:12',
+    'updated_at' => '2026-11-28 11:09:21',
+    'booking_id' => 22,
+  ),
+  12 => 
+  array (
+    'id' => 13,
+    'user_id' => 9,
+    'type' => 'booking',
+    'message' => 'A reserva foi concluída.',
+    'read_at' => NULL,
+    'created_at' => '2026-11-28 12:39:22',
+    'updated_at' => '2026-11-28 12:39:22',
+    'booking_id' => 21,
   ),
 );
             foreach ($notifications as $notificationData) {

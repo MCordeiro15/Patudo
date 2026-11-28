@@ -1,10 +1,10 @@
 <?php
 
-
 /**
  * Factory para gerar dados fictícios de utilizadores nos testes. Cria utilizadores com nome, email e password aleatórios.
  * Factory to generate fake user data in tests. Creates users with random name, email, and password.
  */
+
 namespace Database\Factories;
 
 use App\Models\User;
@@ -36,6 +36,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'weekly_summary_enabled' => true,
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,

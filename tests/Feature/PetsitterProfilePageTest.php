@@ -4,7 +4,9 @@
  * Ficheiro PHP: PetsitterProfilePageTest.php
  * PHP file: PetsitterProfilePageTest.php
  */
+use App\Models\Booking;
 use App\Models\Petsitter;
+use App\Models\Review;
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -22,6 +24,40 @@ test('petsitter can view their own profile with its data', function () {
             ->where('petsitter.user_id', $petsitter->user_id)
             ->where('petsitter.name', $petsitter->user->name)
             ->where('petsitter.biography', 'Cuido de cães há vários anos.')
+        );
+});
+
+test('petsitter own profile includes the average and count of visible reviews', function () {
+    $petsitter = Petsitter::factory()->approved()->create();
+
+    foreach ([5 => Review::PUBLISHED, 4 => Review::FLAGGED, 1 => Review::REMOVED] as $rating => $status) {
+        $booking = Booking::create([
+            'user_id' => User::factory()->create()->id,
+            'petsitter_id' => $petsitter->user_id,
+            'start_date' => now()->subDays(5)->toDateString(),
+            'end_date' => now()->subDays(3)->toDateString(),
+            'status' => 'completed',
+            'total_price' => 30,
+        ]);
+
+        Review::forceCreate([
+            'booking_id' => $booking->id,
+            'petsitter_id' => $petsitter->user_id,
+            'star_rating' => $rating,
+            'comment' => 'Boa experiência.',
+            'status' => $status,
+        ]);
+    }
+
+    $petsitter->refreshAverageRating();
+
+    $this->actingAs($petsitter->user)
+        ->get('/petsitters/profile')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Petsitter/Profile')
+            ->where('petsitter.average_rating', 4.5)
+            ->where('petsitter.reviews_count', 2)
         );
 });
 

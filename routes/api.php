@@ -81,6 +81,11 @@ Route::middleware(['auth:sanctum', EnsureAccountActive::class])->group(function 
     Route::delete('/petsitters/{petsitter}/availability/{date}', [PetsitterAvailabilityController::class, 'destroy']);
     Route::post('/petsitters/{petsitter}/approve', [PetsitterController::class, 'approve']);
     Route::post('/petsitters/{petsitter}/reject', [PetsitterController::class, 'reject']);
+    // pedir mais informação ao candidato (a candidatura continua pendente)
+    Route::post('/petsitters/{petsitter}/request-info', [PetsitterController::class, 'requestInfo']);
+    // um dos documentos de identificação de uma candidatura, pela posição na lista (só o admin)
+    Route::get('/petsitter-applications/{application}/documents/{index}', [PetsitterController::class, 'applicationDocument'])
+        ->whereNumber('index');
     // documento de identificação (disco privado): só o admin o pode abrir
     Route::get('/petsitters/{petsitter}/identification-document', [PetsitterController::class, 'identificationDocument']);
     Route::apiResource('petsitters', PetsitterController::class);

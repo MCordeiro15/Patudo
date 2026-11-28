@@ -1,10 +1,10 @@
 <?php
 
-
 /**
  * Ficheiro PHP: AuthenticationTest.php
  * PHP file: AuthenticationTest.php
  */
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Fortify\Features;
@@ -59,13 +59,22 @@ test('users can not authenticate with invalid password', function () {
 });
 
 test('users can logout', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->admin()->create();
+    $notification = Notification::create([
+        'user_id' => $user->id,
+        'type' => 'booking',
+        'message' => 'A tua reserva foi atualizada.',
+    ]);
+    $rememberToken = $user->getRememberToken();
 
     $response = $this->actingAs($user)->post(route('logout'));
 
     $response->assertRedirect(route('home'));
 
     $this->assertGuest();
+    $this->assertDatabaseHas('users', ['id' => $user->id]);
+    $this->assertDatabaseHas('users', ['id' => $user->id, 'remember_token' => $rememberToken]);
+    $this->assertDatabaseHas('notifications', ['id' => $notification->id]);
 });
 
 test('users are rate limited', function () {

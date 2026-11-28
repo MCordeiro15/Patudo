@@ -4,6 +4,7 @@ use App\Models\Animal;
 use App\Models\Booking;
 use App\Models\Notification;
 use App\Models\Petsitter;
+use App\Models\PetsitterService;
 use App\Models\User;
 use App\Services\ImportExportedPetsitters;
 use Illuminate\Support\Facades\DB;
@@ -169,6 +170,51 @@ test('database export includes notifications and preserves their user and bookin
         ->toContain('Booking::forceCreate($bookingCreateData);')
         ->toContain("array_key_exists('service_id', \$bookingCreateData)")
         ->toContain('Notification::forceCreate(array_intersect_key($notificationData, $notificationColumns));');
+});
+
+test('database export preserves an administrator weekly summary preference', function () {
+    $admin = User::factory()->admin()->create(['weekly_summary_enabled' => false]);
+    $generatedSeeder = null;
+
+    File::shouldReceive('put')->once()->andReturnUsing(function ($path, $contents) use (&$generatedSeeder) {
+        $generatedSeeder = $contents;
+
+        return true;
+    });
+
+    $this->artisan('db:export')->assertSuccessful();
+
+    expect($generatedSeeder)
+        ->toContain("'email' => '{$admin->email}'")
+        ->toContain("'weekly_summary_enabled' => 0")
+        ->toContain('$user->forceFill($userCreateData)->save();');
+});
+
+test('database export includes custom petsitter service names', function () {
+    $petsitter = Petsitter::factory()->approved()->create();
+    $service = PetsitterService::create([
+        'petsitter_id' => $petsitter->user_id,
+        'type' => 'Banho e tosquia',
+        'price' => 20,
+    ]);
+    $generatedSeeder = null;
+
+    File::shouldReceive('put')->once()->andReturnUsing(function ($path, $contents) use (&$generatedSeeder) {
+        $generatedSeeder = $contents;
+
+        return true;
+    });
+
+    $this->artisan('db:export')->assertSuccessful();
+
+    $this->assertDatabaseHas('petsitter_services', [
+        'id' => $service->id,
+        'type' => 'Banho e tosquia',
+    ]);
+
+    expect($generatedSeeder)
+        ->toContain("'type' => 'Banho e tosquia'")
+        ->toContain('PetsitterService::forceCreate(array_intersect_key($sData, $serviceColumns));');
 });
 
 test('database export preserves animal ids referenced by animal bookings', function () {

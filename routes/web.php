@@ -4,9 +4,12 @@
  * Ficheiro PHP: web.php
  * PHP file: web.php
  */
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\PetsitterProfileController;
 use App\Http\Controllers\UserAvatarController;
 use App\Models\Petsitter;
+use App\Models\PetsitterApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -56,6 +59,7 @@ Route::get('/support', function () {
 
     return Inertia::render('Support', ['suspension' => $suspension]);
 })->middleware('auth')->name('support');
+Route::post('/logout', LogoutController::class)->middleware('auth')->name('logout');
 Route::inertia('/petsitters', 'Petsitter/SearchPetsitter')->middleware('auth')->name('petsitters.search');
 Route::inertia('/find-petsitter', 'Petsitter/PublicSearchPetsitter')->name('petsitters.public');
 Route::inertia('/favorites', 'Petsitter/Favorites')->middleware('auth')->name('favorites');
@@ -93,6 +97,11 @@ Route::get('/profile', function () {
     return Inertia::render('Owner/Profile', [
         // null (sem candidatura), 'pending' ou 'rejected' -> o perfil mostra o botão ou o estado
         'petsitterApplicationStatus' => $applicationStatus,
+        // quantas candidaturas ainda pode fazer (um recusado pode voltar a candidatar-se)
+        'petsitterApplicationsRemaining' => max(
+            0,
+            PetsitterApplication::MAX_PER_USER - PetsitterApplication::where('user_id', $user->id)->count(),
+        ),
     ]);
 })->middleware('auth')->name('owner.profile');
 
@@ -134,7 +143,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::inertia('/reviews', 'Admin/ReviewsView')->name('reviews');
     Route::inertia('/reports', 'Admin/ReportsView')->name('reports');
     Route::inertia('/support', 'Admin/SupportView')->name('support');
-    Route::inertia('/settings', 'Admin/SettingsView')->name('settings');
+    Route::get('/settings', [AdminSettingsController::class, 'edit'])->name('settings');
+    Route::patch('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
 });
 
 // Pagamento confirmado (dono)
