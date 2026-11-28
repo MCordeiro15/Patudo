@@ -4,6 +4,7 @@
  * Classe base abstrata para todos os controladores da aplicação. Fornece funcionalidade comum.
  * Abstract base class for all application controllers. Provides common functionality.
  */
+
 namespace App\Http\Controllers;
 
 use App\Models\Petsitter;
@@ -20,10 +21,11 @@ class PetsitterProfileController extends Controller
     {
         $user = $request->user();
 
-        // Se não tem perfil de petsitter, ou a candidatura ainda não foi aprovada,
-        // redireciona para o perfil de utilizador (owner)
+        abort_if(in_array($user->account_status, ['suspended', 'banned'], true), 403);
+
+        // Só mostra o perfil de petsitter quando o papel e a aprovação estão ativos.
         $petsitter = Petsitter::where('user_id', $user->id)->first();
-        if ( ! $petsitter || $petsitter->approval_status !== 'approved') {
+        if (! $petsitter || ! $user->isPetsitter()) {
             return redirect()->route('owner.profile');
         }
 
@@ -38,15 +40,23 @@ class PetsitterProfileController extends Controller
     public function show(Request $request, Petsitter $petsitter)
     {
         $viewer = $request->user();
+
+        abort_if(in_array($viewer->account_status, ['suspended', 'banned'], true), 403);
+        abort_if(
+            in_array($petsitter->user?->account_status, ['suspended', 'banned'], true) && ! $viewer->isAdmin(),
+            403,
+        );
+
         $isOwnProfile = $viewer->id === $petsitter->user_id;
 
-        // o próprio, com a candidatura pendente ou recusada, vê o perfil de owner
-        if ($isOwnProfile && $petsitter->approval_status !== 'approved' && ! $viewer->isAdmin()) {
+        // O próprio só vê o perfil de petsitter se tiver uma aprovação ativa.
+        if ($isOwnProfile && ! $viewer->isAdmin() && ! $viewer->isPetsitter()) {
             return redirect()->route('owner.profile');
         }
 
+        $isPublicPetsitter = $petsitter->approval_status === 'approved' && $petsitter->user?->isPetsitter();
         abort_unless(
-            $viewer->isAdmin() || $isOwnProfile || $petsitter->approval_status === 'approved',
+            $viewer->isAdmin() || $isOwnProfile || $isPublicPetsitter,
             404,
         );
 
@@ -80,12 +90,14 @@ class PetsitterProfileController extends Controller
                     ? (str_starts_with($petsitter->profile_photo, 'data:')
                         ? $petsitter->profile_photo
                         : Storage::disk('public')->url($petsitter->profile_photo))
-                    : 'https://ui-avatars.com/api/?name=' . urlencode($petsitter->user->name ?? 'P') . '&background=random',
+                    : 'https://ui-avatars.com/api/?name='.urlencode($petsitter->user->name ?? 'P').'&background=random',
                 'biography' => $petsitter->biography,
                 'experience' => $petsitter->experience ?? '',
                 'service_location' => $petsitter->service_location,
                 'age' => $petsitter->age,
                 'price_per_day' => $petsitter->price_per_day ?? 0,
+                'average_rating' => $petsitter->average_rating,
+                'reviews_count' => $petsitter->reviews()->visible()->count(),
                 'accepted_sizes' => $petsitter->accepted_sizes ?? [],
                 'accepted_animal_types' => $petsitter->accepted_animal_types ?? [],
                 'sex' => $petsitter->sex,

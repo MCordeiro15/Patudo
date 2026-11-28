@@ -33,8 +33,8 @@ const sizeBadgeClass = (size: string) =>
 </script>
 
 <template>
-    <div class="card border border-primary rounded-4 p-3 h-100">
-        <div class="d-flex align-items-start gap-3">
+    <div class="card animal-card border border-primary rounded-4 p-3 h-100 d-flex flex-column">
+        <div class="d-flex align-items-start gap-3 flex-grow-1">
             <div
                 class="d-flex align-items-center justify-content-center rounded-circle bg-light flex-shrink-0 overflow-hidden"
                 style="width: 56px; height: 56px"
@@ -70,26 +70,27 @@ const sizeBadgeClass = (size: string) =>
                     <strong>Necessidades especiais:</strong>
                     {{ animal.special_needs }}
                 </p>
-
-                <div class="d-flex gap-2 mt-2">
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-outline-primary rounded-pill d-flex align-items-center gap-1"
-                        @click="emit('edit', props.animal.id)"
-                    >
-                        <Pencil :size="14" />
-                        Editar
-                    </button>
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-outline-danger rounded-pill d-flex align-items-center gap-1"
-                        @click="emit('delete', props.animal.id)"
-                    >
-                        <Trash2 :size="14" />
-                        Remover
-                    </button>
-                </div>
             </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-2">
+            <button
+                type="button"
+                class="patudo-icon-action patudo-icon-action-edit"
+                :aria-label="`Editar ${animal.name}`"
+                :title="`Editar ${animal.name}`"
+                @click="emit('edit', props.animal.id)"
+            >
+                <Pencil :size="16" />
+            </button>
+            <button
+                type="button"
+                class="patudo-icon-action patudo-icon-action-delete"
+                :aria-label="`Remover ${animal.name}`"
+                :title="`Remover ${animal.name}`"
+                @click="emit('delete', props.animal.id)"
+            >
+                <Trash2 :size="16" />
+            </button>
         </div>
     </div>
 </template>

@@ -4,6 +4,7 @@
  * Middleware que configura os dados partilhados enviados para o front-end Vue via Inertia. Adiciona dados do utilizador, flash messages e configuração de aparência.
  * Middleware that configures shared data sent to the Vue front-end via Inertia. Adds user data, flash messages, and appearance settings.
  */
+
 namespace App\Http\Middleware;
 
 use App\Models\Petsitter;
@@ -41,12 +42,22 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $authUser = $user?->toArray();
+        if ($user && $authUser) {
+            $authUser['is_petsitter'] = $user->isPetsitter();
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $authUser,
+                'isAdmin' => $request->user()?->isAdmin() ?? false,
             ],
+            'unreadNotificationCount' => fn () => $user
+                ? $user->notifications()->withinRetention()->whereNull('read_at')->count()
+                : 0,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             // Números das bolinhas do menu de admin. A closure só corre quando a prop é enviada
             // (um router.reload({ only: ['adminCounts'] }) pede só esta); para quem não é admin é null, sem consultas.

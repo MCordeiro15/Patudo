@@ -10,6 +10,25 @@ import '../css/app.css';
 
 if (typeof window !== 'undefined') {
     void import('bootstrap');
+
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+        const response = await originalFetch(input, init);
+
+        if (response.status === 403 && window.location.pathname !== '/support') {
+            const responseUrl = new URL(response.url, window.location.origin);
+
+            if (responseUrl.pathname.startsWith('/api/')) {
+                const error = await response.clone().json().catch(() => null);
+
+                if (error?.account_status === 'suspended') {
+                    window.location.replace('/support');
+                }
+            }
+        }
+
+        return response;
+    };
 }
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
@@ -38,6 +57,7 @@ void createInertiaApp({
             case name === 'Messages':
             case name === 'Owner/BookingPage':
             case name === 'Payment/PaymentConfirmed':
+            case name === 'Support':
             case name.startsWith('Admin/'):
                 return null;
             case name.startsWith('settings/'):

@@ -96,12 +96,54 @@ test('postal code must have the 0000-000 format', function (string $postalCode) 
         ->assertJsonValidationErrors('postal_code');
 })->with(['9500123', '950-1234', 'abcd-efg', '']);
 
-test('service must be one of the accepted types', function () {
+test('service is free text, required and up to 50 characters', function () {
     $user = User::factory()->create();
 
-    submitBecomePetsitter($this, $user, becomePetsitterPayload(['service' => 'banho']))
+    submitBecomePetsitter($this, $user, becomePetsitterPayload(['service' => '']))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['service' => 'Escreve o teu serviço.']);
+
+    submitBecomePetsitter($this, $user, becomePetsitterPayload(['service' => str_repeat('a', 51)]))
         ->assertUnprocessable()
         ->assertJsonValidationErrors('service');
+
+    // texto livre escrito pelo candidato: fica como o primeiro serviço, com o preço por dia
+    submitBecomePetsitter($this, $user, becomePetsitterPayload(['service' => 'Banho e tosquia']))
+        ->assertCreated()
+        ->assertJsonPath('data.services.0.type', 'Banho e tosquia')
+        ->assertJsonPath('data.services.0.price', 15);
+});
+
+test('price per day must be between the limits when applying', function (float $price, bool $ok) {
+    $user = User::factory()->create();
+
+    $response = submitBecomePetsitter($this, $user, becomePetsitterPayload(['price_per_day' => $price]));
+
+    $ok
+        ? $response->assertCreated()
+        : $response->assertUnprocessable()->assertJsonValidationErrors([
+            'price_per_day' => 'O preço por dia tem de estar entre 5 € e 200 €.',
+        ]);
+})->with([
+    'mínimo' => [Petsitter::MIN_PRICE_PER_DAY, true],
+    'máximo' => [Petsitter::MAX_PRICE_PER_DAY, true],
+    'abaixo do mínimo' => [Petsitter::MIN_PRICE_PER_DAY - 0.01, false],
+    'acima do máximo' => [Petsitter::MAX_PRICE_PER_DAY + 0.01, false],
+]);
+
+test('price per day must be between the limits when editing the profile', function () {
+    $petsitter = Petsitter::factory()->approved()->create();
+
+    $this->actingAs($petsitter->user)
+        ->putJson("/api/petsitters/{$petsitter->user_id}", ['price_per_day' => 250])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('price_per_day');
+
+    $this->actingAs($petsitter->user)
+        ->putJson("/api/petsitters/{$petsitter->user_id}", ['price_per_day' => 30])
+        ->assertOk();
+
+    expect((float) $petsitter->fresh()->price_per_day)->toBe(30.0);
 });
 
 test('identification document must be a jpg, png or pdf file up to 10 MB', function () {
@@ -181,7 +223,7 @@ test('approving sets is_petsitter and rejecting clears it', function () {
     $this->actingAs($admin)->postJson('/api/petsitters/'.$petsitter->user_id.'/approve')->assertOk();
     expect($petsitter->user->fresh()->is_petsitter)->toBeTrue();
 
-    $this->actingAs($admin)->postJson('/api/petsitters/'.$petsitter->user_id.'/reject')->assertOk();
+    $this->actingAs($admin)->postJson('/api/petsitters/'.$petsitter->user_id.'/reject', ['reasons' => ['illegible_document']])->assertOk();
     expect($petsitter->user->fresh()->is_petsitter)->toBeFalse();
 });
 

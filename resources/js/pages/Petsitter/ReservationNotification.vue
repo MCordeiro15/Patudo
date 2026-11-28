@@ -1,22 +1,16 @@
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3';
-import { Bell, LogOut, MessageCircle, UserRound } from '@lucide/vue';
-import { computed, onMounted, ref } from 'vue';
+import { LogOut, UserRound } from '@lucide/vue';
+import { computed } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
+import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 import BookingList from '@/components/BookingList.vue';
-import { useNotifications } from '@/composables/useNotifications';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 // A página é partilhada: petsitters veem pedidos recebidos e donos veem os seus pedidos pendentes.
-const page = usePage<{ auth: { user: { is_petsitter?: boolean } | null } }>();
+const page = usePage<{ auth: { isAdmin: boolean; user: { is_petsitter?: boolean } | null } }>();
 const viewerIsPetsitter = computed(() => page.props.auth.user?.is_petsitter === true);
-
-const showNotifications = ref(false);
-const { unreadCount, fetchNotifications } = useNotifications();
-
-onMounted(() => {
-    void fetchNotifications();
-});
+const showOwnerNavigation = computed(() => !viewerIsPetsitter.value || page.props.auth.isAdmin);
 </script>
 
 <template>
@@ -32,31 +26,15 @@ onMounted(() => {
                 </a>
 
                 <div class="nav nav-pills border rounded-pill p-1 mx-auto">
-                    <a class="nav-link text-dark rounded-pill px-4" href="/">Início</a>
+                    <a v-if="showOwnerNavigation" class="nav-link text-dark rounded-pill px-4" href="/">Início</a>
                     <a class="nav-link active rounded-pill px-4" href="/orders" aria-current="page">Pedidos</a>
-                    <a class="nav-link text-dark rounded-pill px-4" href="/favorites">Favoritos</a>
+                    <a v-if="showOwnerNavigation" class="nav-link text-dark rounded-pill px-4" href="/favorites">Favoritos</a>
                     <a class="nav-link text-dark rounded-pill px-4" href="/reservations">Reservas</a>
+                    <AdminNavigationMenu />
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark" aria-label="Mensagens">
-                        <MessageCircle :size="25" />
-                    </a>
-                    <button
-                        type="button"
-                        class="text-dark bg-transparent border-0 p-0 position-relative"
-                        aria-label="Notificações"
-                        @click="showNotifications = true"
-                    >
-                        <Bell :size="25" />
-                        <span
-                            v-if="unreadCount > 0"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            style="font-size: 0.6rem;"
-                        >
-                            {{ unreadCount > 9 ? '9+' : unreadCount }}
-                        </span>
-                    </button>
+                    <HeaderNotificationsChat />
                     <a href="/profile" class="text-dark" aria-label="Perfil">
                         <UserRound :size="25" />
                     </a>
@@ -81,15 +59,6 @@ onMounted(() => {
             />
         </div>
 
-        <ModalNotifications
-            :show="showNotifications"
-            @close="showNotifications = false"
-        />
     </main>
 </template>
 
-<style scoped>
-.patudo-page {
-    background-color: var(--patudo-branco, #fffaf3);
-}
-</style>

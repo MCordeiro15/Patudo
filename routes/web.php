@@ -4,7 +4,12 @@
  * Ficheiro PHP: web.php
  * PHP file: web.php
  */
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\PetsitterProfileController;
+use App\Http\Controllers\UserAvatarController;
+use App\Models\Petsitter;
+use App\Models\PetsitterApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -16,13 +21,45 @@ Route::get('/sanctum/csrf-cookie', function (Request $request) {
 
 Route::get('/', action: function () {
     if (auth()->check()) {
-        return redirect()->route('petsitters.search');
+        return redirect()->route('dashboard');
     }
 
     return Inertia::render('Homepage');
 })->name('home');
+Route::get('/dashboard', function () {
+    $user = auth()->user();
+
+    if ($user->isAdmin()) {
+        return redirect()->route('petsitters.search');
+    }
+
+    if ($user->isPetsitter()) {
+        return redirect()->route('bookings.orders');
+    }
+
+    return redirect()->route('petsitters.search');
+})->middleware('auth')->name('dashboard');
 Route::inertia('/login', 'auth/Login')->name('login');
 Route::inertia('/register', 'auth/Register')->name('register');
+Route::get('/support', function () {
+    $user = auth()->user();
+    $suspension = null;
+
+    if ($user && $user->account_status === 'suspended') {
+        $suspension = [
+            'status' => 'suspended',
+            'until' => $user->suspended_until?->toIso8601String(),
+            'reason' => $user->suspension_reason,
+            'notice' => $user->notifications()
+                ->where('type', 'account_suspended')
+                ->latest()
+                ->value('message'),
+        ];
+    }
+
+    return Inertia::render('Support', ['suspension' => $suspension]);
+})->middleware('auth')->name('support');
+Route::post('/logout', LogoutController::class)->middleware('auth')->name('logout');
 Route::inertia('/petsitters', 'Petsitter/SearchPetsitter')->middleware('auth')->name('petsitters.search');
 Route::inertia('/find-petsitter', 'Petsitter/PublicSearchPetsitter')->name('petsitters.public');
 Route::inertia('/favorites', 'Petsitter/Favorites')->middleware('auth')->name('favorites');
@@ -31,7 +68,7 @@ Route::get('/petsitters/profile', [PetsitterProfileController::class, 'showOwn']
     ->name('petsitters.profile');
 Route::inertia('/messages', 'Messages')->middleware('auth')->name('messages');
 // Foto de perfil de um utilizador como imagem (usada pelo chat, que precisa de um URL e não de base64)
-Route::get('/users/{user}/avatar', \App\Http\Controllers\UserAvatarController::class)
+Route::get('/users/{user}/avatar', UserAvatarController::class)
     ->middleware('auth')
     ->whereNumber('user')
     ->name('users.avatar');
@@ -45,16 +82,26 @@ Route::get('/profile-owner-view', fn () => Inertia::render('Petsitter/ProfileOwn
 
 Route::get('/profile', function () {
     $user = auth()->user();
-    $petsitter = \App\Models\Petsitter::where('user_id', $user->id)->first();
+    $petsitter = Petsitter::where('user_id', $user->id)->first();
 
     // só vai para o perfil de petsitter depois de o admin aprovar
-    if ($petsitter && $petsitter->approval_status === 'approved') {
+    if ($user->isPetsitter()) {
         return redirect()->route('petsitters.profile');
+    }
+
+    $applicationStatus = $petsitter?->approval_status;
+    if ($applicationStatus === 'approved') {
+        $applicationStatus = 'inactive';
     }
 
     return Inertia::render('Owner/Profile', [
         // null (sem candidatura), 'pending' ou 'rejected' -> o perfil mostra o botão ou o estado
-        'petsitterApplicationStatus' => $petsitter?->approval_status,
+        'petsitterApplicationStatus' => $applicationStatus,
+        // quantas candidaturas ainda pode fazer (um recusado pode voltar a candidatar-se)
+        'petsitterApplicationsRemaining' => max(
+            0,
+            PetsitterApplication::MAX_PER_USER - PetsitterApplication::where('user_id', $user->id)->count(),
+        ),
     ]);
 })->middleware('auth')->name('owner.profile');
 
@@ -81,9 +128,9 @@ Route::inertia('/reservations', 'Owner/ReservationNotificationToOwner')
     ->middleware('auth')
     ->name('bookings.reservations');
 
-// Páginas de administração: só para admins (403 para os outros, login para quem não tem sessão).
+// Páginas de administração: só para admins (redireciona os restantes para o seu dashboard).
 // Os dados de cada página são carregados pela API (/api/admin/*), que também exige admin.
-Route::middleware(['auth', 'can:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::inertia('/petsitters/pending', 'Admin/VerificationsView')->name('petsitters.pending');
     Route::inertia('/users', 'Admin/UsersView')->name('users');
     Route::get('/users/{user}', fn (string $user) => Inertia::render('Admin/UserDetailView', ['userId' => (int) $user]))
@@ -96,7 +143,8 @@ Route::middleware(['auth', 'can:admin'])->prefix('admin')->name('admin.')->group
     Route::inertia('/reviews', 'Admin/ReviewsView')->name('reviews');
     Route::inertia('/reports', 'Admin/ReportsView')->name('reports');
     Route::inertia('/support', 'Admin/SupportView')->name('support');
-    Route::inertia('/settings', 'Admin/SettingsView')->name('settings');
+    Route::get('/settings', [AdminSettingsController::class, 'edit'])->name('settings');
+    Route::patch('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
 });
 
 Route::inertia('/admin/bookings', 'Admin/BookingsView')
@@ -109,4 +157,4 @@ Route::inertia('/payment-confirmed', 'Payment/PaymentConfirmed')
     ->name('payment.confirmed');
 
 Route::inertia('/dev/modals', 'Modals/ModalTests')->name('dev.modals');
-require __DIR__ . '/settings.php';
+require __DIR__.'/settings.php';

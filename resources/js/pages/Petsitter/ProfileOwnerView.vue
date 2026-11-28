@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { Bell, Check, Heart, LogOut, MessageCircle, Star, UserRound, X } from '@lucide/vue';
+import { Check, Heart, LogOut, UserRound, X } from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
+import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 import ModalReportPetsitter from '@/pages/Modals/ModalReportPetsitter.vue';
-import { useNotifications } from '@/composables/useNotifications';
 import type { Post } from '@/types/post';
 
 // O id vem do controller (/petsitters/{id}) ou do URL: /profile-owner-view?petsitter=ID
@@ -96,8 +96,6 @@ const toggleFavourite = async () => {
 };
 
 const showReportModal = ref(false);
-const showNotifications = ref(false);
-const { unreadCount } = useNotifications();
 
 const submitReport = async (payload: { reason: string; description: string }) => {
     if (!petsitterId) return;
@@ -142,7 +140,7 @@ type PetsitterData = {
 
 type PetsitterService = {
     id: number;
-    type: 'pet-sitting' | 'passeio';
+    type: string;
     price: number;
 };
 
@@ -175,8 +173,10 @@ const loadServices = async () => {
     }
 };
 
-const serviceTypeLabel = (type: PetsitterService['type']) =>
-    type === 'passeio' ? 'Passeio' : 'Pet Sitting';
+const serviceTypeLabel = (type: PetsitterService['type']) => ({
+    passeio: 'Passeio',
+    'pet-sitting': 'Pet Sitting',
+}[type] ?? type);
 const formatServicePrice = (price: number) =>
     `${Number(price).toLocaleString('pt-PT', { maximumFractionDigits: 2 })} €`;
 
@@ -189,7 +189,7 @@ const tags = computed(() => {
     return [
         ...(petsitter.value.accepted_animal_types ?? []).map((t) => typeLabels[t] ?? t),
         ...(petsitter.value.accepted_sizes ?? []).map((s) => sizeLabels[s] ?? s),
-    ].slice(0, 3);
+    ];
 });
 
 const dayList = [
@@ -277,24 +277,18 @@ const displayMemberSince = computed(() =>
                         >
                             Reservas
                         </a>
+                        <AdminNavigationMenu />
                     </div>
 
                     <div class="d-flex align-items-center gap-3">
-                        <a href="/messages" class="text-dark"
-                        ><MessageCircle :size="25"
-                        /></a>
-                        <button type="button" class="text-dark bg-transparent border-0 p-0 position-relative" @click="showNotifications = true">
-                            <Bell :size="25" />
-                            <span v-if="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                                {{ unreadCount > 9 ? '9+' : unreadCount }}
-                            </span>
-                        </button>
-                        <button
-                            type="button"
+                        <HeaderNotificationsChat />
+                        <Link
+                            href="/profile"
                             class="text-dark p-0 border-0 bg-transparent"
+                            aria-label="Abrir o meu perfil"
                         >
                             <UserRound :size="25" />
-                        </button>
+                        </Link>
                         <Link
                             href="/logout"
                             method="post"
@@ -340,13 +334,15 @@ const displayMemberSince = computed(() =>
                                         {{ displayName }}
                                         <button
                                             type="button"
-                                            class="p-0 border-0 bg-transparent shadow-none d-flex"
-                                            aria-label="Favorito"
+                                            class="p-0 border-0 bg-transparent shadow-none d-flex text-primary"
+                                            :aria-label="isFavourite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
+                                            :aria-pressed="isFavourite"
                                             @click="toggleFavourite"
                                         >
-                                            <Star
+                                            <Heart
                                                 :size="20"
-                                                :fill="isFavourite ? '#f5b301' : 'none'"
+                                                :fill="isFavourite ? 'currentColor' : 'transparent'"
+                                                stroke-width="2.5"
                                             />
                                         </button>
                                     </h2>
@@ -470,9 +466,6 @@ const displayMemberSince = computed(() =>
                             <h3 class="fs-2 mb-2">{{ post.title }}</h3>
                             <p class="text-muted mb-auto post-text small">{{ post.description }}</p>
                             <small class="text-muted">{{ formatDate(post.created_at) }}</small>
-                            <button type="button" class="like-btn position-absolute bottom-0 end-0">
-                                <Heart :size="26" />
-                            </button>
                         </div>
                     </div>
                 </section>
@@ -489,19 +482,11 @@ const displayMemberSince = computed(() =>
                 @submit="submitReport"
             />
 
-            <ModalNotifications
-                :show="showNotifications"
-                @close="showNotifications = false"
-            />
         </main>
     </div>
 </template>
 
 <style scoped>
-.patudo-page {
-    background-color: #fffaf3;
-}
-
 .nav-pills .nav-link.active {
     background-color: var(--patudo-terracota, #c2410c) !important;
     color: #ffffff !important;
@@ -583,16 +568,5 @@ const displayMemberSince = computed(() =>
 }
 .post-text {
     max-width: 380px;
-}
-.like-btn {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    border: 0;
-    background: #c8470f;
-    color: #3a1a0a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 </style>

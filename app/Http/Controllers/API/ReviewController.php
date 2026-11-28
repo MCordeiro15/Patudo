@@ -16,12 +16,23 @@ use Illuminate\Support\Facades\Gate;
 
 class ReviewController extends Controller
 {
-    // GET /api/petsitters/{petsitter}/reviews: só as visíveis, mais recentes primeiro
+    // GET /api/petsitters/{petsitter}/reviews: só as visíveis (não removidas), mais recentes primeiro
     public function byPetsitter(Petsitter $petsitter)
     {
         return ReviewResource::collection(
-            $petsitter->reviews()->where('visible', true)->latest()->paginate(15)
+            $petsitter->reviews()->visible()->latest()->paginate(15)
         );
+    }
+
+    // POST /api/reviews/{review}/flag: um utilizador sinaliza a review; o admin decide depois se publica ou remove.
+    // Continua a aparecer no perfil até o admin decidir. Sinalizar duas vezes não muda nada.
+    public function flag(Review $review)
+    {
+        Gate::authorize('flag', $review);
+
+        $review->forceFill(['status' => Review::FLAGGED])->save();
+
+        return new ReviewResource($review);
     }
 
     // POST /api/bookings/{booking}/review
@@ -93,12 +104,12 @@ class ReviewController extends Controller
         return response()->noContent();
     }
 
-    // PATCH /api/reviews/{review}/hide: só o admin
+    // PATCH /api/reviews/{review}/hide: só o admin (o mesmo que remover em /api/admin/reviews/{review}/remove)
     public function hide(Review $review)
     {
         Gate::authorize('hide', $review);
 
-        $review->update(['visible' => false]);
+        $review->forceFill(['status' => Review::REMOVED])->save();
 
         // uma review escondida deixa de contar para a média
         $review->petsitter->refreshAverageRating();

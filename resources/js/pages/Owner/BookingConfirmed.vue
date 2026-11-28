@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { Bell, LogOut, MessageCircle, UserRound, ChevronLeft, CalendarDays, Dog, CheckCircle, Star } from '@lucide/vue';
+import { LogOut, UserRound, ChevronLeft, CalendarDays, Dog, CheckCircle, Star } from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
+import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 import type { Animal } from '@/types';
-import { useNotifications } from '@/composables/useNotifications';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 // O id da reserva vem do URL: /booking-confirmed?booking=ID
 const bookingId = new URLSearchParams(window.location.search).get('booking');
@@ -93,9 +93,6 @@ const loadBooking = async () => {
     }
 };
 
-const showNotifications = ref(false);
-const { unreadCount } = useNotifications();
-
 onMounted(() => {
     void loadBooking();
 });
@@ -128,18 +125,11 @@ onMounted(() => {
                     <a class="nav-link rounded-pill px-4" href="/orders">Pedidos</a>
                     <a class="nav-link rounded-pill px-4" href="/favorites">Favoritos</a>
                     <a class="nav-link active rounded-pill px-4" href="/reservations">Reservas</a>
+                    <AdminNavigationMenu />
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a href="/messages" class="text-dark"
-                        ><MessageCircle :size="25"
-                    /></a>
-                    <button type="button" class="text-dark bg-transparent border-0 p-0 position-relative" @click="showNotifications = true">
-                        <Bell :size="25" />
-                        <span v-if="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                            {{ unreadCount > 9 ? '9+' : unreadCount }}
-                        </span>
-                    </button>
+                    <HeaderNotificationsChat />
                     <button
                         type="button"
                         class="text-dark p-0 border-0 bg-none"
@@ -292,18 +282,10 @@ onMounted(() => {
             </div>
         </div>
 
-        <ModalNotifications
-            :show="showNotifications"
-            @close="showNotifications = false"
-        />
     </main>
 </template>
 
 <style scoped>
-.patudo-page {
-    background-color: #fffaf3;
-}
-
 .nav-pills .nav-link.active {
     background-color: var(--patudo-terracota, #c2410c) !important;
     color: #ffffff !important;

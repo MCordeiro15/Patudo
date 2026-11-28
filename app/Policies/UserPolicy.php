@@ -4,6 +4,7 @@
  * Política de autorização para utilizadores. Define quem pode visualizar, atualizar e suspender utilizadores (apenas admin).
  * Authorization policy for users. Defines who can view, update, and suspend users (only admin).
  */
+
 namespace App\Policies;
 
 use App\Models\User;
@@ -23,7 +24,8 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        return $user->isAdmin() || $user->id === $model->id;
+        return $user->isAdmin()
+            || (! in_array($model->account_status, ['suspended', 'banned'], true) && $user->id === $model->id);
     }
 
     /**

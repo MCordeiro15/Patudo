@@ -41,10 +41,18 @@ test('user can list their own animals', function () {
         ->assertJsonMissing(['name' => 'Garfield']);
 });
 
-test('admin can list all animals from all users', function () {
+test('admin can list only their own animals', function () {
     $admin = User::factory()->admin()->create();
     $user1 = User::factory()->create();
     $user2 = User::factory()->create();
+
+    Animal::create([
+        'user_id' => $admin->id,
+        'name' => 'Toby',
+        'species' => 'Dog',
+        'breed' => 'Beagle',
+        'size' => 'Medium',
+    ]);
 
     Animal::create([
         'user_id' => $user1->id,
@@ -65,9 +73,10 @@ test('admin can list all animals from all users', function () {
     $response = $this->actingAs($admin)->getJson('/api/animals');
 
     $response->assertOk()
-        ->assertJsonCount(2, 'data')
-        ->assertJsonFragment(['name' => 'Rex'])
-        ->assertJsonFragment(['name' => 'Garfield']);
+        ->assertJsonCount(1, 'data')
+        ->assertJsonFragment(['name' => 'Toby'])
+        ->assertJsonMissing(['name' => 'Rex'])
+        ->assertJsonMissing(['name' => 'Garfield']);
 });
 
 test('user can create an animal', function () {

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -40,6 +41,11 @@ class Petsitter extends Model
     protected $primaryKey = 'user_id';
 
     public $incrementing = false;
+
+    /** Limites do preço por dia, em euros (candidatura e editar perfil). / Price-per-day limits, in euros. */
+    public const MIN_PRICE_PER_DAY = 5;
+
+    public const MAX_PRICE_PER_DAY = 200;
 
     /* `approval_status` is not in `$fillable`.
      Only an administrator should be able to change it, and it should not be possible to submit it via a form.
@@ -82,6 +88,24 @@ class Petsitter extends Model
         return $this->hasMany(Post::class, 'petsitter_id', 'user_id');    // Petsitter 1 — 0..* Post
     }
 
+    /**
+     * Candidaturas deste petsitter (as antigas ficam guardadas), da mais recente para a mais antiga.
+     * Applications of this petsitter (old ones are kept), newest first.
+     */
+    public function applications(): HasMany
+    {
+        return $this->hasMany(PetsitterApplication::class, 'user_id', 'user_id')->latest('id');
+    }
+
+    /**
+     * A candidatura mais recente (a que o admin está a analisar).
+     * The most recent application (the one the admin is reviewing).
+     */
+    public function latestApplication(): HasOne
+    {
+        return $this->hasOne(PetsitterApplication::class, 'user_id', 'user_id')->latestOfMany();
+    }
+
     public function favouritedByUsers(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -109,7 +133,8 @@ class Petsitter extends Model
 
     public function refreshAverageRating(): void
     {
-        $avg = $this->reviews()->where('visible', true)->avg('star_rating');
+        // as removidas pelo admin não contam para a média
+        $avg = $this->reviews()->visible()->avg('star_rating');
 
         $this->forceFill([
             'average_rating' => $avg !== null ? round((float) $avg, 2) : null,

@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rule;
 
@@ -78,9 +79,55 @@ class UserController extends Controller
         return response()->json(['data' => $data]);
     }
 
-    public function suspend(User $user): AdminUserResource
+    public function suspend(Request $request, User $user)
     {
-        $user->update(['account_status' => 'suspended']);
+        if ($user->account_status === 'banned') {
+            return response()->json(['message' => 'Uma conta banida não pode ser suspensa temporariamente.'], 409);
+        }
+
+        $validated = $request->validate([
+            'duration_days' => ['required', 'integer', Rule::in([7, 15, 30])],
+            'reason' => ['required', 'string', 'max:2000'],
+            'message' => ['required', 'string', 'max:2000'],
+            'note' => ['nullable', 'string', 'max:5000'],
+        ]);
+
+        DB::transaction(function () use ($request, $user, $validated): void {
+            $user->update([
+                'account_status' => 'suspended',
+                'suspended_until' => now()->addDays((int) $validated['duration_days']),
+                'suspension_reason' => $validated['reason'],
+            ]);
+            $user->notifications()->create([
+                'type' => 'account_suspended',
+                'message' => $validated['message'],
+            ]);
+            $this->storeInternalNote($request, $user, $validated['note'] ?? null);
+        });
+
+        return new AdminUserResource($user->refresh());
+    }
+
+    public function ban(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'reason' => ['required', 'string', 'max:2000'],
+            'message' => ['required', 'string', 'max:2000'],
+            'note' => ['nullable', 'string', 'max:5000'],
+        ]);
+
+        DB::transaction(function () use ($request, $user, $validated): void {
+            $user->update([
+                'account_status' => 'banned',
+                'suspended_until' => null,
+                'suspension_reason' => $validated['reason'],
+            ]);
+            $user->notifications()->create([
+                'type' => 'account_banned',
+                'message' => $validated['message'],
+            ]);
+            $this->storeInternalNote($request, $user, $validated['note'] ?? null);
+        });
 
         return new AdminUserResource($user->refresh());
     }
@@ -125,13 +172,24 @@ class UserController extends Controller
         return response()->json(['data' => $this->noteData($note)], 201);
     }
 
+    private function storeInternalNote(Request $request, User $user, ?string $note): void
+    {
+        if (filled($note)) {
+            UserNote::create([
+                'user_id' => $user->id,
+                'admin_id' => $request->user()->id,
+                'note' => $note,
+            ]);
+        }
+    }
+
     /** @return array<string, mixed> */
     private function validatedFilters(Request $request): array
     {
         return $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
             'type' => ['nullable', Rule::in(['owner', 'user', 'customer', 'petsitter', 'admin'])],
-            'status' => ['nullable', Rule::in(['active', 'suspended'])],
+            'status' => ['nullable', Rule::in(['active', 'suspended', 'banned'])],
         ]);
     }
 

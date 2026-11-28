@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\API\Admin\ReportsController as AdminReportsController;
+use App\Http\Controllers\API\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\API\Admin\UserController as AdminUserController;
 use App\Http\Controllers\API\AnimalController;
 use App\Http\Controllers\API\AuthController;
@@ -15,6 +17,7 @@ use App\Http\Controllers\API\PostFavouriteController;
 use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\SupportTicketsController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Middleware\EnsureAccountActive;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Session\Middleware\StartSession;
@@ -61,13 +64,13 @@ Route::middleware([
 | Rotas autenticadas — requerem auth:sanctum
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', EnsureAccountActive::class])->group(function () {
 
     // Auth
     Route::get('/me', [AuthController::class, 'myInformation']);
 
     // Users
-    Route::post('/users/{user}/suspend', [UserController::class, 'suspend']);
+    Route::post('/users/{user}/suspend', [AdminUserController::class, 'suspend'])->middleware('can:admin');
     Route::apiResource('users', UserController::class);
 
     // Petsitters
@@ -78,6 +81,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/petsitters/{petsitter}/availability/{date}', [PetsitterAvailabilityController::class, 'destroy']);
     Route::post('/petsitters/{petsitter}/approve', [PetsitterController::class, 'approve']);
     Route::post('/petsitters/{petsitter}/reject', [PetsitterController::class, 'reject']);
+    // pedir mais informação ao candidato (a candidatura continua pendente)
+    Route::post('/petsitters/{petsitter}/request-info', [PetsitterController::class, 'requestInfo']);
+    // um dos documentos de identificação de uma candidatura, pela posição na lista (só o admin)
+    Route::get('/petsitter-applications/{application}/documents/{index}', [PetsitterController::class, 'applicationDocument'])
+        ->whereNumber('index');
     // documento de identificação (disco privado): só o admin o pode abrir
     Route::get('/petsitters/{petsitter}/identification-document', [PetsitterController::class, 'identificationDocument']);
     Route::apiResource('petsitters', PetsitterController::class);
@@ -100,6 +108,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/favourites/{petsitter}', [FavouriteController::class, 'destroy']);
 
     // Bookings
+    Route::get('/bookings/availability', [BookingController::class, 'availability']);
     Route::apiResource('bookings', BookingController::class)->only(['index', 'store', 'show']);
     Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus']);
 
@@ -107,6 +116,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bookings/{booking}/review', [ReviewController::class, 'store']);
     Route::get('/petsitters/{petsitter}/reviews', [ReviewController::class, 'byPetsitter']);
     Route::patch('/reviews/{review}/hide', [ReviewController::class, 'hide']);
+    Route::post('/reviews/{review}/flag', [ReviewController::class, 'flag']);
     Route::apiResource('reviews', ReviewController::class)->only(['show', 'update', 'destroy']);
 
     // Services
@@ -117,7 +127,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Support Tickets
     Route::get('/support-tickets', [SupportTicketsController::class, 'index']);
-    Route::post('/support-tickets', [SupportTicketsController::class, 'store']);
+    Route::post('/support-tickets', [SupportTicketsController::class, 'store'])
+        ->withoutMiddleware(EnsureAccountActive::class);
     Route::get('/support-tickets/{ticket}', [SupportTicketsController::class, 'show']);
     Route::post('/support-tickets/{ticket}/claim', [SupportTicketsController::class, 'claim']);
     Route::post('/support-tickets/{ticket}/close', [SupportTicketsController::class, 'close']);
@@ -143,12 +154,23 @@ Route::middleware('auth:sanctum')->group(function () {
 | As rotas de cada página (utilizadores, reservas, avaliações, denúncias, suporte,
 | definições) entram aqui nos tickets seguintes.
 */
-Route::middleware(['auth:sanctum', 'can:admin'])->prefix('admin')->name('api.admin.')->group(function () {
+Route::middleware(['auth:sanctum', 'can:admin', EnsureAccountActive::class])->prefix('admin')->name('api.admin.')->group(function () {
+    Route::get('/reports', [AdminReportsController::class, 'index'])->name('reports.index');
+    Route::get('/reports/{report}', [AdminReportsController::class, 'show'])->name('reports.show');
+    Route::post('/reports/{report}/archive', [AdminReportsController::class, 'archive'])->name('reports.archive');
+    Route::post('/reports/{report}/close', [AdminReportsController::class, 'close'])->name('reports.close');
+    Route::post('/reports/{report}/warning', [AdminReportsController::class, 'sendWarning'])->name('reports.warning');
     Route::get('/users/export', [AdminUserController::class, 'export'])->name('users.export');
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/{user}/notes', [AdminUserController::class, 'notes'])->name('users.notes.index');
     Route::post('/users/{user}/notes', [AdminUserController::class, 'storeNote'])->name('users.notes.store');
     Route::post('/users/{user}/suspend', [AdminUserController::class, 'suspend'])->name('users.suspend');
+    Route::post('/users/{user}/ban', [AdminUserController::class, 'ban'])->name('users.ban');
     Route::post('/users/{user}/warning', [AdminUserController::class, 'sendWarning'])->name('users.warning');
     Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+
+    // Avaliações: lista com filtros e pesquisa, publicar e remover
+    Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+    Route::post('/reviews/{review}/publish', [AdminReviewController::class, 'publish'])->name('reviews.publish');
+    Route::post('/reviews/{review}/remove', [AdminReviewController::class, 'remove'])->name('reviews.remove');
 });

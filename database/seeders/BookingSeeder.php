@@ -136,7 +136,6 @@ class BookingSeeder extends Seeder
                 'petsitter_id' => $petsitter->user_id,
                 'star_rating' => $rating,
                 'comment' => $reviewComments[$petsitterIndex % count($reviewComments)],
-                'visible' => true,
             ]);
 
             // Update petsitter's average rating

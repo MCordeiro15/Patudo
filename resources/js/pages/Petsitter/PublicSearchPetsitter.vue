@@ -3,19 +3,17 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 import {
-    Bell,
     ChevronRight,
     Heart,
     MapPin,
-    MessageCircle,
     SlidersHorizontal,
     Star,
     UserRound,
 } from '@lucide/vue';
 import { ref, onMounted } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
-import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
-import { useNotifications } from '@/composables/useNotifications';
+import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
+import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 
 interface Auth {
     user: {
@@ -46,8 +44,6 @@ const petsitters = ref<PetsitterApiData[]>([]);
 const favourites = ref<number[]>([]);
 const error = ref<string | null>(null);
 const loading = ref(true);
-const showNotifications = ref(false);
-const { unreadCount } = useNotifications();
 
 function navigateToProfile(userId: number) {
     window.location.href = `/petsitters/${userId}`;
@@ -255,18 +251,11 @@ onMounted(() => {
                         >
                             Reservas
                         </a>
+                        <AdminNavigationMenu />
                     </div>
 
                     <div class="d-flex align-items-center gap-3">
-                        <a href="/messages" class="text-dark"
-                        ><MessageCircle :size="25"
-                        /></a>
-                        <button type="button" class="text-dark bg-transparent border-0 p-0 position-relative" @click="showNotifications = true">
-                            <Bell :size="25" />
-                            <span v-if="unreadCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                                {{ unreadCount > 9 ? '9+' : unreadCount }}
-                            </span>
-                        </button>
+                        <HeaderNotificationsChat />
                         <button
                             type="button"
                             class="text-dark p-0 border-0 bg-transparent"
@@ -576,10 +565,6 @@ onMounted(() => {
             </div>
         </main>
 
-    <ModalNotifications
-        :show="showNotifications"
-        @close="showNotifications = false"
-    />
 </template>
 
 <style scoped>

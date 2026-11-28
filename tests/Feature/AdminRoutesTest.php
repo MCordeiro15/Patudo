@@ -44,8 +44,10 @@ test('guest gets 401 on the admin pages when asking for json', function (string 
     $this->getJson($url)->assertUnauthorized();
 })->with('admin pages');
 
-test('non admin gets 403 on the admin pages', function (string $url) {
-    $this->actingAs(User::factory()->create())->get($url)->assertForbidden();
+test('non admin is redirected to their dashboard on the admin pages', function (string $url) {
+    $this->actingAs(User::factory()->create())
+        ->get($url)
+        ->assertRedirect(route('dashboard'));
 })->with('admin pages');
 
 test('admin sees the admin pages', function (string $url, string $component) {
@@ -94,6 +96,7 @@ test('admin receives the menu counters', function () {
     $this->actingAs(User::factory()->admin()->create())
         ->get('/admin/users')
         ->assertInertia(fn (Assert $page) => $page
+            ->where('auth.isAdmin', true)
             ->where('adminCounts.pending_petsitters', 2)
             ->where('adminCounts.open_reports', 3)
             ->where('adminCounts.open_support', 1));
@@ -105,7 +108,9 @@ test('non admin receives adminCounts as null', function () {
 
     $this->actingAs(User::factory()->create())
         ->get('/petsitters')
-        ->assertInertia(fn (Assert $page) => $page->where('adminCounts', null));
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('adminCounts', null)
+            ->where('auth.isAdmin', false));
 });
 
 test('guest receives adminCounts as null', function () {

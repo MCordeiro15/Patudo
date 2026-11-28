@@ -61,7 +61,10 @@ function getXsrfToken(): string {
 }
 
 async function apiRequest(url: string, options: RequestInit = {}): Promise<any> {
-    await fetchCsrfToken();
+    const method = (options.method ?? 'GET').toUpperCase();
+    if (method !== 'GET' && method !== 'HEAD' && !getXsrfToken()) {
+        await fetchCsrfToken();
+    }
     const response = await fetch(url, {
         credentials: 'same-origin',
         headers: {

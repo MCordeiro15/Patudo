@@ -10,27 +10,53 @@ ARTISAN="$PROJECT_ROOT/artisan"
 # Verificar se o artisan existe
 if [ ! -f "$ARTISAN" ]; then
     echo "Erro: artisan não encontrado em $ARTISAN"
-    exit 0
+    exit 1
 fi
 
 # Mudar para o diretório do projeto
-cd "$PROJECT_ROOT"
+if ! cd "$PROJECT_ROOT"; then
+    echo "Erro: não foi possível aceder a $PROJECT_ROOT"
+    exit 1
+fi
 
-# Verificar se ExportedDataSeeder existe e se mudou
-if [ -f "$PROJECT_ROOT/database/seeders/ExportedDataSeeder.php" ]; then
-    # Sempre atualiza se o seeder existe (primeira vez ou atualização)
-    echo "ExportedDataSeeder detetado. Atualizando banco de dados..."
-    echo "Apagando banco de dados antigo e criando o novo..."
-    
-    php "$ARTISAN" migrate:fresh --seed --no-interaction
-    
-    if [ $? -eq 0 ]; then
-        php "$ARTISAN" storage:link 2>/dev/null
-        echo "Tudo atualizado com sucesso! Banco de dados e storage prontos."
-    else
-        echo "Erro ao atualizar o banco de dados."
-        echo "Roda manualmente: php artisan migrate:fresh --seed"
+SNAPSHOT="database/seeders/ExportedDataSeeder.php"
+if [ ! -f "$SNAPSHOT" ]; then
+    echo "Snapshot de dados não encontrado; não há dados exportados para restaurar."
+    exit 0
+fi
+
+RESTORE_SNAPSHOT=false
+if ! git rev-parse --verify ORIG_HEAD >/dev/null 2>&1; then
+    # Sem a referência anterior, restaurar o snapshot é a opção segura.
+    RESTORE_SNAPSHOT=true
+else
+    git diff --quiet ORIG_HEAD HEAD -- "$SNAPSHOT"
+    DIFF_STATUS=$?
+
+    if [ "$DIFF_STATUS" -eq 1 ]; then
+        RESTORE_SNAPSHOT=true
+    elif [ "$DIFF_STATUS" -ne 0 ]; then
+        echo "Erro: não foi possível verificar se o snapshot mudou."
+        exit 1
     fi
 fi
+
+if [ "$RESTORE_SNAPSHOT" = true ]; then
+    echo "O snapshot de dados mudou. A recriar a base de dados a partir do snapshot..."
+    if ! php "$ARTISAN" migrate:fresh --seed --no-interaction; then
+        echo "Erro ao restaurar o snapshot. A base de dados não foi atualizada."
+        echo "Depois de corrigir o problema, executa: php artisan migrate:fresh --seed"
+        exit 1
+    fi
+else
+    echo "O snapshot de dados não mudou. A aplicar apenas migrations novas..."
+    if ! php "$ARTISAN" migrate --no-interaction; then
+        echo "Erro ao aplicar as migrations da base de dados."
+        exit 1
+    fi
+fi
+
+php "$ARTISAN" storage:link 2>/dev/null
+echo "Base de dados atualizada com sucesso."
 
 exit 0

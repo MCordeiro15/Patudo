@@ -1,12 +1,13 @@
 <?php
 
-
 /**
  * Ficheiro PHP: PetsitterTest.php
  * PHP file: PetsitterTest.php
  */
 use App\Models\Petsitter;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 test('unauthenticated user cannot access petsitters endpoint', function () {
     $this->getJson('/api/petsitters')->assertUnauthorized();
@@ -27,18 +28,56 @@ test('regular user only sees approved petsitters in listing', function () {
         ->assertJsonMissing(['user_id' => $pendingPetsitter->user_id]);
 });
 
-test('admin user sees all petsitters regardless of approval status', function () {
+test('public and regular listings hide approved profiles when the user is no longer a petsitter', function () {
+    $user = User::factory()->create(['is_petsitter' => false]);
+    $petsitter = Petsitter::factory()->approved()->create(['user_id' => $user->id]);
+    $user->refresh()->forceFill(['is_petsitter' => false])->save();
+    $viewer = User::factory()->create();
+
+    $this->getJson('/api/petsitters/public')
+        ->assertOk()
+        ->assertJsonMissing(['user_id' => $petsitter->user_id]);
+
+    $this->actingAs($viewer)
+        ->getJson('/api/petsitters')
+        ->assertOk()
+        ->assertJsonMissing(['user_id' => $petsitter->user_id]);
+
+    $this->getJson('/api/petsitters/'.$petsitter->user_id)->assertForbidden();
+});
+
+test('admin default listing only shows approved petsitters', function () {
     $admin = User::factory()->admin()->create();
 
     $approvedPetsitter = Petsitter::factory()->approved()->create();
     $pendingPetsitter = Petsitter::factory()->create(['approval_status' => 'pending']);
+    $rejectedPetsitter = Petsitter::factory()->rejected()->create();
 
     $response = $this->actingAs($admin)->getJson('/api/petsitters');
 
     $response->assertOk()
-        ->assertJsonCount(2, 'data')
+        ->assertJsonCount(1, 'data')
         ->assertJsonFragment(['user_id' => $approvedPetsitter->user_id])
-        ->assertJsonFragment(['user_id' => $pendingPetsitter->user_id]);
+        ->assertJsonMissing(['user_id' => $pendingPetsitter->user_id])
+        ->assertJsonMissing(['user_id' => $rejectedPetsitter->user_id]);
+});
+
+test('petsitter listings do not include profiles owned by administrators', function () {
+    $admin = User::factory()->admin()->create();
+    $adminPetsitter = Petsitter::factory()->approved()->create(['user_id' => $admin->id]);
+    $regularPetsitter = Petsitter::factory()->approved()->create();
+
+    $this->actingAs($admin)->getJson('/api/petsitters')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonFragment(['user_id' => $regularPetsitter->user_id])
+        ->assertJsonMissing(['user_id' => $adminPetsitter->user_id]);
+
+    $this->getJson('/api/petsitters/public')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonFragment(['user_id' => $regularPetsitter->user_id])
+        ->assertJsonMissing(['user_id' => $adminPetsitter->user_id]);
 });
 
 test('admin can filter petsitters by approval status', function () {
@@ -73,7 +112,7 @@ test('pending petsitters page is only accessible to admins', function () {
 test('authenticated user can register as a petsitter', function () {
     $user = User::factory()->create();
 
-    \Illuminate\Support\Facades\Storage::fake('local');
+    Storage::fake('local');
 
     $data = [
         'experience' => '5 years caring for dogs and cats',
@@ -84,7 +123,7 @@ test('authenticated user can register as a petsitter', function () {
         'accepted_sizes' => ['small', 'medium'],
         'accepted_animal_types' => ['dog', 'cat'],
         'service' => 'pet-sitting',
-        'identification_documents' => \Illuminate\Http\UploadedFile::fake()->create('id_card.pdf', 100, 'application/pdf'),
+        'identification_documents' => UploadedFile::fake()->create('id_card.pdf', 100, 'application/pdf'),
     ];
 
     $response = $this->actingAs($user)->post('/api/petsitters', $data, ['Accept' => 'application/json']);
@@ -244,7 +283,7 @@ test('admin can reject a petsitter', function () {
     $admin = User::factory()->admin()->create();
     $petsitter = Petsitter::factory()->create(['approval_status' => 'pending']);
 
-    $response = $this->actingAs($admin)->postJson('/api/petsitters/'.$petsitter->user_id.'/reject');
+    $response = $this->actingAs($admin)->postJson('/api/petsitters/'.$petsitter->user_id.'/reject', ['reasons' => ['illegible_document']]);
 
     $response->assertOk()
         ->assertJsonFragment(['approval_status' => 'rejected']);

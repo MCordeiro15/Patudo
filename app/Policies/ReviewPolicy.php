@@ -15,12 +15,24 @@ class ReviewPolicy
         return $booking->user_id === $user->id && $booking->status === 'completed';
     }
 
-    // Reviews escondidas só o autor e o admin as veem.
+    // Reviews removidas só o autor e o admin as veem.
     public function view(User $user, Review $review): bool
     {
-        return $review->visible
+        return $review->isVisible()
             || $user->isAdmin()
             || $review->booking->user_id === $user->id;
+    }
+
+    // Sinalizar: qualquer utilizador que veja a review no perfil, menos o autor (não faz sentido sinalizar a sua).
+    public function flag(User $user, Review $review): bool
+    {
+        return $review->isVisible() && $review->booking->user_id !== $user->id;
+    }
+
+    // Moderar (publicar ou remover): só o admin.
+    public function moderate(User $user, Review $review): bool
+    {
+        return $user->isAdmin();
     }
 
     public function update(User $user, Review $review): bool
