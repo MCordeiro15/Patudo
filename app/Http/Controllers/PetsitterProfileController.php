@@ -96,6 +96,8 @@ class PetsitterProfileController extends Controller
                 'service_location' => $petsitter->service_location,
                 'age' => $petsitter->age,
                 'price_per_day' => $petsitter->price_per_day ?? 0,
+                'average_rating' => $petsitter->average_rating,
+                'reviews_count' => $petsitter->reviews()->visible()->count(),
                 'accepted_sizes' => $petsitter->accepted_sizes ?? [],
                 'accepted_animal_types' => $petsitter->accepted_animal_types ?? [],
                 'sex' => $petsitter->sex,

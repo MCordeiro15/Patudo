@@ -407,10 +407,6 @@ onMounted(() => {
 
                     <div class="col-12 col-md-4">
                         <div class="border-start border-secondary ps-4 py-2">
-                            <p class="fs-5 text-muted mb-1">
-                                <span class="star">★</span> 5,0
-                            </p>
-                            <p class="text-muted mb-2">Avaliações</p>
                             <p class="text-muted mb-0">
                                 Membro desde:<br />
                                 {{

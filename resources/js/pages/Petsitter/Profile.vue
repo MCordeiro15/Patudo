@@ -39,6 +39,8 @@ type PetsitterProfile = {
     approval_status: string;
     identification_documents?: string | null;
     availability_days: string[] | null;
+    average_rating: number | string | null;
+    reviews_count: number;
     created_at: string;
     updated_at: string;
 };
@@ -145,7 +147,7 @@ const formatRating = (rating: number | null) => {
     if (rating === null) {
         return 'Sem avaliações';
     }
-    return rating.toString().replace('.', ',');
+    return rating.toFixed(1);
 };
 
 // Formata uma data/hora para exibição no formato pt-PT.
@@ -221,13 +223,14 @@ const displayExperience = computed(() => {
 // Propriedade computada que retorna a classificação média.
 // Computed property that returns the average rating.
 const displayRating = computed(() => {
-    return null;
+    const rating = petsitter.value?.average_rating;
+    return rating === null || rating === undefined ? null : Number(rating);
 });
 
 // Propriedade computada que retorna o número de avaliações.
 // Computed property that returns the number of reviews.
 const displayReviewsCount = computed(() => {
-    return 0;
+    return petsitter.value?.reviews_count ?? 0;
 });
 
 // --- Publicações: carregadas da API (GET /api/petsitters/{id}/posts) ---
