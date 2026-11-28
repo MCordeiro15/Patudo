@@ -1,7 +1,6 @@
 <!-- Página Vue: ModalPetDetails.vue -->
 <!-- Vue page: ModalPetDetails.vue -->
 <script setup lang="ts">
-
 import { computed } from 'vue';
 
 export interface PetDetails {
@@ -31,7 +30,9 @@ const emit = defineEmits<{
     (e: 'close'): void;
 }>();
 
-const photos = computed(() => props.pet?.photos?.filter(Boolean).slice(0, 2) ?? []);
+const photos = computed(
+    () => props.pet?.photos?.filter(Boolean).slice(0, 2) ?? [],
+);
 
 const handleClose = () => {
     emit('close');
@@ -45,146 +46,148 @@ const handleClose = () => {
         @click.self="handleClose"
         @keydown.escape="handleClose"
     >
-            <div class="patudo-modal-card" role="dialog" aria-modal="true">
-                <button
-                    type="button"
-                    class="patudo-close-btn"
-                    aria-label="Fechar"
-                    @click="handleClose"
+        <div class="patudo-modal-card" role="dialog" aria-modal="true">
+            <button
+                type="button"
+                class="patudo-close-btn"
+                aria-label="Fechar"
+                @click="handleClose"
+            >
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
                 >
-                    <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.6"
-                        stroke-linecap="round"
-                    >
-                        <path d="M18 6L6 18M6 6l12 12" />
-                    </svg>
-                </button>
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
 
-                <div class="mb-3">
-                    <span class="patudo-pet-tag d-block">Ficha Animal</span>
-                    <h2 class="patudo-pet-name">
-                        {{ pet?.name || 'Nome do animal' }}
-                    </h2>
-                </div>
+            <div class="mb-3">
+                <span class="patudo-pet-tag d-block">Ficha Animal</span>
+                <h2 class="patudo-pet-name">
+                    {{ pet?.name || 'Nome do animal' }}
+                </h2>
+            </div>
 
-                <div v-if="photos.length" class="row g-3 mb-3">
-                    <div
-                        v-for="(photo, index) in photos"
-                        :key="index"
-                        :class="photos.length === 1 ? 'col-12 d-flex justify-content-center' : 'col-6'"
-                    >
-                        <div class="patudo-photo-box">
-                            <img
-                                :src="photo"
-                                :alt="`Foto ${index + 1} de ${pet?.name || 'animal'}`"
-                                class="patudo-pet-photo"
-                            />
-                        </div>
+            <div v-if="photos.length" class="row g-3 mb-3">
+                <div
+                    v-for="(photo, index) in photos"
+                    :key="index"
+                    :class="
+                        photos.length === 1
+                            ? 'col-12 d-flex justify-content-center'
+                            : 'col-6'
+                    "
+                >
+                    <div class="patudo-photo-box">
+                        <img
+                            :src="photo"
+                            :alt="`Foto ${index + 1} de ${pet?.name || 'animal'}`"
+                            class="patudo-pet-photo"
+                        />
                     </div>
                 </div>
+            </div>
 
-                <div class="patudo-details-box">
-                    <div class="row g-0">
-                        <div class="col-5 patudo-col-divider pe-2">
-                            <h3 class="patudo-box-heading">
-                                Informações do animal
-                            </h3>
+            <div class="patudo-details-box">
+                <div class="row g-0">
+                    <div class="col-5 patudo-col-divider pe-2">
+                        <h3 class="patudo-box-heading">
+                            Informações do animal
+                        </h3>
 
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <span class="patudo-info-label"
-                                        >Tipo de animal</span
-                                    >
-                                    <span class="patudo-info-value">{{
-                                        pet?.type || pet?.species || 'Cão'
-                                    }}</span>
-                                </div>
-                                <div class="col-6">
-                                    <span class="patudo-info-label">Raça</span>
-                                    <span class="patudo-info-value">{{
-                                        pet?.breed || '—'
-                                    }}</span>
-                                </div>
-                                <div class="col-6">
-                                    <span class="patudo-info-label">Idade</span>
-                                    <span class="patudo-info-value">{{
-                                        pet?.age || '—'
-                                    }}</span>
-                                </div>
-                                <div class="col-6">
-                                    <span class="patudo-info-label">Porte</span>
-                                    <span class="patudo-info-value">{{
-                                        pet?.size || '—'
-                                    }}</span>
-                                </div>
-                                <div class="col-6">
-                                    <span class="patudo-info-label">Sexo</span>
-                                    <span class="patudo-info-value">{{
-                                        pet?.sex || '—'
-                                    }}</span>
-                                </div>
-                                <div class="col-6">
-                                    <span class="patudo-info-label">Peso</span>
-                                    <span class="patudo-info-value">{{
-                                        pet?.weight || '—'
-                                    }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-3 patudo-col-divider px-2">
-                            <h3 class="patudo-box-heading">Cuidados</h3>
-
-                            <div class="mb-2">
-                                <span class="patudo-info-label">Cuidados</span>
-                                <span class="patudo-info-value">{{
-                                    pet?.care || 'nenhuns'
-                                }}</span>
-                            </div>
-
-                            <div>
-                                <span class="patudo-info-label">Medicação</span>
-                                <span class="patudo-info-value">{{
-                                    pet?.medication || 'nenhuma'
-                                }}</span>
-                            </div>
-                        </div>
-
-                        <div class="col-4 ps-2">
-                            <h3 class="patudo-box-heading">
-                                Comportamento e Rotina
-                            </h3>
-
-                            <div class="mb-2">
+                        <div class="row g-2">
+                            <div class="col-6">
                                 <span class="patudo-info-label"
-                                    >Agressividade</span
+                                    >Tipo de animal</span
                                 >
                                 <span class="patudo-info-value">{{
-                                    pet?.aggressiveness || 'não'
+                                    pet?.type || pet?.species || 'Cão'
                                 }}</span>
                             </div>
-
-                            <div>
-                                <span class="patudo-info-label">Passeio</span>
+                            <div class="col-6">
+                                <span class="patudo-info-label">Raça</span>
                                 <span class="patudo-info-value">{{
-                                    pet?.walks || '1x por dia'
+                                    pet?.breed || '—'
+                                }}</span>
+                            </div>
+                            <div class="col-6">
+                                <span class="patudo-info-label">Idade</span>
+                                <span class="patudo-info-value">{{
+                                    pet?.age || '—'
+                                }}</span>
+                            </div>
+                            <div class="col-6">
+                                <span class="patudo-info-label">Porte</span>
+                                <span class="patudo-info-value">{{
+                                    pet?.size || '—'
+                                }}</span>
+                            </div>
+                            <div class="col-6">
+                                <span class="patudo-info-label">Sexo</span>
+                                <span class="patudo-info-value">{{
+                                    pet?.sex || '—'
+                                }}</span>
+                            </div>
+                            <div class="col-6">
+                                <span class="patudo-info-label">Peso</span>
+                                <span class="patudo-info-value">{{
+                                    pet?.weight || '—'
                                 }}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="patudo-about-section mt-3">
-                        <h3 class="patudo-about-heading">Sobre o animal</h3>
-                        <p class="patudo-about-text">
-                            {{ pet?.about || 'Sem descrição adicional.' }}
-                        </p>
+                    <div class="col-3 patudo-col-divider px-2">
+                        <h3 class="patudo-box-heading">Cuidados</h3>
+
+                        <div class="mb-2">
+                            <span class="patudo-info-label">Cuidados</span>
+                            <span class="patudo-info-value">{{
+                                pet?.care || 'nenhuns'
+                            }}</span>
+                        </div>
+
+                        <div>
+                            <span class="patudo-info-label">Medicação</span>
+                            <span class="patudo-info-value">{{
+                                pet?.medication || 'nenhuma'
+                            }}</span>
+                        </div>
+                    </div>
+
+                    <div class="col-4 ps-2">
+                        <h3 class="patudo-box-heading">
+                            Comportamento e Rotina
+                        </h3>
+
+                        <div class="mb-2">
+                            <span class="patudo-info-label">Agressividade</span>
+                            <span class="patudo-info-value">{{
+                                pet?.aggressiveness || 'não'
+                            }}</span>
+                        </div>
+
+                        <div>
+                            <span class="patudo-info-label">Passeio</span>
+                            <span class="patudo-info-value">{{
+                                pet?.walks || '1x por dia'
+                            }}</span>
+                        </div>
                     </div>
                 </div>
+
+                <div class="patudo-about-section mt-3">
+                    <h3 class="patudo-about-heading">Sobre o animal</h3>
+                    <p class="patudo-about-text">
+                        {{ pet?.about || 'Sem descrição adicional.' }}
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 </template>

@@ -106,97 +106,147 @@ const submit = async () => {
     <div v-if="show" class="patudo-modal-backdrop">
         <div class="modal-backdrop fade show"></div>
 
+        <div
+            class="modal fade show d-block"
+            tabindex="-1"
+            role="dialog"
+            @keydown.escape="close"
+        >
             <div
-                class="modal fade show d-block"
-                tabindex="-1"
-                role="dialog"
-                @keydown.escape="close"
+                class="modal-dialog modal-dialog-centered patudo-new-post-dialog"
+                role="document"
             >
-                <div class="modal-dialog modal-dialog-centered patudo-new-post-dialog" role="document">
-                    <div class="modal-content patudo-new-post-content">
-                        <div class="modal-header border-0 pt-3 pt-md-4">
-                            <h2 class="modal-title patudo-new-post-title">Nova publicação</h2>
+                <div class="modal-content patudo-new-post-content">
+                    <div class="modal-header border-0 pt-3 pt-md-4">
+                        <h2 class="modal-title patudo-new-post-title">
+                            Nova publicação
+                        </h2>
+                        <button
+                            type="button"
+                            class="patudo-close-btn"
+                            aria-label="Fechar"
+                            @click="close"
+                        >
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M18 6 6 18M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <form @submit.prevent="submit">
+                        <div class="modal-body pt-3 pb-2">
+                            <div
+                                v-if="generalError"
+                                class="alert alert-danger py-2 small mb-3"
+                                role="alert"
+                            >
+                                {{ generalError }}
+                            </div>
+
+                            <input
+                                ref="photoInput"
+                                type="file"
+                                accept="image/png,image/jpeg"
+                                class="d-none"
+                                @change="onFilesChange"
+                            />
                             <button
                                 type="button"
-                                class="patudo-close-btn"
-                                aria-label="Fechar"
-                                @click="close"
+                                class="patudo-photo-upload mb-4"
+                                @click="choosePhoto"
                             >
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M18 6 6 18M6 6l12 12" />
-                                </svg>
+                                <img
+                                    v-if="photoPreview"
+                                    :src="photoPreview"
+                                    alt="Pré-visualização da fotografia"
+                                    class="patudo-photo-preview"
+                                />
+                                <template v-else>
+                                    <svg
+                                        class="patudo-camera-icon"
+                                        viewBox="0 0 64 64"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="M18 19h8l4-6h8l4 6h5a7 7 0 0 1 7 7v23a7 7 0 0 1-7 7H17a7 7 0 0 1-7-7V26a7 7 0 0 1 7-7Z"
+                                        />
+                                        <circle cx="32" cy="37" r="11" />
+                                    </svg>
+                                    <span>Adicionar foto</span>
+                                </template>
                             </button>
+                            <InputError :message="errors.photos?.[0]" />
+
+                            <div class="mb-4">
+                                <label
+                                    for="post-title"
+                                    class="form-label patudo-field-label"
+                                    >Título</label
+                                >
+                                <input
+                                    id="post-title"
+                                    v-model="title"
+                                    type="text"
+                                    maxlength="50"
+                                    class="form-control patudo-post-input"
+                                    :class="{ 'is-invalid': errors.title }"
+                                    placeholder="Dê um título à tua publicação..."
+                                    required
+                                />
+                                <div class="patudo-counter">
+                                    {{ titleLength }}/50
+                                </div>
+                                <InputError :message="errors.title?.[0]" />
+                            </div>
+
+                            <div>
+                                <label
+                                    for="post-description"
+                                    class="form-label patudo-field-label"
+                                    >Descrição</label
+                                >
+                                <textarea
+                                    id="post-description"
+                                    v-model="description"
+                                    rows="4"
+                                    maxlength="300"
+                                    class="form-control patudo-post-textarea"
+                                    :class="{
+                                        'is-invalid': errors.description,
+                                    }"
+                                    placeholder="Conta como correu o dia com o pet ou partilha novidades..."
+                                    required
+                                ></textarea>
+                                <div class="patudo-counter">
+                                    {{ descriptionLength }}/300
+                                </div>
+                                <InputError
+                                    :message="errors.description?.[0]"
+                                />
+                            </div>
                         </div>
 
-                        <form @submit.prevent="submit">
-                            <div class="modal-body pt-3 pb-2">
-                                <div v-if="generalError" class="alert alert-danger py-2 small mb-3" role="alert">
-                                    {{ generalError }}
-                                </div>
-
-                                <input
-                                    ref="photoInput"
-                                    type="file"
-                                    accept="image/png,image/jpeg"
-                                    class="d-none"
-                                    @change="onFilesChange"
-                                />
-                                <button type="button" class="patudo-photo-upload mb-4" @click="choosePhoto">
-                                    <img v-if="photoPreview" :src="photoPreview" alt="Pré-visualização da fotografia" class="patudo-photo-preview" />
-                                    <template v-else>
-                                        <svg class="patudo-camera-icon" viewBox="0 0 64 64" aria-hidden="true">
-                                            <path d="M18 19h8l4-6h8l4 6h5a7 7 0 0 1 7 7v23a7 7 0 0 1-7 7H17a7 7 0 0 1-7-7V26a7 7 0 0 1 7-7Z" />
-                                            <circle cx="32" cy="37" r="11" />
-                                        </svg>
-                                        <span>Adicionar foto</span>
-                                    </template>
-                                </button>
-                                <InputError :message="errors.photos?.[0]" />
-
-                                <div class="mb-4">
-                                    <label for="post-title" class="form-label patudo-field-label">Título</label>
-                                    <input
-                                        id="post-title"
-                                        v-model="title"
-                                        type="text"
-                                        maxlength="50"
-                                        class="form-control patudo-post-input"
-                                        :class="{ 'is-invalid': errors.title }"
-                                        placeholder="Dê um título à tua publicação..."
-                                        required
-                                    />
-                                    <div class="patudo-counter">{{ titleLength }}/50</div>
-                                    <InputError :message="errors.title?.[0]" />
-                                </div>
-
-                                <div>
-                                    <label for="post-description" class="form-label patudo-field-label">Descrição</label>
-                                    <textarea
-                                        id="post-description"
-                                        v-model="description"
-                                        rows="4"
-                                        maxlength="300"
-                                        class="form-control patudo-post-textarea"
-                                        :class="{ 'is-invalid': errors.description }"
-                                        placeholder="Conta como correu o dia com o pet ou partilha novidades..."
-                                        required
-                                    ></textarea>
-                                    <div class="patudo-counter">{{ descriptionLength }}/300</div>
-                                    <InputError :message="errors.description?.[0]" />
-                                </div>
-                            </div>
-
-                            <div class="modal-footer border-0 pb-3 pb-md-4 pt-2 justify-content-end gap-2">
-                                <button type="button" class="btn btn-outline-primary patudo-action-button" @click="close">
-                                    Cancelar
-                                </button>
-                                <button type="submit" class="btn btn-primary patudo-action-button" :disabled="isLoading">
-                                    {{ isLoading ? 'A publicar...' : 'Publicar' }}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        <div
+                            class="modal-footer border-0 pb-3 pb-md-4 pt-2 justify-content-end gap-2"
+                        >
+                            <button
+                                type="button"
+                                class="btn btn-outline-primary patudo-action-button"
+                                @click="close"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="submit"
+                                class="btn btn-primary patudo-action-button"
+                                :disabled="isLoading"
+                            >
+                                {{ isLoading ? 'A publicar...' : 'Publicar' }}
+                            </button>
+                        </div>
+                    </form>
                 </div>
+            </div>
         </div>
     </div>
 </template>
@@ -213,7 +263,9 @@ const submit = async () => {
     z-index: 10000000;
 }
 
-.patudo-new-post-dialog { max-width: 480px; }
+.patudo-new-post-dialog {
+    max-width: 480px;
+}
 
 .patudo-new-post-content {
     position: relative;
@@ -224,7 +276,10 @@ const submit = async () => {
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-.patudo-new-post-title { font-size: 1.25rem; font-weight: 700; }
+.patudo-new-post-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
 
 .patudo-close-btn {
     position: absolute;
@@ -236,11 +291,20 @@ const submit = async () => {
     border: 0;
     background: transparent;
 }
-.patudo-close-btn svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-linecap: round; stroke-width: 1.5; }
+.patudo-close-btn svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 1.5;
+}
 
 .patudo-new-post-content .modal-header,
 .patudo-new-post-content .modal-body,
-.patudo-new-post-content .modal-footer { padding-inline: 1.75rem !important; }
+.patudo-new-post-content .modal-footer {
+    padding-inline: 1.75rem !important;
+}
 
 .patudo-photo-upload {
     position: relative;
@@ -259,9 +323,26 @@ const submit = async () => {
     font-weight: 700;
 }
 
-.patudo-camera-icon { width: 62px; height: 62px; fill: none; stroke: currentColor; stroke-linejoin: round; stroke-width: 3; }
-.patudo-photo-preview { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.patudo-field-label { margin-bottom: 0.25rem; font-size: 0.88rem; font-weight: 700; }
+.patudo-camera-icon {
+    width: 62px;
+    height: 62px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linejoin: round;
+    stroke-width: 3;
+}
+.patudo-photo-preview {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.patudo-field-label {
+    margin-bottom: 0.25rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
 
 .patudo-post-input,
 .patudo-post-textarea {
@@ -272,15 +353,41 @@ const submit = async () => {
     padding: 0.65rem 0.95rem;
     font-size: 0.86rem;
 }
-.patudo-post-input { border-radius: 9999px; }
-.patudo-post-textarea { border-radius: 14px; resize: none; }
+.patudo-post-input {
+    border-radius: 9999px;
+}
+.patudo-post-textarea {
+    border-radius: 14px;
+    resize: none;
+}
 .patudo-post-input:focus,
-.patudo-post-textarea:focus { border-color: var(--patudo-terracota); box-shadow: 0 0 0 0.2rem rgb(194 65 12 / 15%); }
-.patudo-counter { margin-top: 0.1rem; text-align: right; font-size: 0.75rem; font-weight: 700; color: #000000; }
-.patudo-action-button { width: 100px; height: 34px; border-radius: 13px; padding: 0 0.5rem; font-size: 0.88rem; font-weight: 600; line-height: 1; }
-.btn-outline-primary.patudo-action-button { background-color: var(--bs-white); }
+.patudo-post-textarea:focus {
+    border-color: var(--patudo-terracota);
+    box-shadow: 0 0 0 0.2rem rgb(194 65 12 / 15%);
+}
+.patudo-counter {
+    margin-top: 0.1rem;
+    text-align: right;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #000000;
+}
+.patudo-action-button {
+    width: 100px;
+    height: 34px;
+    border-radius: 13px;
+    padding: 0 0.5rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1;
+}
+.btn-outline-primary.patudo-action-button {
+    background-color: var(--bs-white);
+}
 
 @media (max-width: 576px) {
-    .patudo-new-post-dialog { max-width: calc(100% - 1rem); }
+    .patudo-new-post-dialog {
+        max-width: calc(100% - 1rem);
+    }
 }
 </style>

@@ -169,9 +169,7 @@ const submit = async () => {
     }
 
     if (!documentFile.value) {
-        errors.value.identity_document = [
-            'Submete o teu Cartão de Cidadão.',
-        ];
+        errors.value.identity_document = ['Submete o teu Cartão de Cidadão.'];
     }
 
     if (Object.keys(errors.value).length > 0) return;
@@ -485,7 +483,9 @@ const submit = async () => {
                             </div>
 
                             <InputError
-                                :message="(errors.sizes ?? errors['sizes.0'])?.[0]"
+                                :message="
+                                    (errors.sizes ?? errors['sizes.0'])?.[0]
+                                "
                             />
                         </fieldset>
 
@@ -503,9 +503,7 @@ const submit = async () => {
                                 class="form-select patudo-field rounded-3"
                                 :class="[
                                     { 'is-invalid': errors.animal_type },
-                                    animalType
-                                        ? 'text-body'
-                                        : 'text-secondary',
+                                    animalType ? 'text-body' : 'text-secondary',
                                 ]"
                                 required
                                 aria-required="true"
@@ -603,7 +601,9 @@ const submit = async () => {
                             </label>
 
                             <div class="min-w-0">
-                                <p class="small text-secondary mb-1 text-truncate">
+                                <p
+                                    class="small text-secondary mb-1 text-truncate"
+                                >
                                     {{
                                         documentFile
                                             ? documentFile.name

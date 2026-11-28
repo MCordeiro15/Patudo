@@ -72,7 +72,10 @@ const handlePhotoChange = (event: Event) => {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
 
-    if (!['image/jpeg', 'image/png'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+    if (
+        !['image/jpeg', 'image/png'].includes(file.type) ||
+        file.size > 5 * 1024 * 1024
+    ) {
         generalError.value = 'Seleciona uma imagem JPG ou PNG até 5 MB.';
         if (photoInput.value) photoInput.value.value = '';
         return;
@@ -93,7 +96,8 @@ const submit = async () => {
 
     try {
         await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
-        const xsrfToken = document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? '';
+        const xsrfToken =
+            document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] ?? '';
 
         const body = new FormData();
         body.append('name', name.value.trim());
@@ -101,7 +105,8 @@ const submit = async () => {
         body.append('breed', breed.value.trim());
         body.append('age', String(Number(age.value)));
         body.append('size', 'medium');
-        if (notes.value.trim()) body.append('special_needs', notes.value.trim());
+        if (notes.value.trim())
+            body.append('special_needs', notes.value.trim());
         if (photoFile.value) body.append('photo', photoFile.value);
 
         const response = await fetch('/api/animals', {
@@ -124,7 +129,8 @@ const submit = async () => {
         } else if (payload.errors) {
             errors.value = payload.errors;
         } else {
-            generalError.value = payload.message ?? 'Não foi possível guardar o animal.';
+            generalError.value =
+                payload.message ?? 'Não foi possível guardar o animal.';
         }
     } catch {
         generalError.value = 'Erro de conexão. Tente novamente.';
@@ -144,22 +150,37 @@ onBeforeUnmount(clearPreview);
 </script>
 
 <template>
-    <div v-if="show" class="reservation-add-pet-backdrop" @click.self="close" @keydown.escape="close">
+    <div
+        v-if="show"
+        class="reservation-add-pet-backdrop"
+        @click.self="close"
+        @keydown.escape="close"
+    >
         <section
             class="reservation-add-pet-card"
             role="dialog"
             aria-modal="true"
             aria-labelledby="reservation-add-pet-title"
         >
-            <h2 id="reservation-add-pet-title" class="modal-heading">Adicionar animal</h2>
+            <h2 id="reservation-add-pet-title" class="modal-heading">
+                Adicionar animal
+            </h2>
 
             <form @submit.prevent="submit" novalidate class="panel-box">
-                <div v-if="generalError" class="alert alert-danger py-1 small mb-2" role="alert">
+                <div
+                    v-if="generalError"
+                    class="alert alert-danger py-1 small mb-2"
+                    role="alert"
+                >
                     {{ generalError }}
                 </div>
 
                 <div class="photo-row mb-2">
-                    <label for="reservation-pet-photo" class="photo-circle" title="Escolher fotografia">
+                    <label
+                        for="reservation-pet-photo"
+                        class="photo-circle"
+                        title="Escolher fotografia"
+                    >
                         <div class="col-12">
                             <div class="patudo-photo-box">
                                 <img
@@ -292,7 +313,9 @@ onBeforeUnmount(clearPreview);
                 <InputError :message="errors.photo?.[0]" />
 
                 <div class="mb-2">
-                    <label for="reservation-pet-name" class="field-label">Nome *</label>
+                    <label for="reservation-pet-name" class="field-label"
+                        >Nome *</label
+                    >
                     <input
                         id="reservation-pet-name"
                         :value="name"
@@ -311,19 +334,35 @@ onBeforeUnmount(clearPreview);
                         <div class="col-6">
                             <label
                                 class="species-option"
-                                :class="{ 'species-option--selected': species === 'Cão' }"
+                                :class="{
+                                    'species-option--selected':
+                                        species === 'Cão',
+                                }"
                             >
                                 <span>Cão</span>
-                                <input v-model="species" type="radio" value="Cão" required />
+                                <input
+                                    v-model="species"
+                                    type="radio"
+                                    value="Cão"
+                                    required
+                                />
                             </label>
                         </div>
                         <div class="col-6">
                             <label
                                 class="species-option"
-                                :class="{ 'species-option--selected': species === 'Gato' }"
+                                :class="{
+                                    'species-option--selected':
+                                        species === 'Gato',
+                                }"
                             >
                                 <span>Gato</span>
-                                <input v-model="species" type="radio" value="Gato" required />
+                                <input
+                                    v-model="species"
+                                    type="radio"
+                                    value="Gato"
+                                    required
+                                />
                             </label>
                         </div>
                     </div>
@@ -332,7 +371,9 @@ onBeforeUnmount(clearPreview);
 
                 <div class="row g-2 mb-2">
                     <div class="col-7">
-                        <label for="reservation-pet-breed" class="field-label">Raça</label>
+                        <label for="reservation-pet-breed" class="field-label"
+                            >Raça</label
+                        >
                         <input
                             id="reservation-pet-breed"
                             :value="breed"
@@ -345,7 +386,9 @@ onBeforeUnmount(clearPreview);
                         <InputError :message="errors.breed?.[0]" />
                     </div>
                     <div class="col-5">
-                        <label for="reservation-pet-age" class="field-label">Idade (anos)</label>
+                        <label for="reservation-pet-age" class="field-label"
+                            >Idade (anos)</label
+                        >
                         <input
                             id="reservation-pet-age"
                             v-model="age"
@@ -362,7 +405,8 @@ onBeforeUnmount(clearPreview);
 
                 <div class="mb-3">
                     <label for="reservation-pet-notes" class="field-label">
-                        Notas para o cuidador <span class="fw-normal">(opcional)</span>
+                        Notas para o cuidador
+                        <span class="fw-normal">(opcional)</span>
                     </label>
                     <textarea
                         id="reservation-pet-notes"
@@ -385,10 +429,7 @@ onBeforeUnmount(clearPreview);
                     >
                         Cancelar
                     </button>
-                    <button
-                        type="submit"
-                        class="btn btn-primary"
-                    >
+                    <button type="submit" class="btn btn-primary">
                         {{ submitting ? 'A guardar...' : 'Guardar animal' }}
                     </button>
                 </footer>

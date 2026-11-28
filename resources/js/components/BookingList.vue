@@ -10,21 +10,33 @@
 //                     Cada cartão mostra a outra pessoa, os animais, as datas, o preço total e o estado,
 //                     e os botões do lado do user (dono: Cancelar/Conversar/Avaliar; petsitter: Conversar/Concluir).
 import { usePage } from '@inertiajs/vue3';
-import { ChevronDown, ChevronRight, MapPin, Menu, UserRound } from '@lucide/vue';
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { ChevronRight, MapPin, UserRound } from '@lucide/vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import type { Animal } from '@/types';
-import ModalPetDetails, { type PetDetails } from '@/pages/Modals/ModalPetDetails.vue';
-import ModalReviewPetsitter, { type ReviewPayload } from '@/pages/Modals/ModalReviewPetsitter.vue';
+import ModalPetDetails, {
+    type PetDetails,
+} from '@/pages/Modals/ModalPetDetails.vue';
+import ModalReviewPetsitter, {
+    type ReviewPayload,
+} from '@/pages/Modals/ModalReviewPetsitter.vue';
 
-const props = withDefaults(defineProps<{
-    role: 'owner' | 'petsitter';
-    pendingOnly?: boolean;
-}>(), {
-    pendingOnly: false,
-});
+const props = withDefaults(
+    defineProps<{
+        role: 'owner' | 'petsitter';
+        pendingOnly?: boolean;
+    }>(),
+    {
+        pendingOnly: false,
+    },
+);
 
 // Pessoa da reserva (BookingResource): nome, localidade e foto
-type Person = { id: number; name: string | null; location: string | null; avatar_url: string | null } | null;
+type Person = {
+    id: number;
+    name: string | null;
+    location: string | null;
+    avatar_url: string | null;
+} | null;
 
 // Campos extra que o cartão do petsitter mostra (idade e porte)
 type AnimalCard = Animal & {
@@ -32,7 +44,12 @@ type AnimalCard = Animal & {
     size?: string | null;
 };
 
-type BookingStatus = 'pending' | 'approved' | 'rejected' | 'cancelled' | 'completed';
+type BookingStatus =
+    | 'pending'
+    | 'approved'
+    | 'rejected'
+    | 'cancelled'
+    | 'completed';
 
 type BookingItem = {
     id: number;
@@ -95,7 +112,11 @@ const loadingAnimalId = ref<number | null>(null);
 // Avaliar (dono)
 const showReviewModal = ref(false);
 const selectedBooking = ref<BookingItem | null>(null);
-const reviewErrors = ref<{ star_rating?: string; comment?: string; general?: string }>({});
+const reviewErrors = ref<{
+    star_rating?: string;
+    comment?: string;
+    general?: string;
+}>({});
 
 function setFeedback(message: string, type: 'success' | 'error') {
     feedback.value = message;
@@ -106,7 +127,9 @@ function setFeedback(message: string, type: 'success' | 'error') {
 function numberOfDays(b: BookingItem): number {
     const start = new Date(b.start_date);
     const end = new Date(b.end_date);
-    const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const diff =
+        Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) +
+        1;
     return diff > 0 ? diff : 0;
 }
 
@@ -132,24 +155,35 @@ function formatPrice(value: number | string): string {
         return `${Number(value).toLocaleString('pt-PT', { maximumFractionDigits: 2 })} €`;
     }
     const n = Number(value);
-    const formatted = Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ',');
+    const formatted = Number.isInteger(n)
+        ? String(n)
+        : n.toFixed(2).replace('.', ',');
     return `${formatted} €`;
 }
 
 function serviceLabel(b: BookingItem): string {
     const species = (b.animals?.[0]?.species ?? '').toString().toLowerCase();
-    if (species.includes('gat') || species.includes('cat')) return 'Cat Sitting';
-    if (species.includes('cão') || species.includes('cao') || species.includes('dog')) return 'Dog Sitting';
+    if (species.includes('gat') || species.includes('cat'))
+        return 'Cat Sitting';
+    if (
+        species.includes('cão') ||
+        species.includes('cao') ||
+        species.includes('dog')
+    )
+        return 'Dog Sitting';
     return 'Pet Sitting';
 }
 
 // Cartão do petsitter: "Cão · Labrador · 3 anos · Grande"
 function animalLine(animal: AnimalCard): string {
     // a idade vem da API (animals.age, em anos) ou é null
-    const age = animal.age != null
-        ? `${animal.age} ${Number(animal.age) === 1 ? 'ano' : 'anos'}`
-        : '';
-    return [animal.species, animal.breed, age, animal.size].filter(Boolean).join(' · ');
+    const age =
+        animal.age != null
+            ? `${animal.age} ${Number(animal.age) === 1 ? 'ano' : 'anos'}`
+            : '';
+    return [animal.species, animal.breed, age, animal.size]
+        .filter(Boolean)
+        .join(' · ');
 }
 
 // Cartão do dono: "Rex, Mia"
@@ -158,13 +192,16 @@ function animalNames(b: BookingItem): string {
 }
 
 // Em cada reserva, o user é o petsitter ou o dono (bookings.petsitter_id é o id do user)
-const isPetsitterOf = (b: BookingItem) => b.petsitter_id === currentUserId.value;
+const isPetsitterOf = (b: BookingItem) =>
+    b.petsitter_id === currentUserId.value;
 
 // O cartão das Reservas mostra a outra pessoa: o petsitter, ou o dono se fores tu o petsitter
-const otherPerson = (b: BookingItem): Person | undefined => (isPetsitterOf(b) ? b.owner : b.petsitter);
+const otherPerson = (b: BookingItem): Person | undefined =>
+    isPetsitterOf(b) ? b.owner : b.petsitter;
 
 // Conversar abre o chat com a outra pessoa da reserva (ids de users)
-const chatWith = (b: BookingItem) => (isPetsitterOf(b) ? b.user_id : b.petsitter_id);
+const chatWith = (b: BookingItem) =>
+    isPetsitterOf(b) ? b.user_id : b.petsitter_id;
 
 const statusShort: Record<string, string> = {
     pending: 'Pendente',
@@ -181,28 +218,13 @@ const statusFilters: { value: 'all' | BookingStatus; label: string }[] = [
     { value: 'cancelled', label: 'Canceladas' },
     { value: 'completed', label: 'Concluídas' },
 ];
-const statusMenu = ref<HTMLDetailsElement | null>(null);
-const selectedStatusLabel = computed(() =>
-    statusFilters.find((filter) => filter.value === statusFilter.value)?.label ?? 'Todas',
-);
-
-function selectStatusFilter(value: 'all' | BookingStatus) {
-    statusFilter.value = value;
-    statusMenu.value?.removeAttribute('open');
-}
-
-function closeStatusMenuOnOutsideClick(event: MouseEvent) {
-    const menu = statusMenu.value;
-    if (menu?.open && event.target instanceof Node && !menu.contains(event.target)) {
-        menu.removeAttribute('open');
-    }
-}
 
 // ---------- Lista: filtro, ordenação e paginação ----------
 // Mais recente primeiro (created_at; em empate, id mais alto primeiro)
 const sortedBookings = computed(() =>
     [...bookings.value].sort((a, b) => {
-        const diff = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        const diff =
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         return diff !== 0 && !Number.isNaN(diff) ? diff : b.id - a.id;
     }),
 );
@@ -213,7 +235,9 @@ const filteredBookings = computed(() =>
         : sortedBookings.value.filter((b) => b.status === statusFilter.value),
 );
 
-const totalPages = computed(() => Math.max(1, Math.ceil(filteredBookings.value.length / PER_PAGE)));
+const totalPages = computed(() =>
+    Math.max(1, Math.ceil(filteredBookings.value.length / PER_PAGE)),
+);
 
 const pagedBookings = computed(() => {
     const start = (currentPage.value - 1) * PER_PAGE;
@@ -241,16 +265,20 @@ const loadBookings = async () => {
         // Pedidos: só os pendentes, filtrados na API (?pending=1).
         // Reservas: só estados já respondidos, com filtro adicional nos botões.
         // A API pagina de 15 em 15, por isso lê todas as páginas.
-        const pendingParam = props.role === 'petsitter' || props.pendingOnly ? '&pending=1' : '';
+        const pendingParam =
+            props.role === 'petsitter' || props.pendingOnly ? '&pending=1' : '';
         const all: BookingItem[] = [];
         let pageNumber = 1;
         let lastPage = 1;
         do {
-            const res = await apiFetch(`/api/bookings?page=${pageNumber}${pendingParam}`);
+            const res = await apiFetch(
+                `/api/bookings?page=${pageNumber}${pendingParam}`,
+            );
             if (!res.ok) {
-                loadError.value = props.role === 'petsitter' || props.pendingOnly
-                    ? 'Não foi possível carregar os pedidos de reserva.'
-                    : 'Não foi possível carregar as reservas.';
+                loadError.value =
+                    props.role === 'petsitter' || props.pendingOnly
+                        ? 'Não foi possível carregar os pedidos de reserva.'
+                        : 'Não foi possível carregar as reservas.';
                 return;
             }
             const json = await res.json();
@@ -260,11 +288,21 @@ const loadBookings = async () => {
         } while (pageNumber <= lastPage);
 
         // A API devolve as reservas onde és dono OU petsitter; o lado e estado determinam a aba.
-        bookings.value = props.role === 'petsitter'
-            ? all.filter((b) => isPetsitterOf(b) && b.status === 'pending')
-            : props.pendingOnly
-                ? all.filter((b) => b.user_id === currentUserId.value && b.status === 'pending')
-                : all.filter((b) => (b.user_id === currentUserId.value || isPetsitterOf(b)) && b.status !== 'pending');
+        bookings.value =
+            props.role === 'petsitter'
+                ? all.filter((b) => isPetsitterOf(b) && b.status === 'pending')
+                : props.pendingOnly
+                  ? all.filter(
+                        (b) =>
+                            b.user_id === currentUserId.value &&
+                            b.status === 'pending',
+                    )
+                  : all.filter(
+                        (b) =>
+                            (b.user_id === currentUserId.value ||
+                                isPetsitterOf(b)) &&
+                            b.status !== 'pending',
+                    );
     } catch {
         loadError.value = 'Erro de conexão. Tente novamente.';
     } finally {
@@ -281,7 +319,10 @@ const successMessages: Record<string, string> = {
 
 // Sem recarregar a página: nos Pedidos o pedido respondido sai da lista (passa para as Reservas);
 // nas Reservas o cartão muda logo de estado
-const updateStatus = async (b: BookingItem, newStatus: 'approved' | 'rejected' | 'cancelled' | 'completed') => {
+const updateStatus = async (
+    b: BookingItem,
+    newStatus: 'approved' | 'rejected' | 'cancelled' | 'completed',
+) => {
     processingId.value = b.id;
     feedback.value = '';
     try {
@@ -291,10 +332,17 @@ const updateStatus = async (b: BookingItem, newStatus: 'approved' | 'rejected' |
         });
         if (res.ok) {
             if (props.role === 'petsitter') {
-                bookings.value = bookings.value.filter((item) => item.id !== b.id);
-                setFeedback(`${successMessages[newStatus]} Podes vê-la nas Reservas.`, 'success');
+                bookings.value = bookings.value.filter(
+                    (item) => item.id !== b.id,
+                );
+                setFeedback(
+                    `${successMessages[newStatus]} Podes vê-la nas Reservas.`,
+                    'success',
+                );
             } else if (props.pendingOnly) {
-                bookings.value = bookings.value.filter((item) => item.id !== b.id);
+                bookings.value = bookings.value.filter(
+                    (item) => item.id !== b.id,
+                );
                 setFeedback(successMessages[newStatus], 'success');
             } else {
                 b.status = newStatus;
@@ -323,7 +371,10 @@ const openAnimal = async (animal: AnimalCard) => {
     try {
         const res = await apiFetch(`/api/animals/${animal.id}`);
         if (!res.ok) {
-            setFeedback('Não foi possível carregar a ficha do animal.', 'error');
+            setFeedback(
+                'Não foi possível carregar a ficha do animal.',
+                'error',
+            );
             return;
         }
         const a = (await res.json()).data;
@@ -334,7 +385,10 @@ const openAnimal = async (animal: AnimalCard) => {
             breed: a.breed,
             size: a.size,
             sex: a.sex ?? undefined,
-            age: a.age != null ? `${a.age} ${a.age === 1 ? 'ano' : 'anos'}` : undefined,
+            age:
+                a.age != null
+                    ? `${a.age} ${a.age === 1 ? 'ano' : 'anos'}`
+                    : undefined,
             weight: a.weight ? `${Number(a.weight)} kg` : undefined,
             care: a.special_needs ?? undefined,
             medication: a.medication ?? undefined,
@@ -362,13 +416,16 @@ const submitBookingReview = async (payload: ReviewPayload) => {
     if (!selectedBooking.value) return;
 
     try {
-        const res = await apiFetch(`/api/bookings/${selectedBooking.value.id}/review`, {
-            method: 'POST',
-            body: JSON.stringify({
-                star_rating: payload.rating,
-                comment: payload.comment || null,
-            }),
-        });
+        const res = await apiFetch(
+            `/api/bookings/${selectedBooking.value.id}/review`,
+            {
+                method: 'POST',
+                body: JSON.stringify({
+                    star_rating: payload.rating,
+                    comment: payload.comment || null,
+                }),
+            },
+        );
 
         const data = await res.json().catch(() => ({}));
 
@@ -382,7 +439,9 @@ const submitBookingReview = async (payload: ReviewPayload) => {
             }
 
             // 403 / 409: mostra a mensagem do servidor (ex.: "Esta reserva já foi avaliada.")
-            reviewErrors.value = { general: data.message ?? 'Não foi possível enviar a avaliação.' };
+            reviewErrors.value = {
+                general: data.message ?? 'Não foi possível enviar a avaliação.',
+            };
 
             // se já estava avaliada, atualiza a lista para o botão "Avaliar" desaparecer
             if (res.status === 409) await loadBookings();
@@ -400,11 +459,6 @@ const submitBookingReview = async (payload: ReviewPayload) => {
 
 onMounted(() => {
     void loadBookings();
-    document.addEventListener('click', closeStatusMenuOnOutsideClick);
-});
-
-onBeforeUnmount(() => {
-    document.removeEventListener('click', closeStatusMenuOnOutsideClick);
 });
 </script>
 
@@ -429,43 +483,50 @@ onBeforeUnmount(() => {
     <!-- Erro -->
     <div v-else-if="loadError" class="text-center py-5">
         <p class="text-danger mb-3" role="alert">{{ loadError }}</p>
-        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" @click="loadBookings">
+        <button
+            type="button"
+            class="btn btn-outline-secondary rounded-pill px-4"
+            @click="loadBookings"
+        >
             Tentar novamente
         </button>
     </div>
 
     <template v-else>
         <!-- Filtro por estado (só nas Reservas; nos Pedidos estão todos pendentes) -->
-        <details v-if="role === 'owner' && !pendingOnly" ref="statusMenu" class="status-filter-menu mb-4">
-            <summary class="status-filter-trigger" aria-label="Filtrar reservas por estado">
-                <Menu :size="20" aria-hidden="true" />
-                <span>Estado: {{ selectedStatusLabel }}</span>
-                <ChevronDown :size="16" aria-hidden="true" />
-            </summary>
-            <div class="status-filter-options" role="group" aria-label="Filtrar por estado">
-                <button
-                    v-for="f in statusFilters"
-                    :key="f.value"
-                    type="button"
-                    class="status-filter-option"
-                    :class="{ active: statusFilter === f.value }"
-                    :aria-pressed="statusFilter === f.value"
-                    @click="selectStatusFilter(f.value)"
-                >
-                    {{ f.label }}
-                </button>
-            </div>
-        </details>
+        <div
+            v-if="role === 'owner' && !pendingOnly"
+            class="status-filters d-flex flex-wrap gap-2 mb-4"
+            role="group"
+            aria-label="Filtrar por estado"
+        >
+            <button
+                v-for="f in statusFilters"
+                :key="f.value"
+                type="button"
+                class="btn btn-sm rounded-pill filter-chip"
+                :class="statusFilter === f.value ? 'active' : ''"
+                :aria-pressed="statusFilter === f.value"
+                @click="statusFilter = f.value"
+            >
+                {{ f.label }}
+            </button>
+        </div>
 
         <!-- Estado vazio -->
-        <div v-if="filteredBookings.length === 0" class="text-center text-secondary py-5">
+        <div
+            v-if="filteredBookings.length === 0"
+            class="text-center text-secondary py-5"
+        >
             <template v-if="role === 'petsitter' || pendingOnly">
                 Ainda não tens pedidos de reserva pendentes.
             </template>
             <template v-else>
-                {{ bookings.length === 0
-                ? 'Ainda não tens reservas.'
-                : 'Não tens reservas com este estado.' }}
+                {{
+                    bookings.length === 0
+                        ? 'Ainda não tens reservas.'
+                        : 'Não tens reservas com este estado.'
+                }}
             </template>
         </div>
 
@@ -486,7 +547,9 @@ onBeforeUnmount(() => {
                 -->
                 <div class="request-grid">
                     <!-- Avatar do dono -->
-                    <div class="owner-avatar cell-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden">
+                    <div
+                        class="owner-avatar cell-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden"
+                    >
                         <img
                             v-if="booking.owner?.avatar_url"
                             :src="booking.owner.avatar_url"
@@ -498,8 +561,13 @@ onBeforeUnmount(() => {
 
                     <!-- Dono -->
                     <div class="cell-owner">
-                        <h2 class="fs-3 fw-bold mb-0">{{ booking.owner?.name ?? 'Proprietário' }}</h2>
-                        <small v-if="booking.owner?.location" class="text-secondary d-block">
+                        <h2 class="fs-3 fw-bold mb-0">
+                            {{ booking.owner?.name ?? 'Proprietário' }}
+                        </h2>
+                        <small
+                            v-if="booking.owner?.location"
+                            class="text-secondary d-block"
+                        >
                             {{ booking.owner.location }}
                         </small>
                     </div>
@@ -535,16 +603,26 @@ onBeforeUnmount(() => {
 
                     <!-- Estado, serviço e período -->
                     <div class="cell-service text-center">
-                        <span class="status-pill d-block mb-2" :class="`status-${booking.status}`">
+                        <span
+                            class="status-pill d-block mb-2"
+                            :class="`status-${booking.status}`"
+                        >
                             {{ statusShort[booking.status] || booking.status }}
                         </span>
-                        <p class="fs-3 fw-medium mb-1">{{ serviceLabel(booking) }}</p>
-                        <small><strong>Período:</strong> {{ periodLabel(booking) }}</small>
+                        <p class="fs-3 fw-medium mb-1">
+                            {{ serviceLabel(booking) }}
+                        </p>
+                        <small
+                            ><strong>Período:</strong>
+                            {{ periodLabel(booking) }}</small
+                        >
                     </div>
 
                     <!-- Preço -->
                     <div class="cell-price text-center">
-                        <p class="fw-bold fs-4 mb-0">Preço: {{ formatPrice(booking.total_price) }}</p>
+                        <p class="fw-bold fs-4 mb-0">
+                            Preço: {{ formatPrice(booking.total_price) }}
+                        </p>
                     </div>
 
                     <!-- Ações (dependem do estado) -->
@@ -575,14 +653,15 @@ onBeforeUnmount(() => {
 
         <!-- ===================== Reservas: como dono e como petsitter ===================== -->
         <template v-else>
-
             <article
                 v-for="b in pagedBookings"
                 :key="b.id"
                 class="booking-card bg-white mb-3"
             >
                 <!-- Avatar da outra pessoa (o petsitter, ou o dono se fores tu o petsitter) -->
-                <div class="booking-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden">
+                <div
+                    class="booking-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 overflow-hidden"
+                >
                     <img
                         v-if="otherPerson(b)?.avatar_url"
                         :src="otherPerson(b)!.avatar_url!"
@@ -596,9 +675,16 @@ onBeforeUnmount(() => {
                 <div class="booking-info">
                     <div>
                         <h2 class="booking-name mb-0">
-                            {{ otherPerson(b)?.name ?? (isPetsitterOf(b) ? 'Proprietário' : 'Petsitter') }}
+                            {{
+                                otherPerson(b)?.name ??
+                                (isPetsitterOf(b)
+                                    ? 'Proprietário'
+                                    : 'Petsitter')
+                            }}
                         </h2>
-                        <small class="booking-location d-flex align-items-center gap-1">
+                        <small
+                            class="booking-location d-flex align-items-center gap-1"
+                        >
                             <MapPin :size="17" />
                             <!-- zona da reserva (onde é o serviço); reservas antigas sem zona: localidade da outra pessoa -->
                             {{ b.zone || otherPerson(b)?.location || '--' }}
@@ -607,7 +693,13 @@ onBeforeUnmount(() => {
 
                     <div>
                         <p class="booking-animal mb-1">
-                            <strong>{{ (b.animals?.length ?? 0) > 1 ? 'Animais' : 'Animal' }}:</strong>
+                            <strong
+                                >{{
+                                    (b.animals?.length ?? 0) > 1
+                                        ? 'Animais'
+                                        : 'Animal'
+                                }}:</strong
+                            >
                             {{ animalNames(b) }}
                         </p>
                         <p class="booking-animal mb-0">
@@ -628,13 +720,21 @@ onBeforeUnmount(() => {
                         Período: {{ periodLabel(b) }}
                     </small>
 
-                    <p class="booking-price mb-0">Preço: {{ formatPrice(b.total_price) }}</p>
+                    <p class="booking-price mb-0">
+                        Preço: {{ formatPrice(b.total_price) }}
+                    </p>
 
                     <!-- Lado do petsitter: reservas que te fizeram (já respondidas) -->
-                    <div v-if="isPetsitterOf(b)" class="booking-actions d-flex gap-2 mt-2 w-100">
+                    <div
+                        v-if="isPetsitterOf(b)"
+                        class="booking-actions d-flex gap-2 mt-2 w-100"
+                    >
                         <!-- Aceite: Conversar + Concluir -->
                         <template v-if="b.status === 'approved'">
-                            <a :href="`/messages?with=${chatWith(b)}`" class="btn btn-conversar btn-sm rounded-pill flex-fill">
+                            <a
+                                :href="`/messages?with=${chatWith(b)}`"
+                                class="btn btn-conversar btn-sm rounded-pill flex-fill"
+                            >
                                 Conversar
                             </a>
 
@@ -652,7 +752,7 @@ onBeforeUnmount(() => {
                         <a
                             v-else
                             :href="`/reservations?booking=${b.id}`"
-                            class="btn btn-primary btn-sm rounded-pill flex-fill"
+                            class="btn btn-outline-primary btn-sm rounded-pill flex-fill"
                         >
                             Ver detalhe
                         </a>
@@ -662,7 +762,10 @@ onBeforeUnmount(() => {
                     <div v-else class="booking-actions d-flex gap-2 mt-2 w-100">
                         <!-- Reserva aceite: Conversar + Cancelar -->
                         <template v-if="b.status === 'approved'">
-                            <a :href="`/messages?with=${chatWith(b)}`" class="btn btn-conversar btn-sm rounded-pill flex-fill">
+                            <a
+                                :href="`/messages?with=${chatWith(b)}`"
+                                class="btn btn-conversar btn-sm rounded-pill flex-fill"
+                            >
                                 Conversar
                             </a>
 
@@ -688,7 +791,9 @@ onBeforeUnmount(() => {
                         </button>
 
                         <!-- Concluída sem avaliação: Avaliar + Ver detalhe -->
-                        <template v-else-if="b.status === 'completed' && !b.review">
+                        <template
+                            v-else-if="b.status === 'completed' && !b.review"
+                        >
                             <button
                                 type="button"
                                 class="btn btn-conversar btn-sm rounded-pill flex-fill"
@@ -699,7 +804,7 @@ onBeforeUnmount(() => {
 
                             <a
                                 :href="`/reservations?booking=${b.id}`"
-                                class="btn btn-primary btn-sm rounded-pill flex-fill"
+                                class="btn btn-outline-primary btn-sm rounded-pill flex-fill"
                             >
                                 Ver detalhe
                             </a>
@@ -709,49 +814,65 @@ onBeforeUnmount(() => {
                         <a
                             v-else
                             :href="`/reservations?booking=${b.id}`"
-                            class="btn btn-primary btn-sm rounded-pill flex-fill"
+                            class="btn btn-outline-primary btn-sm rounded-pill flex-fill"
                         >
                             Ver detalhe
                         </a>
                     </div>
                 </div>
             </article>
-
         </template>
 
-            <!-- Paginação (dono e petsitter) -->
-            <nav v-if="totalPages > 1" aria-label="Paginação" class="mt-4">
-                <ul class="pagination justify-content-center mb-0">
-                    <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                        <button type="button" class="page-link" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
-                            Anterior
-                        </button>
-                    </li>
-                    <li
-                        v-for="n in totalPages"
-                        :key="n"
-                        class="page-item"
-                        :class="{ active: n === currentPage }"
+        <!-- Paginação (dono e petsitter) -->
+        <nav v-if="totalPages > 1" aria-label="Paginação" class="mt-4">
+            <ul class="pagination justify-content-center mb-0">
+                <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                    <button
+                        type="button"
+                        class="page-link"
+                        :disabled="currentPage === 1"
+                        @click="goToPage(currentPage - 1)"
                     >
-                        <button
-                            type="button"
-                            class="page-link"
-                            :aria-current="n === currentPage ? 'page' : undefined"
-                            @click="goToPage(n)"
-                        >
-                            {{ n }}
-                        </button>
-                    </li>
-                    <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                        <button type="button" class="page-link" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">
-                            Seguinte
-                        </button>
-                    </li>
-                </ul>
-            </nav>
+                        Anterior
+                    </button>
+                </li>
+                <li
+                    v-for="n in totalPages"
+                    :key="n"
+                    class="page-item"
+                    :class="{ active: n === currentPage }"
+                >
+                    <button
+                        type="button"
+                        class="page-link"
+                        :aria-current="n === currentPage ? 'page' : undefined"
+                        @click="goToPage(n)"
+                    >
+                        {{ n }}
+                    </button>
+                </li>
+                <li
+                    class="page-item"
+                    :class="{ disabled: currentPage === totalPages }"
+                >
+                    <button
+                        type="button"
+                        class="page-link"
+                        :disabled="currentPage === totalPages"
+                        @click="goToPage(currentPage + 1)"
+                    >
+                        Seguinte
+                    </button>
+                </li>
+            </ul>
+        </nav>
     </template>
 
-    <ModalPetDetails :show="showPetDetails" :pet="selectedPet" @close="showPetDetails = false" />
+    <ModalPetDetails
+        :show="showPetDetails"
+        :pet="selectedPet"
+        @close="showPetDetails = false"
+    />
 
     <ModalReviewPetsitter
         :show="showReviewModal"
@@ -976,73 +1097,27 @@ onBeforeUnmount(() => {
 }
 
 .status-cancelled {
-    background-color: #f9c9c9;
-    color: #dc2626;
+    background-color: #e6dfd9;
+    color: #7a6657;
 }
 
-/* Menu de filtros por estado */
-.status-filter-menu {
-    position: relative;
-    width: fit-content;
-}
-
-.status-filter-trigger {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.55rem 0.9rem;
-    border: 1px solid var(--patudo-terracota, #c2410c);
-    border-radius: 999px;
+/* Filtro por estado */
+.filter-chip {
     color: var(--patudo-terracota, #c2410c);
     background-color: #ffffff;
+    border: 1px solid var(--patudo-terracota, #c2410c);
     font-weight: 600;
-    cursor: pointer;
-    list-style: none;
 }
 
-.status-filter-trigger::-webkit-details-marker {
-    display: none;
-}
-
-.status-filter-trigger:hover,
-.status-filter-menu[open] .status-filter-trigger {
+.filter-chip:hover {
     background-color: #fdeee4;
     color: var(--patudo-terracota, #c2410c);
 }
 
-.status-filter-options {
-    position: absolute;
-    top: calc(100% + 0.45rem);
-    left: 0;
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    min-width: 12rem;
-    padding: 0.35rem;
-    border: 1px solid var(--patudo-terracota, #c2410c);
-    border-radius: 0.85rem;
-    background-color: #ffffff;
-    box-shadow: 0 0.5rem 1.25rem rgb(46 29 20 / 14%);
-}
-
-.status-filter-option {
-    padding: 0.5rem 0.7rem;
-    border: 0;
-    border-radius: 0.55rem;
-    color: var(--patudo-terracota, #c2410c);
-    background: transparent;
-    font-weight: 600;
-    text-align: left;
-}
-
-.status-filter-option:hover,
-.status-filter-option:focus-visible {
-    background-color: #fdeee4;
-}
-
-.status-filter-option.active {
+.filter-chip.active {
     color: #ffffff;
     background-color: var(--patudo-terracota, #c2410c);
+    border-color: var(--patudo-terracota, #c2410c);
 }
 
 /* Paginação com as cores do tema */

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { LogOut, UserRound, Dog } from '@lucide/vue';
+import { Bell, LogOut, MessageCircle, UserRound, Dog } from '@lucide/vue';
 import { ref, onMounted } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
-import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
-import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
+import { useNotifications } from '@/composables/useNotifications';
+import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 defineOptions({ layout: false });
 
@@ -62,8 +62,11 @@ const exitHour = ref<string | null>(null);
 const loadError = ref('');
 
 const payment = ref<PaymentData>(emptyPayment);
+const showNotifications = ref(false);
+const { unreadCount } = useNotifications();
 
-const formatDate = (iso?: string) => (iso ? new Date(iso).toLocaleDateString('pt-PT') : '--');
+const formatDate = (iso?: string) =>
+    iso ? new Date(iso).toLocaleDateString('pt-PT') : '--';
 
 // Datas da reserva vêm como "2026-11-23" (sem hora). new Date() lia-as em UTC e, nos Açores,
 // mostrava o dia anterior; por isso formata-se o texto diretamente.
@@ -73,7 +76,8 @@ const formatDay = (day?: string) => {
 };
 
 // "23/11/2026 10:00"
-const withHour = (day?: string, hour?: string | null) => (hour ? `${formatDay(day)} ${hour.slice(0, 5)}` : formatDay(day));
+const withHour = (day?: string, hour?: string | null) =>
+    hour ? `${formatDay(day)} ${hour.slice(0, 5)}` : formatDay(day);
 
 type BookingAnimal = { name: string; photo?: string | null };
 
@@ -120,7 +124,6 @@ onMounted(() => {
 
     <main class="min-vh-100 py-4 patudo-page patudo-page-shell">
         <div class="container">
-
             <nav
                 class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
             >
@@ -139,17 +142,43 @@ onMounted(() => {
 
                 <div class="nav nav-pills border rounded-pill p-1 mx-auto">
                     <a class="nav-link rounded-pill px-4" href="/">Início</a>
-                    <a class="nav-link rounded-pill px-4" href="/orders">Pedidos</a>
-                    <a class="nav-link rounded-pill px-4" href="/favorites">Favoritos</a>
-                    <a class="nav-link active rounded-pill px-4" href="/reservations">Reservas</a>
-                    <AdminNavigationMenu />
+                    <a class="nav-link rounded-pill px-4" href="/orders"
+                        >Pedidos</a
+                    >
+                    <a class="nav-link rounded-pill px-4" href="/favorites"
+                        >Favoritos</a
+                    >
+                    <a
+                        class="nav-link active rounded-pill px-4"
+                        href="/reservations"
+                        >Reservas</a
+                    >
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <HeaderNotificationsChat />
-                    <a href="/profile" class="text-dark" aria-label="Perfil">
+                    <a href="/messages" class="text-dark"
+                        ><MessageCircle :size="25"
+                    /></a>
+                    <button
+                        type="button"
+                        class="text-dark bg-transparent border-0 p-0 position-relative"
+                        @click="showNotifications = true"
+                    >
+                        <Bell :size="25" />
+                        <span
+                            v-if="unreadCount > 0"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style="font-size: 0.6rem"
+                        >
+                            {{ unreadCount > 9 ? '9+' : unreadCount }}
+                        </span>
+                    </button>
+                    <button
+                        type="button"
+                        class="text-dark p-0 border-0 bg-none"
+                    >
                         <UserRound :size="25" />
-                    </a>
+                    </button>
                     <Link
                         href="/logout"
                         method="post"
@@ -162,22 +191,64 @@ onMounted(() => {
                 </div>
             </nav>
 
-            <h1 class="text-center fw-medium confirmed-title mt-5 mb-4">Pagamento Confirmado</h1>
+            <h1 class="text-center fw-medium confirmed-title mt-5 mb-4">
+                Pagamento Confirmado
+            </h1>
 
             <div class="text-center mb-4">
-                <svg class="paw" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <ellipse cx="38" cy="82" rx="15" ry="22" transform="rotate(-25 38 82)" />
-                    <ellipse cx="78" cy="38" rx="16" ry="25" transform="rotate(-8 78 38)" />
-                    <ellipse cx="122" cy="38" rx="16" ry="25" transform="rotate(8 122 38)" />
-                    <ellipse cx="162" cy="82" rx="15" ry="22" transform="rotate(25 162 82)" />
+                <svg
+                    class="paw"
+                    viewBox="0 0 200 200"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                >
+                    <ellipse
+                        cx="38"
+                        cy="82"
+                        rx="15"
+                        ry="22"
+                        transform="rotate(-25 38 82)"
+                    />
+                    <ellipse
+                        cx="78"
+                        cy="38"
+                        rx="16"
+                        ry="25"
+                        transform="rotate(-8 78 38)"
+                    />
+                    <ellipse
+                        cx="122"
+                        cy="38"
+                        rx="16"
+                        ry="25"
+                        transform="rotate(8 122 38)"
+                    />
+                    <ellipse
+                        cx="162"
+                        cy="82"
+                        rx="15"
+                        ry="22"
+                        transform="rotate(25 162 82)"
+                    />
                     <circle cx="100" cy="135" r="55" />
-                    <path d="M70 135 L92 157 L132 112" fill="none" stroke="#000" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+                    <path
+                        d="M70 135 L92 157 L132 112"
+                        fill="none"
+                        stroke="#000"
+                        stroke-width="16"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
                 </svg>
             </div>
 
-            <p class="text-center fw-medium fs-5 mb-4">O pagamento foi aprovado com sucesso!</p>
+            <p class="text-center fw-medium fs-5 mb-4">
+                O pagamento foi aprovado com sucesso!
+            </p>
             <!-- só aparece se a reserva não carregar -->
-            <p v-if="loadError" class="text-center text-danger small mb-4">{{ loadError }}</p>
+            <p v-if="loadError" class="text-center text-danger small mb-4">
+                {{ loadError }}
+            </p>
 
             <section class="details-card mx-auto">
                 <div class="px-4 pt-4 pb-3">
@@ -185,11 +256,19 @@ onMounted(() => {
 
                     <div class="detail-row">
                         <span>id da reserva:</span>
-                        <span class="value-pill">{{ payment.reservation_id ? `#${payment.reservation_id}` : '' }}</span>
+                        <span class="value-pill">{{
+                            payment.reservation_id
+                                ? `#${payment.reservation_id}`
+                                : ''
+                        }}</span>
                     </div>
                     <div class="detail-row">
                         <span>Valor pago:</span>
-                        <span>{{ payment.amount.toFixed(2).replace('.', ',') }}€</span>
+                        <span
+                            >{{
+                                payment.amount.toFixed(2).replace('.', ',')
+                            }}€</span
+                        >
                     </div>
                     <div class="detail-row">
                         <span>Data:</span>
@@ -197,24 +276,42 @@ onMounted(() => {
                     </div>
                     <div class="detail-row">
                         <span>Forma de pagamento:</span>
-                        <span class="value-pill">{{ payment.payment_method }}</span>
+                        <span class="value-pill">{{
+                            payment.payment_method
+                        }}</span>
                     </div>
                 </div>
 
                 <div class="divider px-4 py-3">
                     <p class="mb-3">Agradecemos a tua confiança!</p>
-                    <p class="mb-0">Aguarda a resposta do Pet Sitter para saber se a reserva foi aceite.</p>
+                    <p class="mb-0">
+                        Aguarda a resposta do Pet Sitter para saber se a reserva
+                        foi aceite.
+                    </p>
                 </div>
 
                 <div class="divider px-4 py-3 d-flex align-items-center gap-3">
-                    <div class="pet-avatar rounded-circle border border-dark overflow-hidden d-flex align-items-center justify-content-center flex-shrink-0">
-                        <img v-if="payment.pet_photo" :src="payment.pet_photo" :alt="payment.pet_name" class="w-100 h-100 object-fit-cover" />
+                    <div
+                        class="pet-avatar rounded-circle border border-dark overflow-hidden d-flex align-items-center justify-content-center flex-shrink-0"
+                    >
+                        <img
+                            v-if="payment.pet_photo"
+                            :src="payment.pet_photo"
+                            :alt="payment.pet_name"
+                            class="w-100 h-100 object-fit-cover"
+                        />
                         <Dog v-else :size="26" class="text-primary" />
                     </div>
                     <div class="lh-sm">
                         <p class="mb-1 fw-medium">{{ payment.pet_name }}</p>
                         <small class="fs-6">
-                            {{ withHour(payment.reservation_start, entranceHour) }} - {{ withHour(payment.reservation_end, exitHour) }}
+                            {{
+                                withHour(
+                                    payment.reservation_start,
+                                    entranceHour,
+                                )
+                            }}
+                            - {{ withHour(payment.reservation_end, exitHour) }}
                         </small>
                     </div>
                 </div>
@@ -222,14 +319,26 @@ onMounted(() => {
 
             <div class="text-center mt-5">
                 <!-- as reservas do dono estão em /reservations (/orders é a página do petsitter) -->
-                <a href="/reservations" class="btn btn-primary rounded-pill px-5 py-2">Ir para meus pedidos</a>
+                <a
+                    href="/reservations"
+                    class="btn btn-primary rounded-pill px-5 py-2"
+                    >Ir para meus pedidos</a
+                >
             </div>
         </div>
 
+        <ModalNotifications
+            :show="showNotifications"
+            @close="showNotifications = false"
+        />
     </main>
 </template>
 
 <style scoped>
+.patudo-page {
+    background-color: #fffaf3;
+}
+
 .nav-pills .nav-link.active {
     background-color: var(--patudo-terracota, #c2410c) !important;
     color: #ffffff !important;

@@ -4,8 +4,7 @@
 // and the open-conversation action. Messages (send, edit, delete, react) are handled by the <t-chatbox> box.
 import { getTalkSession } from '@talkjs/core';
 import type { ConversationSnapshot, TalkSession } from '@talkjs/core';
-import { usePage } from '@inertiajs/vue3';
-import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue';
+import { computed, onBeforeUnmount, ref, shallowRef } from 'vue';
 
 export interface ChatPerson {
     id: string;
@@ -46,36 +45,6 @@ async function getJson<T>(url: string): Promise<T> {
 }
 
 export function useChat() {
-    const page = usePage<{ auth?: { user?: { id?: number } | null } }>();
-    const userId = page.props.auth?.user?.id;
-    const unreadStorageKey = userId ? `patudo:chat-unread:${userId}` : null;
-
-    function readCachedUnreadCount(): number {
-        if (!unreadStorageKey || typeof window === 'undefined') {
-            return 0;
-        }
-
-        try {
-            const count = Number(window.localStorage.getItem(unreadStorageKey));
-
-            return Number.isFinite(count) && count > 0 ? Math.floor(count) : 0;
-        } catch {
-            return 0;
-        }
-    }
-
-    function cacheUnreadCount(count: number): void {
-        if (!unreadStorageKey || typeof window === 'undefined') {
-            return;
-        }
-
-        try {
-            window.localStorage.setItem(unreadStorageKey, String(count));
-        } catch {
-            // O chat continua funcional quando o armazenamento local não está disponível.
-        }
-    }
-
     const me = ref<ChatPerson | null>(null);
     const contacts = ref<ChatPerson[]>([]);
     const conversations = shallowRef<ConversationSnapshot[]>([]);
@@ -83,8 +52,6 @@ export function useChat() {
     const activeOtherId = ref<string | null>(null);
     const activeOnline = ref(false);
     const ready = ref(false);
-    const conversationsLoaded = ref(false);
-    const cachedUnread = ref(readCachedUnreadCount());
     const error = ref<string | null>(null);
     const appId = ref<string | null>(null);
     // Só existe quando a autenticação do TalkJS está ligada; a caixa usa-o para pedir um token novo.
@@ -99,7 +66,9 @@ export function useChat() {
     // ID único por par de utilizadores, igual para os dois lados (ex.: chat_3_12).
     // Unique ID per pair of users, the same on both sides (e.g. chat_3_12).
     function conversationIdFor(otherId: string): string {
-        const ids = [Number(me.value?.id), Number(otherId)].sort((a, b) => a - b);
+        const ids = [Number(me.value?.id), Number(otherId)].sort(
+            (a, b) => a - b,
+        );
 
         return `chat_${ids[0]}_${ids[1]}`;
     }
@@ -160,43 +129,54 @@ export function useChat() {
     async function start(): Promise<void> {
         try {
             const info = await getJson<SessionInfo>('/api/chat/session');
+            const list = await getJson<{ data: ChatPerson[] }>(
+                '/api/chat/contacts',
+            );
 
             me.value = info.user;
+            contacts.value = list.data;
             appId.value = info.app_id;
 
             if (info.token) {
                 tokenFetcher.value = async () => {
-                    const fresh = await getJson<SessionInfo>('/api/chat/session');
+                    const fresh =
+                        await getJson<SessionInfo>('/api/chat/session');
 
                     return fresh.token ?? '';
                 };
             }
 
-            const chatSession = getTalkSession({
+            session = getTalkSession({
                 appId: info.app_id,
                 userId: info.user.id,
                 token: info.token ?? undefined,
             });
-            session = chatSession;
 
             // Só há renovação de token quando a autenticação do TalkJS está ligada.
             // Token renewal only applies when TalkJS authentication is enabled.
             if (info.token) {
-                chatSession.onNeedToken = () => {
+                session.onNeedToken = () => {
                     void refreshToken();
                 };
             }
 
-            const currentUser = chatSession.currentUser;
-            await currentUser.createIfNotExists({
+            await session.currentUser.createIfNotExists({
                 name: info.user.name,
                 custom: { papel: info.user.role },
                 photoUrl: info.user.photo_url ?? undefined,
             });
 
-            conversationsSub = chatSession.subscribeConversations((snapshots) => {
+            // createIfNotExists não altera quem já existe: atualiza o nome e a foto em cada entrada no chat
+            // createIfNotExists does not update existing users: refresh name and photo on every chat start
+            await session.currentUser.set({
+                name: info.user.name,
+                photoUrl: info.user.photo_url ?? null,
+                // textos do TalkJS em português ("Hoje", "Ontem"...); o TalkJS só tem pt-BR
+                locale: 'pt-BR',
+            });
+
+            conversationsSub = session.subscribeConversations((snapshots) => {
                 conversations.value = snapshots ?? [];
-                conversationsLoaded.value = true;
 
                 (snapshots ?? []).forEach((conversation) => {
                     const otherId = otherIdFrom(conversation.id);
@@ -206,20 +186,6 @@ export function useChat() {
                     }
                 });
             });
-
-            const contactsPromise = getJson<{ data: ChatPerson[] }>('/api/chat/contacts');
-
-            // createIfNotExists não altera quem já existe: atualiza o nome e a foto em cada entrada no chat
-            // createIfNotExists does not update existing users: refresh name and photo on every chat start
-            const currentUserPromise = currentUser.set({
-                name: info.user.name,
-                photoUrl: info.user.photo_url ?? null,
-                // textos do TalkJS em português ("Hoje", "Ontem"...); o TalkJS só tem pt-BR
-                locale: 'pt-BR',
-            });
-
-            const [list] = await Promise.all([contactsPromise, currentUserPromise]);
-            contacts.value = list.data;
 
             ready.value = true;
         } catch (e) {
@@ -235,7 +201,12 @@ export function useChat() {
         const byOther = new Map<string, ChatListItem>();
 
         contacts.value.forEach((contact) => {
-            byOther.set(contact.id, { ...contact, lastText: '', lastAt: null, unread: 0 });
+            byOther.set(contact.id, {
+                ...contact,
+                lastText: '',
+                lastAt: null,
+                unread: 0,
+            });
         });
 
         conversations.value.forEach((conversation) => {
@@ -249,16 +220,25 @@ export function useChat() {
             }
 
             const person: ChatPerson = byOther.get(otherId) ??
-                knownPeople.value[otherId] ?? { id: otherId, name: `Utilizador ${otherId}`, role: 'Dono' };
+                knownPeople.value[otherId] ?? {
+                    id: otherId,
+                    name: `Utilizador ${otherId}`,
+                    role: 'Dono',
+                };
 
             byOther.set(otherId, {
                 id: person.id,
                 name: person.name,
                 role: person.role,
                 photo_url: person.photo_url ?? null,
-                lastText: last ? (last.sender?.id === myId ? 'Tu: ' : '') + last.plaintext : '',
+                lastText: last
+                    ? (last.sender?.id === myId ? 'Tu: ' : '') + last.plaintext
+                    : '',
                 lastAt: last ? last.createdAt : null,
-                unread: otherId === activeOtherId.value ? 0 : conversation.unreadMessageCount,
+                unread:
+                    otherId === activeOtherId.value
+                        ? 0
+                        : conversation.unreadMessageCount,
             });
         });
 
@@ -266,39 +246,34 @@ export function useChat() {
         // não aparecem: uma conversa nova começa no perfil do petsitter (/messages?with=ID).
         // Only conversations with messages are shown (plus the open one, even if empty).
         return [...byOther.values()]
-            .filter((item) => item.lastAt !== null || item.id === activeOtherId.value)
+            .filter(
+                (item) =>
+                    item.lastAt !== null || item.id === activeOtherId.value,
+            )
             .sort((a, b) => {
-            if (a.lastAt !== null && b.lastAt !== null) {
-                return b.lastAt - a.lastAt;
-            }
+                if (a.lastAt !== null && b.lastAt !== null) {
+                    return b.lastAt - a.lastAt;
+                }
 
-            if (a.lastAt !== null) {
-                return -1;
-            }
+                if (a.lastAt !== null) {
+                    return -1;
+                }
 
-            if (b.lastAt !== null) {
-                return 1;
-            }
+                if (b.lastAt !== null) {
+                    return 1;
+                }
 
-            return a.name.localeCompare(b.name, 'pt');
-        });
+                return a.name.localeCompare(b.name, 'pt');
+            });
     });
 
-    const totalUnread = computed<number>(() => conversationsLoaded.value
-        ? items.value.reduce((sum, item) => sum + item.unread, 0)
-        : cachedUnread.value);
-
-    watch([conversationsLoaded, totalUnread], ([loaded, count]) => {
-        if (!loaded) {
-            return;
-        }
-
-        cachedUnread.value = count;
-        cacheUnreadCount(count);
-    }, { flush: 'sync' });
+    const totalUnread = computed<number>(() =>
+        items.value.reduce((sum, item) => sum + item.unread, 0),
+    );
 
     const activePerson = computed<ChatListItem | null>(
-        () => items.value.find((item) => item.id === activeOtherId.value) ?? null,
+        () =>
+            items.value.find((item) => item.id === activeOtherId.value) ?? null,
     );
 
     async function openConversation(otherId: string): Promise<void> {
@@ -308,7 +283,9 @@ export function useChat() {
 
         try {
             error.value = null;
-            const conversation = session.conversation(conversationIdFor(otherId));
+            const conversation = session.conversation(
+                conversationIdFor(otherId),
+            );
             const contact = contacts.value.find((c) => c.id === otherId);
 
             // Só quem tem o outro na lista de contactos (o dono) pode iniciar a conversa.
@@ -324,7 +301,9 @@ export function useChat() {
                 // ligada), ignora: a foto atualiza-se quando essa pessoa abrir o chat.
                 // Updates the photo of users who already existed without it; ignored if TalkJS does not allow it.
                 try {
-                    await session.user(otherId).set({ photoUrl: contact.photo_url ?? null });
+                    await session
+                        .user(otherId)
+                        .set({ photoUrl: contact.photo_url ?? null });
                 } catch {
                     // sem permissão para alterar outro utilizador
                 }
@@ -350,7 +329,9 @@ export function useChat() {
     function canOpen(otherId: string): boolean {
         return (
             contacts.value.some((contact) => contact.id === otherId) ||
-            conversations.value.some((conversation) => otherIdFrom(conversation.id) === otherId)
+            conversations.value.some(
+                (conversation) => otherIdFrom(conversation.id) === otherId,
+            )
         );
     }
 

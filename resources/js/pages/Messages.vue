@@ -7,11 +7,10 @@
 // May God bless all the developers working on this project. Amen.
 import '@talkjs/web-components';
 import '@talkjs/web-components/default.css';
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import { Bell, LogOut, MessageCircle, UserRound } from '@lucide/vue';
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
-import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
 import { useChat } from '@/composables/useChat';
 import { useInitials } from '@/composables/useInitials';
 import { useNotifications } from '@/composables/useNotifications';
@@ -19,9 +18,6 @@ import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 const showNotifications = ref(false);
 const { unreadCount, fetchNotifications } = useNotifications();
-const page = usePage<{ auth: { isAdmin: boolean; user: { is_petsitter?: boolean } | null } }>();
-const viewerIsPetsitter = computed(() => page.props.auth.user?.is_petsitter === true);
-const showOwnerNavigation = computed(() => !viewerIsPetsitter.value || page.props.auth.isAdmin);
 
 const {
     me,
@@ -49,20 +45,28 @@ const avatarColors = [
     { background: '#a52352', foreground: '#ffffff' },
 ];
 
-function avatarStyle(id: string, photoUrl?: string | null): Record<string, string> {
+function avatarStyle(
+    id: string,
+    photoUrl?: string | null,
+): Record<string, string> {
     if (photoUrl) {
         return { backgroundImage: `url("${photoUrl}")` };
     }
 
     const numericId = Number(id);
-    const colorIndex = Number.isFinite(numericId) ? Math.abs(numericId) % avatarColors.length : 0;
+    const colorIndex = Number.isFinite(numericId)
+        ? Math.abs(numericId) % avatarColors.length
+        : 0;
     const color = avatarColors[colorIndex] ?? avatarColors[0]!;
 
     return { backgroundColor: color.background, color: color.foreground };
 }
 
 function timeLabel(timestamp: number): string {
-    return new Date(timestamp).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+    return new Date(timestamp).toLocaleTimeString('pt-PT', {
+        hour: '2-digit',
+        minute: '2-digit',
+    });
 }
 
 onMounted(async () => {
@@ -84,28 +88,55 @@ onMounted(async () => {
     <Head title="Mensagens" />
 
     <main class="min-vh-100 py-4 patudo-page-shell">
-        <div class="container ">
+        <div class="container">
             <!-- Barra de navegação, igual à das outras páginas. -->
             <!-- Navigation bar, same as the other pages. -->
-            <nav class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4">
-                <a class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2" href="/">
-                    <img :src="logoPatudo" alt="Patudo" width="70" height="70" />
+            <nav
+                class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
+            >
+                <a
+                    class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2"
+                    href="/"
+                >
+                    <img
+                        :src="logoPatudo"
+                        alt="Patudo"
+                        width="70"
+                        height="70"
+                    />
                     <span>Patudo</span>
                 </a>
 
                 <div class="nav nav-pills border rounded-pill p-1 mx-auto">
-                    <a v-if="showOwnerNavigation" class="nav-link text-dark rounded-pill px-4" href="/">Início</a>
-                    <a class="nav-link text-dark rounded-pill px-4" href="/orders">Pedidos</a>
-                    <a v-if="showOwnerNavigation" class="nav-link text-dark rounded-pill px-4" href="/favorites">Favoritos</a>
-                    <a class="nav-link text-dark rounded-pill px-4" href="/reservations">Reservas</a>
-                    <AdminNavigationMenu />
+                    <a class="nav-link text-dark rounded-pill px-4" href="/"
+                        >Início</a
+                    >
+                    <a
+                        class="nav-link text-dark rounded-pill px-4"
+                        href="/orders"
+                        >Pedidos</a
+                    >
+                    <a
+                        class="nav-link text-dark rounded-pill px-4"
+                        href="/favorites"
+                        >Favoritos</a
+                    >
+                    <a
+                        class="nav-link text-dark rounded-pill px-4"
+                        href="/reservations"
+                        >Reservas</a
+                    >
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
                     <a
                         href="/messages"
                         class="text-dark bg-transparent border-0 p-0 position-relative"
-                        :aria-label="totalUnread > 0 ? `Mensagens, ${totalUnread} por ler` : 'Mensagens'"
+                        :aria-label="
+                            totalUnread > 0
+                                ? `Mensagens, ${totalUnread} por ler`
+                                : 'Mensagens'
+                        "
                     >
                         <MessageCircle :size="25" fill="none" />
                         <span
@@ -151,7 +182,10 @@ onMounted(async () => {
                     <h1 class="chat-title">Mensagens</h1>
 
                     <p v-if="error" class="text-danger small">{{ error }}</p>
-                    <p v-else-if="ready && items.length === 0" class="text-muted small">
+                    <p
+                        v-else-if="ready && items.length === 0"
+                        class="text-muted small"
+                    >
                         Ainda não tens conversas.
                     </p>
 
@@ -165,16 +199,35 @@ onMounted(async () => {
                             @click="openConversation(item.id)"
                         >
                             <span
-                                :class="['chat-avatar', { 'chat-avatar-with-photo': item.photo_url }]"
+                                :class="[
+                                    'chat-avatar',
+                                    {
+                                        'chat-avatar-with-photo':
+                                            item.photo_url,
+                                    },
+                                ]"
                                 :style="avatarStyle(item.id, item.photo_url)"
-                            >{{ item.photo_url ? '' : getInitials(item.name) }}</span>
+                                >{{
+                                    item.photo_url ? '' : getInitials(item.name)
+                                }}</span
+                            >
                             <span class="chat-item-info">
-                                <strong>{{ item.name }} • {{ item.role }}</strong>
-                                <span class="chat-preview">{{ item.lastText || 'Sem mensagens' }}</span>
+                                <strong
+                                    >{{ item.name }} • {{ item.role }}</strong
+                                >
+                                <span class="chat-preview">{{
+                                    item.lastText || 'Sem mensagens'
+                                }}</span>
                             </span>
                             <span class="chat-item-side">
-                                <span>{{ item.lastAt ? timeLabel(item.lastAt) : '' }}</span>
-                                <span v-if="item.unread > 0" class="chat-badge">{{ item.unread }}</span>
+                                <span>{{
+                                    item.lastAt ? timeLabel(item.lastAt) : ''
+                                }}</span>
+                                <span
+                                    v-if="item.unread > 0"
+                                    class="chat-badge"
+                                    >{{ item.unread }}</span
+                                >
                             </span>
                         </button>
                     </div>
@@ -182,26 +235,58 @@ onMounted(async () => {
 
                 <!-- Conversa aberta -->
                 <section class="chat-panel">
-                    <p v-if="!activePerson" class="chat-empty">Escolhe uma conversa para começar.</p>
+                    <p v-if="!activePerson" class="chat-empty">
+                        Escolhe uma conversa para começar.
+                    </p>
 
                     <template v-else>
                         <div class="chat-header">
                             <span
-                                :class="['chat-avatar', 'chat-avatar-lg', { 'chat-avatar-with-photo': activePerson.photo_url }]"
-                                :style="avatarStyle(activePerson.id, activePerson.photo_url)"
-                            >{{ activePerson.photo_url ? '' : getInitials(activePerson.name) }}</span>
+                                :class="[
+                                    'chat-avatar',
+                                    'chat-avatar-lg',
+                                    {
+                                        'chat-avatar-with-photo':
+                                            activePerson.photo_url,
+                                    },
+                                ]"
+                                :style="
+                                    avatarStyle(
+                                        activePerson.id,
+                                        activePerson.photo_url,
+                                    )
+                                "
+                                >{{
+                                    activePerson.photo_url
+                                        ? ''
+                                        : getInitials(activePerson.name)
+                                }}</span
+                            >
                             <div>
-                                <strong class="chat-header-name">{{ activePerson.name }} • {{ activePerson.role }}</strong>
+                                <strong class="chat-header-name"
+                                    >{{ activePerson.name }} •
+                                    {{ activePerson.role }}</strong
+                                >
                                 <span class="chat-status">
-                                    <i class="chat-dot" :class="{ online: activeOnline }"></i>
-                                    {{ activeOnline ? 'Online agora' : 'Offline' }}
+                                    <i
+                                        class="chat-dot"
+                                        :class="{ online: activeOnline }"
+                                    ></i>
+                                    {{
+                                        activeOnline
+                                            ? 'Online agora'
+                                            : 'Offline'
+                                    }}
                                 </span>
                             </div>
                         </div>
 
-                        <p v-if="error" class="text-danger small mb-0 pb-2 px-2">{{ error }}</p>
-
-                        
+                        <p
+                            v-if="error"
+                            class="text-danger small mb-0 pb-2 px-2"
+                        >
+                            {{ error }}
+                        </p>
 
                         <!-- Caixa de chat do TalkJS: envia, edita, apaga, reage e anexa ficheiros. -->
                         <!-- TalkJS chat box: sends, edits, deletes, reacts and attaches files. -->
@@ -412,7 +497,6 @@ onMounted(async () => {
     border: 1px solid var(--patudo-terracota);
     border-radius: 0.5rem;
     font-size: 1rem;
-    
 }
 
 .chat-box :deep(.t-theme-message > .t-avatar-wrapper > .t-theme-avatar) {
@@ -503,14 +587,22 @@ onMounted(async () => {
     background: var(--patudo-bege);
 }
 
-.chat-box :deep(.t-theme-message-action-menu .t-menu-item:hover .t-menu-item-icon-box),
-.chat-box :deep(.t-theme-message-action-menu .t-menu-item:focus .t-menu-item-icon-box) {
+.chat-box
+    :deep(
+        .t-theme-message-action-menu .t-menu-item:hover .t-menu-item-icon-box
+    ),
+.chat-box
+    :deep(
+        .t-theme-message-action-menu .t-menu-item:focus .t-menu-item-icon-box
+    ) {
     background: #fff;
     border-color: var(--patudo-terracota);
 }
 
-.chat-box :deep(.t-theme-message-action-menu .t-menu-item:hover .t-menu-item-icon),
-.chat-box :deep(.t-theme-message-action-menu .t-menu-item:focus .t-menu-item-icon) {
+.chat-box
+    :deep(.t-theme-message-action-menu .t-menu-item:hover .t-menu-item-icon),
+.chat-box
+    :deep(.t-theme-message-action-menu .t-menu-item:focus .t-menu-item-icon) {
     color: var(--patudo-castanhoDark);
 }
 

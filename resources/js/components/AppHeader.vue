@@ -2,7 +2,15 @@
 <!-- Application header component. Contains navigation, search, and user menu. -->
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { Bell, BookOpen, Folder, Home, LayoutGrid, Menu, MessageCircle, Search } from '@lucide/vue';
+import {
+    Bell,
+    BookOpen,
+    Folder,
+    Home,
+    LayoutGrid,
+    Menu,
+    Search,
+} from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
@@ -36,7 +44,6 @@ import {
 import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import UserMenuContent from '@/components/UserMenuContent.vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
-import { useChat } from '@/composables/useChat';
 import { getInitials } from '@/composables/useInitials';
 import { useNotifications } from '@/composables/useNotifications';
 import { toUrl } from '@/lib/utils';
@@ -44,6 +51,10 @@ import type { BreadcrumbItem, NavItem } from '@/types';
 
 const showNotifications = ref(false);
 const { unreadCount, fetchNotifications } = useNotifications();
+
+onMounted(() => {
+    void fetchNotifications();
+});
 
 // Tipo TypeScript para Props.
 // TypeScript type for Props.
@@ -58,16 +69,6 @@ const props = withDefaults(defineProps<Props>(), {
 const page = usePage();
 const auth = computed(() => page.props.auth);
 const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
-const { totalUnread, start } = useChat();
-
-if (typeof page.props.unreadNotificationCount === 'number') {
-    unreadCount.value = page.props.unreadNotificationCount;
-}
-
-onMounted(() => {
-    void fetchNotifications();
-    if (auth.value.user) void start();
-});
 
 const activeItemStyles =
     'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
@@ -232,28 +233,6 @@ const rightNavItems: NavItem[] = [
                             >
                                 {{ unreadCount > 9 ? '9+' : unreadCount }}
                             </span>
-                        </Button>
-
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            as-child
-                            class="group h-9 w-9 cursor-pointer relative"
-                        >
-                            <a
-                                href="/messages"
-                                :aria-label="totalUnread > 0 ? `Mensagens, ${totalUnread} por ler` : 'Mensagens'"
-                            >
-                                <MessageCircle
-                                    class="size-5 opacity-80 group-hover:opacity-100"
-                                />
-                                <span
-                                    v-if="totalUnread > 0"
-                                    class="absolute top-1 right-1 inline-flex items-center justify-center h-4 w-4 rounded-full bg-red-500 text-[10px] font-bold text-white"
-                                >
-                                    {{ totalUnread > 9 ? '9+' : totalUnread }}
-                                </span>
-                            </a>
                         </Button>
 
                         <div class="hidden space-x-1 lg:flex">

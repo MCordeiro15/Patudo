@@ -39,7 +39,10 @@ watch(
             // Remove o prefixo +351 e formata para apenas 9 dígitos
             const rawPhone = props.user?.phone ?? '';
             if (rawPhone) {
-                phone.value = rawPhone.replace(/\D/g, '').replace(/^351/, '').slice(-9);
+                phone.value = rawPhone
+                    .replace(/\D/g, '')
+                    .replace(/^351/, '')
+                    .slice(-9);
             } else {
                 phone.value = '';
             }
@@ -232,7 +235,9 @@ const handleDeleteAccount = () => {
                             inputmode="numeric"
                             maxlength="9"
                             pattern="[0-9]*"
-                            @input="phone = phone.replace(/\D/g, '').slice(0, 9)"
+                            @input="
+                                phone = phone.replace(/\D/g, '').slice(0, 9)
+                            "
                             class="patudo-pill-input"
                         />
                     </div>

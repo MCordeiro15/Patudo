@@ -1,11 +1,20 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { Check, Heart, LogOut, UserRound, X } from '@lucide/vue';
+import {
+    Bell,
+    Check,
+    Heart,
+    LogOut,
+    MessageCircle,
+    Star,
+    UserRound,
+    X,
+} from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
-import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
-import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
+import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 import ModalReportPetsitter from '@/pages/Modals/ModalReportPetsitter.vue';
+import { useNotifications } from '@/composables/useNotifications';
 import type { Post } from '@/types/post';
 
 // O id vem do controller (/petsitters/{id}) ou do URL: /profile-owner-view?petsitter=ID
@@ -15,7 +24,9 @@ const petsitterId = props.petsitterId
     : new URLSearchParams(window.location.search).get('petsitter');
 
 const bookingUrl = computed(() =>
-    petsitterId ? `/booking?petsitter=${encodeURIComponent(petsitterId)}` : '/booking',
+    petsitterId
+        ? `/booking?petsitter=${encodeURIComponent(petsitterId)}`
+        : '/booking',
 );
 
 function getXsrf(): string {
@@ -71,7 +82,8 @@ const loadFavourite = async () => {
     if (!petsitterId) return;
     const res = await apiFetch('/api/favourites');
     if (res.ok) {
-        const list: { user_id?: number; id?: number }[] = (await res.json()).data;
+        const list: { user_id?: number; id?: number }[] = (await res.json())
+            .data;
         isFavourite.value = list.some(
             (p) => String(p.user_id ?? p.id) === petsitterId,
         );
@@ -85,19 +97,26 @@ const toggleFavourite = async () => {
     const res = isFavourite.value
         ? await apiFetch(`/api/favourites/${petsitterId}`, { method: 'DELETE' })
         : await apiFetch('/api/favourites', {
-            method: 'POST',
-            body: JSON.stringify({ petsitter_id: Number(petsitterId) }),
-        });
+              method: 'POST',
+              body: JSON.stringify({ petsitter_id: Number(petsitterId) }),
+          });
     if (res.ok) {
         isFavourite.value = !isFavourite.value;
     } else {
-        feedback.value = (await res.json().catch(() => ({}))).message ?? 'Não foi possível atualizar os favoritos.';
+        feedback.value =
+            (await res.json().catch(() => ({}))).message ??
+            'Não foi possível atualizar os favoritos.';
     }
 };
 
 const showReportModal = ref(false);
+const showNotifications = ref(false);
+const { unreadCount } = useNotifications();
 
-const submitReport = async (payload: { reason: string; description: string }) => {
+const submitReport = async (payload: {
+    reason: string;
+    description: string;
+}) => {
     if (!petsitterId) return;
     feedback.value = '';
     await fetch('/sanctum/csrf-cookie', { credentials: 'same-origin' });
@@ -140,7 +159,7 @@ type PetsitterData = {
 
 type PetsitterService = {
     id: number;
-    type: string;
+    type: 'pet-sitting' | 'passeio';
     price: number;
 };
 
@@ -165,7 +184,9 @@ const loadServices = async () => {
         const res = await apiFetch(`/api/petsitters/${petsitterId}/services`);
         const data = await res.json().catch(() => ({}));
         if (res.ok) services.value = data.data ?? [];
-        else servicesError.value = data.message ?? 'Não foi possível carregar os serviços.';
+        else
+            servicesError.value =
+                data.message ?? 'Não foi possível carregar os serviços.';
     } catch {
         servicesError.value = 'Erro de rede ao carregar os serviços.';
     } finally {
@@ -173,23 +194,34 @@ const loadServices = async () => {
     }
 };
 
-const serviceTypeLabel = (type: PetsitterService['type']) => ({
-    passeio: 'Passeio',
-    'pet-sitting': 'Pet Sitting',
-}[type] ?? type);
+const serviceTypeLabel = (type: PetsitterService['type']) =>
+    type === 'passeio' ? 'Passeio' : 'Pet Sitting';
 const formatServicePrice = (price: number) =>
     `${Number(price).toLocaleString('pt-PT', { maximumFractionDigits: 2 })} €`;
 
-const sizeLabels: Record<string, string> = { small: 'Porte Pequeno', medium: 'Porte Médio', large: 'Porte Grande' };
-const typeLabels: Record<string, string> = { dog: 'Cão', cat: 'Gato', bird: 'Ave', other: 'Outro' };
+const sizeLabels: Record<string, string> = {
+    small: 'Porte Pequeno',
+    medium: 'Porte Médio',
+    large: 'Porte Grande',
+};
+const typeLabels: Record<string, string> = {
+    dog: 'Cão',
+    cat: 'Gato',
+    bird: 'Ave',
+    other: 'Outro',
+};
 
 const demoTags = ['Dog sitting', 'Medium dogs', 'Outdoor'];
 const tags = computed(() => {
     if (!petsitter.value) return demoTags;
     return [
-        ...(petsitter.value.accepted_animal_types ?? []).map((t) => typeLabels[t] ?? t),
-        ...(petsitter.value.accepted_sizes ?? []).map((s) => sizeLabels[s] ?? s),
-    ];
+        ...(petsitter.value.accepted_animal_types ?? []).map(
+            (t) => typeLabels[t] ?? t,
+        ),
+        ...(petsitter.value.accepted_sizes ?? []).map(
+            (s) => sizeLabels[s] ?? s,
+        ),
+    ].slice(0, 3);
 });
 
 const dayList = [
@@ -210,8 +242,16 @@ const days = computed(() =>
     })),
 );
 
-const displayName = computed(() => (petsitter.value ? (petsitter.value.user?.name ?? 'Petsitter') : 'Nome do Pet Sitter'));
-const displayLocation = computed(() => (petsitter.value ? (petsitter.value.service_location ?? petsitter.value.city ?? '--') : 'Localização'));
+const displayName = computed(() =>
+    petsitter.value
+        ? (petsitter.value.user?.name ?? 'Petsitter')
+        : 'Nome do Pet Sitter',
+);
+const displayLocation = computed(() =>
+    petsitter.value
+        ? (petsitter.value.service_location ?? petsitter.value.city ?? '--')
+        : 'Localização',
+);
 const displayShortBio = computed(() =>
     petsitter.value
         ? (petsitter.value.short_bio ?? '')
@@ -219,23 +259,32 @@ const displayShortBio = computed(() =>
 );
 const displayAbout = computed(() =>
     petsitter.value
-        ? (petsitter.value.biography ?? 'Este petsitter ainda não adicionou uma biografia.')
+        ? (petsitter.value.biography ??
+          'Este petsitter ainda não adicionou uma biografia.')
         : 'Um pouco sobre mim',
 );
 const displayRating = computed(() => {
     if (!petsitter.value) return '5.0';
-    return petsitter.value.average_rating != null ? Number(petsitter.value.average_rating).toFixed(1) : 'Sem avaliações';
+    return petsitter.value.average_rating != null
+        ? Number(petsitter.value.average_rating).toFixed(1)
+        : 'Sem avaliações';
 });
-const displayReviews = computed(() => (petsitter.value ? petsitter.value.reviews_count : ''));
+const displayReviews = computed(() =>
+    petsitter.value ? petsitter.value.reviews_count : '',
+);
 const displayMemberSince = computed(() =>
-    petsitter.value?.created_at ? new Date(petsitter.value.created_at).toLocaleDateString('pt-PT') : '01/01/1990',
+    petsitter.value?.created_at
+        ? new Date(petsitter.value.created_at).toLocaleDateString('pt-PT')
+        : '01/01/1990',
 );
 </script>
 
 <template>
     <Head title="Perfil do Petsitter" />
 
-    <div class="min-vh-100 d-flex flex-column position-relative overflow-hidden patudo-page">
+    <div
+        class="min-vh-100 d-flex flex-column position-relative overflow-hidden patudo-page"
+    >
         <div class="patudo-glow patudo-glow-top"></div>
         <div class="patudo-glow patudo-glow-bottom"></div>
 
@@ -258,12 +307,12 @@ const displayMemberSince = computed(() =>
                     </a>
                     <div class="nav nav-pills border rounded-pill p-1 mx-auto">
                         <a class="nav-link active rounded-pill px-4" href="/"
-                        >Início</a
+                            >Início</a
                         >
                         <a
                             class="nav-link text-dark rounded-pill px-4"
                             href="/orders"
-                        >Pedidos</a
+                            >Pedidos</a
                         >
                         <a
                             class="nav-link text-dark rounded-pill px-4"
@@ -277,18 +326,32 @@ const displayMemberSince = computed(() =>
                         >
                             Reservas
                         </a>
-                        <AdminNavigationMenu />
                     </div>
 
                     <div class="d-flex align-items-center gap-3">
-                        <HeaderNotificationsChat />
-                        <Link
-                            href="/profile"
+                        <a href="/messages" class="text-dark"
+                            ><MessageCircle :size="25"
+                        /></a>
+                        <button
+                            type="button"
+                            class="text-dark bg-transparent border-0 p-0 position-relative"
+                            @click="showNotifications = true"
+                        >
+                            <Bell :size="25" />
+                            <span
+                                v-if="unreadCount > 0"
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size: 0.6rem"
+                            >
+                                {{ unreadCount > 9 ? '9+' : unreadCount }}
+                            </span>
+                        </button>
+                        <button
+                            type="button"
                             class="text-dark p-0 border-0 bg-transparent"
-                            aria-label="Abrir o meu perfil"
                         >
                             <UserRound :size="25" />
-                        </Link>
+                        </button>
                         <Link
                             href="/logout"
                             method="post"
@@ -301,7 +364,9 @@ const displayMemberSince = computed(() =>
                     </div>
                 </nav>
 
-                <h1 class="text-center fw-bold display-5 mt-5 pt-4 mb-4">Perfil do Petsitter</h1>
+                <h1 class="text-center fw-bold display-5 mt-5 pt-4 mb-4">
+                    Perfil do Petsitter
+                </h1>
 
                 <section
                     class="card bg-white border border-primary rounded-4 p-3 p-md-4 mb-3 position-relative"
@@ -326,27 +391,37 @@ const displayMemberSince = computed(() =>
                                         alt="Foto de perfil"
                                         class="w-100 h-100 object-fit-cover"
                                     />
-                                    <UserRound v-else :size="64" class="text-primary" />
+                                    <UserRound
+                                        v-else
+                                        :size="64"
+                                        class="text-primary"
+                                    />
                                 </div>
 
                                 <div class="flex-grow-1">
-                                    <h2 class="h5 fw-bold mb-0 d-flex align-items-center gap-2">
+                                    <h2
+                                        class="h5 fw-bold mb-0 d-flex align-items-center gap-2"
+                                    >
                                         {{ displayName }}
                                         <button
                                             type="button"
-                                            class="p-0 border-0 bg-transparent shadow-none d-flex text-primary"
-                                            :aria-label="isFavourite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
-                                            :aria-pressed="isFavourite"
+                                            class="p-0 border-0 bg-transparent shadow-none d-flex"
+                                            aria-label="Favorito"
                                             @click="toggleFavourite"
                                         >
-                                            <Heart
+                                            <Star
                                                 :size="20"
-                                                :fill="isFavourite ? 'currentColor' : 'transparent'"
-                                                stroke-width="2.5"
+                                                :fill="
+                                                    isFavourite
+                                                        ? '#f5b301'
+                                                        : 'none'
+                                                "
                                             />
                                         </button>
                                     </h2>
-                                    <p class="text-muted small mb-2">{{ displayLocation }}</p>
+                                    <p class="text-muted small mb-2">
+                                        {{ displayLocation }}
+                                    </p>
 
                                     <div class="tags-row mb-2">
                                         <span
@@ -358,7 +433,9 @@ const displayMemberSince = computed(() =>
                                         </span>
                                     </div>
 
-                                    <p class="text-muted small mb-2">{{ displayShortBio }}</p>
+                                    <p class="text-muted small mb-2">
+                                        {{ displayShortBio }}
+                                    </p>
 
                                     <div class="actions-row">
                                         <Link
@@ -384,17 +461,32 @@ const displayMemberSince = computed(() =>
                                         >
                                             Chat
                                         </Link>
-                                        <button v-else type="button" class="action-btn" disabled>Chat</button>
+                                        <button
+                                            v-else
+                                            type="button"
+                                            class="action-btn"
+                                            disabled
+                                        >
+                                            Chat
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-12 col-md-4">
-                            <div class="border-start border-secondary ps-4 py-2">
-                                <p class="fs-5 text-muted mb-1">Rating {{ displayRating }}</p>
-                                <p class="text-muted mb-2">Avaliações {{ displayReviews }}</p>
-                                <p class="text-muted mb-0">Membro desde:<br />{{ displayMemberSince }}</p>
+                            <div
+                                class="border-start border-secondary ps-4 py-2"
+                            >
+                                <p class="fs-5 text-muted mb-1">
+                                    Rating {{ displayRating }}
+                                </p>
+                                <p class="text-muted mb-2">
+                                    Avaliações {{ displayReviews }}
+                                </p>
+                                <p class="text-muted mb-0">
+                                    Membro desde:<br />{{ displayMemberSince }}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -404,30 +496,58 @@ const displayMemberSince = computed(() =>
                     class="card bg-white border border-primary rounded-4 p-3 px-md-4 mb-3 about-card"
                 >
                     <h2 class="h5 fw-semibold mb-3">Sobre mim</h2>
-                    <p class="text-muted fs-5 mb-0 ps-md-2">{{ displayAbout }}</p>
+                    <p class="text-muted fs-5 mb-0 ps-md-2">
+                        {{ displayAbout }}
+                    </p>
                 </section>
 
                 <div class="row g-3 mb-5">
                     <div class="col-12 col-md-6">
-                        <section class="card bg-white border border-primary rounded-4 p-3 h-100 info-card">
-                            <h2 class="h6 fw-semibold mb-2">Serviços e preços</h2>
-                            <p v-if="servicesLoading" class="small text-muted">A carregar serviços...</p>
-                            <p v-if="servicesError" class="small text-danger" role="alert">{{ servicesError }}</p>
+                        <section
+                            class="card bg-white border border-primary rounded-4 p-3 h-100 info-card"
+                        >
+                            <h2 class="h6 fw-semibold mb-2">
+                                Serviços e preços
+                            </h2>
+                            <p v-if="servicesLoading" class="small text-muted">
+                                A carregar serviços...
+                            </p>
+                            <p
+                                v-if="servicesError"
+                                class="small text-danger"
+                                role="alert"
+                            >
+                                {{ servicesError }}
+                            </p>
                             <div
                                 v-for="service in services"
                                 :key="service.id"
                                 class="d-flex justify-content-between border-bottom pb-1 mb-2"
                             >
-                                <span>{{ serviceTypeLabel(service.type) }}</span>
-                                <span>{{ formatServicePrice(service.price) }}</span>
+                                <span>{{
+                                    serviceTypeLabel(service.type)
+                                }}</span>
+                                <span>{{
+                                    formatServicePrice(service.price)
+                                }}</span>
                             </div>
-                            <p v-if="petsitterId && !servicesLoading && !services.length && !servicesError" class="small text-muted mb-0">
+                            <p
+                                v-if="
+                                    petsitterId &&
+                                    !servicesLoading &&
+                                    !services.length &&
+                                    !servicesError
+                                "
+                                class="small text-muted mb-0"
+                            >
                                 Ainda não foram adicionados serviços.
                             </p>
                         </section>
                     </div>
                     <div class="col-12 col-md-6">
-                        <section class="card bg-white border border-primary rounded-4 p-3 h-100 info-card">
+                        <section
+                            class="card bg-white border border-primary rounded-4 p-3 h-100 info-card"
+                        >
                             <h2 class="h6 fw-semibold mb-3">Disponibilidade</h2>
                             <div class="days-grid">
                                 <div
@@ -436,7 +556,9 @@ const displayMemberSince = computed(() =>
                                     class="day"
                                     :class="d.ok ? 'day-ok' : 'day-no'"
                                 >
-                                    <span class="small fw-semibold">{{ d.label }}</span>
+                                    <span class="small fw-semibold">{{
+                                        d.label
+                                    }}</span>
                                     <Check v-if="d.ok" :size="18" />
                                     <X v-else :size="18" />
                                 </div>
@@ -447,7 +569,10 @@ const displayMemberSince = computed(() =>
 
                 <h1 class="text-center fw-bold display-5 mb-4">Publicações</h1>
 
-                <p v-if="petsitterId && !visiblePosts.length" class="text-center text-muted">
+                <p
+                    v-if="petsitterId && !visiblePosts.length"
+                    class="text-center text-muted"
+                >
                     Ainda não há publicações.
                 </p>
 
@@ -462,16 +587,31 @@ const displayMemberSince = computed(() =>
                             alt="Post"
                             class="post-img rounded-3"
                         />
-                        <div class="flex-grow-1 d-flex flex-column py-2 pe-2 position-relative">
+                        <div
+                            class="flex-grow-1 d-flex flex-column py-2 pe-2 position-relative"
+                        >
                             <h3 class="fs-2 mb-2">{{ post.title }}</h3>
-                            <p class="text-muted mb-auto post-text small">{{ post.description }}</p>
-                            <small class="text-muted">{{ formatDate(post.created_at) }}</small>
+                            <p class="text-muted mb-auto post-text small">
+                                {{ post.description }}
+                            </p>
+                            <small class="text-muted">{{
+                                formatDate(post.created_at)
+                            }}</small>
+                            <button
+                                type="button"
+                                class="like-btn position-absolute bottom-0 end-0"
+                            >
+                                <Heart :size="26" />
+                            </button>
                         </div>
                     </div>
                 </section>
             </div>
 
-            <div v-if="feedback" class="alert alert-info position-fixed bottom-0 start-50 translate-middle-x mb-3 py-2">
+            <div
+                v-if="feedback"
+                class="alert alert-info position-fixed bottom-0 start-50 translate-middle-x mb-3 py-2"
+            >
                 {{ feedback }}
             </div>
 
@@ -482,11 +622,19 @@ const displayMemberSince = computed(() =>
                 @submit="submitReport"
             />
 
+            <ModalNotifications
+                :show="showNotifications"
+                @close="showNotifications = false"
+            />
         </main>
     </div>
 </template>
 
 <style scoped>
+.patudo-page {
+    background-color: #fffaf3;
+}
+
 .nav-pills .nav-link.active {
     background-color: var(--patudo-terracota, #c2410c) !important;
     color: #ffffff !important;
@@ -514,7 +662,8 @@ const displayMemberSince = computed(() =>
     min-height: 170px;
 }
 
-.tags-row, .actions-row {
+.tags-row,
+.actions-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.25rem;
@@ -568,5 +717,16 @@ const displayMemberSince = computed(() =>
 }
 .post-text {
     max-width: 380px;
+}
+.like-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 0;
+    background: #c8470f;
+    color: #3a1a0a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 </style>

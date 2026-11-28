@@ -15,19 +15,22 @@ export interface ReviewPayload {
     comment: string;
 }
 
-const props = withDefaults(defineProps<{
-    show: boolean;
-    petsitter?: ReviewPetsitterInfo;
-    closeOnSubmit?: boolean;
-    serverErrors?: {
-        star_rating?: string;
-        comment?: string;
-        // erro geral do servidor (403, 409 ou de ligação)
-        general?: string;
-    };
-}>(), {
-    closeOnSubmit: true,
-});
+const props = withDefaults(
+    defineProps<{
+        show: boolean;
+        petsitter?: ReviewPetsitterInfo;
+        closeOnSubmit?: boolean;
+        serverErrors?: {
+            star_rating?: string;
+            comment?: string;
+            // erro geral do servidor (403, 409 ou de ligação)
+            general?: string;
+        };
+    }>(),
+    {
+        closeOnSubmit: true,
+    },
+);
 
 const emit = defineEmits<{
     (e: 'close'): void;
@@ -73,7 +76,7 @@ watch(
             comment.value = '';
             errorMessage.value = '';
         }
-    }
+    },
 );
 
 const toggleTag = (label: string) => {
@@ -91,7 +94,8 @@ const handleClose = () => {
 
 const handleSubmit = () => {
     if (rating.value < 1) {
-        errorMessage.value = 'Por favor, selecione uma classificação de 1 a 5 estrelas.';
+        errorMessage.value =
+            'Por favor, selecione uma classificação de 1 a 5 estrelas.';
         return;
     }
 
@@ -117,207 +121,253 @@ const handleSubmit = () => {
         @click.self="handleClose"
         @keydown.escape="handleClose"
     >
-            <div class="patudo-modal-card" role="dialog" aria-modal="true">
-                <!-- Cabeçalho com linha divisória a toda a largura -->
-                <div class="patudo-modal-header">
-                    <h2 class="patudo-modal-title">
-                        Avalie a sua experiência com este Petsitter
-                    </h2>
-                    <button
-                        type="button"
-                        class="patudo-close-btn"
-                        aria-label="Fechar"
-                        @click="handleClose"
+        <div class="patudo-modal-card" role="dialog" aria-modal="true">
+            <!-- Cabeçalho com linha divisória a toda a largura -->
+            <div class="patudo-modal-header">
+                <h2 class="patudo-modal-title">
+                    Avalie a sua experiência com este Petsitter
+                </h2>
+                <button
+                    type="button"
+                    class="patudo-close-btn"
+                    aria-label="Fechar"
+                    @click="handleClose"
+                >
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
                     >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                            <path d="M18 6L6 18M6 6l12 12" />
-                        </svg>
-                    </button>
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Corpo -->
+            <form class="patudo-modal-body" @submit.prevent="handleSubmit">
+                <!-- Pílula de resumo do Petsitter e Serviço -->
+                <div class="patudo-sitter-pill mb-3">
+                    <div class="patudo-sitter-left">
+                        <div class="patudo-sitter-avatar">
+                            <img
+                                v-if="petsitter?.avatar_url"
+                                :src="petsitter.avatar_url"
+                                alt="Avatar do Petsitter"
+                                class="patudo-avatar-img"
+                            />
+                            <svg
+                                v-else
+                                viewBox="0 0 100 100"
+                                class="patudo-avatar-svg"
+                                aria-hidden="true"
+                            >
+                                <circle cx="50" cy="50" r="48" fill="#ffffff" />
+                                <path
+                                    d="M35 72 C35 66, 65 66, 65 72 L68 85 L32 85 Z"
+                                    fill="#f3c69f"
+                                />
+                                <path
+                                    d="M27 52 C27 25, 73 25, 73 52 L76 64 L24 64 Z"
+                                    fill="#f25c66"
+                                />
+                                <path
+                                    d="M34 42 C34 30, 66 30, 66 42 C66 57, 58 66, 50 66 C42 66, 34 57, 34 42 Z"
+                                    fill="#fbd3ae"
+                                />
+                                <path
+                                    d="M32 42 C32 24, 68 24, 68 42 C60 39, 42 44, 32 42 Z"
+                                    fill="#f25c66"
+                                />
+                            </svg>
+                        </div>
+                        <span class="patudo-sitter-name">
+                            {{ petsitter?.name || 'Nome do Pet Sitter' }}
+                        </span>
+                    </div>
+
+                    <div class="patudo-sitter-divider"></div>
+
+                    <div class="patudo-sitter-service">
+                        {{
+                            petsitter?.service_summary ||
+                            'Cuidado de cães · 12/11 – 15/11/2026'
+                        }}
+                    </div>
                 </div>
 
-                <!-- Corpo -->
-                <form class="patudo-modal-body" @submit.prevent="handleSubmit">
-                    <!-- Pílula de resumo do Petsitter e Serviço -->
-                    <div class="patudo-sitter-pill mb-3">
-                        <div class="patudo-sitter-left">
-                            <div class="patudo-sitter-avatar">
-                                <img
-                                    v-if="petsitter?.avatar_url"
-                                    :src="petsitter.avatar_url"
-                                    alt="Avatar do Petsitter"
-                                    class="patudo-avatar-img"
-                                />
+                <!-- Classificação por Estrelas -->
+                <div class="mb-3">
+                    <label class="patudo-section-label d-block mb-1">
+                        Como foi a tua experiência? *
+                    </label>
+                    <div class="d-flex align-items-center gap-2">
+                        <div
+                            class="patudo-stars-group"
+                            @mouseleave="hoverRating = 0"
+                        >
+                            <button
+                                v-for="star in 5"
+                                :key="star"
+                                type="button"
+                                class="patudo-star-btn"
+                                :aria-label="`${star} estrelas`"
+                                @mouseenter="hoverRating = star"
+                                @click="rating = star"
+                            >
+                                <!-- Estrela Preenchida -->
+                                <svg
+                                    v-if="star <= (hoverRating || rating)"
+                                    width="30"
+                                    height="30"
+                                    viewBox="0 0 24 24"
+                                    fill="#ECC94B"
+                                    stroke="#ECC94B"
+                                    stroke-width="1.5"
+                                    stroke-linejoin="round"
+                                >
+                                    <polygon
+                                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                                    />
+                                </svg>
+                                <!-- Estrela Vazia com contorno escuro -->
                                 <svg
                                     v-else
-                                    viewBox="0 0 100 100"
-                                    class="patudo-avatar-svg"
-                                    aria-hidden="true"
+                                    width="30"
+                                    height="30"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="#1A120B"
+                                    stroke-width="1.6"
+                                    stroke-linejoin="round"
                                 >
-                                    <circle cx="50" cy="50" r="48" fill="#ffffff" />
-                                    <path d="M35 72 C35 66, 65 66, 65 72 L68 85 L32 85 Z" fill="#f3c69f" />
-                                    <path d="M27 52 C27 25, 73 25, 73 52 L76 64 L24 64 Z" fill="#f25c66" />
-                                    <path d="M34 42 C34 30, 66 30, 66 42 C66 57, 58 66, 50 66 C42 66, 34 57, 34 42 Z" fill="#fbd3ae" />
-                                    <path d="M32 42 C32 24, 68 24, 68 42 C60 39, 42 44, 32 42 Z" fill="#f25c66" />
+                                    <polygon
+                                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                                    />
                                 </svg>
-                            </div>
-                            <span class="patudo-sitter-name">
-                                {{ petsitter?.name || 'Nome do Pet Sitter' }}
-                            </span>
+                            </button>
                         </div>
-
-                        <div class="patudo-sitter-divider"></div>
-
-                        <div class="patudo-sitter-service">
-                            {{ petsitter?.service_summary || 'Cuidado de cães · 12/11 – 15/11/2026' }}
-                        </div>
+                        <span class="patudo-rating-text">
+                            {{ currentRatingLabel }}
+                        </span>
                     </div>
+                    <!-- aviso local (sem estrelas) ou erro de validação do servidor -->
+                    <p
+                        v-if="errorMessage || serverErrors?.star_rating"
+                        class="patudo-error-text mt-1 mb-0"
+                    >
+                        {{ errorMessage || serverErrors?.star_rating }}
+                    </p>
+                </div>
 
-                    <!-- Classificação por Estrelas -->
-                    <div class="mb-3">
-                        <label class="patudo-section-label d-block mb-1">
-                            Como foi a tua experiência? *
-                        </label>
-                        <div class="d-flex align-items-center gap-2">
-                            <div
-                                class="patudo-stars-group"
-                                @mouseleave="hoverRating = 0"
-                            >
-                                <button
-                                    v-for="star in 5"
-                                    :key="star"
-                                    type="button"
-                                    class="patudo-star-btn"
-                                    :aria-label="`${star} estrelas`"
-                                    @mouseenter="hoverRating = star"
-                                    @click="rating = star"
+                <!-- Checkboxes em 2 Colunas -->
+                <div class="mb-3">
+                    <label class="patudo-section-label d-block mb-2">
+                        Justifique assinalando ou não os campos seguintes:
+                    </label>
+                    <div class="row g-2">
+                        <div
+                            v-for="item in highlightOptions"
+                            :key="item.id"
+                            class="col-12 col-sm-6"
+                        >
+                            <label class="patudo-check-item">
+                                <input
+                                    type="checkbox"
+                                    class="d-none"
+                                    :checked="selectedTags.includes(item.label)"
+                                    @change="toggleTag(item.label)"
+                                />
+                                <span
+                                    class="patudo-custom-checkbox"
+                                    :class="{
+                                        'is-checked': selectedTags.includes(
+                                            item.label,
+                                        ),
+                                    }"
                                 >
-                                    <!-- Estrela Preenchida -->
                                     <svg
-                                        v-if="star <= (hoverRating || rating)"
-                                        width="30"
-                                        height="30"
-                                        viewBox="0 0 24 24"
-                                        fill="#ECC94B"
-                                        stroke="#ECC94B"
-                                        stroke-width="1.5"
-                                        stroke-linejoin="round"
-                                    >
-                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                                    </svg>
-                                    <!-- Estrela Vazia com contorno escuro -->
-                                    <svg
-                                        v-else
-                                        width="30"
-                                        height="30"
+                                        v-if="selectedTags.includes(item.label)"
+                                        width="12"
+                                        height="12"
                                         viewBox="0 0 24 24"
                                         fill="none"
-                                        stroke="#1A120B"
-                                        stroke-width="1.6"
+                                        stroke="#231810"
+                                        stroke-width="2.5"
+                                        stroke-linecap="round"
                                         stroke-linejoin="round"
                                     >
-                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                        <polyline points="20 6 9 17 4 12" />
                                     </svg>
-                                </button>
-                            </div>
-                            <span class="patudo-rating-text">
-                                {{ currentRatingLabel }}
-                            </span>
-                        </div>
-                        <!-- aviso local (sem estrelas) ou erro de validação do servidor -->
-                        <p v-if="errorMessage || serverErrors?.star_rating" class="patudo-error-text mt-1 mb-0">
-                            {{ errorMessage || serverErrors?.star_rating }}
-                        </p>
-                    </div>
-
-                    <!-- Checkboxes em 2 Colunas -->
-                    <div class="mb-3">
-                        <label class="patudo-section-label d-block mb-2">
-                            Justifique assinalando ou não os campos seguintes:
-                        </label>
-                        <div class="row g-2">
-                            <div
-                                v-for="item in highlightOptions"
-                                :key="item.id"
-                                class="col-12 col-sm-6"
-                            >
-                                <label class="patudo-check-item">
-                                    <input
-                                        type="checkbox"
-                                        class="d-none"
-                                        :checked="selectedTags.includes(item.label)"
-                                        @change="toggleTag(item.label)"
-                                    />
-                                    <span
-                                        class="patudo-custom-checkbox"
-                                        :class="{ 'is-checked': selectedTags.includes(item.label) }"
-                                    >
-                                        <svg
-                                            v-if="selectedTags.includes(item.label)"
-                                            width="12"
-                                            height="12"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="#231810"
-                                            stroke-width="2.5"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        >
-                                            <polyline points="20 6 9 17 4 12" />
-                                        </svg>
-                                    </span>
-                                    <span class="patudo-check-label">{{ item.label }}</span>
-                                </label>
-                            </div>
+                                </span>
+                                <span class="patudo-check-label">{{
+                                    item.label
+                                }}</span>
+                            </label>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Sobre a experiência (Opcional) -->
-                    <div class="mb-1">
-                        <label for="review-comment" class="patudo-section-label d-block mb-1">
-                            Sobre a experiência (Opcional)
-                        </label>
-                        <textarea
-                            id="review-comment"
-                            v-model="comment"
-                            rows="3"
-                            maxlength="500"
-                            class="patudo-textarea"
-                            placeholder="A tua experiência com o serviço do Petsitter, por exemplo"
-                        ></textarea>
-                        <p v-if="serverErrors?.comment" class="patudo-error-text mt-1 mb-0">
-                            {{ serverErrors.comment }}
-                        </p>
-                        <div class="text-end">
-                            <span class="patudo-char-counter">{{ comment.length }}/500</span>
-                        </div>
-                    </div>
-
-                    <!-- Erro geral do servidor (ex.: "Esta reserva já foi avaliada.") -->
-                    <p v-if="serverErrors?.general" class="patudo-error-text mb-2">
-                        {{ serverErrors.general }}
+                <!-- Sobre a experiência (Opcional) -->
+                <div class="mb-1">
+                    <label
+                        for="review-comment"
+                        class="patudo-section-label d-block mb-1"
+                    >
+                        Sobre a experiência (Opcional)
+                    </label>
+                    <textarea
+                        id="review-comment"
+                        v-model="comment"
+                        rows="3"
+                        maxlength="500"
+                        class="patudo-textarea"
+                        placeholder="A tua experiência com o serviço do Petsitter, por exemplo"
+                    ></textarea>
+                    <p
+                        v-if="serverErrors?.comment"
+                        class="patudo-error-text mt-1 mb-0"
+                    >
+                        {{ serverErrors.comment }}
                     </p>
-
-                    <!-- Rodapé com linha divisória a toda a largura -->
-                    <div class="patudo-modal-footer">
-                        <span class="patudo-required-note">* Campos obrigatórios</span>
-                        <div class="d-flex align-items-center gap-2">
-                            <button
-                                type="button"
-                                class="btn btn-outline-danger"
-                                @click="handleClose"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                type="submit"
-                                class="btn btn-primary"
-                                :disabled="isLoading"
-                            >
-                                {{ isLoading ? 'A submeter...' : 'Submeter' }}
-                            </button>
-                        </div>
+                    <div class="text-end">
+                        <span class="patudo-char-counter"
+                            >{{ comment.length }}/500</span
+                        >
                     </div>
-                </form>
+                </div>
+
+                <!-- Erro geral do servidor (ex.: "Esta reserva já foi avaliada.") -->
+                <p v-if="serverErrors?.general" class="patudo-error-text mb-2">
+                    {{ serverErrors.general }}
+                </p>
+
+                <!-- Rodapé com linha divisória a toda a largura -->
+                <div class="patudo-modal-footer">
+                    <span class="patudo-required-note"
+                        >* Campos obrigatórios</span
+                    >
+                    <div class="d-flex align-items-center gap-2">
+                        <button
+                            type="button"
+                            class="btn btn-outline-danger"
+                            @click="handleClose"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            :disabled="isLoading"
+                        >
+                            {{ isLoading ? 'A submeter...' : 'Submeter' }}
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </template>

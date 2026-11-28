@@ -4,7 +4,12 @@ import { ChevronLeft, CircleCheck, CircleX, Clock } from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 
-type BookingStatus = 'pending' | 'approved' | 'rejected' | 'completed' | 'cancelled';
+type BookingStatus =
+    | 'pending'
+    | 'approved'
+    | 'rejected'
+    | 'completed'
+    | 'cancelled';
 
 interface Animal {
     id: number;
@@ -143,7 +148,10 @@ function statusBadgeClass(status: BookingStatus): string {
 
 const canCancel = computed(() => {
     if (!booking.value) return false;
-    return booking.value.status === 'pending' || booking.value.status === 'approved';
+    return (
+        booking.value.status === 'pending' ||
+        booking.value.status === 'approved'
+    );
 });
 
 function parseDate(iso?: string | null): Date | null {
@@ -163,34 +171,54 @@ function parseDate(iso?: string | null): Date | null {
 
 const formatDate = (iso?: string | null) => {
     const date = parseDate(iso);
-    return date ? date.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
+    return date
+        ? date.toLocaleDateString('pt-PT', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+          })
+        : '—';
 };
 
 const formatShortDate = (iso?: string | null) => {
     const date = parseDate(iso);
-    return date ? date.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' }) : '—';
+    return date
+        ? date.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' })
+        : '—';
 };
 
 const formatDateWithTime = (iso?: string | null) => {
     const date = parseDate(iso);
     if (!date) return '—';
-    const d = date.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const t = date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+    const d = date.toLocaleDateString('pt-PT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+    });
+    const t = date.toLocaleTimeString('pt-PT', {
+        hour: '2-digit',
+        minute: '2-digit',
+    });
     return `${d} · ${t}`;
 };
 
 const serviceName = computed(() => {
-    const raw = booking.value?.service?.name ?? booking.value?.service?.title ?? '';
+    const raw =
+        booking.value?.service?.name ?? booking.value?.service?.title ?? '';
     return raw.trim() || 'Serviço';
 });
 
-const isWalkService = computed(() => serviceName.value.toLowerCase().includes('passeio'));
+const isWalkService = computed(() =>
+    serviceName.value.toLowerCase().includes('passeio'),
+);
 
 const formattedPeriod = computed(() => {
     if (!booking.value) return '—';
     const start = formatShortDate(booking.value.start_date);
     const end = formatDate(booking.value.end_date);
-    return start === formatShortDate(booking.value.end_date) ? end : `${start} – ${end}`;
+    return start === formatShortDate(booking.value.end_date)
+        ? end
+        : `${start} – ${end}`;
 });
 
 const durationUnits = computed(() => {
@@ -198,7 +226,10 @@ const durationUnits = computed(() => {
     const start = parseDate(booking.value.start_date);
     const end = parseDate(booking.value.end_date);
     if (!start || !end) return 1;
-    const diffDays = Math.max(0, Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+    const diffDays = Math.max(
+        0,
+        Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)),
+    );
     return isWalkService.value ? diffDays + 1 : Math.max(1, diffDays);
 });
 
@@ -225,7 +256,9 @@ const unitPriceLabel = computed(() => {
     const units = durationUnits.value;
     if (total > 0 && units > 0) {
         const estimated = total / units;
-        const formatted = Number.isInteger(estimated) ? String(estimated) : estimated.toFixed(2).replace('.', ',');
+        const formatted = Number.isInteger(estimated)
+            ? String(estimated)
+            : estimated.toFixed(2).replace('.', ',');
         return `${formatted} € / ${unit}`;
     }
 
@@ -257,7 +290,8 @@ const primaryAnimalName = computed(() => {
 });
 
 const sitterRatingText = computed(() => {
-    const rating = booking.value?.petsitter?.rating ?? booking.value?.review?.rating;
+    const rating =
+        booking.value?.petsitter?.rating ?? booking.value?.review?.rating;
     if (rating == null) return '5,0';
     return Number(rating).toFixed(1).replace('.', ',');
 });
@@ -272,11 +306,15 @@ const timelineSteps = computed<TimelineStep[]>(() => {
     const updatedAt = parseDate(b.updated_at ?? b.created_at);
 
     const createdBeforeStart =
-        createdAt && startDate ? createdAt.getTime() <= startDate.getTime() : true;
+        createdAt && startDate
+            ? createdAt.getTime() <= startDate.getTime()
+            : true;
 
-    const isAcceptedOrBeyond = b.status === 'approved' || b.status === 'completed';
+    const isAcceptedOrBeyond =
+        b.status === 'approved' || b.status === 'completed';
     const isCompleted = b.status === 'completed';
-    const isCancelledOrRejected = b.status === 'cancelled' || b.status === 'rejected';
+    const isCancelledOrRejected =
+        b.status === 'cancelled' || b.status === 'rejected';
 
     if (createdBeforeStart) {
         const steps: TimelineStep[] = [
@@ -289,14 +327,19 @@ const timelineSteps = computed<TimelineStep[]>(() => {
 
         if (isCancelledOrRejected) {
             steps.push({
-                label: b.status === 'rejected' ? 'Recusado pelo cuidador' : 'Reserva cancelada',
+                label:
+                    b.status === 'rejected'
+                        ? 'Recusado pelo cuidador'
+                        : 'Reserva cancelada',
                 dateText: formatDateWithTime(b.updated_at ?? b.created_at),
                 completed: true,
             });
         } else {
             steps.push({
                 label: 'Aceite pelo cuidador',
-                dateText: isAcceptedOrBeyond ? formatDateWithTime(b.updated_at ?? b.created_at) : 'Aguarda resposta',
+                dateText: isAcceptedOrBeyond
+                    ? formatDateWithTime(b.updated_at ?? b.created_at)
+                    : 'Aguarda resposta',
                 completed: isAcceptedOrBeyond,
             });
         }
@@ -327,14 +370,19 @@ const timelineSteps = computed<TimelineStep[]>(() => {
 
     if (isCancelledOrRejected) {
         steps.push({
-            label: b.status === 'rejected' ? 'Recusado pelo cuidador' : 'Reserva cancelada',
+            label:
+                b.status === 'rejected'
+                    ? 'Recusado pelo cuidador'
+                    : 'Reserva cancelada',
             dateText: formatDateWithTime(b.updated_at ?? b.created_at),
             completed: true,
         });
     } else if (isAcceptedOrBeyond) {
         steps.push({
             label: 'Aceite pelo cuidador',
-            dateText: formatDateWithTime(updatedAt ? b.updated_at ?? b.created_at : b.created_at),
+            dateText: formatDateWithTime(
+                updatedAt ? (b.updated_at ?? b.created_at) : b.created_at,
+            ),
             completed: true,
         });
     }
@@ -386,7 +434,8 @@ const cancelBooking = async () => {
             booking.value = data.data ?? data;
         } else {
             const body = await res.json().catch(() => null);
-            actionError.value = body?.message ?? 'Não foi possível cancelar a reserva.';
+            actionError.value =
+                body?.message ?? 'Não foi possível cancelar a reserva.';
         }
     } catch {
         actionError.value = 'Erro de conexão. Tente novamente.';
@@ -409,11 +458,16 @@ onMounted(() => {
 </script>
 
 <template>
-    <Head :title="`Reserva #${booking?.id ?? props.bookingId} — Administração`" />
+    <Head
+        :title="`Reserva #${booking?.id ?? props.bookingId} — Administração`"
+    />
 
     <div class="patudo-page-shell patudo-admin-shell">
         <aside class="patudo-navbar" aria-label="Menu de administração">
-            <a class="navbar-brand fw-bold fs-4 d-flex align-items-center gap-2" href="/">
+            <a
+                class="navbar-brand fw-bold fs-4 d-flex align-items-center gap-2"
+                href="/"
+            >
                 <img :src="logoPatudo" alt="Patudo" width="36" height="36" />
                 <span>Patudo</span>
             </a>
@@ -429,20 +483,32 @@ onMounted(() => {
                     :class="{ active: item.active }"
                 >
                     <span>{{ item.label }}</span>
-                    <span v-if="item.badge !== undefined && item.badge !== null" class="navbar-badge">{{ item.badge }}</span>
+                    <span
+                        v-if="item.badge !== undefined && item.badge !== null"
+                        class="navbar-badge"
+                        >{{ item.badge }}</span
+                    >
                 </a>
             </nav>
 
             <div class="navbar-footer">
-                <button type="button" class="navbar-link logout w-100 border-0 bg-transparent text-start" @click="logout">
+                <button
+                    type="button"
+                    class="navbar-link logout w-100 border-0 bg-transparent text-start"
+                    @click="logout"
+                >
                     Terminar sessão
                 </button>
             </div>
         </aside>
 
-        <main class="patudo-content booking-detail-container flex-grow-1 py-4 px-4 px-lg-5">
+        <main
+            class="patudo-content booking-detail-container flex-grow-1 py-4 px-4 px-lg-5"
+        >
             <!-- Topo: Voltar a Reservas + Administrador -->
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div
+                class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4"
+            >
                 <button type="button" class="back-link-btn" @click="goBack">
                     <ChevronLeft :size="18" :stroke-width="2.4" />
                     <span>Voltar a Reservas</span>
@@ -454,27 +520,48 @@ onMounted(() => {
                 </div>
             </div>
 
-            <div v-if="loading" class="text-center py-5 text-secondary">A carregar...</div>
-            <div v-else-if="loadError" class="alert alert-danger">{{ loadError }}</div>
+            <div v-if="loading" class="text-center py-5 text-secondary">
+                A carregar...
+            </div>
+            <div v-else-if="loadError" class="alert alert-danger">
+                {{ loadError }}
+            </div>
 
             <template v-else-if="booking">
-                <div v-if="actionError" class="alert alert-danger py-2 px-3 mb-3 small">
+                <div
+                    v-if="actionError"
+                    class="alert alert-danger py-2 px-3 mb-3 small"
+                >
                     {{ actionError }}
                 </div>
 
                 <!-- Cartão de Cabeçalho da Reserva -->
                 <section class="patudo-outline-card p-4 mb-4">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div
+                        class="d-flex justify-content-between align-items-center flex-wrap gap-3"
+                    >
                         <div class="d-flex align-items-center flex-wrap gap-4">
                             <div>
-                                <h1 class="booking-title mb-1">Reserva #{{ booking.id }}</h1>
+                                <h1 class="booking-title mb-1">
+                                    Reserva #{{ booking.id }}
+                                </h1>
                                 <p class="text-secondary small mb-0">
-                                    Criada a {{ formatDate(booking.created_at) }} · {{ serviceName }}
+                                    Criada a
+                                    {{ formatDate(booking.created_at) }} ·
+                                    {{ serviceName }}
                                 </p>
                             </div>
 
-                            <span class="status-pill" :class="statusBadgeClass(booking.status)">
-                                <component :is="statusIcons[booking.status]" :size="14" :stroke-width="2.5" class="me-1" />
+                            <span
+                                class="status-pill"
+                                :class="statusBadgeClass(booking.status)"
+                            >
+                                <component
+                                    :is="statusIcons[booking.status]"
+                                    :size="14"
+                                    :stroke-width="2.5"
+                                    class="me-1"
+                                />
                                 {{ statusLabels[booking.status] }}
                             </span>
                         </div>
@@ -486,7 +573,11 @@ onMounted(() => {
                             :disabled="busy"
                             @click="cancelBooking"
                         >
-                            <span v-if="busy" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            <span
+                                v-if="busy"
+                                class="spinner-border spinner-border-sm me-2"
+                                role="status"
+                            ></span>
                             Cancelar reserva
                         </button>
                     </div>
@@ -496,9 +587,18 @@ onMounted(() => {
                 <section class="row g-4 mb-4">
                     <div class="col-12 col-lg-6">
                         <div class="patudo-outline-card p-4 h-100">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div
+                                class="d-flex justify-content-between align-items-center mb-3"
+                            >
                                 <span class="card-kicker">DONO</span>
-                                <a :href="booking.owner?.id ? `/admin/users/${booking.owner.id}` : '#'" class="profile-link">
+                                <a
+                                    :href="
+                                        booking.owner?.id
+                                            ? `/admin/users/${booking.owner.id}`
+                                            : '#'
+                                    "
+                                    class="profile-link"
+                                >
                                     Ver perfil &rsaquo;
                                 </a>
                             </div>
@@ -513,9 +613,20 @@ onMounted(() => {
                                 <span v-else class="person-avatar"></span>
 
                                 <div class="min-w-0">
-                                    <div class="fw-bold fs-6 text-truncate">{{ booking.owner?.name ?? 'Nome do dono' }}</div>
-                                    <div class="text-secondary small text-truncate">
-                                        {{ booking.owner?.location ?? 'Localização' }} · Animal: {{ primaryAnimalName }}
+                                    <div class="fw-bold fs-6 text-truncate">
+                                        {{
+                                            booking.owner?.name ??
+                                            'Nome do dono'
+                                        }}
+                                    </div>
+                                    <div
+                                        class="text-secondary small text-truncate"
+                                    >
+                                        {{
+                                            booking.owner?.location ??
+                                            'Localização'
+                                        }}
+                                        · Animal: {{ primaryAnimalName }}
                                     </div>
                                 </div>
                             </div>
@@ -524,9 +635,18 @@ onMounted(() => {
 
                     <div class="col-12 col-lg-6">
                         <div class="patudo-outline-card p-4 h-100">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div
+                                class="d-flex justify-content-between align-items-center mb-3"
+                            >
                                 <span class="card-kicker">CUIDADOR</span>
-                                <a :href="booking.petsitter?.id ? `/admin/users/${booking.petsitter.id}` : '#'" class="profile-link">
+                                <a
+                                    :href="
+                                        booking.petsitter?.id
+                                            ? `/admin/users/${booking.petsitter.id}`
+                                            : '#'
+                                    "
+                                    class="profile-link"
+                                >
                                     Ver perfil &rsaquo;
                                 </a>
                             </div>
@@ -541,9 +661,20 @@ onMounted(() => {
                                 <span v-else class="person-avatar"></span>
 
                                 <div class="min-w-0">
-                                    <div class="fw-bold fs-6 text-truncate">{{ booking.petsitter?.name ?? 'Nome do cuidador' }}</div>
-                                    <div class="text-secondary small text-truncate">
-                                        {{ booking.petsitter?.location ?? 'Localização' }} · ★ {{ sitterRatingText }}
+                                    <div class="fw-bold fs-6 text-truncate">
+                                        {{
+                                            booking.petsitter?.name ??
+                                            'Nome do cuidador'
+                                        }}
+                                    </div>
+                                    <div
+                                        class="text-secondary small text-truncate"
+                                    >
+                                        {{
+                                            booking.petsitter?.location ??
+                                            'Localização'
+                                        }}
+                                        · ★ {{ sitterRatingText }}
                                     </div>
                                 </div>
                             </div>
@@ -560,32 +691,44 @@ onMounted(() => {
                             <div class="row g-3">
                                 <div class="col-6">
                                     <div class="detail-label">Serviço</div>
-                                    <div class="detail-value">{{ serviceName }}</div>
+                                    <div class="detail-value">
+                                        {{ serviceName }}
+                                    </div>
                                 </div>
 
                                 <div class="col-6">
                                     <div class="detail-label">Animal</div>
-                                    <div class="detail-value">{{ primaryAnimalName }}</div>
+                                    <div class="detail-value">
+                                        {{ primaryAnimalName }}
+                                    </div>
                                 </div>
 
                                 <div class="col-6">
                                     <div class="detail-label">Período</div>
-                                    <div class="detail-value">{{ formattedPeriod }}</div>
+                                    <div class="detail-value">
+                                        {{ formattedPeriod }}
+                                    </div>
                                 </div>
 
                                 <div class="col-6">
                                     <div class="detail-label">Duração</div>
-                                    <div class="detail-value">{{ durationLabel }}</div>
+                                    <div class="detail-value">
+                                        {{ durationLabel }}
+                                    </div>
                                 </div>
 
                                 <div class="col-6">
                                     <div class="detail-label">Preço</div>
-                                    <div class="detail-value">{{ unitPriceLabel }}</div>
+                                    <div class="detail-value">
+                                        {{ unitPriceLabel }}
+                                    </div>
                                 </div>
 
                                 <div class="col-6">
                                     <div class="detail-label">Total</div>
-                                    <div class="detail-value">{{ booking.total_price }} €</div>
+                                    <div class="detail-value">
+                                        {{ booking.total_price }} €
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -593,7 +736,9 @@ onMounted(() => {
 
                     <div class="col-12 col-lg-6">
                         <div class="patudo-outline-card p-4 h-100">
-                            <h2 class="section-card-title mb-4">Histórico de estados</h2>
+                            <h2 class="section-card-title mb-4">
+                                Histórico de estados
+                            </h2>
 
                             <ul class="status-timeline list-unstyled mb-0">
                                 <li
@@ -602,13 +747,23 @@ onMounted(() => {
                                     class="timeline-item"
                                     :class="{
                                         'is-completed': step.completed,
-                                        'is-last': idx === timelineSteps.length - 1,
+                                        'is-last':
+                                            idx === timelineSteps.length - 1,
                                     }"
                                 >
-                                    <span class="timeline-dot" aria-hidden="true"></span>
-                                    <div class="d-flex justify-content-between align-items-baseline gap-2 flex-wrap w-100">
-                                        <span class="timeline-label">{{ step.label }}</span>
-                                        <span class="timeline-date">{{ step.dateText }}</span>
+                                    <span
+                                        class="timeline-dot"
+                                        aria-hidden="true"
+                                    ></span>
+                                    <div
+                                        class="d-flex justify-content-between align-items-baseline gap-2 flex-wrap w-100"
+                                    >
+                                        <span class="timeline-label">{{
+                                            step.label
+                                        }}</span>
+                                        <span class="timeline-date">{{
+                                            step.dateText
+                                        }}</span>
                                     </div>
                                 </li>
                             </ul>

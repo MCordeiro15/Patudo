@@ -28,9 +28,6 @@ const cardNumber = ref('');
 const expiry = ref('');
 const cvv = ref('');
 const submitted = ref(false);
-const cardNumberTouched = ref(false);
-const expiryTouched = ref(false);
-const cvvTouched = ref(false);
 
 watch(
     () => props.show,
@@ -40,135 +37,112 @@ watch(
             expiry.value = '';
             cvv.value = '';
             submitted.value = false;
-            cardNumberTouched.value = false;
-            expiryTouched.value = false;
-            cvvTouched.value = false;
         }
     },
 );
 
-const formattedAmount = computed(() => `${props.amount.toFixed(2).replace('.', ',')} €`);
+const formattedAmount = computed(
+    () => `${props.amount.toFixed(2).replace('.', ',')} €`,
+);
 
 const onCardInput = (e: Event) => {
-    cardNumberTouched.value = true;
-    const input = e.target as HTMLInputElement;
-    const digits = input.value.replace(/\D/g, '').slice(0, 16);
+    const digits = (e.target as HTMLInputElement).value
+        .replace(/\D/g, '')
+        .slice(0, 16);
     cardNumber.value = digits.replace(/(.{4})/g, '$1 ').trim();
-    input.value = cardNumber.value;
 };
 
 const onExpiryInput = (e: Event) => {
-    expiryTouched.value = true;
-    const input = e.target as HTMLInputElement;
-    const digits = input.value.replace(/\D/g, '').slice(0, 4);
-    expiry.value = digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
-    input.value = expiry.value;
+    const digits = (e.target as HTMLInputElement).value
+        .replace(/\D/g, '')
+        .slice(0, 4);
+    expiry.value =
+        digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
 };
 
 const onCvvInput = (e: Event) => {
-    cvvTouched.value = true;
-    const input = e.target as HTMLInputElement;
-    cvv.value = input.value.replace(/\D/g, '').slice(0, 3);
-    input.value = cvv.value;
+    cvv.value = (e.target as HTMLInputElement).value
+        .replace(/\D/g, '')
+        .slice(0, 4);
 };
 
-const cardError = computed(() => {
-    const digits = cardNumber.value.replace(/\s/g, '');
-    if (!digits) return 'Introduza o número do cartão.';
-    return /^\d{16}$/.test(digits) ? '' : 'O número do cartão deve conter 16 algarismos.';
-});
-const cardValid = computed(() => !cardError.value);
-
-const expiryError = computed(() => {
+const cardValid = computed(
+    () => cardNumber.value.replace(/\s/g, '').length === 16,
+);
+const expiryValid = computed(() => {
     const match = expiry.value.match(/^(\d{2})\/(\d{2})$/);
-    if (!match) return 'Introduza a validade no formato MM/AA.';
-
-    const month = Number(match[1]);
-    if (month < 1 || month > 12) return 'O mês deve estar entre 01 e 12.';
-
-    const year = 2000 + Number(match[2]);
-    const now = new Date();
-    if (year < now.getFullYear() || (year === now.getFullYear() && month < now.getMonth() + 1)) {
-        return 'O cartão está caducado.';
-    }
-
-    return '';
+    return !!match && Number(match[1]) >= 1 && Number(match[1]) <= 12;
 });
-const expiryValid = computed(() => !expiryError.value);
-
-const cvvError = computed(() => {
-    if (!cvv.value) return 'Introduza o CVV.';
-    return /^\d{3}$/.test(cvv.value) ? '' : 'O CVV deve conter exatamente 3 algarismos.';
-});
-const cvvValid = computed(() => !cvvError.value);
-const formValid = computed(() => cardValid.value && expiryValid.value && cvvValid.value);
+const cvvValid = computed(() => cvv.value.length >= 3);
 
 const close = () => emit('close');
 
 const pay = () => {
     submitted.value = true;
-    if (formValid.value) emit('paid');
+    if (cardValid.value && expiryValid.value && cvvValid.value) emit('paid');
 };
 </script>
 
 <template>
-    <div v-if="show" class="patudo-modal-backdrop" @click.self="close" @keydown.escape="close">
+    <div
+        v-if="show"
+        class="patudo-modal-backdrop"
+        @click.self="close"
+        @keydown.escape="close"
+    >
         <div class="payment-modal" role="dialog" aria-modal="true">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h2 class="h6 fw-bold mb-0">Confirmação de Pagamento</h2>
-                <button type="button" class="btn-close" aria-label="Fechar" @click="close"></button>
+                <button
+                    type="button"
+                    class="btn-close"
+                    aria-label="Fechar"
+                    @click="close"
+                ></button>
             </div>
 
             <form class="payment-box" novalidate @submit.prevent="pay">
                 <p class="fw-bold small mb-2">{{ serviceLabel }}</p>
 
-                <div class="d-flex justify-content-between align-items-center pb-2 box-divider">
+                <div
+                    class="d-flex justify-content-between align-items-center pb-2 box-divider"
+                >
                     <span class="small">Montante a pagar:</span>
                     <span class="fw-bold fs-5">{{ formattedAmount }}</span>
                 </div>
 
                 <p class="fw-bold small mt-2 mb-2">Cartão de Crédito</p>
 
-                <label class="field-label" for="card-number">Número do Cartão *</label>
+                <label class="field-label" for="card-number"
+                    >Número do Cartão *</label
+                >
                 <input
                     id="card-number"
                     :value="cardNumber"
                     type="text"
                     inputmode="numeric"
-                    maxlength="19"
                     autocomplete="cc-number"
                     class="field-input mb-2"
-                    :class="{ invalid: (submitted || cardNumberTouched) && !cardValid }"
-                    :aria-invalid="(submitted || cardNumberTouched) && !cardValid"
-                    :aria-describedby="(submitted || cardNumberTouched) && !cardValid ? 'card-number-error' : undefined"
+                    :class="{ invalid: submitted && !cardValid }"
                     @input="onCardInput"
-                    @blur="cardNumberTouched = true"
                 />
-                <p v-if="(submitted || cardNumberTouched) && !cardValid" id="card-number-error" class="field-error" role="alert">
-                    {{ cardError }}
-                </p>
 
                 <div class="d-flex gap-3">
                     <div class="flex-fill">
-                        <label class="field-label" for="card-expiry">Data de Validade *</label>
+                        <label class="field-label" for="card-expiry"
+                            >Data de Validade *</label
+                        >
                         <input
                             id="card-expiry"
                             :value="expiry"
                             type="text"
                             inputmode="numeric"
-                            maxlength="5"
                             placeholder="MM/AA"
                             autocomplete="cc-exp"
                             class="field-input"
-                            :class="{ invalid: (submitted || expiryTouched) && !expiryValid }"
-                            :aria-invalid="(submitted || expiryTouched) && !expiryValid"
-                            :aria-describedby="(submitted || expiryTouched) && !expiryValid ? 'card-expiry-error' : undefined"
+                            :class="{ invalid: submitted && !expiryValid }"
                             @input="onExpiryInput"
-                            @blur="expiryTouched = true"
                         />
-                        <p v-if="(submitted || expiryTouched) && !expiryValid" id="card-expiry-error" class="field-error" role="alert">
-                            {{ expiryError }}
-                        </p>
                     </div>
                     <div class="flex-fill">
                         <label class="field-label" for="card-cvv">CVV *</label>
@@ -177,26 +151,28 @@ const pay = () => {
                             :value="cvv"
                             type="password"
                             inputmode="numeric"
-                            maxlength="3"
                             autocomplete="cc-csc"
                             class="field-input"
-                            :class="{ invalid: (submitted || cvvTouched) && !cvvValid }"
-                            :aria-invalid="(submitted || cvvTouched) && !cvvValid"
-                            :aria-describedby="(submitted || cvvTouched) && !cvvValid ? 'card-cvv-error' : undefined"
+                            :class="{ invalid: submitted && !cvvValid }"
                             @input="onCvvInput"
-                            @blur="cvvTouched = true"
                         />
-                        <p v-if="(submitted || cvvTouched) && !cvvValid" id="card-cvv-error" class="field-error" role="alert">
-                            {{ cvvError }}
-                        </p>
                     </div>
                 </div>
 
                 <div class="d-flex justify-content-end gap-2 mt-4">
-                    <button type="button" class="btn btn-outline-primary btn-light border rounded-pill px-3" :disabled="processing" @click="close">
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary btn-light border rounded-pill px-3"
+                        :disabled="processing"
+                        @click="close"
+                    >
                         Cancelar
                     </button>
-                    <button type="submit" class="btn btn-primary btn-pay rounded-pill px-4" :disabled="processing || !formValid">
+                    <button
+                        type="submit"
+                        class="btn btn-primary btn-pay rounded-pill px-4"
+                        :disabled="processing"
+                    >
                         {{ processing ? 'A pagar...' : 'Pagar' }}
                     </button>
                 </div>
@@ -240,12 +216,6 @@ const pay = () => {
     display: block;
     font-size: 0.7rem;
     margin-bottom: 0.15rem;
-}
-
-.field-error {
-    color: #dc3545;
-    font-size: 0.7rem;
-    margin: 0.25rem 0 0;
 }
 
 .field-input {

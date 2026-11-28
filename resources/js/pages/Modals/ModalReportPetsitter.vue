@@ -40,99 +40,93 @@ const handleSubmit = () => {
 </script>
 
 <template>
-    <div
-        v-if="show"
-        class="patudo-modal-backdrop"
-        @click.self="handleClose"
-    >
-            <div class="patudo-modal-card" role="dialog" aria-modal="true">
-                <button
-                    type="button"
-                    class="patudo-close-btn"
-                    aria-label="Fechar"
-                    @click="handleClose"
+    <div v-if="show" class="patudo-modal-backdrop" @click.self="handleClose">
+        <div class="patudo-modal-card" role="dialog" aria-modal="true">
+            <button
+                type="button"
+                class="patudo-close-btn"
+                aria-label="Fechar"
+                @click="handleClose"
+            >
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
                 >
-                    <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                    >
-                        <path d="M18 6L6 18M6 6l12 12" />
-                    </svg>
-                </button>
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
 
+            <div class="mb-3">
+                <h2 class="patudo-modal-title">Denunciar Petsitter</h2>
+                <p class="patudo-modal-subtitle">
+                    Ajuda-nos a manter a comunidade Patudo segura.
+                </p>
+            </div>
+
+            <!-- Formulário para entrada de dados do utilizador. -->
+            <!-- Form for user data input. -->
+            <form @submit.prevent="handleSubmit">
                 <div class="mb-3">
-                    <h2 class="patudo-modal-title">Denunciar Petsitter</h2>
-                    <p class="patudo-modal-subtitle">
-                        Ajuda-nos a manter a comunidade Patudo segura.
-                    </p>
+                    <label class="patudo-section-label d-block mb-2">
+                        Motivo da denúncia
+                    </label>
+
+                    <div class="d-flex flex-column gap-1 ps-2">
+                        <label
+                            v-for="reason in reasons"
+                            :key="reason"
+                            class="patudo-radio-option"
+                        >
+                            <input
+                                v-model="selectedReason"
+                                type="radio"
+                                name="report_reason"
+                                :value="reason"
+                                class="patudo-radio-input"
+                            />
+                            <span class="patudo-radio-text">{{ reason }}</span>
+                        </label>
+                    </div>
                 </div>
 
-                <!-- Formulário para entrada de dados do utilizador. -->
-                <!-- Form for user data input. -->
-                <form @submit.prevent="handleSubmit">
-                    <div class="mb-3">
-                        <label class="patudo-section-label d-block mb-2">
-                            Motivo da denúncia
-                        </label>
+                <div class="mb-3">
+                    <label
+                        for="report-description"
+                        class="patudo-section-label d-block mb-2"
+                    >
+                        Descrição (opcional)
+                    </label>
+                    <textarea
+                        id="report-description"
+                        v-model="description"
+                        rows="3"
+                        class="patudo-textarea"
+                        placeholder="Descreve brevemente o que aconteceu..."
+                    ></textarea>
+                </div>
 
-                        <div class="d-flex flex-column gap-1 ps-2">
-                            <label
-                                v-for="reason in reasons"
-                                :key="reason"
-                                class="patudo-radio-option"
-                            >
-                                <input
-                                    v-model="selectedReason"
-                                    type="radio"
-                                    name="report_reason"
-                                    :value="reason"
-                                    class="patudo-radio-input"
-                                />
-                                <span class="patudo-radio-text">{{
-                                    reason
-                                }}</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label
-                            for="report-description"
-                            class="patudo-section-label d-block mb-2"
-                        >
-                            Descrição (opcional)
-                        </label>
-                        <textarea
-                            id="report-description"
-                            v-model="description"
-                            rows="3"
-                            class="patudo-textarea"
-                            placeholder="Descreve brevemente o que aconteceu..."
-                        ></textarea>
-                    </div>
-
-                    <div class="patudo-modal-actions">
-                        <button
-                            type="button"
-                            class="btn btn-outline-primary"
-                            @click="handleClose"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            type="submit"
-                            class="btn btn-primary"
-                            :disabled="!selectedReason"
-                        >
-                            Enviar denúncia
-                        </button>
-                    </div>
-                </form>
+                <div class="patudo-modal-actions">
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary"
+                        @click="handleClose"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        :disabled="!selectedReason"
+                    >
+                        Enviar denúncia
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </template>

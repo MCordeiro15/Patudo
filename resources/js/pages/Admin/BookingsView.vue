@@ -3,8 +3,18 @@ import { Head, router } from '@inertiajs/vue3';
 import { computed, onMounted, ref, watch } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
 
-type BookingStatus = 'pending' | 'approved' | 'rejected' | 'completed' | 'cancelled';
-type FilterTab = 'Todas' | 'Pendentes' | 'Aceites' | 'Concluídas' | 'Canceladas';
+type BookingStatus =
+    | 'pending'
+    | 'approved'
+    | 'rejected'
+    | 'completed'
+    | 'cancelled';
+type FilterTab =
+    | 'Todas'
+    | 'Pendentes'
+    | 'Aceites'
+    | 'Concluídas'
+    | 'Canceladas';
 
 interface ApiBooking {
     id: number;
@@ -12,14 +22,36 @@ interface ApiBooking {
     petsitter_id: number;
     service_id: number;
     service: { id: number; name: string; price: number } | null;
-    owner: { id: number; name: string; location?: string | null; avatar_url?: string | null } | null;
-    petsitter: { id: number; name: string; location?: string | null; avatar_url?: string | null } | null;
+    owner: {
+        id: number;
+        name: string;
+        location?: string | null;
+        avatar_url?: string | null;
+    } | null;
+    petsitter: {
+        id: number;
+        name: string;
+        location?: string | null;
+        avatar_url?: string | null;
+    } | null;
     start_date: string;
     end_date: string;
     status: BookingStatus;
     total_price: number;
-    animals: { id: number; name: string; species: string; breed?: string | null; age?: number | null; photo?: string | null }[];
-    review: { id: number; rating: number; comment: string; created_at: string } | null;
+    animals: {
+        id: number;
+        name: string;
+        species: string;
+        breed?: string | null;
+        age?: number | null;
+        photo?: string | null;
+    }[];
+    review: {
+        id: number;
+        rating: number;
+        comment: string;
+        created_at: string;
+    } | null;
     created_at: string;
     message?: string | null;
     zone?: string | null;
@@ -105,7 +137,11 @@ const loading = ref(false);
 
 const navItems = computed<AdminNavItem[]>(() => [
     { label: 'Utilizadores', href: '/admin/users' },
-    { label: 'Verificações', href: '/admin/petsitters/pending', badge: pendingVerifications.value },
+    {
+        label: 'Verificações',
+        href: '/admin/petsitters/pending',
+        badge: pendingVerifications.value,
+    },
     { label: 'Reservas', href: '/admin/bookings', active: true },
     { label: 'Avaliações', href: '/admin/reviews' },
     { label: 'Denúncias', href: '/admin/reports', badge: 3 },
@@ -126,10 +162,11 @@ const bookings = ref<AdminBooking[]>([]);
 const mapApiToAdmin = (api: ApiBooking): AdminBooking => {
     const start = parseDate(api.start_date);
     const end = parseDate(api.end_date);
-    const period = start && end
-        ? `${start.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' })} – ${end.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' })}`
-        : '—';
-    const petNames = api.animals.map(a => a.name).join(', ') || '—';
+    const period =
+        start && end
+            ? `${start.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' })} – ${end.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' })}`
+            : '—';
+    const petNames = api.animals.map((a) => a.name).join(', ') || '—';
 
     return {
         id: api.id,
@@ -179,11 +216,17 @@ const loadBookings = async () => {
     }
 };
 
-const totalPages = computed(() => Math.max(1, Math.ceil(totalItems.value / pageSize)));
+const totalPages = computed(() =>
+    Math.max(1, Math.ceil(totalItems.value / pageSize)),
+);
 
-watch([currentPage, selectedFilter], () => {
-    void loadBookings();
-}, { deep: true });
+watch(
+    [currentPage, selectedFilter],
+    () => {
+        void loadBookings();
+    },
+    { deep: true },
+);
 
 onMounted(() => {
     void loadPendingVerifications();
@@ -252,12 +295,7 @@ const paginatedBookings = computed(() => filteredBookings.value);
                 class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2"
                 href="/"
             >
-                <img
-                    :src="logoPatudo"
-                    alt="Patudo"
-                    width="70"
-                    height="70"
-                />
+                <img :src="logoPatudo" alt="Patudo" width="70" height="70" />
                 <span>Patudo</span>
             </a>
 
@@ -272,7 +310,11 @@ const paginatedBookings = computed(() => filteredBookings.value);
                     :class="{ active: item.active }"
                 >
                     <span>{{ item.label }}</span>
-                    <span v-if="item.badge !== undefined && item.badge !== null" class="navbar-badge">{{ item.badge }}</span>
+                    <span
+                        v-if="item.badge !== undefined && item.badge !== null"
+                        class="navbar-badge"
+                        >{{ item.badge }}</span
+                    >
                 </a>
             </nav>
 
@@ -287,8 +329,12 @@ const paginatedBookings = computed(() => filteredBookings.value);
             </div>
         </aside>
 
-        <main class="patudo-content bookings-container flex-grow-1 py-4 px-4 px-lg-5">
-            <header class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <main
+            class="patudo-content bookings-container flex-grow-1 py-4 px-4 px-lg-5"
+        >
+            <header
+                class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4"
+            >
                 <div>
                     <h1 class="fw-bold mb-1">Reservas</h1>
                 </div>
@@ -302,7 +348,14 @@ const paginatedBookings = computed(() => filteredBookings.value);
             <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
                 <div class="search-wrapper">
                     <span class="search-icon" aria-hidden="true">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
                             <circle cx="11" cy="11" r="7" />
                             <line x1="21" y1="21" x2="16.65" y2="16.65" />
                         </svg>
@@ -322,7 +375,11 @@ const paginatedBookings = computed(() => filteredBookings.value);
                         :key="tab"
                         type="button"
                         class="btn"
-                        :class="selectedFilter === tab ? 'btn-primary' : 'btn-outline-primary'"
+                        :class="
+                            selectedFilter === tab
+                                ? 'btn-primary'
+                                : 'btn-outline-primary'
+                        "
                         @click="setFilter(tab)"
                     >
                         {{ tab }}
@@ -334,112 +391,173 @@ const paginatedBookings = computed(() => filteredBookings.value);
                 <div class="table-responsive">
                     <table class="table align-middle mb-0 bookings-table">
                         <thead>
-                        <tr class="text-secondary small text-uppercase">
-                            <th>Nº</th>
-                            <th>Dono</th>
-                            <th>Cuidador</th>
-                            <th>Serviço</th>
-                            <th>Período</th>
-                            <th>Total</th>
-                            <th>Estado</th>
-                            <th class="text-end">Ações</th>
-                        </tr>
+                            <tr class="text-secondary small text-uppercase">
+                                <th>Nº</th>
+                                <th>Dono</th>
+                                <th>Cuidador</th>
+                                <th>Serviço</th>
+                                <th>Período</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                                <th class="text-end">Ações</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="booking in paginatedBookings" :key="booking.id" class="booking-row">
-                            <td class="fw-bold">#{{ booking.id }}</td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <img v-if="booking.ownerAvatar" :src="booking.ownerAvatar" :alt="booking.ownerName" class="person-avatar" />
-                                    <span v-else class="person-avatar"></span>
-                                    <div>
-                                        <div class="fw-semibold">{{ booking.ownerName }}</div>
-                                        <small class="text-secondary">{{ booking.petName }}</small>
+                            <tr
+                                v-for="booking in paginatedBookings"
+                                :key="booking.id"
+                                class="booking-row"
+                            >
+                                <td class="fw-bold">#{{ booking.id }}</td>
+                                <td>
+                                    <div
+                                        class="d-flex align-items-center gap-2"
+                                    >
+                                        <img
+                                            v-if="booking.ownerAvatar"
+                                            :src="booking.ownerAvatar"
+                                            :alt="booking.ownerName"
+                                            class="person-avatar"
+                                        />
+                                        <span
+                                            v-else
+                                            class="person-avatar"
+                                        ></span>
+                                        <div>
+                                            <div class="fw-semibold">
+                                                {{ booking.ownerName }}
+                                            </div>
+                                            <small class="text-secondary">{{
+                                                booking.petName
+                                            }}</small>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <img v-if="booking.sitterAvatar" :src="booking.sitterAvatar" :alt="booking.sitterName" class="person-avatar" />
-                                    <span v-else class="person-avatar"></span>
-                                    <div>
-                                        <div class="fw-semibold">{{ booking.sitterName }}</div>
-                                        <small class="text-secondary">{{ booking.location }}</small>
+                                </td>
+                                <td>
+                                    <div
+                                        class="d-flex align-items-center gap-2"
+                                    >
+                                        <img
+                                            v-if="booking.sitterAvatar"
+                                            :src="booking.sitterAvatar"
+                                            :alt="booking.sitterName"
+                                            class="person-avatar"
+                                        />
+                                        <span
+                                            v-else
+                                            class="person-avatar"
+                                        ></span>
+                                        <div>
+                                            <div class="fw-semibold">
+                                                {{ booking.sitterName }}
+                                            </div>
+                                            <small class="text-secondary">{{
+                                                booking.location
+                                            }}</small>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td>{{ booking.service }}</td>
-                            <td>{{ booking.period }}</td>
-                            <td class="fw-bold">{{ booking.total }} €</td>
-                            <td>
-                                <span class="status-pill" :class="statusBadgeClass(booking.status)">
-                                    <svg
-                                        v-if="booking.status === 'approved' || booking.status === 'completed'"
-                                        width="13"
-                                        height="13"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2.5"
-                                        class="me-1"
-                                        aria-hidden="true"
+                                </td>
+                                <td>{{ booking.service }}</td>
+                                <td>{{ booking.period }}</td>
+                                <td class="fw-bold">{{ booking.total }} €</td>
+                                <td>
+                                    <span
+                                        class="status-pill"
+                                        :class="
+                                            statusBadgeClass(booking.status)
+                                        "
                                     >
-                                        <polyline points="20 6 9 17 4 12" />
-                                    </svg>
-                                    <svg
-                                        v-else-if="booking.status === 'pending'"
-                                        width="13"
-                                        height="13"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2.2"
-                                        class="me-1"
-                                        aria-hidden="true"
+                                        <svg
+                                            v-if="
+                                                booking.status === 'approved' ||
+                                                booking.status === 'completed'
+                                            "
+                                            width="13"
+                                            height="13"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2.5"
+                                            class="me-1"
+                                            aria-hidden="true"
+                                        >
+                                            <polyline points="20 6 9 17 4 12" />
+                                        </svg>
+                                        <svg
+                                            v-else-if="
+                                                booking.status === 'pending'
+                                            "
+                                            width="13"
+                                            height="13"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2.2"
+                                            class="me-1"
+                                            aria-hidden="true"
+                                        >
+                                            <circle cx="12" cy="12" r="9" />
+                                            <polyline
+                                                points="12 7 12 12 15.5 14"
+                                            />
+                                        </svg>
+                                        <svg
+                                            v-else
+                                            width="13"
+                                            height="13"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2.5"
+                                            class="me-1"
+                                            aria-hidden="true"
+                                        >
+                                            <line
+                                                x1="18"
+                                                y1="6"
+                                                x2="6"
+                                                y2="18"
+                                            />
+                                            <line
+                                                x1="6"
+                                                y1="6"
+                                                x2="18"
+                                                y2="18"
+                                            />
+                                        </svg>
+                                        {{ statusLabels[booking.status] }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-primary"
+                                        @click="viewBooking(booking.id)"
                                     >
-                                        <circle cx="12" cy="12" r="9" />
-                                        <polyline points="12 7 12 12 15.5 14" />
-                                    </svg>
-                                    <svg
-                                        v-else
-                                        width="13"
-                                        height="13"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2.5"
-                                        class="me-1"
-                                        aria-hidden="true"
-                                    >
-                                        <line x1="18" y1="6" x2="6" y2="18" />
-                                        <line x1="6" y1="6" x2="18" y2="18" />
-                                    </svg>
-                                    {{ statusLabels[booking.status] }}
-                                </span>
-                            </td>
-                            <td class="text-end">
-                                <button
-                                    type="button"
-                                    class="btn btn-outline-primary"
-                                    @click="viewBooking(booking.id)"
+                                        Ver
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr v-if="paginatedBookings.length === 0">
+                                <td
+                                    colspan="8"
+                                    class="text-center text-secondary py-4"
                                 >
-                                    Ver
-                                </button>
-                            </td>
-                        </tr>
-                        <tr v-if="paginatedBookings.length === 0">
-                            <td colspan="8" class="text-center text-secondary py-4">
-                                Nenhuma reserva encontrada com os filtros atuais.
-                            </td>
-                        </tr>
+                                    Nenhuma reserva encontrada com os filtros
+                                    atuais.
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <footer class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
+            <footer
+                class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3"
+            >
                 <small class="text-secondary">
-                    A mostrar {{ paginatedBookings.length }} de {{ totalItems }} resultados
+                    A mostrar {{ paginatedBookings.length }} de
+                    {{ totalItems }} resultados
                 </small>
 
                 <div class="d-flex align-items-center gap-1">
@@ -456,7 +574,11 @@ const paginatedBookings = computed(() => filteredBookings.value);
                         :key="page"
                         type="button"
                         class="btn page-btn"
-                        :class="currentPage === page ? 'btn-primary' : 'btn-outline-primary'"
+                        :class="
+                            currentPage === page
+                                ? 'btn-primary'
+                                : 'btn-outline-primary'
+                        "
                         @click="currentPage = page"
                     >
                         {{ page }}
@@ -476,7 +598,6 @@ const paginatedBookings = computed(() => filteredBookings.value);
 </template>
 
 <style scoped>
-
 .brand-icon,
 .brand-text {
     color: var(--patudo-laranjaVivo);

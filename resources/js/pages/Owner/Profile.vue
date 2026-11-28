@@ -1,17 +1,24 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { CirclePlus, LogOut, Pencil, UserRound } from '@lucide/vue';
+import {
+    CirclePlus,
+    LogOut,
+    UserRound,
+    MessageCircle,
+    Bell,
+    SquarePen,
+} from '@lucide/vue';
 import { computed, onMounted, ref } from 'vue';
 import logoPatudo from '@/../../assets/logoPatudo.svg';
-import AdminNavigationMenu from '@/components/AdminNavigationMenu.vue';
-import HeaderNotificationsChat from '@/components/HeaderNotificationsChat.vue';
 import type { Animal } from '@/types';
 import { useAuth } from '@/composables/useAuth';
+import { useNotifications } from '@/composables/useNotifications';
 import AnimalCard from '@/components/AnimalCard.vue';
 import ModalAddPet from '@/pages/Modals/ModalAddPet.vue';
 import ModalDeleteAnimal from '@/pages/Modals/ModalDeleteAnimal.vue';
 import ModalEditOwnerProfile from '@/pages/Modals/ModalEditOwnerProfile.vue';
 import ModalFormPetsitter from '@/pages/Modals/ModalFormPetsitter.vue';
+import ModalNotifications from '@/pages/Modals/ModalNotifications.vue';
 
 const { user, logout } = useAuth();
 
@@ -21,21 +28,23 @@ const loadError = ref('');
 const showAddModal = ref(false);
 const showEditAnimalModal = ref(false);
 const showDeleteModal = ref(false);
+const showNotifications = ref(false);
 
 // "Quero ser petsitter" — botão placeholder: no futuro passa para a navbar
-// O estado vem do servidor (rota /profile): candidatura, perfil desativado ou sem candidatura.
+// O estado vem do servidor (rota /profile): null = sem candidatura, 'pending' ou 'rejected'
 const props = defineProps<{
-    petsitterApplicationStatus?: 'pending' | 'rejected' | 'inactive' | null;
-    // candidaturas que ainda pode fazer (máximo 3); um recusado pode voltar a candidatar-se
-    petsitterApplicationsRemaining?: number;
+    petsitterApplicationStatus?: 'pending' | 'rejected' | null;
 }>();
 
 const showFormPetsitter = ref(false);
-const petsitterApplicationStatus = ref(props.petsitterApplicationStatus ?? null);
+const petsitterApplicationStatus = ref(
+    props.petsitterApplicationStatus ?? null,
+);
 
 const handlePetsitterApplicationSaved = () => {
     petsitterApplicationStatus.value = 'pending';
 };
+const { unreadCount } = useNotifications();
 const deletingAnimal = ref<{ id: number; name: string } | null>(null);
 const deletingAnimalLoading = ref(false);
 const editingAnimal = ref<Animal | null>(null);
@@ -107,7 +116,8 @@ const handleSaveProfile = async (formData: FormData) => {
 
 const handleDeleteAccount = async () => {
     if (!user.value) return;
-    if (!window.confirm('Tens a certeza que queres eliminar a tua conta?')) return;
+    if (!window.confirm('Tens a certeza que queres eliminar a tua conta?'))
+        return;
 
     try {
         const response = await fetch(`/api/users/${user.value.id}`, {
@@ -176,7 +186,8 @@ const handleAnimalSaved = (animal?: Animal) => {
 };
 
 const openEditAnimalModal = (animalId: number) => {
-    editingAnimal.value = animals.value.find((animal) => animal.id === animalId) ?? null;
+    editingAnimal.value =
+        animals.value.find((animal) => animal.id === animalId) ?? null;
     if (editingAnimal.value) showEditAnimalModal.value = true;
 };
 
@@ -236,7 +247,6 @@ onMounted(() => {
     <!-- Main content area of the page. -->
     <main class="min-vh-100 py-4 patudo-page patudo-page-shell">
         <div class="container">
-
             <nav
                 class="navbar navbar-expand-lg bg-white border border-primary rounded-4 px-3 px-md-4"
             >
@@ -274,11 +284,26 @@ onMounted(() => {
                     >
                         Reservas
                     </a>
-                    <AdminNavigationMenu />
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <HeaderNotificationsChat />
+                    <a href="/messages" class="text-dark"
+                        ><MessageCircle :size="25"
+                    /></a>
+                    <button
+                        type="button"
+                        class="text-dark bg-transparent border-0 p-0 position-relative"
+                        @click="showNotifications = true"
+                    >
+                        <Bell :size="25" />
+                        <span
+                            v-if="unreadCount > 0"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style="font-size: 0.6rem"
+                        >
+                            {{ unreadCount > 9 ? '9+' : unreadCount }}
+                        </span>
+                    </button>
                     <button
                         type="button"
                         class="text-dark p-0 border-0 bg-transparent"
@@ -297,7 +322,9 @@ onMounted(() => {
                 </div>
             </nav>
 
-            <h1 class="text-center fw-bold display-5 mt-5 pt-4 mb-4">O meu perfil</h1>
+            <h1 class="text-center fw-bold display-5 mt-5 pt-4 mb-4">
+                O meu perfil
+            </h1>
 
             <div
                 v-if="profileError"
@@ -314,40 +341,20 @@ onMounted(() => {
                     class="alert alert-success py-2 px-3 small mb-0"
                     role="status"
                 >
-                    Candidatura enviada! Aguarda a aprovação de um administrador.
+                    Candidatura enviada! Aguarda a aprovação de um
+                    administrador.
                 </div>
                 <div
                     v-else-if="petsitterApplicationStatus === 'rejected'"
-                    class="d-flex flex-wrap align-items-center justify-content-end gap-2"
-                >
-                    <div class="alert alert-danger py-2 px-3 small mb-0" role="status">
-                        A tua candidatura a petsitter foi recusada.
-                        <template v-if="(props.petsitterApplicationsRemaining ?? 0) > 0">
-                            Podes candidatar-te mais {{ props.petsitterApplicationsRemaining }}
-                            {{ props.petsitterApplicationsRemaining === 1 ? 'vez' : 'vezes' }}.
-                        </template>
-                        <template v-else>Atingiste o limite de 3 candidaturas.</template>
-                    </div>
-                    <button
-                        v-if="(props.petsitterApplicationsRemaining ?? 0) > 0"
-                        type="button"
-                        class="btn btn-primary btn-sm rounded-pill px-4"
-                        @click="showFormPetsitter = true"
-                    >
-                        Candidatar novamente
-                    </button>
-                </div>
-                <div
-                    v-else-if="petsitterApplicationStatus === 'inactive'"
-                    class="alert alert-secondary py-2 px-3 small mb-0"
+                    class="alert alert-danger py-2 px-3 small mb-0"
                     role="status"
                 >
-                    O teu perfil de petsitter está desativado.
+                    A tua candidatura a petsitter foi recusada.
                 </div>
                 <button
                     v-else
                     type="button"
-                    class="btn btn-primary btn-sm rounded-pill px-4"
+                    class="btn btn-outline-primary btn-sm rounded-pill px-4"
                     @click="showFormPetsitter = true"
                 >
                     Quero ser petsitter
@@ -359,12 +366,28 @@ onMounted(() => {
             >
                 <button
                     type="button"
-                    class="patudo-icon-action patudo-icon-action-edit position-absolute top-0 end-0 mt-3 me-3"
-                    aria-label="Editar perfil"
-                    title="Editar perfil"
+                    class="btn btn-primary btn-sm d-flex align-items-center gap-2 position-absolute top-0 end-0 mt-3 me-3 px-4"
                     @click="showEditModal = true"
                 >
-                    <Pencil :size="16" aria-hidden="true" />
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path
+                            d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                        />
+                        <path
+                            d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"
+                        />
+                    </svg>
+                    Editar
                 </button>
 
                 <div class="row g-4 align-items-center">
@@ -379,18 +402,28 @@ onMounted(() => {
                                     alt="Foto de perfil"
                                     class="profile-avatar-img"
                                 />
-                                <UserRound v-else :size="64" class="text-primary" />
+                                <UserRound
+                                    v-else
+                                    :size="64"
+                                    class="text-primary"
+                                />
                             </div>
 
                             <div>
-                                <h2 class="h5 fw-bold mb-0">{{ displayName }}</h2>
+                                <h2 class="h5 fw-bold mb-0">
+                                    {{ displayName }}
+                                </h2>
                                 <p class="text-muted small mb-2">
                                     {{ user?.location ?? 'Localização' }}
                                 </p>
 
                                 <div class="d-flex flex-wrap gap-3 mb-2">
                                     <span
-                                        v-for="species in [...new Set(animals.map((a) => a.species))]"
+                                        v-for="species in [
+                                            ...new Set(
+                                                animals.map((a) => a.species),
+                                            ),
+                                        ]"
                                         :key="species"
                                         class="tag-pill rounded-pill py-1 small"
                                     >
@@ -399,7 +432,10 @@ onMounted(() => {
                                 </div>
 
                                 <p class="text-muted small mb-0">
-                                    {{ user?.bio ?? 'Breve descrição sobre o que procura, sobre o seu animal.' }}
+                                    {{
+                                        user?.bio ??
+                                        'Breve descrição sobre o que procura, sobre o seu animal.'
+                                    }}
                                 </p>
                             </div>
                         </div>
@@ -407,11 +443,17 @@ onMounted(() => {
 
                     <div class="col-12 col-md-4">
                         <div class="border-start border-secondary ps-4 py-2">
+                            <p class="fs-5 text-muted mb-1">
+                                <span class="star">★</span> 5,0
+                            </p>
+                            <p class="text-muted mb-2">Avaliações</p>
                             <p class="text-muted mb-0">
                                 Membro desde:<br />
                                 {{
                                     user?.created_at
-                                        ? new Date(user.created_at).toLocaleDateString('pt-PT')
+                                        ? new Date(
+                                              user.created_at,
+                                          ).toLocaleDateString('pt-PT')
                                         : '—'
                                 }}
                             </p>
@@ -469,8 +511,14 @@ onMounted(() => {
                             class="add-animal-card w-100 h-100 d-flex flex-column align-items-center justify-content-center gap-2 border border-primary rounded-4 bg-white"
                             @click="showAddModal = true"
                         >
-                            <CirclePlus :size="56" :stroke-width="1" class="text-primary" />
-                            <span class="small text-muted">Adicionar animal</span>
+                            <CirclePlus
+                                :size="56"
+                                :stroke-width="1"
+                                class="text-primary"
+                            />
+                            <span class="small text-muted"
+                                >Adicionar animal</span
+                            >
                         </button>
                     </div>
                 </div>
@@ -486,7 +534,10 @@ onMounted(() => {
         <ModalAddPet
             :show="showEditAnimalModal"
             :animal="editingAnimal"
-            @close="showEditAnimalModal = false; editingAnimal = null"
+            @close="
+                showEditAnimalModal = false;
+                editingAnimal = null;
+            "
             @saved="handleAnimalSaved"
         />
 
@@ -494,7 +545,10 @@ onMounted(() => {
             :show="showDeleteModal"
             :animal-name="deletingAnimal?.name ?? ''"
             :deleting="deletingAnimalLoading"
-            @close="showDeleteModal = false; deletingAnimal = null"
+            @close="
+                showDeleteModal = false;
+                deletingAnimal = null;
+            "
             @confirmed="confirmDeleteAnimal"
         />
 
@@ -512,10 +566,18 @@ onMounted(() => {
             @saved="handlePetsitterApplicationSaved"
         />
 
+        <ModalNotifications
+            :show="showNotifications"
+            @close="showNotifications = false"
+        />
     </main>
 </template>
 
 <style scoped>
+.patudo-page {
+    background-color: #fffaf3;
+}
+
 .profile-avatar {
     width: 140px;
     height: 140px;

@@ -39,7 +39,9 @@ const login = async () => {
 </script>
 
 <template>
-    <div class="login-wrapper patudo-page-shell d-flex align-items-center justify-content-center p-3">
+    <div
+        class="login-wrapper patudo-page-shell d-flex align-items-center justify-content-center p-3"
+    >
         <div class="auth-card d-flex flex-column flex-md-row">
             <div class="brand-panel d-flex flex-column justify-content-between">
                 <img :src="imgCao" alt="Cão Patudo" class="brand-bg-cover" />
