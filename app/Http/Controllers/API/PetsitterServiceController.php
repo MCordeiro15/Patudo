@@ -39,7 +39,7 @@ class PetsitterServiceController extends Controller
             'type' => [
                 'required',
                 'string',
-                Rule::in(PetsitterService::TYPES),
+                'max:255',
                 Rule::unique('petsitter_services', 'type')->where('petsitter_id', $petsitter->user_id),
             ],
             'price' => 'required|numeric|min:0',
@@ -63,7 +63,7 @@ class PetsitterServiceController extends Controller
                 'sometimes',
                 'required',
                 'string',
-                Rule::in(PetsitterService::TYPES),
+                'max:255',
                 Rule::unique('petsitter_services', 'type')
                     ->where('petsitter_id', $service->petsitter_id)
                     ->ignore($service->id),
