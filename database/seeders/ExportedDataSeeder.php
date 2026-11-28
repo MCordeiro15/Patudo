@@ -1395,10 +1395,10 @@ class ExportedDataSeeder extends Seeder
     'petsitter_id' => 17,
     'start_date' => '2026-12-16',
     'end_date' => '2026-12-16',
-    'status' => 'approved',
+    'status' => 'completed',
     'total_price' => 10,
     'created_at' => '2026-11-27 10:46:27',
-    'updated_at' => '2026-11-27 10:48:25',
+    'updated_at' => '2026-11-28 12:39:22',
     'service_id' => 4,
     'message' => NULL,
     'zone' => 'Ribreira Grande',
@@ -1451,7 +1451,7 @@ class ExportedDataSeeder extends Seeder
             Booking::forceCreate($bookingCreateData);
         }
 
-        // Export Reviews (8 reviews)
+        // Export Reviews (9 reviews)
         $reviews = array (
   0 => 
   array (
@@ -1539,6 +1539,17 @@ class ExportedDataSeeder extends Seeder
     'comment' => NULL,
     'created_at' => '2026-11-28 11:09:41',
     'updated_at' => '2026-11-28 11:09:41',
+    'status' => 'published',
+  ),
+  8 => 
+  array (
+    'id' => 9,
+    'booking_id' => 21,
+    'petsitter_id' => 17,
+    'star_rating' => 5,
+    'comment' => NULL,
+    'created_at' => '2026-11-28 12:39:35',
+    'updated_at' => '2026-11-28 12:39:35',
     'status' => 'published',
   ),
 );
@@ -1637,7 +1648,7 @@ class ExportedDataSeeder extends Seeder
             AnimalBooking::forceCreate($abCreateData);
         }
 
-        // Export Notifications (12 notifications)
+        // Export Notifications (13 notifications)
         if (\Illuminate\Support\Facades\Schema::hasTable('notifications')) {
             $notificationColumns = array_flip(\Illuminate\Support\Facades\Schema::getColumnListing('notifications'));
             $notifications = array (
@@ -1772,6 +1783,17 @@ class ExportedDataSeeder extends Seeder
     'created_at' => '2026-11-28 11:09:12',
     'updated_at' => '2026-11-28 11:09:21',
     'booking_id' => 22,
+  ),
+  12 => 
+  array (
+    'id' => 13,
+    'user_id' => 9,
+    'type' => 'booking',
+    'message' => 'A reserva foi concluída.',
+    'read_at' => NULL,
+    'created_at' => '2026-11-28 12:39:22',
+    'updated_at' => '2026-11-28 12:39:22',
+    'booking_id' => 21,
   ),
 );
             foreach ($notifications as $notificationData) {
