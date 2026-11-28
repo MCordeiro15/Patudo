@@ -1,10 +1,10 @@
 <!-- Página do administrador para responder aos pedidos de ajuda (versão só front-end, dados falsos). -->
 <!-- Admin page to answer help requests (front-end only version, mock data). -->
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ChevronRight, Search } from '@lucide/vue';
 import { computed, nextTick, ref } from 'vue';
-import logoPatudo from '@/../../assets/logoPatudo.svg';
+import logoPatudo from '../../../../assets/logoPatudo.svg';
 
 type Status = 'open' | 'in_progress' | 'closed';
 
@@ -120,15 +120,17 @@ const tickets = ref<Ticket[]>([
 ]);
 // ---------------------------------------------------------------------------------
 
-const menu = [
+const inertiaPage = usePage();
+
+const menu = computed(() => [
     { label: 'Utilizadores', href: '/admin/users' },
-    { label: 'Verificações', href: '/admin/petsitters/pending' },
+    { label: 'Verificações', href: '/admin/petsitters/pending', badge: inertiaPage.props.adminCounts?.pending_petsitters },
     { label: 'Reservas', href: '/admin/bookings' },
     { label: 'Avaliações', href: '/admin/reviews' },
-    { label: 'Denúncias', href: '/admin/reports' },
-    { label: 'Suporte', href: '/admin/support', active: true },
+    { label: 'Denúncias', href: '/admin/reports', badge: inertiaPage.props.adminCounts?.open_reports },
+    { label: 'Suporte', href: '/admin/support', active: true, badge: inertiaPage.props.adminCounts?.open_support },
     { label: 'Definições', href: '/admin/settings' },
-];
+]);
 
 const tabs: { key: Status; label: string }[] = [
     { key: 'open', label: 'Abertos' },
@@ -201,30 +203,37 @@ const logout = () => router.post('/logout');
 <template>
     <Head title="Suporte" />
 
-    <div class="admin-shell">
-        <aside class="admin-sidebar">
-            <div>
-                <div class="brand">
-                    <img :src="logoPatudo" alt="Patudo" width="36" height="36" />
-                    <span>Patudo</span>
-                </div>
-                <p class="menu-label">ADMINISTRAÇÃO</p>
-                <nav class="menu">
-                    <Link
-                        v-for="item in menu"
-                        :key="item.label"
-                        :href="item.href"
-                        class="menu-item"
-                        :aria-current="item.active ? 'page' : undefined"
-                    >
-                        <span>{{ item.label }}</span>
-                    </Link>
-                </nav>
+    <div class="patudo-admin-shell">
+        <aside class="patudo-navbar" aria-label="Menu de administração">
+            <Link class="navbar-brand fw-bold fs-3 d-flex align-items-center gap-2" href="/">
+                <img :src="logoPatudo" alt="Patudo" width="70" height="70" />
+                <span>Patudo</span>
+            </Link>
+
+            <div class="navbar-section-title">Administração</div>
+
+            <nav class="navbar-nav">
+                <Link
+                    v-for="item in menu"
+                    :key="item.href"
+                    :href="item.href"
+                    class="navbar-link"
+                    :class="{ active: item.active }"
+                    :aria-current="item.active ? 'page' : undefined"
+                >
+                    <span>{{ item.label }}</span>
+                    <span v-if="item.badge" class="navbar-badge">{{ item.badge }}</span>
+                </Link>
+            </nav>
+
+            <div class="navbar-footer">
+                <button type="button" class="navbar-link logout w-100 border-0 bg-transparent text-start" @click="logout">
+                    Terminar sessão
+                </button>
             </div>
-            <button type="button" class="logout" @click="logout">Terminar sessão</button>
         </aside>
 
-        <main class="admin-main">
+        <main class="patudo-content admin-main">
             <header class="main-header">
                 <h1>Suporte</h1>
                 <div class="admin-user">
@@ -329,7 +338,7 @@ const logout = () => router.post('/logout');
 </template>
 
 <style scoped>
-.admin-shell {
+.patudo-admin-shell {
     display: flex;
     min-height: 100vh;
     background-color: rgba(var(--bs-light-rgb), 0.25);
@@ -339,54 +348,105 @@ const logout = () => router.post('/logout');
     color: #2e1d14;
 }
 
-.admin-sidebar {
-    width: 176px;
-    flex-shrink: 0;
-    background-color: #fffaf5;
-    border-right: 1px solid #f3b78a;
-    padding: 22px 8px 18px;
+.patudo-navbar {
+    width: 200px;
+    min-width: 200px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #ffffff;
+    border-right: 1px solid var(--patudo-laranjaVivo);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    padding: 1rem;
 }
 
-.brand {
+.patudo-navbar .navbar-brand {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 1.15rem;
-    font-weight: 600;
-    padding: 0 4px;
-}
-
-.menu-label {
-    font-size: 0.62rem;
-    margin: 24px 12px 12px;
-    color: #5b4638;
-}
-
-.menu-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 9px 16px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    border-radius: 999px;
-    margin-bottom: 4px;
-    color: inherit;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    margin-bottom: 1.5rem;
     text-decoration: none;
+    color: var(--patudo-castanhoDark);
 }
 
-.logout {
-    background: none;
-    border: 0;
-    border-top: 1px solid #f3b78a;
-    padding: 18px 16px 0;
-    font-size: 0.75rem;
+.patudo-navbar .navbar-brand img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.patudo-navbar .navbar-section-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--patudo-castanhoMid);
+    font-weight: 600;
+    padding: 0 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.patudo-navbar .navbar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.patudo-navbar .navbar-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    border-radius: 25px;
+    color: var(--patudo-castanhoDark);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.patudo-navbar .navbar-link:hover {
+    background-color: rgba(194, 65, 12, 0.08);
+    color: var(--patudo-terracota);
+}
+
+.patudo-navbar .navbar-link.active,
+.patudo-navbar .navbar-link.active:hover {
+    background-color: var(--patudo-castanhoDark);
+    color: #ffffff;
+}
+
+.patudo-navbar .navbar-badge {
+    background-color: var(--patudo-terracota);
+    color: #ffffff;
+    font-size: 0.7rem;
     font-weight: 700;
-    text-align: left;
-    color: inherit;
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 0 0.4rem;
+}
+
+.patudo-navbar .navbar-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--patudo-laranjaVivo);
+}
+
+.patudo-navbar .navbar-link.logout {
+    justify-content: flex-start;
+}
+
+.patudo-content {
+    flex: 1;
+    min-width: 0;
 }
 
 .admin-main {
@@ -770,8 +830,28 @@ textarea:focus-visible {
     .detail {
         padding: 16px;
     }
+}
 
-    .admin-sidebar {
+@media (max-width: 767px) {
+    .patudo-admin-shell {
+        flex-direction: column;
+    }
+
+    .patudo-navbar {
+        position: static;
+        width: auto;
+        min-width: 0;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--patudo-laranjaVivo);
+    }
+
+    .patudo-navbar .navbar-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .patudo-navbar .navbar-footer {
         display: none;
     }
 }
