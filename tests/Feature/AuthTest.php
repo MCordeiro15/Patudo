@@ -1,12 +1,13 @@
 <?php
 
-
 /**
  * Ficheiro PHP: AuthTest.php
  * PHP file: AuthTest.php
  */
+
 namespace Tests\Feature;
 
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -93,6 +94,13 @@ class AuthTest extends TestCase
     public function test_logout_ends_session(): void
     {
         $user = User::factory()->create();
+        $notification = Notification::create([
+            'user_id' => $user->id,
+            'type' => 'booking',
+            'message' => 'A tua reserva foi atualizada.',
+        ]);
+        $rememberToken = $user->getRememberToken();
+        $otherDeviceToken = $user->createToken('other-device');
 
         $this->actingAs($user)->postJson('/api/logout', [], [
             'HTTP-Origin' => 'http://localhost:8000',
@@ -103,5 +111,16 @@ class AuthTest extends TestCase
         // Clear the in-memory guard state to simulate a fresh request after session invalidation.
         $this->actingAsGuest();
         $this->assertGuest();
+
+        $this->assertDatabaseHas('users', ['id' => $user->id]);
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'remember_token' => $rememberToken]);
+        $this->assertDatabaseHas('notifications', ['id' => $notification->id]);
+        $this->assertDatabaseHas('personal_access_tokens', ['id' => $otherDeviceToken->accessToken->id]);
+
+        $this->actingAsGuest()
+            ->withToken($otherDeviceToken->plainTextToken)
+            ->getJson('/api/me')
+            ->assertOk()
+            ->assertJsonPath('data.email', $user->email);
     }
 }

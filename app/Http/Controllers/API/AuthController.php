@@ -4,6 +4,7 @@
  * Controlador API para autenticação. Lida com login, logout e obtenção do utilizador autenticado via tokens.
  * API controller for authentication. Handles login, logout, and retrieving the authenticated user via tokens.
  */
+
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
@@ -63,6 +64,7 @@ class AuthController extends Controller
 
         $user = Auth::user();
         $user->load('petsitter');
+
         return new UserResource($user);
     }
 
@@ -70,20 +72,19 @@ class AuthController extends Controller
     {
         $user = $request->user();
         $user->load('petsitter');
+
         return new UserResource($user);
     }
 
     /**
-     * Termina a sessão do utilizador, invalidando o token de autenticação.
-     * Ends the user's session, invalidating the authentication token.
+     * Ends the current web session without revoking credentials on other devices.
      */
     public function logout(Request $request)
     {
-        Auth::guard('web')->logout();
-        Auth::guard('web')->forgetUser();
+        Auth::guard('web')->logoutCurrentDevice();
 
         if ($request->session()->isStarted()) {
-            $request->session()->flush();
+            $request->session()->invalidate();
             $request->session()->regenerateToken();
         }
 

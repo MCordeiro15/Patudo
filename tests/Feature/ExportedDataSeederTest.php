@@ -172,6 +172,24 @@ test('database export includes notifications and preserves their user and bookin
         ->toContain('Notification::forceCreate(array_intersect_key($notificationData, $notificationColumns));');
 });
 
+test('database export preserves an administrator weekly summary preference', function () {
+    $admin = User::factory()->admin()->create(['weekly_summary_enabled' => false]);
+    $generatedSeeder = null;
+
+    File::shouldReceive('put')->once()->andReturnUsing(function ($path, $contents) use (&$generatedSeeder) {
+        $generatedSeeder = $contents;
+
+        return true;
+    });
+
+    $this->artisan('db:export')->assertSuccessful();
+
+    expect($generatedSeeder)
+        ->toContain("'email' => '{$admin->email}'")
+        ->toContain("'weekly_summary_enabled' => 0")
+        ->toContain('$user->forceFill($userCreateData)->save();');
+});
+
 test('database export includes custom petsitter service names', function () {
     $petsitter = Petsitter::factory()->approved()->create();
     $service = PetsitterService::create([
