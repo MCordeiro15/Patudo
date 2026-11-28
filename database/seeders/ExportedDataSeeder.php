@@ -697,7 +697,7 @@ class ExportedDataSeeder extends Seeder
   array (
     'user_id' => 17,
     'biography' => NULL,
-    'experience' => 'Teste aaaaaaa',
+    'experience' => 'Teste',
     'service_location' => 'Ribeira Grande',
     'age' => 20,
     'price_per_day' => 10,
